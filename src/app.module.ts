@@ -55,6 +55,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { OpenPhoneEvent } from './entities/open-phone-event.entity';
 import { OpenPhoneEventType } from './entities/open-phone-event-type.entity';
+ import { AuctionEvent } from './entities/auction-event.entity';
+import { OpenPhoneEventModule } from './module/open-phone-event.module';
 
 @Module({
   imports: [
@@ -68,13 +70,14 @@ import { OpenPhoneEventType } from './entities/open-phone-event-type.entity';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
-        entities: [OpenPhoneEvent, OpenPhoneEventType],
+        entities: [OpenPhoneEvent, OpenPhoneEventType,AuctionEvent],
         synchronize: false,
         migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
         migrationsRun: false,
       }),
       inject: [ConfigService],
     }),
+    OpenPhoneEventModule
   ],
 })
 export class AppModule {}
