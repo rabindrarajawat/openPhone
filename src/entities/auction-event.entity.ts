@@ -1,12 +1,26 @@
-import { Entity,PrimaryGeneratedColumn,Column } from "typeorm";
+// import { Entity,PrimaryGeneratedColumn,Column } from "typeorm";
 
-@Entity('auction_event')
-export class AuctionEvent{
+// @Entity('auction_event')
+// export class AuctionEvent{
 
+//     @PrimaryGeneratedColumn()
+//     id:number ;
+
+//     @Column()
+//     event_id:number
+
+// }
+
+
+
+
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { CommonEntity } from "./common-columns.entity"; 
+@Entity('tax_deed')
+export class AuctionEvent extends CommonEntity {
     @PrimaryGeneratedColumn()
-    id:number ;
+    id: number;
 
     @Column()
-    event_id:number
-
+    event_id: number;
 }
