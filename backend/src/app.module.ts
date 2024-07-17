@@ -53,10 +53,17 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { OpenPhoneEvent } from './entities/open-phone-event.entity';
-import { OpenPhoneEventType } from './entities/open-phone-event-type.entity';
+import { OpenPhoneEventEntity } from './entities/open-phone-event.entity';
+import { OpenPhoneEventTypeEntity } from './entities/open-phone-event-type.entity';
  import { AuctionEvent } from './entities/auction-event.entity';
 import { OpenPhoneEventModule } from './module/open-phone-event.module';
+import { AdressModule } from './module/address.module';
+import { OpenPhoneEventDirectionModule } from './module/open-phone-event-direction.module';
+import { OpenPhoneEventTypeModule } from './module/open-phone-event-type.module';
+import { AddressEntity } from './entities/address.entity';
+import { OpenPhoneEventDirectionEntity } from './entities/open-phone-event-direction.entity';
+import { CaseEventModule } from './module/case-event.module';
+import { CaseEventEntity } from './entities/case-event.entity';
 
 @Module({
   imports: [
@@ -70,14 +77,14 @@ import { OpenPhoneEventModule } from './module/open-phone-event.module';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
-        entities: [OpenPhoneEvent, OpenPhoneEventType,AuctionEvent],
-        synchronize: false,
+        entities: [OpenPhoneEventEntity,AddressEntity, OpenPhoneEventTypeEntity,AuctionEvent,OpenPhoneEventDirectionEntity,CaseEventEntity],
+        synchronize: true,
         migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
-        migrationsRun: false,
+        migrationsRun: true,
       }),
       inject: [ConfigService],
     }),
-    OpenPhoneEventModule
+    OpenPhoneEventModule,AdressModule,OpenPhoneEventDirectionModule,OpenPhoneEventTypeModule,CaseEventModule
   ],
 })
 export class AppModule {}

@@ -1,12 +1,11 @@
-import { Entity,PrimaryGeneratedColumn,Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { CommonEntity } from "./common-columns.entity";
 
-@Entity('case_event')
-export class CaseEvent{
+@Entity("case-event")
+export class CaseEventEntity extends CommonEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @PrimaryGeneratedColumn()
-    id:number ;
-
-    @Column()
-    event_id:number
-
+  @Column()
+  event_id: number;
 }
