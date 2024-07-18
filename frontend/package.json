@@ -10,13 +10,19 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
+    "jquery": "^3.7.1",
     "next": "14.2.5",
+    "popper.js": "^1.16.1",
+    "primeicons": "^7.0.0",
+    "primereact": "^10.7.0",
     "react": "^18",
-    "react-dom": "^18"
+    "react-bootstrap": "^2.10.4",
+    "react-dom": "^18",
+    "react-table": "^7.8.0"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^18",
+    "@types/react": "^18.3.3",
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
