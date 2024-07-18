@@ -8,11 +8,9 @@ export class CaseEventController {
 
   @Post()
   async createCaseEventData(@Body() caseEventDto: CaseEventDto) {
-    console.log("🚀 ~ CaseEventController ~ createCaseEventData ~ caseEventDto:", caseEventDto)
-    const caseEventData =
+     const caseEventData =
     await this.caseEventService.create(caseEventDto);
-    console.log("🚀 ~ CaseEventController ~ createCaseEventData ~ caseEventData:", caseEventData)
-    return {
+     return {
       message: "Case event data saved successfully",
       id: caseEventData.id,
     };

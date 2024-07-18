@@ -1,9 +1,9 @@
 import { IsNumber } from "class-validator";
 
-export class CaseEventDto {
+export class MessageMasterDto{
   @IsNumber()
   id: number;
 
   @IsNumber()
-  event_id: number;
+  message: string;
 }

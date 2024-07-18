@@ -1,6 +1,6 @@
 import { IsNumber } from "class-validator";
 
-export class CaseEventDto {
+export class TaxDeadDto {
   @IsNumber()
   id: number;
 
