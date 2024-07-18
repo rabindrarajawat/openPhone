@@ -7,7 +7,7 @@ import {
 import { CommonEntity } from "./common-columns.entity";
 
 @Entity("open_phone_event")
-export class OpenPhoneEvent extends CommonEntity {
+export class OpenPhoneEventEntity extends CommonEntity {
 // export class OpenPhoneEvent {
   @PrimaryGeneratedColumn()
   id: number;
