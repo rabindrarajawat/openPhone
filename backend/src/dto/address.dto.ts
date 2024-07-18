@@ -1,4 +1,5 @@
 import { IsBoolean, IsDateString, IsNotEmpty, IsString } from "class-validator";
+import { DeepPartial } from "typeorm";
 
 export class AddressDto {
   @IsNotEmpty()
@@ -8,6 +9,10 @@ export class AddressDto {
   @IsNotEmpty()
   @IsDateString()
   date: Date;
+  created_by: string;
+  // conversation_id: number;
+  is_active: DeepPartial<boolean>;
+  name: string;
 
 
 }
