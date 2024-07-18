@@ -1,0 +1,53 @@
+.sidebar {
+    position: absolute;
+    background: #ECF0FF;
+    width: 90px;
+    height: 755px;
+    top: 76px;
+}
+
+.nav {
+    width: 50px;
+    margin-top: 50%;
+    height: 50px;
+    top: 323px;
+    /* left: -10px !important; */
+    gap: 0px;
+    opacity: 0px;
+}
+
+.logo2 {
+    margin-left: -10px;
+    cursor: pointer;
+}
+
+.log {
+    margin-top: 35rem;
+    width: 50px;
+    height: 16px;
+    top: 804px;
+    left: 20px;
+    gap: 0px;
+    opacity: 0px;
+    font-family: Inter;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 15.73px;
+    text-align: left;
+    color: #7D8FB3;
+    cursor: pointer;
+}
+
+.dash {
+    color: #7D8FB3;
+    font-family: Inter;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 14.52px;
+    /* text-align: left; */
+    width: 62px;
+    height: 15px;
+    margin-left: -10px;
+    cursor: pointer;
+
+}

@@ -1,0 +1,126 @@
+.dashboard {
+    width: 128px;
+    height: 20px;
+    top: 53px;
+    left: 105px;
+    gap: 0px;
+    opacity: 0px;
+    font-family: Roboto;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 20px;
+    text-align: left;
+    color: #ABABAB;
+}
+
+.navbar-brand1 {
+    width: 95px;
+    height: 30px;
+    top: 23px;
+    left: 104px;
+    gap: 0px;
+    opacity: 0px;
+    margin-left: 30px;
+    font-family: Roboto;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 30px;
+    text-align: left;
+    color: #4D5E80;
+    margin-bottom: 30px;
+
+}
+
+.tracking {
+    cursor: pointer;
+}
+
+.d-flex {
+    margin-left: 40%;
+}
+
+
+
+.search-wrapper {
+    position: relative;
+    width: 293px;
+    height: 60px;
+    border-radius: 28px;
+    padding: 2px;
+    background: linear-gradient(102.59deg, #01F890 -59.65%, #F4F3F3 71.41%);
+    display: flex;
+    align-items: center;
+}
+
+.search {
+    width: 100%;
+    height: 100%;
+    padding: 15px 20px 15px 50px;
+    border: none;
+    border-radius: 26px;
+    outline: none;
+    background-color: white;
+    box-sizing: border-box;
+}
+
+.search-wrapper::before {
+    content: url('/icon.svg');
+    position: absolute;
+    left: 15px;
+    top: 44%;
+    transform: translateY(-50%);
+    width: 17.05px;
+    height: 17.06px;
+}
+
+/* .search-wrapper::after {
+    content: url('/next.svg');
+    position: absolute;
+    left: 85%;
+    top: 44%;
+    transform: translateY(-50%);
+    width: 17.05px;
+    height: 17.06px;
+} */
+
+.search::placeholder {
+    font-family: Roboto;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 20px;
+    text-align: left;
+    color: #ADB8CC;
+}
+
+.name {
+    font-family: Roboto;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 25px;
+    margin-right: 30px;
+    color: #6B7A99;
+    margin-top: 2px;
+    width: 48px;
+    height: 25px;
+    top: 34px;
+    left: 1271px;
+    gap: 0px;
+    opacity: 0px;
+
+
+}
+
+.profileicon {
+    margin-right: 15px;
+    margin-top: -5px;
+}
+
+.profile {
+    width: 30px;
+    height: 30px;
+    left: 1231px;
+    padding: 5px 0px 0px 0px;
+    gap: 0px;
+    opacity: 0px;
+
+}
