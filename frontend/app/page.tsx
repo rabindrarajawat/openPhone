@@ -2,15 +2,19 @@
 import Image from "next/image";
 import styles from "./page.module.css";
 import { useRouter } from "next/navigation";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min';
+
+
 
 export default function Home() {
-    const router = useRouter(); 
+  const router = useRouter();
 
   return (
     <div className={styles.container}>
       <div className={styles.loginItem}>
         <h1 className={`text-center ${styles.fontLogin}`}>Login to Your Account</h1>
-        
+
         <h5 className={`text-center text-secondary mt-4 ${styles.fontCommon}`}>
           "Welcome to the Admin Portal.{" "}
         </h5>
@@ -50,7 +54,7 @@ export default function Home() {
           </div>
         </div>
         <div>
-         
+
         </div>
       </div>
     </div>
