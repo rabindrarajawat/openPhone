@@ -41,7 +41,7 @@ export default function Home() {
           </div>
           <div className="">
             <button
-              className={`btn btn-outline-secondary  px-3 py-3 mt-3 ${styles.loginButton}`}
+              className={`btn btn-outline-secondary  px-3 py-3 mt-3 text-dark ${styles.loginButton}`}
               onClick={() => router.push("/Dashboard")}
             >
               {" "}
