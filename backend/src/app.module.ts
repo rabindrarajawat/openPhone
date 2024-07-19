@@ -17,6 +17,7 @@ import { TaxDeadModule } from "./module/tax-dead.module";
 import { TaxDeadEntity } from "./entities/tax_deed.entity";
 import { MessageMasterEntity } from "./entities/message-template.entity";
 import { MessageMasterModule } from "./module/message-master.module";
+import { AddressMappingEntity } from "./entities/address-mapping.entity";
 
 @Module({
   imports: [
@@ -38,7 +39,7 @@ import { MessageMasterModule } from "./module/message-master.module";
           OpenPhoneEventDirectionEntity,
           CaseEventEntity,
           TaxDeadEntity,
-          MessageMasterEntity,MessageMasterEntity
+          MessageMasterEntity,MessageMasterEntity,AddressMappingEntity
         ],
         synchronize: true,
         migrations: [__dirname + "/migrations/**/*{.ts,.js}"],
