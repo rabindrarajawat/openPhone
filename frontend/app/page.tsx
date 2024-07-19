@@ -2,17 +2,26 @@
 import Image from "next/image";
 import styles from "./page.module.css";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
 import 'bootstrap/dist/js/bootstrap.bundle.min';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
 
 export default function Home() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) {
+      setEmail("");
+      setPassword("");
+    }
+  }, [router]);
 
   const handleLogin = async () => {
     try {
@@ -44,7 +53,7 @@ export default function Home() {
           Please log in to access and manage your system's settings and data securely."
         </h5>
       </div>
-      <div className={`d-flex justify-content-between align-items-center ${styles.textBox}`}>
+      <div className={` ${styles.textBox}`}>
         <div className={styles.inputBoxLeft}>
           <div>
             <input
@@ -75,8 +84,12 @@ export default function Home() {
             <button
               className={`btn btn-outline-secondary px-3 py-3 mt-3 text-dark  ${styles.loginButton}`}
               onClick={handleLogin}
-            >
+            > <div className="d-flex-column justify-content-left">
+
               <span className={styles.textLogin}>Login to Your Account</span>
+              <span className=""> <i className="bi bi-arrow-right"></i>
+              </span>
+            </div>
             </button>
           </div>
         </div>
