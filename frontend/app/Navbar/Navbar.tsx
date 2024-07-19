@@ -12,7 +12,7 @@ const Navbar = () => {
                 <Image src="/line.svg" alt="Logo" className='logo1' width={50} height={50} />
 
                 <div className="navbar-brand1" >OpenPhone <br />
-                    <p className="dashboard" > Dashboard <a className='tracking'>/Tracking Page</a>  </p>
+                    <p className="dashboard" > Dashboard  </p>
                 </div>
 
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
