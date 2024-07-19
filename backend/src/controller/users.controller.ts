@@ -27,4 +27,12 @@ export class UsersController {
   async getUserById(@Param('id') id: string): Promise<UserEntity> {
     return this.usersService.getUserById(id);
   }
+
+  @Post('login')
+  async login(
+    @Body('email') email: string,
+    @Body('password') password: string
+  ): Promise<{ token: string }> {
+    return this.usersService.validateUserByEmail(email, password);
+  }
 }
