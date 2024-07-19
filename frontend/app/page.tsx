@@ -76,7 +76,7 @@ export default function Home() {
               className={`btn btn-outline-secondary px-3 py-3 mt-3 text-dark  ${styles.loginButton}`}
               onClick={handleLogin}
             >
-              Login to Your Account
+              <span className={styles.textLogin}>Login to Your Account</span>
             </button>
           </div>
         </div>
