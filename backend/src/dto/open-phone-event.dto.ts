@@ -67,7 +67,7 @@ export class OpenPhoneEventDto {
 
   @IsNotEmpty()
   @IsString()
-  conversation_id: string;
+  conversation_id: number;
 
   @IsNotEmpty()
   @IsDateString()

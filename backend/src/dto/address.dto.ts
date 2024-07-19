@@ -13,6 +13,4 @@ export class AddressDto {
   // conversation_id: number;
   is_active: DeepPartial<boolean>;
   name: string;
-
-
 }

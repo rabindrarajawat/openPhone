@@ -15,7 +15,7 @@
 
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { CommonEntity } from "./common-columns.entity"; 
-@Entity('tax_deed')
+@Entity('tax_dead')
 export class TaxDeadEntity extends CommonEntity {
     @PrimaryGeneratedColumn()
     id: number;
