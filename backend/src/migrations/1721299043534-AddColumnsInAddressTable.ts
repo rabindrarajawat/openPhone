@@ -10,8 +10,8 @@ export class AddColumnsInAddressTable1721299043534
         name: "conversation_id",
         type: "int",
         isNullable: false,
-        isGenerated: true,
-        generationStrategy: "increment",
+        // isGenerated: true,
+        // generationStrategy: "increment",
       })
     );
 

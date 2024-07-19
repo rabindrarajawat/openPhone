@@ -6,6 +6,7 @@ import { AddressEntity } from "../entities/address.entity"
 import { AuctionEventEntity } from "../entities/auction-event.entity"
 import { CaseEventEntity } from "../entities/case-event.entity"
 import { MessageMasterEntity } from "../entities/message-template.entity"
+import { AddressMappingEntity } from "../entities/address-mapping.entity"
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -14,7 +15,7 @@ export const AppDataSource = new DataSource({
     username: "postgres",
     password: "postgres",
     database: "openphone",
-    entities: [OpenPhoneEventEntity,OpenPhoneEventTypeEntity,OpenPhoneEventDirectionEntity,AddressEntity,AuctionEventEntity,MessageMasterEntity,CaseEventEntity],
+    entities: [OpenPhoneEventEntity,OpenPhoneEventTypeEntity,OpenPhoneEventDirectionEntity,AddressEntity,AuctionEventEntity,MessageMasterEntity,CaseEventEntity,AddressMappingEntity],
     migrations: ["src/migrations/**/*.ts"],
     synchronize: true,
 })
