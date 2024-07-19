@@ -13,8 +13,8 @@ const Navbar = () => {
       try {
         // Decode the token
         const decodedToken: any = jwtDecode(token);
-        setUserName(decodedToken.name); 
-        console.log("decodedToken",decodedToken)
+        setUserName(decodedToken.name);
+        console.log("decodedToken", decodedToken)
         // Assuming `email` is part of the token payload
       } catch (error) {
         console.error("Failed to decode token:", error);
@@ -27,9 +27,8 @@ const Navbar = () => {
       <div className="container-fluid">
         <Image src="/line.svg" alt="Logo" className='logo1' width={50} height={50} />
 
-        <div className="navbar-brand1">
-          OpenPhone <br />
-          <p className="dashboard">Dashboard <a className='tracking'>/Tracking Page</a></p>
+        <div className="navbar-brand1" >OpenPhone <br />
+          <p className="dashboard" > Dashboard  </p>
         </div>
 
         <div className="collapse navbar-collapse" id="navbarSupportedContent">

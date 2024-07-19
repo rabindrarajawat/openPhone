@@ -4,21 +4,30 @@ import React, { useState } from 'react';
 import Navbar from '../Navbar/Navbar';
 import SideBar from '../SideNavbar/sideNavbar';
 import Image from 'next/image';
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
+// import ReactPaginate from 'react-paginate';
+
 
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './dashboard.css';
 
 const Dashboard = () => {
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
-    const [dateDropdownOpen, setDateDropdownOpen] = useState(false);
-    const [box1DropdownOpen, setBox1DropdownOpen] = useState(false); // State for the new dropdown
+    const [dropdownOpen, setDropdownOpen] = useState(true);
+    const [statusDropdownOpen, setStatusDropdownOpen] = useState(true);
+    const [dateDropdownOpen, setDateDropdownOpen] = useState(true);
+    const [box1DropdownOpen, setBox1DropdownOpen] = useState(false);
 
-    const [selectedOptions, setSelectedOptions] = useState<string[]>([]); // Explicitly define type as string array
-    const [selectedAddress, setSelectedAddress] = useState('Search Address'); // State for the selected address
+    const [isFollowUpClicked, setIsFollowUpClicked] = useState(false); // Add state for Follow-up button
+
+
+    const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+    const [selectedAddress, setSelectedAddress] = useState('Search Address');
+
+
+
+    const handleFollowUpClick = () => {
+        setIsFollowUpClicked(!isFollowUpClicked); // Toggle the Follow-up button state
+    };
 
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
@@ -50,19 +59,16 @@ const Dashboard = () => {
     };
 
 
-    const data = [
+    const tableData = [
         { id: 1, ownerid: '011045', PhoneNumber: '889945694', Status: 'Dead', Responses: "Stop" },
         { id: 2, ownerid: '011045', PhoneNumber: '889945694', Status: 'Initial', Responses: "Intrested" },
-        { id: 1, ownerid: '011045', PhoneNumber: '889945694', Status: 'Prospect', Responses: "Intrested" },
-        { id: 2, ownerid: '011045', PhoneNumber: '889945694', Status: 'Dead', Responses: "Stop" },
-        { id: 1, ownerid: '011045', PhoneNumber: '889945694', Status: 'Converted', Responses: "Intrested" },
-        { id: 2, ownerid: '011045', PhoneNumber: '889945694', Status: 'Prospect', Responses: "Intrested" },
-        { id: 1, ownerid: '011045', PhoneNumber: '889945694', Status: 'Initial', Responses: "Intrested" },
-        { id: 2, ownerid: '011045', PhoneNumber: '889945694', Status: 'converted', Responses: "Intrested" },
-        { id: 1, ownerid: '011045', PhoneNumber: '889945694', Status: 'Hot', Responses: "Intrested" },
-
-
+        { id: 3, ownerid: '011045', PhoneNumber: '889945694', Status: 'Prospect', Responses: "Intrested" },
+        { id: 4, ownerid: '011045', PhoneNumber: '889945694', Status: 'Dead', Responses: "Stop" },
+        { id: 5, ownerid: '011045', PhoneNumber: '889945694', Status: 'Converted', Responses: "Intrested" },
+        { id: 6, ownerid: '011045', PhoneNumber: '889945694', Status: 'Prospect', Responses: "Intrested" },
     ];
+
+
 
     return (
         <div>
@@ -232,8 +238,8 @@ const Dashboard = () => {
 
                     <div className="logos-row">
                         <div className="nav1">
-                            <Image src="/follow.svg" alt="Follow-up Logo" className='logo3' width={50} height={50} />
-                            <label className='Activity' htmlFor="">Follow-up</label>
+                            <Image src="/follow.svg" alt="Follow-up Logo" className={`logo3 ${isFollowUpClicked ? 'follow-up-heading' : ''}`} width={50} height={50} />
+                            <label className={`Activity ${isFollowUpClicked ? 'follow-up-heading' : ''}`} htmlFor="" onClick={handleFollowUpClick}>Follow-up</label>
                         </div>
                         <div className="nav1">
                             <Image src="/id.svg" alt="ID Logo" className='logo3' width={50} height={50} />
@@ -254,69 +260,96 @@ const Dashboard = () => {
                     <div className="logos-row-msg">
                         <div className="nav-msg">
                             <div className='message'>Message Delivered</div>
+                            <input type="text" className="round-input" placeholder="5" readOnly />
                         </div>
                         <div className="nav-msg">
-                            <div className='message-response '>Message Response</div>
+                            <div className='message response '>Message Response</div>
+                            <input type="text" className="round-input" placeholder="5" readOnly />
                         </div>
                         <div className="nav-msg">
-                            <div className='call-'>call </div>
+                            <div className='message call-'>Call </div>
+                            <input type="text" className="round-input" placeholder="5" readOnly />
                         </div>
                         <div className="nav-msg">
-                            <div className='call-response'>Call Response</div>
+                            <div className='message call-response'>Call Response</div>
+                            <input type="text" className="round-input" placeholder="5" readOnly />
                         </div>
                     </div>
-                    <div>
-                        <Image src="/vector.svg" alt="Activity Logo" className='vector' width={50} height={50} />
-                        <div className='text'>Call tracking of search address </div>
+                    <div className='tracking-container'>
+                        <div className='call-tracking'>
+                            <Image src="/vector.svg" alt="Activity Logo" className='vector' width={50} height={50} />
+                            <div className='text'>Call tracking of search address </div>
+                        </div>
+                        <div className='follow-up'>
+                            <div>
+                                <Image src="/redo.svg" alt="redo Logo" className={`vector redo ${isFollowUpClicked ? 'follow-up-heading' : ''}`} width={50} height={50} />
+                                <div className={`text-follow ${isFollowUpClicked ? 'follow-up-heading' : ''}`}>Follow-up tracking of search address </div>
+                            </div>
+                        </div>
                     </div>
-                    <div className='check-status'>
-                        <div className='time  '>Times</div>
-                        <div className='vertical-line'></div>
-                        <div className='time'>Duration</div>
-                        <div className='vertical-line'></div>
-                        <div className='time'>Status</div>
-                        <div className='vertical-line'></div>
-                        <div className='time'>Action</div>
+                    <div className='tracking-container-box'>
+                        <div className='check-status'>
+                            <div className='time  '>Times</div>
+                            <div className='vertical-line'></div>
+                            <div className='time'>Duration</div>
+                            <div className='vertical-line'></div>
+                            <div className='time'>Status</div>
+                            <div className='vertical-line'></div>
+                            <div className='time'>Action</div>
+                        </div>
+                        <div className={`follow-status ${isFollowUpClicked ? 'follow-up-heading' : ''}`} >
+                            <div className='time  '>Owner ID</div>
+                            <div className='vertical-line'></div>
+                            <div className='time'>Status</div>
+                            <div className='vertical-line'></div>
+                            <div className='time'>Last Follow-up</div>
+                        </div>
                     </div>
-                    <Image src="/converstation.svg" alt="Activity Logo" className='converstation' width={50} height={50} />
-                    <div className='text'>Converation From 8827145468 </div>
-                    <div className='datatable-box'>
-                        <DataTable
-                            value={data}
-                            showGridlines
-                            tableStyle={{ minWidth: "0rem" }}
-                            tableClassName="dataTable"
-                            selectionMode="single"
-                            className='datatable'
+                    <div className='tracking-container'>
+                        <div className='call-tracking'>
+                            <Image src="/converstation.svg" alt="converstation Logo" className='vector' width={50} height={50} />
+                            <div className='text'>Converation From 8827145468 </div>
+                        </div>
+                        <div className=''>
+                            <div>
+                                <Image src="/msg.svg" alt="msg Logo" className='vector redo' width={50} height={50} />
+                                <div className='text-follow '>Message Detail </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className='tracking-container-box' >
+                        <div className='datatable-box '>
+                            <table className="table table-hover ">
+                                <thead>
+                                    <tr className='datatable'>
+                                        <th scope="col">Owner'ID</th>
+                                        <th scope="col">Phone Number</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Responses</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {tableData.map((row: any) => (
+                                        <tr key={row.id} className="center-align">
+                                            {/* <th scope="row">{row.id}</th> */}
+                                            <td>{row.ownerid}</td>
+                                            <td>{row.PhoneNumber}</td>
+                                            <td>{row.Status}</td>
+                                            <td>{row.Responses}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
 
-                        >
-                            <Column
-                                field="ownerid"
-                                headerClassName="headercolor"
-                                header="Owner's ID"
-                                className="center-align"
-                            />
-                            <Column
-                                field="PhoneNumber"
-                                headerClassName="headercolor"
-                                header="Phone Number "
-                                className="center-align"
-                            />
-                            <Column
-                                field="Status"
-                                headerClassName="headercolor"
-                                header="Status "
-                                className="center-align"
-                            />
-                            <Column
-                                field="Responses"
-                                headerClassName="headercolor"
-                                header="Responses"
-                                className="center-align"
-                            />
+                        <div className='input-msg'>
+                            <div className='screenshot-msg'></div>
+                        </div>
 
-                        </DataTable>
+
                     </div>
+
+
 
                 </div>
 
