@@ -6,11 +6,12 @@ export class RoleEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 255 })
+  @Column()
   name: string;
 
   @OneToMany(() => UserEntity, user => user.role)
   users: UserEntity[];
+  
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
