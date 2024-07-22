@@ -110,7 +110,7 @@
 }
 
 .box1 {
-    margin-left: 115%;
+    margin-left: 120%;
     width: 1282px;
     height: 730px;
     margin-top: -145px;
@@ -131,7 +131,7 @@
 }
 
 .search-address-dropdown .dropdown-toggle {
-    border: 1px solid #3361FF;
+    border: 2px solid #3361FF;
     background-color: white;
     font-family: 'Inter', sans-serif;
     font-weight: 500;
@@ -296,6 +296,13 @@
     padding: 10px;
     align-items: center;
     border-left: 2px solid #8833FF;
+    font-family: 'Roboto', sans-serif;
+
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 20px;
+    text-align: left;
+
 
 }
 
@@ -324,7 +331,7 @@
 }
 
 .redo {
-    margin-left: -35px;
+    margin-left: -2px;
 }
 
 
@@ -341,7 +348,7 @@
 }
 
 .check-status {
-    width: 603px;
+    width: 660px;
     height: 70px;
     margin-left: 15px;
     margin-top: 20px;
@@ -353,12 +360,17 @@
     box-shadow: 0px 2px 5px 0px #26334D08;
 }
 
+.last {
+    margin-left: 25px !important;
+
+}
+
 .time {
     margin-top: 8px;
-    margin-left: 35px;
+    margin-left: 45px;
     color: #47494C;
     font-family: 'Roboto', sans-serif;
-    font-size: 15px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 20px;
     text-align: left;
@@ -383,7 +395,7 @@
 
 .datatable-box {
     /* width: 49%; */
-    width: 603px;
+    width: 750px;
     height: 290px;
     margin-left: 15px;
     margin-top: 10px;
@@ -448,7 +460,7 @@
 }
 
 .text-follow {
-    margin-left: 10px;
+    margin-left: 50px;
     margin-top: -20px;
     font-family: 'Roboto', sans-serif;
     font-size: 16px;
@@ -460,7 +472,7 @@
 }
 
 .follow-status {
-    width: 500px;
+    width: 440px;
     height: 70px;
     margin-left: 25px;
     margin-top: 20px;
@@ -481,6 +493,7 @@
     margin-left: -80px;
 }
 
+
 .input-msg {
     width: 500px;
     height: 290px;
@@ -492,8 +505,8 @@
     border: 1px solid #DBE3FF;
     box-shadow: 3px 8px 12.7px 0px #567CFF2E;
     position: relative;
-    /* Ensure the screenshot-msg can be positioned relative to this */
     z-index: 1;
+    margin-right: 40px;
 }
 
 .screenshot-msg {
@@ -542,4 +555,107 @@
     box-shadow: 0px 2px 5px 0px #26334D08;
     margin-left: -35px;
     margin-top: 8px;
+}
+
+.chat-heading {
+    display: flex;
+    gap: 95px;
+    margin-left: 45px;
+    margin-top: 15px;
+}
+
+.chat-heading-follow {
+    display: flex;
+    gap: 40px;
+    margin-left: 45px;
+    margin-top: 195px;
+}
+
+.chat-heading-msg {
+    display: flex;
+    flex-direction: column;
+
+}
+
+.msg-id {
+    height: 20px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 20px;
+    color: #3361FF;
+}
+
+.follow-id {
+    height: 20px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 20px;
+    color: #6B7A99;
+}
+
+.stop {
+    color: #EA0000;
+    font-family: 'Roboto', sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    margin-top: -5px;
+    text-align: left;
+}
+
+.msg-auction {
+    font-family: 'Roboto', sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    margin-top: -5px;
+    text-align: left;
+    color: #6B7A99;
+}
+
+.btn-call {
+    width: 61px;
+    height: 24px;
+    border-radius: 5px;
+    border: 1px;
+    background-color: #3361FF;
+    font-family: 'Roboto', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 20px;
+    text-align: left;
+    color: #FFFFFF;
+    margin-top: 8px;
+    padding-left: 5px;
+}
+
+.chat {
+    display: flex;
+    flex-direction: column;
+}
+
+.inbox-chat {
+    font-family: 'Roboto', sans-serif;
+    font-size: 8px;
+    font-weight: 400;
+    line-height: 20px;
+    text-align: left;
+    background: #3361FF;
+    color: #FFFFFF;
+    padding-left: 5px;
+    margin-top: 9px;
+    width: 177px;
+    height: 18px;
+    top: 681px;
+    left: 1045px;
+    gap: 0px;
+    border-radius: 5px;
+    border: 1px;
+    margin-left: 10px;
+}
+
+.reply {
+    color: #4E4E4E;
+    background-color: #EEEBEB;
+    margin-left: 160px;
 }
