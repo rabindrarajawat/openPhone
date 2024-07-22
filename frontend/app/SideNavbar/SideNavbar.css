@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap');
+
+.sidebar {
+    position: absolute;
+    background: #ECF0FF;
+    width: 90px;
+    height: 755px;
+    top: 76px;
+}
+
+.nav {
+    width: 50px;
+    margin-top: 50%;
+    height: 50px;
+    top: 323px;
+    /* left: -10px !important; */
+    gap: 0px;
+    opacity: 0px;
+}
+
+.logo2 {
+    margin-left: -10px;
+    cursor: pointer;
+}
+
+.log {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 15.73px;
+    text-align: left;
+    color: #7D8FB3;
+    cursor: pointer;
+    margin-top: 1100%;
+
+}
+
+.dash {
+    color: #7D8FB3;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 14.52px;
+    /* text-align: left; */
+    width: 62px;
+    height: 15px;
+    margin-left: -10px;
+    cursor: pointer;
+
+}

@@ -7,7 +7,7 @@
 //     username: process.env.DB_USERNAME || 'postgres',
 //     password: process.env.DB_PASSWORD || 'postgres',
 //     database: process.env.DB_NAME || 'openphone',
-//     entities: [OpenPhoneEvent],
+//     entities: const [OpenPhoneEvent],
 //     migrations: ['src/migrations/*{.ts,.js}'],
 //     cli: {
 //       migrationsDir: 'src/migrations'

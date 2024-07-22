@@ -1,0 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');
+
+.container {
+  background: linear-gradient(180deg, #DAFDE5 0%, #F6F9FF 100%);
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.loginItem {
+  padding-top: 10%;
+  text-align: center;
+}
+
+.fontLogin {
+  font-family: 'Space Grotesk', sans-serif;
+  color: #222222;
+  font-size: 322%;
+  font-weight: 500;
+
+}
+
+.fontCommon {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+}
+
+.textBox {
+  margin: 5% 8%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.inputBoxLeft {
+  width: 100%;
+  max-width: 440px;
+}
+
+.textBorder {
+  border-color: #E6E1E5;
+  color: #898889;
+  font-size: large;
+}
+
+.loginButton {
+  background: linear-gradient(90deg, #A9A5FD 0%, #EBD75D 101.62%);
+  width: 100%;
+  height: 100%;
+  border-color: transparent;
+  color: #4E4E4E;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  
+  font-size: 18px;
+}
+
+.buttonSet {
+  border: 2px solid transparent;
+  border-image: linear-gradient(90deg, #A9A5FD 0%, #EBD75D 101.62%);
+  border-image-slice: 1;
+  width: 60%;
+  background-color: transparent;
+}
+.loginSet{
+  padding-right: 58%;
+  font-weight: 500;
+}
+
+/* Responsive Styles */
+@media (max-width: 767px) {
+  .loginItem {
+    padding-top: 20%;
+  }
+  .textBox {
+    margin: 10% 5%;
+  }
+  .inputBoxLeft {
+    width: 100%;
+    margin-left: 0;
+  }
+  .fontLogin {
+    font-size: 24px;
+  }
+  .fontCommon {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .loginItem {
+    padding-top: 15%;
+  }
+  .textBox {
+    margin: 8% 5%;
+  }
+  .inputBoxLeft {
+    width: 50%;
+    margin-left: 25%;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+  .loginItem {
+    padding-top: 10%;
+  }
+  .textBox {
+    margin: 6% 8%;
+  }
+  .inputBoxLeft {
+    width: 40%;
+    margin-left: 30%;
+  }
+}
