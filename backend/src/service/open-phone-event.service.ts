@@ -1,13 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { OpenPhoneEventEntity } from "../entities/open-phone-event.entity";
+import { OpenPhoneEvent } from "../entities/open-phone-event.entity";
 import { OpenPhoneEventDto } from "../dto/open-phone-event.dto";
 import { AddressEntity } from "../entities/address.entity";
 
 @Injectable()
 export class OpenPhoneEventService {
   constructor(
+<<<<<<< HEAD
     @InjectRepository(OpenPhoneEventEntity)
     private readonly openPhoneEventRepository: Repository<OpenPhoneEventEntity>,
     @InjectRepository(AddressEntity)
@@ -60,9 +61,19 @@ export class OpenPhoneEventService {
       await this.openPhoneEventRepository.save(openPhoneEvent);
 
     return { openPhoneEvent: savedOpenPhoneEvent, address, addressCreated };
+=======
+    @InjectRepository(OpenPhoneEvent)
+    private readonly openPhoneEventRepository: Repository<OpenPhoneEvent>
+  ) {}
+
+  async create(openPhoneEventDto: OpenPhoneEventDto): Promise<OpenPhoneEvent> {
+    const openPhoneEvent =
+      this.openPhoneEventRepository.create(openPhoneEventDto);
+    return this.openPhoneEventRepository.save(openPhoneEvent);
+>>>>>>> parent of 6863df3 (Merge pull request #1 from rabindrarajawat/dev_ram)
   }
 
-  async findAll(): Promise<OpenPhoneEventEntity[]> {
+  async findAll(): Promise<OpenPhoneEvent[]> {
     return this.openPhoneEventRepository.find();
   }
 
