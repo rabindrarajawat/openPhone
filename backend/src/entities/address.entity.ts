@@ -1,25 +1,15 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-} from "typeorm";
-import { CommonEntity } from "./common-columns.entity";
+import { Entity,PrimaryGeneratedColumn,Column, CreateDateColumn } from "typeorm";
 
-@Entity("address")
-export class AddressEntity extends CommonEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+@Entity('address')
+export class Address{
 
-  @Column()
-  address: string;
+    @PrimaryGeneratedColumn()
+    id:number ;
 
-  @CreateDateColumn({ nullable: true })
+    @Column()
+    address:string
+
+    @CreateDateColumn()
   date: Date;
 
-  @PrimaryGeneratedColumn()
-  conversation_id: number;
-
-  @Column({ nullable: true })
-  name: string;
 }

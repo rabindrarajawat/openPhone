@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
-import { OpenPhoneEventDirectionDTO } from "src/dto/open-phone-event-direction.dto";
-import { OpenPhoneEventDirectionService } from "src/service/open-phone-event-direction.service";
+import { OpenPhoneEventDirectionDTO } from "../dto/open-phone-event-direction.dto";
+import { OpenPhoneEventDirectionService } from "../service/open-phone-event-direction.service";
 
 @Controller("open-phone-event-direction")
 export class OpenPhoneEventDirectionController {
