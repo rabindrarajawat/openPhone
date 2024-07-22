@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
-import { AddressDto } from "src/dto/address.dto";
-import { AddressService } from "src/service/address.service";
+import { AddressDto } from "../dto/address.dto";
+import { AddressService } from "../service/address.service";
 
 @Controller("address")
 export class AddressController {

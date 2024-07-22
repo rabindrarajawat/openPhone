@@ -1,5 +1,5 @@
-import { AddressDto } from "src/dto/address.dto";
-import { AddressEntity } from "src/entities/address.entity";
+import { AddressDto } from "../dto/address.dto";
+import { AddressEntity } from "../entities/address.entity";
 
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";

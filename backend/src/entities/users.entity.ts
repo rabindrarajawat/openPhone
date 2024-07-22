@@ -6,23 +6,23 @@ export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 255 })
+  @Column({ nullable: true })
   name: string;
 
-  @Column({ length: 255, unique: true })
+  @Column({ length: 255, unique: true, nullable: true })
   email: string;
 
-  @Column()
+  @Column({ nullable: false })
   password: string;
 
   @ManyToOne(() => RoleEntity, role => role.users)
   @JoinColumn({ name: 'roleid' })
   role: RoleEntity;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: false })
   created_at: Date;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: false })
   modified_at: Date;
 
   @Column({ nullable: true })
@@ -31,6 +31,6 @@ export class UserEntity {
   @Column({ nullable: true })
   modified_by: string;
 
-  @Column({ default: true })
+  @Column({ default: true, nullable: false })
   is_active: boolean;
 }

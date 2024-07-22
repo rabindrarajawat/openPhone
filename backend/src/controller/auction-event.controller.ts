@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
-import { AuctionEventDto } from "src/dto/auction-event.dto";
-import { AuctionEventService } from "src/service/auction-event.service";
+import { AuctionEventDto } from "../dto/auction-event.dto";
+import { AuctionEventService } from "../service/auction-event.service";
 
 @Controller("auction-event")
 export class AuctionEventController {
