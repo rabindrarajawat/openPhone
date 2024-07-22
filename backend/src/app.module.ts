@@ -18,6 +18,10 @@ import { TaxDeadEntity } from "./entities/tax_deed.entity";
 import { MessageMasterEntity } from "./entities/message-template.entity";
 import { MessageMasterModule } from "./module/message-master.module";
 import { AddressMappingEntity } from "./entities/address-mapping.entity";
+import { UserEntity } from "./entities/users.entity"
+import { RoleEntity } from "./entities/role.entity";
+import { usersModule } from "./module/users.module";
+import { RoleModule } from "./module/role.module";
 
 @Module({
   imports: [
@@ -39,7 +43,7 @@ import { AddressMappingEntity } from "./entities/address-mapping.entity";
           OpenPhoneEventDirectionEntity,
           CaseEventEntity,
           TaxDeadEntity,
-          MessageMasterEntity,MessageMasterEntity,AddressMappingEntity
+          MessageMasterEntity,MessageMasterEntity,AddressMappingEntity,UserEntity,RoleEntity
         ],
         synchronize: true,
         migrations: [__dirname + "/migrations/**/*{.ts,.js}"],
@@ -52,7 +56,7 @@ import { AddressMappingEntity } from "./entities/address-mapping.entity";
     OpenPhoneEventDirectionModule,
     OpenPhoneEventTypeModule,
     CaseEventModule,
-    AuctionEventModule,TaxDeadModule,MessageMasterModule
+    AuctionEventModule,TaxDeadModule,MessageMasterModule,RoleModule,usersModule
   ],
 })
 export class AppModule {}
