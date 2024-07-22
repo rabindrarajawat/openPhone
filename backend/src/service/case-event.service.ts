@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { CaseEventDto } from "src/dto/case-event.dto";
-import { CaseEventEntity } from "src/entities/case-event.entity";
+import { CaseEventDto } from "../dto/case-event.dto";
+import { CaseEventEntity } from "../entities/case-event.entity";
 import { Repository } from "typeorm";
 
 @Injectable()

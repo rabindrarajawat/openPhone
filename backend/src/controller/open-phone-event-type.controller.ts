@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
-import { OpenPhoneEventTypeDTO } from "src/dto/open-phone-event-type.dto";
-import { OpenPhoneEventTypeService } from "src/service/open-phone-event-type.service";
+import { OpenPhoneEventTypeDTO } from "../dto/open-phone-event-type.dto";
+import { OpenPhoneEventTypeService } from "../service/open-phone-event-type.service";
 
 @Controller("open-phone-event-type")
 export class OpenPhoneEventTypeController {

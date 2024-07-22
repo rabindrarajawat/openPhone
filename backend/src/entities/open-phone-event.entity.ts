@@ -7,8 +7,8 @@ import {
 import { CommonEntity } from "./common-columns.entity";
 
 @Entity("open_phone_event")
-export class OpenPhoneEventEntity extends CommonEntity {
-  // export class OpenPhoneEvent {
+export class OpenPhoneEvent extends CommonEntity {
+// export class OpenPhoneEvent {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -37,7 +37,7 @@ export class OpenPhoneEventEntity extends CommonEntity {
   url_type: string;
 
   @Column()
-  conversation_id: number;
+  conversation_id: string;
 
   // @CreateDateColumn()
   // created_at: Date;
