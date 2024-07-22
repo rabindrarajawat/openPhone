@@ -4,7 +4,7 @@ import { AddressService } from "src/service/address.service";
 
 @Controller("address")
 export class AddressController {
-  constructor(private readonly addressService: AddressService) {}
+  constructor(private readonly addressService: AddressService) { }
 
   @Post()
   async createAddress(@Body() addressDto: AddressDto) {
@@ -15,7 +15,7 @@ export class AddressController {
     };
   }
 
-  @Get()
+  @Get('getalladdress')
   async getAllAddressData() {
     const addressData = this.addressService.findAll();
     const filteredAddresses = (await addressData).filter(
