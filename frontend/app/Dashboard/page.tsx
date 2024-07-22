@@ -298,14 +298,14 @@ const Dashboard = () => {
                             <div className='time'>Action</div>
                         </div>
                         <div className={`follow-status ${isFollowUpClicked ? 'follow-up-heading' : ''}`} >
-                            <div className='time  '>Owner ID</div>
+                            <div className='time last '>Owner ID</div>
                             <div className='vertical-line'></div>
-                            <div className='time'>Status</div>
+                            <div className='time last'>Status</div>
                             <div className='vertical-line'></div>
-                            <div className='time'>Last Follow-up</div>
+                            <div className='time last'>Last Follow-up</div>
                         </div>
                     </div>
-                    <div className='tracking-container'>
+                    <div className='tracking-container '>
                         <div className='call-tracking'>
                             <Image src="/converstation.svg" alt="converstation Logo" className='vector' width={50} height={50} />
                             <div className='text'>Converation From 8827145468 </div>
@@ -317,7 +317,7 @@ const Dashboard = () => {
                             </div>
                         </div>
                     </div>
-                    <div className='tracking-container-box' >
+                    <div className='tracking-container-box input-box-msg' >
                         <div className='datatable-box '>
                             <table className="table table-hover ">
                                 <thead>
@@ -343,7 +343,48 @@ const Dashboard = () => {
                         </div>
 
                         <div className='input-msg'>
-                            <div className='screenshot-msg'></div>
+                            <div className='chat-heading' >
+                                <div className='chat-heading-msg'>
+                                    <div className='msg-id'>Message ID</div>
+                                    <div className='msg-auction'>011045</div>
+                                </div>
+                                <div className='chat-heading-msg'>
+                                    <div className='msg-id'>Message Status</div>
+                                    <div className='msg-auction'>Delivered</div>
+                                </div>
+                                <div className='chat-heading-msg'>
+                                    <div className='msg-id'>Type</div>
+                                    <div className='msg-auction'>Auction</div>
+                                </div>
+                            </div>
+                            <div className='screenshot-msg'>
+                                <div className='chat'>
+                                    <div className='inbox-chat'>yes, I am not intrested on your plan</div>
+                                    <div className='inbox-chat'>Can please stop reaching to me</div>
+                                    <div className='inbox-chat reply'>Sure could you please let me know, is there any </div>
+                                    <div className='inbox-chat'>ya, actually I don’t have any plan regarding this </div>
+                                    <div className='inbox-chat reply'>Okay ma’am </div>
+                                    <div className='inbox-chat'>so please stop messages & calling</div>
+                                </div>
+                            </div>
+
+                            <div className='chat-heading-follow' >
+                                <div className='chat-heading-msg'>
+                                    <div className='follow-id'>Follow Up</div>
+                                    <div className='msg-auction'>03 Times</div>
+                                </div>
+                                <div className='chat-heading-msg'>
+                                    <div className='follow-id'>Lead Status</div>
+                                    <div className='stop '>Dead</div>
+                                </div>
+                                <div className='chat-heading-msg'>
+                                    <div className='follow-id'>Response</div>
+                                    <div className=' stop'>Stop</div>
+                                </div>
+                                <button type="button" className="btn-call">Call Now</button>
+
+                            </div>
+
                         </div>
 
 

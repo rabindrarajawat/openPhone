@@ -12,7 +12,7 @@ export const AppDataSource = new DataSource({
     host: 'localhost',
     port: 5432,
     username: 'postgres',
-    password: '1234',
+    password: 'RS!@3367',
     database: 'openphone',
     entities: [
         OpenPhoneEvent,
