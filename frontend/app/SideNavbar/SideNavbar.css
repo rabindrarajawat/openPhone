@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap');
 
 .sidebar {
     position: absolute;
@@ -24,25 +25,20 @@
 }
 
 .log {
-    margin-top: 35rem;
-    width: 50px;
-    height: 16px;
-    top: 804px;
-    left: 20px;
-    gap: 0px;
-    opacity: 0px;
-    font-family: Inter;
+    font-family: 'Inter', sans-serif;
     font-size: 13px;
     font-weight: 700;
     line-height: 15.73px;
     text-align: left;
     color: #7D8FB3;
     cursor: pointer;
+    margin-top: 1100%;
+
 }
 
 .dash {
     color: #7D8FB3;
-    font-family: Inter;
+    font-family: 'Inter', sans-serif;
     font-size: 12px;
     font-weight: 400;
     line-height: 14.52px;
