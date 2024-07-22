@@ -12,20 +12,25 @@ import { AddressMappingEntity } from "../entities/address-mapping.entity"
 
 export const AppDataSource = new DataSource({
     type: 'postgres',
-    host: 'localhost',
-    port: 5432,
-    username: 'postgres',
-    password: '1234',
-    database: 'openphone',
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT, 10),
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
     entities: [
-        OpenPhoneEvent,
-        OpenPhoneEventType,
-        OpenPhoneEventDirection,
-        Address,
-        AuctionEvent,
-        UserEntity,
-        RoleEntity
+      OpenPhoneEventEntity,
+      OpenPhoneEventTypeEntity,
+      OpenPhoneEventDirectionEntity,
+      AddressEntity,
+      AuctionEventEntity,
+      UserEntity,
+      RoleEntity,
+      CaseEventEntity,
+      MessageMasterEntity,
+      AddressMappingEntity
     ],
     migrations: ['src/migrations/**/*.ts'],
-    synchronize: false,
-});
+    synchronize: process.env.DB_SYNC === 'true',
+  });
+  
+

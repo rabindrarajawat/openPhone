@@ -1,14 +1,21 @@
 // dto/users.dto.ts
 
-import { IsString, IsEmail, IsNotEmpty, IsUUID, IsBoolean, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsNotEmpty,
+  IsUUID,
+  IsBoolean,
+  IsDateString,
+} from "class-validator";
 
 export class CreateUsersDto {
   @IsString()
   @IsNotEmpty()
+
   name: string;
 
-  @IsEmail()
-  @IsNotEmpty()
+  @IsString()
   email: string;
 
   @IsString()

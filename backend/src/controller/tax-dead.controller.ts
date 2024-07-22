@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
-import { AddressDto } from "src/dto/address.dto";
-import { TaxDeadDto } from "src/dto/tax_dead.dto";
-import { AddressService } from "src/service/address.service";
-import { TaxDeadService } from "src/service/tax-dead.service";
+import { AddressDto } from "../dto/address.dto";
+import { TaxDeadDto } from "../dto/tax_dead.dto";
+import { AddressService } from "../service/address.service";
+import { TaxDeadService } from "../service/tax-dead.service";
 
 @Controller("tax-dead")
 export class TaxDeadController {
