@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { AddressDto } from "src/dto/address.dto";
 import { AddressService } from "src/service/address.service";
 
@@ -17,6 +17,16 @@ export class AddressController {
 
   @Get()
   async getAllAddressData() {
-    return this.addressService.findAll();
+    const addressData = this.addressService.findAll();
+    const filteredAddresses = (await addressData).filter(
+      (address) => address?.is_active === true
+    );
+    return filteredAddresses;
+  }
+
+  @Get("details")
+  async getAddressDetails(@Query("address") address: string) {
+    const addressDetails = await this.addressService.findByAddress(address);
+    return addressDetails;
   }
 }
