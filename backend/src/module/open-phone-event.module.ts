@@ -6,7 +6,7 @@ import { OpenPhoneEventEntity } from '../entities/open-phone-event.entity';
 import { AddressEntity } from '../entities/address.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([OpenPhoneEventEntity,AddressEntity])],
+  imports: [TypeOrmModule.forFeature([OpenPhoneEvent])],
   controllers: [OpenPhoneEventController],
   providers: [OpenPhoneEventService],
 })
