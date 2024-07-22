@@ -1,3 +1,17 @@
+// import { Body, Controller, HttpCode, Post } from "@nestjs/common";
+// import { OpenPhoneEventDto } from "src/dto/open-phone-event.dto";
+
+// @Controller("")
+// export class OpenPhoneEvent {
+//     constructor(private readonly openPhoneEventService : OpenPhoneEventService){}
+
+// @Post('/openPhoneEvent')
+// @HttpCode(200)
+//  postOpenPhoneEventData( @Body() dto:OpenPhoneEventDto){
+//     return this.OpenPhoneEventService(dto)
+//  }
+
+// }
 
 
 

@@ -4,10 +4,9 @@ export abstract class CommonEntity extends BaseEntity {
     @CreateDateColumn()
     created_at: Date;
 
-    @Column({ type: 'timestamp', nullable: true })
+    @UpdateDateColumn()
     modified_at: Date;
 
-    
     @Column({ nullable: true })
     created_by: string;
 
