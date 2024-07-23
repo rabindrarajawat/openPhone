@@ -9,8 +9,7 @@ import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class UsersService {
-  private readonly jwtSecret = 'SBEQUSATXXXDXEZ3BC56RG6O2SZC7UMMY5YGZ4W5GQZPFHPPHUHKB2UC'; // You should store this in an environment variable
-
+  private readonly jwtSecret = 'SBEQUSATXXXDXEZ3BC56RG6O2SZC7UMMY5YGZ4W5GQZPFHPPHUHKB2UC'; 
   constructor(
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,

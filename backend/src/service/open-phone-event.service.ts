@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { OpenPhoneEventEntity } from "../entities/open-phone-event.entity";
@@ -46,6 +46,7 @@ export class OpenPhoneEventService {
     // Create open phone event
     const openPhoneEvent = this.openPhoneEventRepository.create({
       ...openPhoneEventDto,
+      conversation_id: address.conversation_id,
       address_id: address.id,
       created_at: new Date(),
       received_at: new Date(),
@@ -83,5 +84,34 @@ export class OpenPhoneEventService {
       name: nameMatch ? nameMatch[1].trim() : null,
       date: dateMatch ? new Date(dateMatch[1]) : null,
     };
+  }
+
+  async findOpenPhoneEventsByAddress(
+    address: string
+  ): Promise<Partial<OpenPhoneEventEntity>[]> {
+    const addressData = await this.addressRepository.findOne({
+      where: { address: address },
+    });
+
+    if (!addressData) {
+      throw new NotFoundException(`Address not found: ${address}`);
+    }
+
+    const openPhoneEvents = await this.openPhoneEventRepository.find({
+      where: { conversation_id: addressData.conversation_id },
+    });
+
+    if (openPhoneEvents.length === 0) {
+      throw new NotFoundException(
+        `No OpenPhoneEvents found for address: ${address}`
+      );
+    }
+
+    const eventsWithoutBody = openPhoneEvents.map((event) => {
+      const { body, ...eventWithoutBody } = event;
+      return eventWithoutBody;
+    });
+
+    return eventsWithoutBody;
   }
 }
