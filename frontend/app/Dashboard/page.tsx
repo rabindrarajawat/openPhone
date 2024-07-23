@@ -1,6 +1,7 @@
+
 "use client"
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from '../Navbar/Navbar';
 import SideBar from '../SideNavbar/sideNavbar';
 import Image from 'next/image';
@@ -10,6 +11,7 @@ import Image from 'next/image';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './dashboard.css';
+import axios from 'axios';
 
 const Dashboard = () => {
     const [dropdownOpen, setDropdownOpen] = useState(true);
@@ -22,7 +24,24 @@ const Dashboard = () => {
 
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
     const [selectedAddress, setSelectedAddress] = useState('Search Address');
+    const [addresses, setAddresses] = useState<string[]>([]); // State to store addresses
 
+
+
+
+    useEffect(() => {
+        axios.get('http://localhost:8000/address/getalladdress')
+            .then(response => {
+                const addressData = response.data.map((address: any) => address.address);
+                setAddresses(addressData);
+                if (addressData.length > 0) {
+                    setSelectedAddress(addressData[0]); // Set the first address as the default selected address
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching addresses:', error);
+            });
+    }, []);
 
 
     const handleFollowUpClick = () => {
@@ -57,6 +76,7 @@ const Dashboard = () => {
         setSelectedAddress(address);
         setBox1DropdownOpen(false); // Close the dropdown after selection
     };
+
 
 
     const tableData = [
@@ -221,7 +241,7 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                <div className='box1'>
+                {/* <div className='box1'>
                     <div className={`dropdown search-address-dropdown ${box1DropdownOpen ? 'show' : ''}`}>
                         <button className="btn btn-secondary dropdown-toggle" type="button" onClick={toggleBox1Dropdown}>
                             {selectedAddress}
@@ -232,6 +252,24 @@ const Dashboard = () => {
                             <a className="dropdown-item" href="#" onClick={() => handleAddressSelect('Address 00014')}>Address 00014</a>
                             <a className="dropdown-item" href="#" onClick={() => handleAddressSelect('Address 00015')}>Address 00015</a>
                             <a className="dropdown-item" href="#" onClick={() => handleAddressSelect('Address 00016')}>Address 00016</a>
+                        </div>
+                    </div> */}
+
+                <div className='box1'>
+                    <div className={`dropdown search-address-dropdown custom-dropdown ${box1DropdownOpen ? 'show' : ''}`}>
+                        <button className="btn btn-secondary dropdown-toggle custom-dropdown-button" type="button" onClick={toggleBox1Dropdown}>
+                            {selectedAddress}
+                        </button>
+                        <div className={`dropdown-menu  custom-dropdown-menu ${box1DropdownOpen ? 'show' : ''}`}>
+                            {addresses.map((address, index) => (
+                                <button
+                                    key={index}
+                                    className="dropdown-item custom-dropdown-item"
+                                    onClick={() => handleAddressSelect(address)}
+                                >
+                                    {address}
+                                </button>
+                            ))}
                         </div>
                     </div>
 
@@ -298,14 +336,14 @@ const Dashboard = () => {
                             <div className='time'>Action</div>
                         </div>
                         <div className={`follow-status ${isFollowUpClicked ? 'follow-up-heading' : ''}`} >
-                            <div className='time last '>Owner ID</div>
+                            <div className='time  '>Owner ID</div>
                             <div className='vertical-line'></div>
-                            <div className='time last'>Status</div>
+                            <div className='time'>Status</div>
                             <div className='vertical-line'></div>
-                            <div className='time last'>Last Follow-up</div>
+                            <div className='time'>Last Follow-up</div>
                         </div>
                     </div>
-                    <div className='tracking-container '>
+                    <div className='tracking-container'>
                         <div className='call-tracking'>
                             <Image src="/converstation.svg" alt="converstation Logo" className='vector' width={50} height={50} />
                             <div className='text'>Converation From 8827145468 </div>
@@ -317,7 +355,7 @@ const Dashboard = () => {
                             </div>
                         </div>
                     </div>
-                    <div className='tracking-container-box input-box-msg' >
+                    <div className='tracking-container-box' >
                         <div className='datatable-box '>
                             <table className="table table-hover ">
                                 <thead>
@@ -382,20 +420,10 @@ const Dashboard = () => {
                                     <div className=' stop'>Stop</div>
                                 </div>
                                 <button type="button" className="btn-call">Call Now</button>
-
                             </div>
-
                         </div>
-
-
                     </div>
-
-
-
                 </div>
-
-
-
             </div>
         </div>
     );

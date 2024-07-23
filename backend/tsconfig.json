@@ -1,5 +1,4 @@
-{
-  "compilerOptions": {
+{"compilerOptions": {
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
@@ -8,10 +7,8 @@
     "allowSyntheticDefaultImports": true,
     "target": "ES2021",
     "sourceMap": true,
-     "outDir":"./dist",
-   
-    
-   
+     "outDir": "./dist",
+    "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
