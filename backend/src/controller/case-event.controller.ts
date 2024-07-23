@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
-import { CaseEventDto } from "../dto/case-event.dto";
-import { CaseEventService } from "../service/case-event.service";
+import { CaseEventDto } from "src/dto/case-event.dto";
+import { CaseEventService } from "src/service/case-event.service";
 
 @Controller("case-event")
 export class CaseEventController {

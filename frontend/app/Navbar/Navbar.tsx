@@ -35,10 +35,10 @@ const Navbar = () => {
     }
 
     try {
-      const response = await axios.get(`http://localhost:8000/address/details?address=${address}`);
+      const response = await axios.get(`http://localhost:8000/address/getalladdress`);
       console.log(response.data);
       toast.success('Address found successfully!');
-    } catch (error: any) { // Typecast error to any
+    } catch (error: any) { 
       if (error.response && error.response.status === 404) {
         toast.error('Address are incorrect please type correct address.');
       } else {
