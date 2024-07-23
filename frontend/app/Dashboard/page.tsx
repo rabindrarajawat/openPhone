@@ -13,6 +13,30 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './dashboard.css';
 import axios from 'axios';
 
+interface EventItem {
+    created_at: string;
+    modified_at: string | null;
+    created_by: string;
+    modified_by: string | null;
+    is_active: boolean;
+    id: number;
+    event_type_id: number;
+    address_id: number;
+    event_direction_id: number;
+    from: string;
+    to: string;
+    url: string;
+    url_type: string;
+    conversation_id: number;
+    received_at: string;
+    contact_established: string;
+    dead: string;
+    keep_an_eye: string;
+    stop: string;
+}
+
+
+
 const Dashboard = () => {
     const [dropdownOpen, setDropdownOpen] = useState(true);
     const [statusDropdownOpen, setStatusDropdownOpen] = useState(true);
@@ -25,6 +49,9 @@ const Dashboard = () => {
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
     const [selectedAddress, setSelectedAddress] = useState('Search Address');
     const [addresses, setAddresses] = useState<string[]>([]); // State to store addresses
+    const [eventData, setEventData] = useState<EventItem[]>([]);
+    const [phoneNumber, setPhoneNumber] = useState<string>('');
+
 
 
 
@@ -42,6 +69,33 @@ const Dashboard = () => {
                 console.error('Error fetching addresses:', error);
             });
     }, []);
+
+    useEffect(() => {
+        if (selectedAddress && selectedAddress !== 'Search Address') {
+            axios.get(`http://localhost:8000/openPhoneEventData/events?address=${encodeURIComponent(selectedAddress)}`)
+                .then(response => {
+                    setEventData(response.data.data); // Ensure the data is correctly accessed from the API response
+                })
+                .catch(error => {
+                    console.error('Error fetching event data:', error);
+                });
+        }
+    }, [selectedAddress]);
+
+    const tableData = eventData.map((event: EventItem) => ({
+        ownerid: event.conversation_id,
+        PhoneNumber: event.to,
+        Status: event.stop === 'yes' ? 'Inactive' : 'Active', // Set Status based on stop value
+        Responses: event.stop === 'yes' ? 'Stop' : 'Interested', // Set Responses based on stop value
+    }));
+
+
+    const phonenumber = eventData.map((event: EventItem) => ({
+        PhoneNumber: event.to,
+    }));
+
+
+
 
 
     const handleFollowUpClick = () => {
@@ -77,17 +131,13 @@ const Dashboard = () => {
         setBox1DropdownOpen(false); // Close the dropdown after selection
     };
 
-
-
-    const tableData = [
-        { id: 1, ownerid: '011045', PhoneNumber: '889945694', Status: 'Dead', Responses: "Stop" },
-        { id: 2, ownerid: '011045', PhoneNumber: '889945694', Status: 'Initial', Responses: "Intrested" },
-        { id: 3, ownerid: '011045', PhoneNumber: '889945694', Status: 'Prospect', Responses: "Intrested" },
-        { id: 4, ownerid: '011045', PhoneNumber: '889945694', Status: 'Dead', Responses: "Stop" },
-        { id: 5, ownerid: '011045', PhoneNumber: '889945694', Status: 'Converted', Responses: "Intrested" },
-        { id: 6, ownerid: '011045', PhoneNumber: '889945694', Status: 'Prospect', Responses: "Intrested" },
-    ];
-
+    const responseBodyTemplate = (rowData: any) => {
+        return (
+            <span style={{ color: rowData.Responses === 'Interested' ? 'green' : 'red' }}>
+                {rowData.Responses}
+            </span>
+        );
+    };
 
 
     return (
@@ -346,7 +396,7 @@ const Dashboard = () => {
                     <div className='tracking-container'>
                         <div className='call-tracking'>
                             <Image src="/converstation.svg" alt="converstation Logo" className='vector' width={50} height={50} />
-                            <div className='text'>Converation From 8827145468 </div>
+                            <div className='text'>Converation From 8827145468  </div>
                         </div>
                         <div className=''>
                             <div>
@@ -373,8 +423,9 @@ const Dashboard = () => {
                                             <td>{row.ownerid}</td>
                                             <td>{row.PhoneNumber}</td>
                                             <td>{row.Status}</td>
-                                            <td>{row.Responses}</td>
-                                        </tr>
+                                            <td className={row.Responses === 'Interested' ? 'interested' : row.Responses === 'Stop' ? 'stop' : ''}>
+                                                {row.Responses}
+                                            </td>                                        </tr>
                                     ))}
                                 </tbody>
                             </table>

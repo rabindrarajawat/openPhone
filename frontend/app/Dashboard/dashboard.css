@@ -737,3 +737,18 @@
     background-color: inherit;
     color: inherit;
 }
+
+.interested {
+    color: #17A505 !important;
+}
+
+.stop {
+    color: #EA0000 !important;
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 20px;
+    text-align: left;
+
+
+}
