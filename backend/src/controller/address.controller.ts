@@ -24,9 +24,9 @@ export class AddressController {
     return filteredAddresses;
   }
 
-  @Get("details")
-  async getAddressDetails(@Query("address") address: string) {
-    const addressDetails = await this.addressService.findByAddress(address);
-    return addressDetails;
-  }
+  // @Get("details")
+  // async getAddressDetails(@Query("address") address: string) {
+  //   const addressDetails = await this.addressService.findByAddress(address);
+  //   return addressDetails;
+  // }
 }

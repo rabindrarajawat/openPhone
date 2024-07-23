@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { OpenPhoneEventDirectionDTO } from "src/dto/open-phone-event-direction.dto";
-import { OpenPhoneEventDirectionEntity } from "src/entities/open-phone-event-direction.entity";
+import { OpenPhoneEventDirectionDTO } from "../dto/open-phone-event-direction.dto";
+import { OpenPhoneEventDirectionEntity } from "../entities/open-phone-event-direction.entity";
 import { Repository } from "typeorm";
 
 @Injectable()
