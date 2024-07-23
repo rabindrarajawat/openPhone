@@ -3,7 +3,7 @@ import { AddressEntity } from "../entities/address.entity";
 
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { ILike, Repository } from "typeorm";
 
 @Injectable()
 export class AddressService {
@@ -62,5 +62,29 @@ export class AddressService {
 
   //   return addressData;
   // }
+
+
+
+
+
+
+
+  async searchAddresses(searchTerm: string): Promise<AddressEntity[]> {
+    return this.addressRepository.find({
+      where: [
+        { address: ILike(`%${searchTerm}%`) },
+        { name: ILike(`%${searchTerm}%`) },
+        // { conversation_id: ILike(`%${searchTerm}%`) },
+        { created_by: ILike(`%${searchTerm}%`) },
+        // { zipCode: ILike(`%${searchTerm}%`) },
+      ],
+      take: 10,
+    });
+  }
+
+
+
+
+
 
 }

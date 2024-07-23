@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { ILike, Repository } from "typeorm";
 import { OpenPhoneEventEntity } from "../entities/open-phone-event.entity";
 import { OpenPhoneEventDto } from "../dto/open-phone-event.dto";
 import { AddressEntity } from "../entities/address.entity";
@@ -114,4 +114,21 @@ export class OpenPhoneEventService {
 
     return eventsWithoutBody;
   }
+
+
+  // async searchAddresses(searchTerm: string): Promise<AddressEntity[]> {
+  //   return this.addressRepository.find({
+  //     where: [
+  //       { address: ILike(`%${searchTerm}%`) },
+  //       { name: ILike(`%${searchTerm}%`) },
+  //       // { conversation_id: ILike(`%${searchTerm}%`) },
+  //       { created_by: ILike(`%${searchTerm}%`) },
+  //       // { zipCode: ILike(`%${searchTerm}%`) },
+  //     ],
+  //     take: 10,
+  //   });
+  // }
+
+
+
 }
