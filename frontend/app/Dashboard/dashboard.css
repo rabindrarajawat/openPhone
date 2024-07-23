@@ -750,11 +750,11 @@
 
 .dead {
     color: #EA0000 !important;
-    font-family: 'Roboto', sans-serif;
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 20px;
-    text-align: left;
+    font-family: 'Roboto', sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    line-height: 20px !important;
+    text-align: left !important;
 
 
 }
