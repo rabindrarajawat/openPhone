@@ -1,10 +1,13 @@
 import { Controller, Post, Get, Body, Query } from "@nestjs/common";
 import { OpenPhoneEventService } from "../service/open-phone-event.service";
 import { OpenPhoneEventDto } from "../dto/open-phone-event.dto";
+import { AddressService } from "src/service/address.service";
 
 @Controller("openPhoneEventData")
 export class OpenPhoneEventController {
-  constructor(private readonly openPhoneEventService: OpenPhoneEventService) {}
+  constructor(private readonly openPhoneEventService: OpenPhoneEventService,
+    private readonly addressService:AddressService
+  ) {}
 
   @Post()
   async createOpenPhoneEvent(@Body() openPhoneEventDto: OpenPhoneEventDto) {
@@ -51,4 +54,25 @@ export class OpenPhoneEventController {
       data: openPhoneEvents,
     };
   }
+
+  // @Get('search')
+  // async searchAddresses(@Query('term') searchTerm: string) {
+  //   if (!searchTerm || searchTerm.length < 2) {
+  //     return { results: [] };
+  //   }
+  //   const addresses = await this.addressService.searchAddresses(searchTerm);
+  //   return {
+  //     results: addresses.map(address => ({
+  //       id: address.id,
+  //       fullAddress: address.address,
+  //       name: address.name,
+  //       // Add any other fields you want to return
+  //     }))
+  //   };
+  // }
+
+
+
+
+
 }
