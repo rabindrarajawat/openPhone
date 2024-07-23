@@ -29,4 +29,35 @@ export class AddressController {
   //   const addressDetails = await this.addressService.findByAddress(address);
   //   return addressDetails;
   // }
+
+
+
+
+
+  @Get('search')
+  async searchAddresses(@Query('term') searchTerm: string) {
+    if (!searchTerm || searchTerm.length < 2) {
+      return { results: [] };
+    }
+    const addresses = await this.addressService.searchAddresses(searchTerm);
+    return {
+      results: addresses.map(address => ({
+        // id: address.id,
+        fullAddress: address.address,
+        // name: address.name,
+        // Add any other fields you want to return
+      }))
+    };
+  }
+
+
+
+
+
+
+
+
+
+
+
 }
