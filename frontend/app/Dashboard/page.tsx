@@ -84,7 +84,7 @@ const Dashboard = () => {
         ownerid: event.conversation_id,
         PhoneNumber: event.to,
         Status: event.is_stop ? 'Inactive' : 'Active',  // Use 'Inactive' if is_stop is true, otherwise 'Active'
-        Responses: event.is_stop ? 'Dead' : 'Interested' // Use 'Dead' if is_stop is true, otherwise 'Interested'
+        Responses: event.is_stop ? 'Stop' : 'Interested' // Use 'Dead' if is_stop is true, otherwise 'Interested'
     }));
 
 
@@ -120,14 +120,6 @@ const Dashboard = () => {
     const handleAddressSelect = (address: string) => {
         setSelectedAddress(address);
         setBox1DropdownOpen(false); // Close the dropdown after selection
-    };
-
-    const responseBodyTemplate = (rowData: any) => {
-        return (
-            <span style={{ color: rowData.Responses === 'Interested' ? 'green' : 'red' }}>
-                {rowData.Responses}
-            </span>
-        );
     };
 
 
@@ -400,7 +392,7 @@ const Dashboard = () => {
                                             <td>{row.ownerid}</td>
                                             <td>{row.PhoneNumber}</td>
                                             <td>{row.Status}</td>
-                                            <td className={row.Responses === 'Interested' ? 'interested' : row.Responses === 'Dead' ? 'dead' : ''}>
+                                            <td className={row.Responses === 'Interested' ? 'interested' : row.Responses === 'Stop' ? 'stop' : ''}>
                                                 {row.Responses}
                                             </td>
                                         </tr>
