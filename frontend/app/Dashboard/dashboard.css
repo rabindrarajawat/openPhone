@@ -43,6 +43,8 @@
     border-color: none;
 }
 
+
+
 .dropdown {
     font-family: 'Inter', sans-serif;
     border: 1px solid #E4FFEC;
@@ -729,4 +731,9 @@
 .dropdown-item:focus,
 .dropdown-item:hover {
     background-color: inherit !important;
+}
+
+.search-address-dropdown .dropdown-toggle:hover {
+    background-color: inherit;
+    color: inherit;
 }
