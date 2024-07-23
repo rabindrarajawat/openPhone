@@ -5,10 +5,6 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '../Navbar/Navbar';
 import SideBar from '../SideNavbar/sideNavbar';
 import Image from 'next/image';
-// import ReactPaginate from 'react-paginate';
-
-
-
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './dashboard.css';
 import axios from 'axios';
@@ -32,7 +28,7 @@ interface EventItem {
     contact_established: string;
     dead: string;
     keep_an_eye: string;
-    stop: string;
+    is_stop: string;
 }
 
 
@@ -42,15 +38,13 @@ const Dashboard = () => {
     const [statusDropdownOpen, setStatusDropdownOpen] = useState(true);
     const [dateDropdownOpen, setDateDropdownOpen] = useState(true);
     const [box1DropdownOpen, setBox1DropdownOpen] = useState(false);
-
     const [isFollowUpClicked, setIsFollowUpClicked] = useState(false); // Add state for Follow-up button
-
-
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
     const [selectedAddress, setSelectedAddress] = useState('Search Address');
     const [addresses, setAddresses] = useState<string[]>([]); // State to store addresses
     const [eventData, setEventData] = useState<EventItem[]>([]);
     const [phoneNumber, setPhoneNumber] = useState<string>('');
+
 
 
 
@@ -74,7 +68,11 @@ const Dashboard = () => {
         if (selectedAddress && selectedAddress !== 'Search Address') {
             axios.get(`http://localhost:8000/openPhoneEventData/events?address=${encodeURIComponent(selectedAddress)}`)
                 .then(response => {
-                    setEventData(response.data.data); // Ensure the data is correctly accessed from the API response
+                    const data = response.data.data;
+                    setEventData(data);
+                    if (data.length > 0) {
+                        setPhoneNumber(data[0].to); // Assuming you want the 'to' value from the first item
+                    }
                 })
                 .catch(error => {
                     console.error('Error fetching event data:', error);
@@ -82,19 +80,12 @@ const Dashboard = () => {
         }
     }, [selectedAddress]);
 
-    const tableData = eventData.map((event: EventItem) => ({
+    const tableData = eventData.map((event: any) => ({
         ownerid: event.conversation_id,
         PhoneNumber: event.to,
-        Status: event.stop === 'yes' ? 'Inactive' : 'Active', // Set Status based on stop value
-        Responses: event.stop === 'yes' ? 'Stop' : 'Interested', // Set Responses based on stop value
+        Status: event.is_stop ? 'Inactive' : 'Active',  // Use 'Inactive' if is_stop is true, otherwise 'Active'
+        Responses: event.is_stop ? 'Dead' : 'Interested' // Use 'Dead' if is_stop is true, otherwise 'Interested'
     }));
-
-
-    const phonenumber = eventData.map((event: EventItem) => ({
-        PhoneNumber: event.to,
-    }));
-
-
 
 
 
@@ -291,20 +282,6 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* <div className='box1'>
-                    <div className={`dropdown search-address-dropdown ${box1DropdownOpen ? 'show' : ''}`}>
-                        <button className="btn btn-secondary dropdown-toggle" type="button" onClick={toggleBox1Dropdown}>
-                            {selectedAddress}
-                        </button>
-                        <div className={`dropdown-menu ${box1DropdownOpen ? 'show' : ''}`}>
-                            <a className="dropdown-item" href="#" onClick={() => handleAddressSelect('Address 00012')}>Address 00012</a>
-                            <a className="dropdown-item" href="#" onClick={() => handleAddressSelect('Address 00013')}>Address 00013</a>
-                            <a className="dropdown-item" href="#" onClick={() => handleAddressSelect('Address 00014')}>Address 00014</a>
-                            <a className="dropdown-item" href="#" onClick={() => handleAddressSelect('Address 00015')}>Address 00015</a>
-                            <a className="dropdown-item" href="#" onClick={() => handleAddressSelect('Address 00016')}>Address 00016</a>
-                        </div>
-                    </div> */}
-
                 <div className='box1'>
                     <div className={`dropdown search-address-dropdown custom-dropdown ${box1DropdownOpen ? 'show' : ''}`}>
                         <button className="btn btn-secondary dropdown-toggle custom-dropdown-button" type="button" onClick={toggleBox1Dropdown}>
@@ -396,7 +373,7 @@ const Dashboard = () => {
                     <div className='tracking-container'>
                         <div className='call-tracking'>
                             <Image src="/converstation.svg" alt="converstation Logo" className='vector' width={50} height={50} />
-                            <div className='text'>Converation From 8827145468  </div>
+                            <div className='text'>Converation From {phoneNumber}  </div>
                         </div>
                         <div className=''>
                             <div>
@@ -423,9 +400,10 @@ const Dashboard = () => {
                                             <td>{row.ownerid}</td>
                                             <td>{row.PhoneNumber}</td>
                                             <td>{row.Status}</td>
-                                            <td className={row.Responses === 'Interested' ? 'interested' : row.Responses === 'Stop' ? 'stop' : ''}>
+                                            <td className={row.Responses === 'Interested' ? 'interested' : row.Responses === 'Dead' ? 'dead' : ''}>
                                                 {row.Responses}
-                                            </td>                                        </tr>
+                                            </td>
+                                        </tr>
                                     ))}
                                 </tbody>
                             </table>
