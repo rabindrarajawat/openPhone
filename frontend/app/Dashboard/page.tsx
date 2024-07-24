@@ -11,7 +11,7 @@ import axios from 'axios';
 
 interface Address {
     fullAddress: string;
-  }
+}
 
 interface EventItem {
     created_at: string;
@@ -93,18 +93,23 @@ const Dashboard = () => {
 
 
     const handleRowClick = (ownerId: number) => {
-        setSelectedRowId(ownerId);
-        console.log('Selected owner ID:', ownerId);
+        // Only update selectedRowId if it's different
+        if (selectedRowId !== ownerId) {
+            setSelectedRowId(ownerId);
+            console.log('Selected owner ID:', ownerId);
 
-        axios.get(`http://localhost:8000/openPhoneEventData/getbody?conversation_id=${ownerId}`)
-            .then(response => {
-                console.log('API response for selected owner ID:', response.data);
-                setApiResponseBody(response.data.body); // Store the API response body in state
-            })
-            .catch(error => {
-                console.error('Error fetching data for selected owner ID:', error);
-            });
+            axios.get(`http://localhost:8000/openPhoneEventData/getbody?conversation_id=${ownerId}`)
+                .then(response => {
+                    console.log('API response for selected owner ID:', response.data);
+                    setApiResponseBody(response.data.body); // Store the API response body in state
+                })
+                .catch(error => {
+                    console.error('Error fetching data for selected owner ID:', error);
+                });
+        }
     };
+
+
 
 
     const toggleMessage = () => {
@@ -158,16 +163,21 @@ const Dashboard = () => {
     };
     const handleAddressSelect1 = (address: Address) => {
         setSelectedAddress(address.fullAddress);
-        
+
     };
 
     useEffect(() => {
-        if (tableData && tableData.length > 0) {
-            const firstRowId = tableData[0].ownerid;
-            setSelectedRowId(firstRowId); // Set the first row's ownerid as the selectedRowId
-            handleRowClick(firstRowId); // Fetch and display data for the first row
+        if (tableData.length > 0) {
+            // Set default selectedRowId only if it is not already set
+            if (selectedRowId === null && tableData.length > 0) {
+                const firstRowId = tableData[0].ownerid;
+                setSelectedRowId(firstRowId);
+                handleRowClick(firstRowId);
+            }
         }
-    }, [tableData]);
+    }, [tableData, selectedRowId]);
+
+
     // const handleRowClick = (ownerId: number) => {
     //     setSelectedRowId(ownerId);
     //     console.log('Selected owner ID:', ownerId);
@@ -177,7 +187,7 @@ const Dashboard = () => {
 
     return (
         <div>
-            <Navbar onSelectAddress = {handleAddressSelect1}/>
+            <Navbar onSelectAddress={handleAddressSelect1} />
             <SideBar />
             <div className='box'>
                 <div className='msg'>Message and Calls</div>
