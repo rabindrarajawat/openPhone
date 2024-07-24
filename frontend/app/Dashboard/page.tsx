@@ -122,6 +122,55 @@ const Dashboard = () => {
 
 
 
+    useEffect(() => {
+        if (selectedAddress && selectedAddress !== 'Search Address') {
+            axios.get(`http://localhost:8000/openPhoneEventData/events?address=${encodeURIComponent(selectedAddress)}`)
+                .then(response => {
+                    const data = response.data.data;
+                    setEventData(data); // Set the new event data based on the selected address
+                    if (data.length > 0) {
+                        setPhoneNumber(data[0].to); // Assuming you want the 'to' value from the first item
+                    } else {
+                        setPhoneNumber(''); // Clear phone number if no data
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching event data:', error);
+                });
+        }
+    }, [selectedAddress]);
+
+
+    const handleRowClick = (ownerId: number) => {
+        setSelectedRowId(ownerId);
+        console.log('Selected owner ID:', ownerId);
+
+        axios.get(`http://localhost:8000/openPhoneEventData/getbody?conversation_id=${ownerId}`)
+            .then(response => {
+                console.log('API response for selected owner ID:', response.data);
+                setApiResponseBody(response.data.body); // Store the API response body in state
+            })
+            .catch(error => {
+                console.error('Error fetching data for selected owner ID:', error);
+            });
+    };
+
+
+    const toggleMessage = () => {
+        setIsMessageExpanded(!isMessageExpanded);
+    };
+
+
+
+    const tableData = eventData.map((event: EventItem) => ({
+        ownerid: event.conversation_id,
+        PhoneNumber: event.to,
+        Status: event.is_stop ? 'Inactive' : 'Active',  // Use 'Inactive' if is_stop is true, otherwise 'Active'
+        Responses: event.is_stop ? 'Stop' : 'Interested' // Use 'Dead' if is_stop is true, otherwise 'Interested'
+    }));
+
+
+
 
     const handleFollowUpClick = () => {
         setIsFollowUpClicked(!isFollowUpClicked); // Toggle the Follow-up button state
@@ -153,6 +202,7 @@ const Dashboard = () => {
 
     const handleAddressSelect = (address: string) => {
         setSelectedAddress(address);
+        setEventData([]); // Clear existing event data to ensure new data is shown
         setEventData([]); // Clear existing event data to ensure new data is shown
         setBox1DropdownOpen(false); // Close the dropdown after selection
     };
@@ -336,6 +386,7 @@ const Dashboard = () => {
 
                         </button>
                         <div className={`dropdown-menu custom-dropdown-menu ${box1DropdownOpen ? 'show' : ''}`}>
+                        <div className={`dropdown-menu custom-dropdown-menu ${box1DropdownOpen ? 'show' : ''}`}>
                             {addresses.map((address, index) => (
                                 <button
                                     key={index}
@@ -347,6 +398,7 @@ const Dashboard = () => {
                             ))}
                         </div>
                     </div>
+
 
 
 
@@ -423,6 +475,7 @@ const Dashboard = () => {
                         <div className='call-tracking'>
                             <Image src="/converstation.svg" alt="converstation Logo" className='vector' width={50} height={50} />
                             <div className='text'>Converation From {phoneNumber}  </div>
+                            <div className='text'>Converation From {phoneNumber}  </div>
                         </div>
                         <div className=''>
                             <div>
@@ -434,8 +487,10 @@ const Dashboard = () => {
                     <div className='tracking-container-box' >
                         <div className='datatable-box '>
                             <table className="table table-hover">
+                            <table className="table table-hover">
                                 <thead>
                                     <tr className='datatable'>
+                                        <th scope="col">Owner ID</th>
                                         <th scope="col">Owner ID</th>
                                         <th scope="col">Phone Number</th>
                                         <th scope="col">Status</th>
@@ -449,9 +504,18 @@ const Dashboard = () => {
                                             className={`center-align ${selectedRowId === row.ownerid ? 'selected-row' : ''}`}
                                             onClick={() => handleRowClick(row.ownerid)}
                                         >
+                                    {tableData.map((row) => (
+                                        <tr
+                                            key={row.ownerid}
+                                            className={`center-align ${selectedRowId === row.ownerid ? 'selected-row' : ''}`}
+                                            onClick={() => handleRowClick(row.ownerid)}
+                                        >
                                             <td>{row.ownerid}</td>
                                             <td>{row.PhoneNumber}</td>
                                             <td>{row.Status}</td>
+                                            <td className={row.Responses === 'Interested' ? 'interested' : row.Responses === 'Stop' ? 'stop' : ''}>
+                                                {row.Responses}
+                                            </td>
                                             <td className={row.Responses === 'Interested' ? 'interested' : row.Responses === 'Stop' ? 'stop' : ''}>
                                                 {row.Responses}
                                             </td>
@@ -477,6 +541,26 @@ const Dashboard = () => {
                                 </div>
                             </div>
                             <div className='screenshot-msg'>
+                                <div className='inbox-chat'>
+                                    {apiResponseBody ? (
+                                        <div>
+                                            {isMessageExpanded ? (
+                                                <div>
+                                                    {JSON.stringify(apiResponseBody, null, 2)}
+                                                    <button onClick={toggleMessage} className="read-more-btn">Read Less</button>
+                                                </div>
+                                            ) : (
+                                                <div>
+                                                    {JSON.stringify(apiResponseBody, null, 2).substring(0, 100)}{/* Adjust 100 to your preferred length */}
+                                                    {JSON.stringify(apiResponseBody, null, 2).length > 100 && (
+                                                        <button onClick={toggleMessage} className="read-more-btn">...  Read More</button>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        'Loading...'
+                                    )}
                                 <div className='inbox-chat'>
                                     {apiResponseBody ? (
                                         <div>
