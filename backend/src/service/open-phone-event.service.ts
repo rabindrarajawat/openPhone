@@ -89,31 +89,36 @@ export class OpenPhoneEventService {
   async findOpenPhoneEventsByAddress(
     address: string
   ): Promise<Partial<OpenPhoneEventEntity>[]> {
+    // Fetch address data based on the provided address
     const addressData = await this.addressRepository.findOne({
       where: { address: address },
     });
 
+    // If address is not found, throw an exception
     if (!addressData) {
       throw new NotFoundException(`Address not found: ${address}`);
     }
 
+    // Fetch OpenPhone events using the address_id from the found address
     const openPhoneEvents = await this.openPhoneEventRepository.find({
-      where: { conversation_id: addressData.conversation_id },
+      where: { address_id: addressData.id },
     });
 
+    // If no events are found, throw an exception
     if (openPhoneEvents.length === 0) {
-      throw new NotFoundException(
-        `No OpenPhoneEvents found for address: ${address}`
-      );
+      throw new NotFoundException(`No OpenPhoneEvents found for address: ${address}`);
     }
 
+    // Map through the events and remove the body field from each event
     const eventsWithoutBody = openPhoneEvents.map((event) => {
       const { body, ...eventWithoutBody } = event;
       return eventWithoutBody;
     });
 
+    // Return the events without their body field
     return eventsWithoutBody;
   }
+
 
 
   // async searchAddresses(searchTerm: string): Promise<AddressEntity[]> {
