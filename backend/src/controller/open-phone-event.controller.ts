@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Query } from "@nestjs/common";
+import { Controller, Post, Get, Body, Query, NotFoundException } from "@nestjs/common";
 import { OpenPhoneEventService } from "../service/open-phone-event.service";
 import { OpenPhoneEventDto } from "../dto/open-phone-event.dto";
 import { AddressService } from "src/service/address.service";
@@ -6,8 +6,8 @@ import { AddressService } from "src/service/address.service";
 @Controller("openPhoneEventData")
 export class OpenPhoneEventController {
   constructor(private readonly openPhoneEventService: OpenPhoneEventService,
-    private readonly addressService:AddressService
-  ) {}
+    private readonly addressService: AddressService
+  ) { }
 
   @Post()
   async createOpenPhoneEvent(@Body() openPhoneEventDto: OpenPhoneEventDto) {
@@ -71,6 +71,15 @@ export class OpenPhoneEventController {
   //   };
   // }
 
+  @Get("getbody")
+  async getBodyByConversationId(@Query("conversation_id") conversation_id: number) {
+    try {
+      const body = await this.openPhoneEventService.findBodyByConversationId(conversation_id);
+      return { body };
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
+  }
 
 
 
