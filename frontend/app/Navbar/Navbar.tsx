@@ -10,11 +10,19 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { SearchResultList } from "../SearchResultList/SearchResultList";
 
-const Navbar = () => {
+
+interface Address {
+  fullAddress: string;
+}
+interface SearchBarProps {
+  setResults?: (results: Address[]) => void; // Optional prop
+  onSelectAddress: (address: Address) => void; // Required prop
+}
+
+const Navbar: React.FC<SearchBarProps> = ({ setResults, onSelectAddress }) => {
   const [userName, setUserName] = useState<string>('');
   const [input, setInput] = useState<string>('');
-  const [results, setResultsState] = useState<Array<{ fullAddress: string }>>([]);
-
+  const [results, setResultsState] = useState<Address[]>([]);
   useEffect(() => {
     const token = localStorage.getItem('authToken');
 
@@ -33,22 +41,30 @@ const Navbar = () => {
   const fetchData = async (value: string) => {
     try {
       const response = await axios.get(`http://localhost:8000/address/search?term=${encodeURIComponent(value)}`);
-      const results = response.data.results.filter((address: { fullAddress: string }) => {
-        return (
-          address.fullAddress &&
-          address.fullAddress.toLowerCase().includes(value.toLowerCase())
-        );
-      });
+      const results = response.data.results.filter((address: Address) => 
+        address.fullAddress.toLowerCase().includes(value.toLowerCase())
+      );
       setResultsState(results);
+      if (setResults) {
+        setResults(results);
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-
   const handleChange = (value: string) => {
     setInput(value);
-    fetchData(value);
+    fetchData(value); 
   };
+
+  const handleSelectAddress = (address: Address) => {
+    setInput(address.fullAddress);
+    setResultsState([]);
+    if (onSelectAddress) {
+      onSelectAddress(address); // Call the callback function when an address is selected
+    }
+  };
+
 
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -70,9 +86,9 @@ const Navbar = () => {
                 value={input}
                 onChange={(e) => handleChange(e.target.value)}
               />
-              {results.length > 0 && (
-                <SearchResultList results={results} />
-              )}
+            {results.length > 0 && (
+        <SearchResultList results={results} onSelect={handleSelectAddress} />
+      )}
             </div>
             <ToastContainer />
           </form>
