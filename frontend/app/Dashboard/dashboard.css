@@ -136,23 +136,23 @@
 .search-address-dropdown .dropdown-toggle {
     border: 2px solid #3361FF;
     background-color: white;
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 900;
     text-align: left;
-    color: #7D8FB3;
-    width: 210px;
+    color: #3361FF;
+    width: 180px;
     height: Hug (40px)px;
-    top: 137px;
-    left: 390px;
     padding: 10px;
-    gap: 65px;
     border-radius: 10px;
     border: 1px 0px 0px 0px;
     overflow: hidden;
-    /* Add this */
     text-overflow: ellipsis;
-    /* Add this */
     white-space: nowrap;
+    font-size: 10px;
+    font-weight: 900;
+    line-height: 20px;
+    text-align: left;
+
 }
 
 .search-address-dropdown {
@@ -169,15 +169,19 @@
     position: relative;
 }
 
+.dropdown-icon {
+    width: 16px;
+    height: 8px;
+    margin-left: 25px;
+}
+
 .search-address-dropdown .dropdown-toggle::after {
     position: absolute;
-    margin-top: 6px;
-    right: -115px;
-
+    margin-top: 10px;
+    right: -155px;
     display: inline-block;
-    border: .3em solid transparent;
+    border: .0em solid transparent;
     border-top-color: #7D8FB3;
-
 }
 
 .dropdown-text {
@@ -465,6 +469,7 @@
     font-weight: 400;
     line-height: 20px;
     text-align: left;
+    cursor: pointer;
 }
 
 .tracking-container {
@@ -667,15 +672,37 @@
     background: #3361FF;
     color: #FFFFFF;
     padding-left: 5px;
+    padding-right: 5px;
     margin-top: 9px;
-    width: 177px;
-    height: 18px;
+    /* width: 177px; */
+    max-height: 140px;
+    overflow-y: auto;
+    /* Enable vertical scrolling if content exceeds max height */
+    overflow-x: hidden;
+    /* Prevent horizontal scrolling */
     top: 681px;
     left: 1045px;
     gap: 0px;
     border-radius: 5px;
     border: 1px;
     margin-left: 10px;
+    margin-right: 10px;
+}
+
+.read-more-btn {
+    background: none;
+    border: none;
+    color: #FFFFFF;
+    cursor: pointer;
+    padding-left: 5px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 8px;
+    font-weight: 400;
+    /* text-decoration: underline; */
+}
+
+.read-more-btn:hover {
+    text-decoration: none;
 }
 
 .reply {
@@ -755,6 +782,4 @@
     font-weight: 400 !important;
     line-height: 20px !important;
     text-align: left !important;
-
-
 }

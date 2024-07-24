@@ -12,7 +12,7 @@ export class OpenPhoneEventService {
     private readonly openPhoneEventRepository: Repository<OpenPhoneEventEntity>,
     @InjectRepository(AddressEntity)
     private readonly addressRepository: Repository<AddressEntity>
-  ) {}
+  ) { }
 
   async create(openPhoneEventDto: OpenPhoneEventDto): Promise<{
     openPhoneEvent: OpenPhoneEventEntity;
@@ -128,6 +128,20 @@ export class OpenPhoneEventService {
   //     take: 10,
   //   });
   // }
+
+
+  async findBodyByConversationId(conversation_id: number): Promise<string> {
+    const event = await this.openPhoneEventRepository.findOne({
+      where: { conversation_id },
+      select: ['body'],
+    });
+
+    if (!event) {
+      throw new NotFoundException(`Conversation ID ${conversation_id} not found`);
+    }
+
+    return event.body;
+  }
 
 
 

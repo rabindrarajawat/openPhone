@@ -44,6 +44,10 @@ const Dashboard = () => {
     const [addresses, setAddresses] = useState<string[]>([]); // State to store addresses
     const [eventData, setEventData] = useState<EventItem[]>([]);
     const [phoneNumber, setPhoneNumber] = useState<string>('');
+    const [selectedRowId, setSelectedRowId] = useState<number | null>(null); // State for selected row
+    const [apiResponseBody, setApiResponseBody] = useState<string>(''); // State for API response body
+    const [isMessageExpanded, setIsMessageExpanded] = useState<boolean>(false);
+
 
 
 
@@ -69,9 +73,11 @@ const Dashboard = () => {
             axios.get(`http://localhost:8000/openPhoneEventData/events?address=${encodeURIComponent(selectedAddress)}`)
                 .then(response => {
                     const data = response.data.data;
-                    setEventData(data);
+                    setEventData(data); // Set the new event data based on the selected address
                     if (data.length > 0) {
                         setPhoneNumber(data[0].to); // Assuming you want the 'to' value from the first item
+                    } else {
+                        setPhoneNumber(''); // Clear phone number if no data
                     }
                 })
                 .catch(error => {
@@ -80,12 +86,34 @@ const Dashboard = () => {
         }
     }, [selectedAddress]);
 
-    const tableData = eventData.map((event: any) => ({
+
+    useEffect(() => {
+        if (selectedRowId !== null) {
+            axios.get(`http://localhost:8000/openPhoneEventData/getbody?conversation_id=${selectedRowId}`)
+                .then(response => {
+                    console.log('API response for selected owner ID:', response.data);
+                    setApiResponseBody(response.data.body); // Store the API response body in state
+                })
+                .catch(error => {
+                    console.error('Error fetching data for selected owner ID:', error);
+                });
+        }
+    }, [selectedRowId]);
+
+
+    const toggleMessage = () => {
+        setIsMessageExpanded(!isMessageExpanded);
+    };
+
+
+
+    const tableData = eventData.map((event: EventItem) => ({
         ownerid: event.conversation_id,
         PhoneNumber: event.to,
         Status: event.is_stop ? 'Inactive' : 'Active',  // Use 'Inactive' if is_stop is true, otherwise 'Active'
         Responses: event.is_stop ? 'Stop' : 'Interested' // Use 'Dead' if is_stop is true, otherwise 'Interested'
     }));
+
 
 
 
@@ -119,8 +147,22 @@ const Dashboard = () => {
 
     const handleAddressSelect = (address: string) => {
         setSelectedAddress(address);
+        setEventData([]); // Clear existing event data to ensure new data is shown
         setBox1DropdownOpen(false); // Close the dropdown after selection
     };
+
+
+    useEffect(() => {
+        if (tableData && tableData.length > 0) {
+            setSelectedRowId(tableData[0].ownerid); // Set the first row's ownerid as the selectedRowId
+        }
+    }, [tableData]);
+
+    const handleRowClick = (ownerId: number) => {
+        setSelectedRowId(ownerId);
+        console.log('Selected owner ID:', ownerId);
+    };
+
 
 
     return (
@@ -278,8 +320,10 @@ const Dashboard = () => {
                     <div className={`dropdown search-address-dropdown custom-dropdown ${box1DropdownOpen ? 'show' : ''}`}>
                         <button className="btn btn-secondary dropdown-toggle custom-dropdown-button" type="button" onClick={toggleBox1Dropdown}>
                             {selectedAddress}
+                            <Image src="/dropdownicon.svg" alt="Dropdown Icon" className={`dropdown-icon ${box1DropdownOpen ? 'open' : ''}`} width={50} height={50} />
+
                         </button>
-                        <div className={`dropdown-menu  custom-dropdown-menu ${box1DropdownOpen ? 'show' : ''}`}>
+                        <div className={`dropdown-menu custom-dropdown-menu ${box1DropdownOpen ? 'show' : ''}`}>
                             {addresses.map((address, index) => (
                                 <button
                                     key={index}
@@ -291,6 +335,7 @@ const Dashboard = () => {
                             ))}
                         </div>
                     </div>
+
 
 
                     <div className="logos-row">
@@ -376,19 +421,22 @@ const Dashboard = () => {
                     </div>
                     <div className='tracking-container-box' >
                         <div className='datatable-box '>
-                            <table className="table table-hover ">
+                            <table className="table table-hover">
                                 <thead>
                                     <tr className='datatable'>
-                                        <th scope="col">Owner'ID</th>
+                                        <th scope="col">Owner ID</th>
                                         <th scope="col">Phone Number</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">Responses</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {tableData.map((row: any) => (
-                                        <tr key={row.id} className="center-align">
-                                            {/* <th scope="row">{row.id}</th> */}
+                                    {tableData.map((row) => (
+                                        <tr
+                                            key={row.ownerid}
+                                            className={`center-align ${selectedRowId === row.ownerid ? 'selected-row' : ''}`}
+                                            onClick={() => handleRowClick(row.ownerid)}
+                                        >
                                             <td>{row.ownerid}</td>
                                             <td>{row.PhoneNumber}</td>
                                             <td>{row.Status}</td>
@@ -417,13 +465,26 @@ const Dashboard = () => {
                                 </div>
                             </div>
                             <div className='screenshot-msg'>
-                                <div className='chat'>
-                                    <div className='inbox-chat'>yes, I am not intrested on your plan</div>
-                                    <div className='inbox-chat'>Can please stop reaching to me</div>
-                                    <div className='inbox-chat reply'>Sure could you please let me know, is there any </div>
-                                    <div className='inbox-chat'>ya, actually I don’t have any plan regarding this </div>
-                                    <div className='inbox-chat reply'>Okay ma’am </div>
-                                    <div className='inbox-chat'>so please stop messages & calling</div>
+                                <div className='inbox-chat'>
+                                    {apiResponseBody ? (
+                                        <div>
+                                            {isMessageExpanded ? (
+                                                <div>
+                                                    {JSON.stringify(apiResponseBody, null, 2)}
+                                                    <button onClick={toggleMessage} className="read-more-btn">Read Less</button>
+                                                </div>
+                                            ) : (
+                                                <div>
+                                                    {JSON.stringify(apiResponseBody, null, 2).substring(0, 100)}{/* Adjust 100 to your preferred length */}
+                                                    {JSON.stringify(apiResponseBody, null, 2).length > 100 && (
+                                                        <button onClick={toggleMessage} className="read-more-btn">...  Read More</button>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        'API response will appear here'
+                                    )}
                                 </div>
                             </div>
 

@@ -19,7 +19,7 @@ const Navbar = () => {
         // Decode the token
         const decodedToken: any = jwtDecode(token);
         setUserName(decodedToken.name);
-        console.log("decodedToken", decodedToken)
+        // console.log("decodedToken", Token)
       } catch (error) {
         console.error("Failed to decode token:", error);
       }
