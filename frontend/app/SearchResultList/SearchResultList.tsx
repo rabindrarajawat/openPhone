@@ -1,17 +1,26 @@
-import React from 'react';
+import React from "react";
 import "./SearchResultList.css";
-import { SearchResult } from "../SearchResult/SearchResult";
 
-// Define the type for the results array
-interface SearchResultListProps {
-  results: Array<{ fullAddress: string }>;
+interface Address {
+  fullAddress: string;
 }
 
-export const SearchResultList: React.FC<SearchResultListProps> = ({ results }) => {
+interface SearchResultsListProps {
+  results: Address[];
+  onSelect: (address: Address) => void;
+}
+
+export const SearchResultList: React.FC<SearchResultsListProps> = ({ results, onSelect }) => {
   return (
     <div className="results-list">
       {results.map((result, index) => (
-        <SearchResult result={result.fullAddress} key={index} />
+        <div
+          key={index}
+          className="result-item"
+          onClick={() => onSelect(result)}
+        >
+          {result.fullAddress}
+        </div>
       ))}
     </div>
   );
