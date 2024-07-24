@@ -329,8 +329,8 @@ const Dashboard = () => {
                 <div className='box1'>
                     <div className={`dropdown search-address-dropdown custom-dropdown ${box1DropdownOpen ? 'show' : ''}`}>
                         <button className="btn btn-secondary dropdown-toggle custom-dropdown-button" type="button" onClick={toggleBox1Dropdown}>
+                            {selectedAddress1}
                             {selectedAddress}
-                            {selectedAddress || "Select an address"}
 
                             <Image src="/dropdownicon.svg" alt="Dropdown Icon" className={`dropdown-icon ${box1DropdownOpen ? 'open' : ''}`} width={50} height={50} />
 
