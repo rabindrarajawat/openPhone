@@ -87,18 +87,19 @@ const Dashboard = () => {
     }, [selectedAddress]);
 
 
-    useEffect(() => {
-        if (selectedRowId !== null) {
-            axios.get(`http://localhost:8000/openPhoneEventData/getbody?conversation_id=${selectedRowId}`)
-                .then(response => {
-                    console.log('API response for selected owner ID:', response.data);
-                    setApiResponseBody(response.data.body); // Store the API response body in state
-                })
-                .catch(error => {
-                    console.error('Error fetching data for selected owner ID:', error);
-                });
-        }
-    }, [selectedRowId]);
+    const handleRowClick = (ownerId: number) => {
+        setSelectedRowId(ownerId);
+        console.log('Selected owner ID:', ownerId);
+
+        axios.get(`http://localhost:8000/openPhoneEventData/getbody?conversation_id=${ownerId}`)
+            .then(response => {
+                console.log('API response for selected owner ID:', response.data);
+                setApiResponseBody(response.data.body); // Store the API response body in state
+            })
+            .catch(error => {
+                console.error('Error fetching data for selected owner ID:', error);
+            });
+    };
 
 
     const toggleMessage = () => {
@@ -154,14 +155,16 @@ const Dashboard = () => {
 
     useEffect(() => {
         if (tableData && tableData.length > 0) {
-            setSelectedRowId(tableData[0].ownerid); // Set the first row's ownerid as the selectedRowId
+            const firstRowId = tableData[0].ownerid;
+            setSelectedRowId(firstRowId); // Set the first row's ownerid as the selectedRowId
+            handleRowClick(firstRowId); // Fetch and display data for the first row
         }
     }, [tableData]);
 
-    const handleRowClick = (ownerId: number) => {
-        setSelectedRowId(ownerId);
-        console.log('Selected owner ID:', ownerId);
-    };
+    // const handleRowClick = (ownerId: number) => {
+    //     setSelectedRowId(ownerId);
+    //     console.log('Selected owner ID:', ownerId);
+    // };
 
 
 
@@ -483,7 +486,7 @@ const Dashboard = () => {
                                             )}
                                         </div>
                                     ) : (
-                                        'API response will appear here'
+                                        'Loading...'
                                     )}
                                 </div>
                             </div>
