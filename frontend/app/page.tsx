@@ -76,7 +76,16 @@ export default function Home() {
               className={`btn btn-outline-secondary px-3 py-3 mt-3 text-dark  ${styles.loginButton}`}
               onClick={handleLogin}
             >
+              <span className='d-flex-column '>
+
               <span className={styles.loginSet}>Login to Your Account</span>
+              <span className={styles.arrow}>
+              <i className="">        
+                <Image src="/arrow.png" alt="" className='logo1' width={25} height={20} />
+              </i>
+              </span>
+
+              </span>
             </button>
           </div>
         </div>
