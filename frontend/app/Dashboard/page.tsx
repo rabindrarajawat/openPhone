@@ -391,7 +391,7 @@ const Dashboard = () => {
                     </div>
                     <div className='tracking-container'>
                         <div className='call-tracking'>
-                            <Image src="/vector.svg" alt="Activity Logo" className='vector' width={50} height={50} />
+                            <Image src="/calling.png" alt="Activity Logo" className='vector' width={50} height={50} />
                             <div className='text'>Call tracking of search address </div>
                         </div>
                         <div className='follow-up'>
