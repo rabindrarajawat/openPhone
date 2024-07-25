@@ -64,8 +64,12 @@
   background-color: transparent;
 }
 .loginSet{
-  padding-right: 58%;
+  padding-right: 48%;
   font-weight: 500;
+}
+.arrow{
+  margin-right:14px
+
 }
 
 /* Responsive Styles */
