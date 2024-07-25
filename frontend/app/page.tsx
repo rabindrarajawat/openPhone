@@ -54,7 +54,7 @@ export default function Home() {
             <input
               type="text"
               aria-label="Email"
-              className={`form-control px-3 py-3 ${styles.textBorder}`}
+              className={`rounded-2 px-3 ${styles.textBorder}`}
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -64,7 +64,7 @@ export default function Home() {
             <input
               type="password"
               aria-label="Password"
-              className={`form-control px-3 py-3 mt-3 ${styles.textBorder}`}
+              className={` rounded-2 px-3 mt-3 ${styles.textBorder}`}
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -73,7 +73,7 @@ export default function Home() {
           {error && <div className="text-danger mt-3">{error}</div>}
           <div>
             <button
-              className={`btn btn-outline-secondary px-3 py-3 mt-3 text-dark  ${styles.loginButton}`}
+              className={`btn btn-outline-secondary px-3 mt-3 text-dark  ${styles.loginButton}`}
               onClick={handleLogin}
             >
               <span className='d-flex-column '>
