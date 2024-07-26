@@ -16,10 +16,4 @@ export class AddressEntity extends CommonEntity {
 
   @CreateDateColumn({ nullable: true })
   date: Date;
-
-  @PrimaryGeneratedColumn()
-  conversation_id: number;
-
-  @Column({ nullable: true })
-  name: string;
 }
