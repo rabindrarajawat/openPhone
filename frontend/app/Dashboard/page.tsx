@@ -13,6 +13,17 @@ interface Address {
     fullAddress: string;
 }
 
+interface Message {
+    event_type_id: number;
+    body: string;
+}
+
+interface ApiResponse {
+    message: string;
+    data: Message[];
+}
+
+
 interface EventItem {
     created_at: string;
     modified_at: string | null;
@@ -48,10 +59,12 @@ const Dashboard = () => {
     const [addresses, setAddresses] = useState<string[]>([]); // State to store addresses
     const [eventData, setEventData] = useState<EventItem[]>([]);
     const [phoneNumber, setPhoneNumber] = useState<string>('');
-    const [selectedRowId, setSelectedRowId] = useState<number | null>(null); // State for selected row
-    const [apiResponseBody, setApiResponseBody] = useState<string>(''); // State for API response body
-    const [isMessageExpanded, setIsMessageExpanded] = useState<boolean>(false);
+    const [fromNumber, setFromNumber] = useState('');
     const [selectedAddress1, setSelectedAddress1] = useState<string>('');
+    const [apiResponseBody, setApiResponseBody] = useState<Message[]>([]);
+    const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
+    const [isMessageExpanded, setIsMessageExpanded] = useState(false);
+    const [expandedMessages, setExpandedMessages] = useState<Set<number>>(new Set());
 
 
 
@@ -81,8 +94,12 @@ const Dashboard = () => {
                     setEventData(data); // Set the new event data based on the selected address
                     if (data.length > 0) {
                         setPhoneNumber(data[0].to); // Assuming you want the 'to' value from the first item
+                        setFromNumber(data[0].from); // Set the 'from' value from the first item
+
                     } else {
                         setPhoneNumber(''); // Clear phone number if no data
+                        setFromNumber(''); // Clear from number if no data
+
                     }
                 })
                 .catch(error => {
@@ -93,15 +110,14 @@ const Dashboard = () => {
 
 
     const handleRowClick = (ownerId: number) => {
-        // Only update selectedRowId if it's different
         if (selectedRowId !== ownerId) {
             setSelectedRowId(ownerId);
             console.log('Selected owner ID:', ownerId);
 
-            axios.get(`http://localhost:8000/openPhoneEventData/getbody?conversation_id=${ownerId}`)
+            axios.get<ApiResponse>(`http://localhost:8000/openPhoneEventData/events-by-conversation?conversation_id=${ownerId}`)
                 .then(response => {
                     console.log('API response for selected owner ID:', response.data);
-                    setApiResponseBody(response.data.body); // Store the API response body in state
+                    setApiResponseBody(response.data.data); // Store the data array in state
                 })
                 .catch(error => {
                     console.error('Error fetching data for selected owner ID:', error);
@@ -109,6 +125,18 @@ const Dashboard = () => {
         }
     };
 
+
+    const toggleMessageExpansion = (index: number) => {
+        setExpandedMessages(prev => {
+            const newExpandedMessages = new Set(prev);
+            if (newExpandedMessages.has(index)) {
+                newExpandedMessages.delete(index);
+            } else {
+                newExpandedMessages.add(index);
+            }
+            return newExpandedMessages;
+        });
+    };
 
 
 
@@ -432,7 +460,8 @@ const Dashboard = () => {
                     <div className='tracking-container'>
                         <div className='call-tracking'>
                             <Image src="/converstation.svg" alt="converstation Logo" className='vector' width={50} height={50} />
-                            <div className='text'>Converation From {phoneNumber}  </div>
+                            <div className='text'>        Conversation From {fromNumber}
+                            </div>
                         </div>
                         <div className=''>
                             <div>
@@ -488,22 +517,41 @@ const Dashboard = () => {
                             </div>
                             <div className='screenshot-msg'>
                                 <div className='inbox-chat'>
-                                    {apiResponseBody ? (
-                                        <div>
-                                            {isMessageExpanded ? (
-                                                <div>
-                                                    {JSON.stringify(apiResponseBody, null, 2)}
-                                                    <button onClick={toggleMessage} className="read-more-btn">Read Less</button>
-                                                </div>
-                                            ) : (
-                                                <div>
-                                                    {JSON.stringify(apiResponseBody, null, 2).substring(0, 100)}{/* Adjust 100 to your preferred length */}
-                                                    {JSON.stringify(apiResponseBody, null, 2).length > 100 && (
-                                                        <button onClick={toggleMessage} className="read-more-btn">...  Read More</button>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
+                                    {apiResponseBody.length > 0 ? (
+                                        apiResponseBody.map((message, index) => (
+                                            <div
+                                                key={index}
+                                                className={message.event_type_id === 2 ? 'chat-message-right' : 'chat-message-left'}
+                                            >
+                                                {expandedMessages.has(index) ? (
+                                                    <div>
+                                                        {message.body}
+                                                        <button
+                                                            onClick={() => toggleMessageExpansion(index)}
+                                                            className={`read-more-btn ${message.event_type_id === 2 ? 'read-more-btn-right' : 'read-more-btn-left'}`}
+                                                        >
+                                                            Read Less
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div>
+                                                        {message.body.length > 100 ? (
+                                                            <>
+                                                                {message.body.substring(0, 100)}...
+                                                                <button
+                                                                    onClick={() => toggleMessageExpansion(index)}
+                                                                    className={`read-more-btn ${message.event_type_id === 2 ? 'read-more-btn-right' : 'read-more-btn-left'}`}
+                                                                >
+                                                                    Read More
+                                                                </button>
+                                                            </>
+                                                        ) : (
+                                                            message.body
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))
                                     ) : (
                                         'Loading...'
                                     )}

@@ -114,6 +114,16 @@ export class OpenPhoneEventController {
     };
   }
 
+  @Get("events-by-conversation")
+  async getEventBodiesByConversationId(@Query("conversation_id") conversationId: string) {
+    // Fetch the event bodies using the service
+    const eventBodies = await this.openPhoneEventService.findEventBodiesByConversationId(conversationId);
+    return {
+      message: `Event bodies fetched successfully for conversation_id: ${conversationId}`,
+      data: eventBodies,
+    };
+  }
+
   @Get()
   async getAllOpenPhoneEvents() {
     return this.openPhoneEventService.findAll();
