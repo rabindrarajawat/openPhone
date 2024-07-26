@@ -38,8 +38,6 @@ export class OpenPhoneEventEntity extends CommonEntity {
   @Column()
   conversation_id: string;
 
-
-
   @CreateDateColumn()
   received_at: Date;
 
@@ -60,5 +58,4 @@ export class OpenPhoneEventEntity extends CommonEntity {
 
   @Column({ nullable: true })
   user_id: string;
-
 }
