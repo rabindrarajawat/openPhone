@@ -8,13 +8,13 @@ import { CommonEntity } from "./common-columns.entity";
 
 @Entity("open_phone_event")
 export class OpenPhoneEventEntity extends CommonEntity {
-   @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   event_type_id: number;
 
-  @Column()
+  @Column({ nullable: true })
   address_id: number;
 
   @Column()
@@ -36,9 +36,9 @@ export class OpenPhoneEventEntity extends CommonEntity {
   url_type: string;
 
   @Column()
-  conversation_id: number;
+  conversation_id: string;
 
-    
+
 
   @CreateDateColumn()
   received_at: Date;
@@ -51,8 +51,14 @@ export class OpenPhoneEventEntity extends CommonEntity {
 
   @Column()
   keep_an_eye: string;
-  
-  @Column({ type: 'boolean', default: false })
+
+  @Column({ type: "boolean", default: false })
   is_stop: boolean;
+
+  @Column({ nullable: true })
+  phone_number_id: string;
+
+  @Column({ nullable: true })
+  user_id: string;
 
 }
