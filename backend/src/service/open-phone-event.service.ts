@@ -98,7 +98,16 @@
 //   const addressData = await this.addressRepository.findOne({
 //     where: { address: address },
 //   });
+// async findOpenPhoneEventsByAddress(
+//   address: string
+// ): Promise<Partial<OpenPhoneEventEntity>[]> {
+//   const addressData = await this.addressRepository.findOne({
+//     where: { address: address },
+//   });
 
+//   if (!addressData) {
+//     throw new NotFoundException(`Address not found: ${address}`);
+//   }
 //   if (!addressData) {
 //     throw new NotFoundException(`Address not found: ${address}`);
 //   }
@@ -106,7 +115,15 @@
 //   // const openPhoneEvents = await this.openPhoneEventRepository.find({
 //   //   where: { conversation_id: addressData.conversation_id },
 //   // });
+//   // const openPhoneEvents = await this.openPhoneEventRepository.find({
+//   //   where: { conversation_id: addressData.conversation_id },
+//   // });
 
+// //   if (openPhoneEvents.length === 0) {
+// //     throw new NotFoundException(
+// //       `No OpenPhoneEvents found for address: ${address}`
+// //     );
+// //   }
 // //   if (openPhoneEvents.length === 0) {
 // //     throw new NotFoundException(
 // //       `No OpenPhoneEvents found for address: ${address}`
@@ -117,7 +134,13 @@
 // //     const { body, ...eventWithoutBody } = event;
 // //     return eventWithoutBody;
 // //   });
+// //   const eventsWithoutBody = openPhoneEvents.map((event) => {
+// //     const { body, ...eventWithoutBody } = event;
+// //     return eventWithoutBody;
+// //   });
 
+// //   return eventsWithoutBody;
+// // }
 // //   return eventsWithoutBody;
 // // }
 
@@ -136,12 +159,6 @@
 
 //   // }
 // }
-
-
-
-
-
-
 
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -166,6 +183,7 @@ export class OpenPhoneEventService {
   async create(payload: any) {
     const messageData = payload.data.object;
     const body = messageData.body;
+
 
     let addressId = null;
     let addressCreated = false;
@@ -206,10 +224,18 @@ export class OpenPhoneEventService {
     } else {
       console.warn("Body is null or empty.");
     }
+    const existingEvent = await this.openPhoneEventRepository.findOne({
+      where: { conversation_id: messageData.conversationId },
+    });
 
     const openPhoneEvent = new OpenPhoneEventEntity();
     openPhoneEvent.event_type_id = this.getEventTypeId(payload.type);
-    openPhoneEvent.address_id = addressId;
+    if (messageData.status === "delivered") {
+      openPhoneEvent.address_id = existingEvent.address_id;
+    } else {
+      openPhoneEvent.address_id = addressId;
+    }
+    // openPhoneEvent.address_id = addressId;
     openPhoneEvent.event_direction_id = this.getEventDirectionId(
       messageData.direction
     );
@@ -231,8 +257,8 @@ export class OpenPhoneEventService {
     openPhoneEvent.contact_established = "NA";
     openPhoneEvent.dead = "No";
     openPhoneEvent.keep_an_eye = "Yes";
-    openPhoneEvent.is_stop = body.toLowerCase().includes("stop");
-
+    openPhoneEvent.is_stop = false;
+    openPhoneEvent.created_by = "Ram";
     try {
       const savedOpenPhoneEvent =
         await this.openPhoneEventRepository.save(openPhoneEvent);
@@ -241,10 +267,6 @@ export class OpenPhoneEventService {
         created_by: "Ram",
       };
       const saveEventId = await this.auctionService.create(auctionEventDto);
-      console.log(
-        "🚀 ~ OpenPhoneEventService ~ create ~ saveEventId:",
-        saveEventId
-      );
 
       return { openPhoneEvent: savedOpenPhoneEvent, addressCreated };
     } catch (error) {
@@ -300,7 +322,6 @@ export class OpenPhoneEventService {
       date: dateMatch ? new Date(dateMatch[1]) : null,
     };
   }
-
 
   async findOpenPhoneEventsByAddress(
     address: string
