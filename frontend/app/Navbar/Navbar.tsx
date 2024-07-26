@@ -37,7 +37,7 @@ const Navbar: React.FC<SearchBarProps> = ({ setResults, onSelectAddress }) => {
 
   const fetchData = async (value: string) => {
     try {
-      const response = await axios.get(`http://localhost:8000/address/search?term=${encodeURIComponent(value)}`);
+      const response = await axios.get(`http://localhost:8000/address/search?address=${encodeURIComponent(value)}`);
       const results = response.data.results.filter((address: Address) => 
         address.fullAddress.toLowerCase().includes(value.toLowerCase())
       );
