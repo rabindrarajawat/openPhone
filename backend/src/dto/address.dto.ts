@@ -10,7 +10,5 @@ export class AddressDto {
   @IsDateString()
   date: Date;
   created_by: string;
-  // conversation_id: number;
-  is_active: DeepPartial<boolean>;
-  name: string;
+  is_active: boolean;
 }
