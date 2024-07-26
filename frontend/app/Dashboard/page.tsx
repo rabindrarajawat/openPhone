@@ -11,7 +11,18 @@ import axios from 'axios';
 
 interface Address {
     fullAddress: string;
-  }
+}
+
+interface Message {
+    event_type_id: number;
+    body: string;
+}
+
+interface ApiResponse {
+    message: string;
+    data: Message[];
+}
+
 
 interface EventItem {
     created_at: string;
@@ -45,26 +56,15 @@ const Dashboard = () => {
     const [isFollowUpClicked, setIsFollowUpClicked] = useState(false); // Add state for Follow-up button
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
     const [selectedAddress, setSelectedAddress] = useState('Search Address');
+    const [addresses, setAddresses] = useState<string[]>([]); // State to store addresses
     const [eventData, setEventData] = useState<EventItem[]>([]);
     const [phoneNumber, setPhoneNumber] = useState<string>('');
-    const [selectedRowId, setSelectedRowId] = useState<number | null>(null); // State for selected row
-    const [apiResponseBody, setApiResponseBody] = useState<string>(''); // State for API response body
-    const [isMessageExpanded, setIsMessageExpanded] = useState<boolean>(false);
+    const [fromNumber, setFromNumber] = useState('');
     const [selectedAddress1, setSelectedAddress1] = useState<string>('');
-    const [selectedOption, setSelectedOption] = useState('View Recent');
-    const [addresses, setAddresses] = useState([
-        'Address 1',
-        'Address 2',
-        'Address 3',
-        // Add your addresses here
-    ]);
-
-    useEffect(() => {
-        // Set the default selection as 'View Recent' on component mount
-        handleAddressSelect('View Recent');
-    }, []);
-
-   
+    const [apiResponseBody, setApiResponseBody] = useState<Message[]>([]);
+    const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
+    const [isMessageExpanded, setIsMessageExpanded] = useState(false);
+    const [expandedMessages, setExpandedMessages] = useState<Set<number>>(new Set());
 
 
 
@@ -94,8 +94,12 @@ const Dashboard = () => {
                     setEventData(data); // Set the new event data based on the selected address
                     if (data.length > 0) {
                         setPhoneNumber(data[0].to); // Assuming you want the 'to' value from the first item
+                        setFromNumber(data[0].from); // Set the 'from' value from the first item
+
                     } else {
                         setPhoneNumber(''); // Clear phone number if no data
+                        setFromNumber(''); // Clear from number if no data
+
                     }
                 })
                 .catch(error => {
@@ -106,18 +110,34 @@ const Dashboard = () => {
 
 
     const handleRowClick = (ownerId: number) => {
-        setSelectedRowId(ownerId);
-        console.log('Selected owner ID:', ownerId);
+        if (selectedRowId !== ownerId) {
+            setSelectedRowId(ownerId);
+            console.log('Selected owner ID:', ownerId);
 
-        axios.get(`http://localhost:8000/openPhoneEventData/getbody?conversation_id=${ownerId}`)
-            .then(response => {
-                console.log('API response for selected owner ID:', response.data);
-                setApiResponseBody(response.data.body); // Store the API response body in state
-            })
-            .catch(error => {
-                console.error('Error fetching data for selected owner ID:', error);
-            });
+            axios.get<ApiResponse>(`http://localhost:8000/openPhoneEventData/events-by-conversation?conversation_id=${ownerId}`)
+                .then(response => {
+                    console.log('API response for selected owner ID:', response.data);
+                    setApiResponseBody(response.data.data); // Store the data array in state
+                })
+                .catch(error => {
+                    console.error('Error fetching data for selected owner ID:', error);
+                });
+        }
     };
+
+
+    const toggleMessageExpansion = (index: number) => {
+        setExpandedMessages(prev => {
+            const newExpandedMessages = new Set(prev);
+            if (newExpandedMessages.has(index)) {
+                newExpandedMessages.delete(index);
+            } else {
+                newExpandedMessages.add(index);
+            }
+            return newExpandedMessages;
+        });
+    };
+
 
 
     const toggleMessage = () => {
@@ -171,16 +191,21 @@ const Dashboard = () => {
     };
     const handleAddressSelect1 = (address: Address) => {
         setSelectedAddress(address.fullAddress);
-        
+
     };
 
     useEffect(() => {
-        if (tableData && tableData.length > 0) {
-            const firstRowId = tableData[0].ownerid;
-            setSelectedRowId(firstRowId); // Set the first row's ownerid as the selectedRowId
-            handleRowClick(firstRowId); // Fetch and display data for the first row
+        if (tableData.length > 0) {
+            // Set default selectedRowId only if it is not already set
+            if (selectedRowId === null && tableData.length > 0) {
+                const firstRowId = tableData[0].ownerid;
+                setSelectedRowId(firstRowId);
+                handleRowClick(firstRowId);
+            }
         }
-    }, [tableData]);
+    }, [tableData, selectedRowId]);
+
+
     // const handleRowClick = (ownerId: number) => {
     //     setSelectedRowId(ownerId);
     //     console.log('Selected owner ID:', ownerId);
@@ -190,10 +215,8 @@ const Dashboard = () => {
 
     return (
         <div>
-            <Navbar onSelectAddress = {handleAddressSelect1}/>
+            <Navbar onSelectAddress={handleAddressSelect1} />
             <SideBar />
-            <div className='main'>
-
             <div className='box'>
                 <div className='msg'>Message and Calls</div>
                 <div className={`dropdown ${dropdownOpen ? 'show' : ''}`}>
@@ -223,10 +246,10 @@ const Dashboard = () => {
                                 onChange={() => handleOptionToggle('not delivered')}
                             />
                             <label className="form-check-label" htmlFor="checkbox-not-delivered">
-                                Not Delivered
+                                Received
                             </label>
                         </div>
-                        <div className="form-check custom-dropdown-item">
+                        {/* <div className="form-check custom-dropdown-item">
                             <input
                                 className="form-check-input"
                                 type="checkbox"
@@ -237,7 +260,7 @@ const Dashboard = () => {
                             <label className="form-check-label" htmlFor="checkbox-pending">
                                 Pending
                             </label>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
                 <div className={`dropdown ${statusDropdownOpen ? 'show' : ''}`}>
@@ -314,7 +337,7 @@ const Dashboard = () => {
                                 Monthly
                             </label>
                         </div>
-                        <div className="form-check custom-dropdown-item">
+                        {/* <div className="form-check custom-dropdown-item">
                             <input
                                 className="form-check-input"
                                 type="checkbox"
@@ -325,9 +348,9 @@ const Dashboard = () => {
                             <label className="form-check-label" htmlFor="checkbox-custom">
                                 Custom
                             </label>
-                        </div>
+                        </div> */}
                     </div>
-                    <div className="form-check call custom-dropdown-item">
+                    {/* <div className="form-check call custom-dropdown-item">
                         <input
                             className="form-check-input"
                             type="checkbox"
@@ -338,7 +361,7 @@ const Dashboard = () => {
                         <label className="form-check-label" htmlFor="checkbox-call">
                             Calls
                         </label>
-                    </div>
+                    </div> */}
                 </div>
 
                 <div className='box1'>
@@ -351,35 +374,16 @@ const Dashboard = () => {
 
                         </button>
                         <div className={`dropdown-menu custom-dropdown-menu ${box1DropdownOpen ? 'show' : ''}`}>
-            <span className='ms-3'>
-                <span
-                    className={`${selectedOption === 'View Recent' ? 'text-primary' : ''}`}
-                    // onClick={() => handleAddressSelect('View Recent')}
-                >
-                    View Recent
-                </span>
-                <span
-                    className={`px-2 ${selectedOption === 'Oldest to Latest' ? 'text-primary' : ''}`}
-                   
-                >
-                    Oldest to Latest
-                </span>
-                <span
-                    className={`px-2 ${selectedOption === 'Latest to Oldest' ? 'text-primary' : ''}`}
-                >
-                    Latest to Oldest
-                </span>
-            </span>
-            {addresses.map((address, index) => (
-                <button
-                    key={index}
-                    className="dropdown-item custom-dropdown-item"
-                    onClick={() => handleAddressSelect(address)}
-                >
-                    {address}
-                </button>
-            ))}
-        </div>
+                            {addresses.map((address, index) => (
+                                <button
+                                    key={index}
+                                    className="dropdown-item custom-dropdown-item"
+                                    onClick={() => handleAddressSelect(address)}
+                                >
+                                    {address}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
 
@@ -425,7 +429,7 @@ const Dashboard = () => {
                     </div>
                     <div className='tracking-container'>
                         <div className='call-tracking'>
-                            <Image src="/calling.png" alt="Activity Logo" className='vector' width={50} height={50} />
+                            <Image src="/vector.svg" alt="Activity Logo" className='vector' width={50} height={50} />
                             <div className='text'>Call tracking of search address </div>
                         </div>
                         <div className='follow-up'>
@@ -435,9 +439,8 @@ const Dashboard = () => {
                             </div>
                         </div>
                     </div>
-                    <div className='tracking-container-box '>
-                        <div className='check-status rounded-4'>
-
+                    <div className='tracking-container-box'>
+                        <div className='check-status'>
                             <div className='time  '>Times</div>
                             <div className='vertical-line'></div>
                             <div className='time'>Duration</div>
@@ -446,7 +449,7 @@ const Dashboard = () => {
                             <div className='vertical-line'></div>
                             <div className='time'>Action</div>
                         </div>
-                        <div className={`follow-status  ${isFollowUpClicked ? 'follow-up-heading' : ''}`} >
+                        <div className={`follow-status ${isFollowUpClicked ? 'follow-up-heading' : ''}`} >
                             <div className='time  '>Owner ID</div>
                             <div className='vertical-line'></div>
                             <div className='time'>Status</div>
@@ -457,7 +460,8 @@ const Dashboard = () => {
                     <div className='tracking-container'>
                         <div className='call-tracking'>
                             <Image src="/converstation.svg" alt="converstation Logo" className='vector' width={50} height={50} />
-                            <div className='text'>Converation From {phoneNumber}  </div>
+                            <div className='text'>        Conversation From {fromNumber}
+                            </div>
                         </div>
                         <div className=''>
                             <div>
@@ -471,7 +475,7 @@ const Dashboard = () => {
                             <table className="table table-hover">
                                 <thead>
                                     <tr className='datatable'>
-                                        <th scope="col">Owner ID</th>
+                                        <th scope="col">Conversation ID</th>
                                         <th scope="col">Phone Number</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">Responses</th>
@@ -513,22 +517,41 @@ const Dashboard = () => {
                             </div>
                             <div className='screenshot-msg'>
                                 <div className='inbox-chat'>
-                                    {apiResponseBody ? (
-                                        <div>
-                                            {isMessageExpanded ? (
-                                                <div>
-                                                    {JSON.stringify(apiResponseBody, null, 2)}
-                                                    <button onClick={toggleMessage} className="read-more-btn">Read Less</button>
-                                                </div>
-                                            ) : (
-                                                <div>
-                                                    {JSON.stringify(apiResponseBody, null, 2).substring(0, 100)}{/* Adjust 100 to your preferred length */}
-                                                    {JSON.stringify(apiResponseBody, null, 2).length > 100 && (
-                                                        <button onClick={toggleMessage} className="read-more-btn">...  Read More</button>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
+                                    {apiResponseBody.length > 0 ? (
+                                        apiResponseBody.map((message, index) => (
+                                            <div
+                                                key={index}
+                                                className={message.event_type_id === 2 ? 'chat-message-right' : 'chat-message-left'}
+                                            >
+                                                {expandedMessages.has(index) ? (
+                                                    <div>
+                                                        {message.body}
+                                                        <button
+                                                            onClick={() => toggleMessageExpansion(index)}
+                                                            className={`read-more-btn ${message.event_type_id === 2 ? 'read-more-btn-right' : 'read-more-btn-left'}`}
+                                                        >
+                                                            Read Less
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div>
+                                                        {message.body.length > 100 ? (
+                                                            <>
+                                                                {message.body.substring(0, 100)}...
+                                                                <button
+                                                                    onClick={() => toggleMessageExpansion(index)}
+                                                                    className={`read-more-btn ${message.event_type_id === 2 ? 'read-more-btn-right' : 'read-more-btn-left'}`}
+                                                                >
+                                                                    Read More
+                                                                </button>
+                                                            </>
+                                                        ) : (
+                                                            message.body
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))
                                     ) : (
                                         'Loading...'
                                     )}
@@ -553,7 +576,6 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
-            </div>
             </div>
         </div>
     );
