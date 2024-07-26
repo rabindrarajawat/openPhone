@@ -1,19 +1,103 @@
-// // 
+// // // 
 
 
-// import { IsNumber, IsOptional, IsString, IsBoolean } from 'class-validator';
+// // import { IsNumber, IsOptional, IsString, IsBoolean } from 'class-validator';
 
-// export class CreateAuctionEventDto {
-//   @IsNumber()
-//   event_id: number;
+// // export class CreateAuctionEventDto {
+// //   @IsNumber()
+// //   event_id: number;
+
+// //   @IsOptional()
+// //   @IsString()
+// //   created_by?: string;
+
+// //   @IsOptional()
+// //   @IsString()
+// //   created_at?: string;
+
+// //   @IsOptional()
+// //   @IsString()
+// //   modified_by?: string;
+
+// //   @IsOptional()
+// //   @IsString()
+// //   modified_at?: string;
+
+// //   @IsOptional()
+// //   @IsBoolean()
+// //   is_active?: boolean;
+// // }
+
+
+
+// import { IsNotEmpty, IsString, IsInt, IsOptional, IsDateString, IsBoolean } from 'class-validator';
+
+// export class OpenPhoneEventDto {
+//   @IsNotEmpty()
+//   @IsInt()
+//   event_type_id: number;
+
+//   @IsNotEmpty()
+//   @IsInt()
+//   address_id: number;
+
+//   @IsNotEmpty()
+//   @IsInt()
+//   event_direction_id: number;
+
+//   @IsNotEmpty()
+//   @IsString()
+//   from: string;
+
+//   @IsNotEmpty()
+//   @IsString()
+//   to: string;
+
+//   @IsNotEmpty()
+//   @IsString()
+//   body: string;
+
+//   @IsNotEmpty()
+//   @IsString()
+//   url: string;
+
+//   @IsNotEmpty()
+//   @IsString()
+//   url_type: string;
+
+//   @IsNotEmpty()
+//   @IsString()
+//   conversation_id: number;
+
+//   @IsNotEmpty()
+//   @IsDateString()
+//   created_at: Date;
+
+//   @IsNotEmpty()
+//   @IsDateString()
+//   received_at: Date;
+
+//   @IsOptional()
+//   @IsString()
+//   contact_established?: string;
+
+//   @IsOptional()
+//   @IsString()
+//   dead?: string;
+
+//   @IsOptional()
+//   @IsString()
+//   keep_an_eye?: string;
+
+//   @IsOptional()
+//   @IsString()
+//   stop?: string;
 
 //   @IsOptional()
 //   @IsString()
 //   created_by?: string;
 
-//   @IsOptional()
-//   @IsString()
-//   created_at?: string;
+  
 
 //   @IsOptional()
 //   @IsString()
@@ -30,20 +114,33 @@
 
 
 
-import { IsNotEmpty, IsString, IsInt, IsOptional, IsDateString, IsBoolean } from 'class-validator';
 
-export class OpenPhoneEventDto {
+
+
+
+
+
+import { IsNotEmpty, IsString, IsObject, IsArray, IsOptional, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+
+class MediaDto {
   @IsNotEmpty()
-  @IsInt()
-  event_type_id: number;
+  @IsString()
+  url: string;
 
   @IsNotEmpty()
-  @IsInt()
-  address_id: number;
+  @IsString()
+  type: string;
+}
+
+class MessageObjectDto {
+  @IsNotEmpty()
+  @IsString()
+  id: string;
 
   @IsNotEmpty()
-  @IsInt()
-  event_direction_id: number;
+  @IsString()
+  object: string;
 
   @IsNotEmpty()
   @IsString()
@@ -55,59 +152,65 @@ export class OpenPhoneEventDto {
 
   @IsNotEmpty()
   @IsString()
+  direction: string;
+
+  @IsNotEmpty()
+  @IsString()
   body: string;
 
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => MediaDto)
+  media?: MediaDto[];
+
   @IsNotEmpty()
   @IsString()
-  url: string;
+  status: string;
 
   @IsNotEmpty()
   @IsString()
-  url_type: string;
+  createdAt: string;
 
   @IsNotEmpty()
   @IsString()
-  conversation_id: number;
+  userId: string;
 
   @IsNotEmpty()
-  @IsDateString()
-  created_at: Date;
+  @IsString()
+  phoneNumberId: string;
 
   @IsNotEmpty()
-  @IsDateString()
-  received_at: Date;
-
-  @IsOptional()
   @IsString()
-  contact_established?: string;
+  conversationId: string;
+}
 
-  @IsOptional()
+export class OpenPhoneEventDto {
+  @IsNotEmpty()
   @IsString()
-  dead?: string;
+  id: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  keep_an_eye?: string;
+  object: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  stop?: string;
+  apiVersion: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  created_by?: string;
+  createdAt: string;
 
-  
-
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  modified_by?: string;
+  type: string;
 
-  @IsOptional()
-  @IsString()
-  modified_at?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  is_active?: boolean;
+  @IsNotEmpty()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => MessageObjectDto)
+  data: {
+    object: MessageObjectDto;
+  };
 }
