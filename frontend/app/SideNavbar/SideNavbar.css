@@ -4,7 +4,7 @@
 .sidebar {
     position: absolute;
     background: #ECF0FF;
-    width: 90px;
+    width: 153px;
     height: 835px;
     top: 76px;
 }
@@ -32,7 +32,7 @@
     text-align: left;
     color: #7D8FB3;
     cursor: pointer;
-    margin-top: 1100%;
+    margin-top: 500%;
 
 }
 

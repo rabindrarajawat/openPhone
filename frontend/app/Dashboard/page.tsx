@@ -45,13 +45,26 @@ const Dashboard = () => {
     const [isFollowUpClicked, setIsFollowUpClicked] = useState(false); // Add state for Follow-up button
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
     const [selectedAddress, setSelectedAddress] = useState('Search Address');
-    const [addresses, setAddresses] = useState<string[]>([]); // State to store addresses
     const [eventData, setEventData] = useState<EventItem[]>([]);
     const [phoneNumber, setPhoneNumber] = useState<string>('');
     const [selectedRowId, setSelectedRowId] = useState<number | null>(null); // State for selected row
     const [apiResponseBody, setApiResponseBody] = useState<string>(''); // State for API response body
     const [isMessageExpanded, setIsMessageExpanded] = useState<boolean>(false);
     const [selectedAddress1, setSelectedAddress1] = useState<string>('');
+    const [selectedOption, setSelectedOption] = useState('View Recent');
+    const [addresses, setAddresses] = useState([
+        'Address 1',
+        'Address 2',
+        'Address 3',
+        // Add your addresses here
+    ]);
+
+    useEffect(() => {
+        // Set the default selection as 'View Recent' on component mount
+        handleAddressSelect('View Recent');
+    }, []);
+
+   
 
 
 
@@ -179,6 +192,8 @@ const Dashboard = () => {
         <div>
             <Navbar onSelectAddress = {handleAddressSelect1}/>
             <SideBar />
+            <div className='main'>
+
             <div className='box'>
                 <div className='msg'>Message and Calls</div>
                 <div className={`dropdown ${dropdownOpen ? 'show' : ''}`}>
@@ -336,16 +351,35 @@ const Dashboard = () => {
 
                         </button>
                         <div className={`dropdown-menu custom-dropdown-menu ${box1DropdownOpen ? 'show' : ''}`}>
-                            {addresses.map((address, index) => (
-                                <button
-                                    key={index}
-                                    className="dropdown-item custom-dropdown-item"
-                                    onClick={() => handleAddressSelect(address)}
-                                >
-                                    {address}
-                                </button>
-                            ))}
-                        </div>
+            <span className='ms-3'>
+                <span
+                    className={`${selectedOption === 'View Recent' ? 'text-primary' : ''}`}
+                    // onClick={() => handleAddressSelect('View Recent')}
+                >
+                    View Recent
+                </span>
+                <span
+                    className={`px-2 ${selectedOption === 'Oldest to Latest' ? 'text-primary' : ''}`}
+                   
+                >
+                    Oldest to Latest
+                </span>
+                <span
+                    className={`px-2 ${selectedOption === 'Latest to Oldest' ? 'text-primary' : ''}`}
+                >
+                    Latest to Oldest
+                </span>
+            </span>
+            {addresses.map((address, index) => (
+                <button
+                    key={index}
+                    className="dropdown-item custom-dropdown-item"
+                    onClick={() => handleAddressSelect(address)}
+                >
+                    {address}
+                </button>
+            ))}
+        </div>
                     </div>
 
 
@@ -401,8 +435,9 @@ const Dashboard = () => {
                             </div>
                         </div>
                     </div>
-                    <div className='tracking-container-box'>
-                        <div className='check-status'>
+                    <div className='tracking-container-box '>
+                        <div className='check-status rounded-4'>
+
                             <div className='time  '>Times</div>
                             <div className='vertical-line'></div>
                             <div className='time'>Duration</div>
@@ -411,7 +446,7 @@ const Dashboard = () => {
                             <div className='vertical-line'></div>
                             <div className='time'>Action</div>
                         </div>
-                        <div className={`follow-status ${isFollowUpClicked ? 'follow-up-heading' : ''}`} >
+                        <div className={`follow-status  ${isFollowUpClicked ? 'follow-up-heading' : ''}`} >
                             <div className='time  '>Owner ID</div>
                             <div className='vertical-line'></div>
                             <div className='time'>Status</div>
@@ -518,6 +553,7 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
     );

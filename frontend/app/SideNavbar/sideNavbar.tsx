@@ -24,9 +24,9 @@ const SideBar = () => {
                         <label className='dash' htmlFor="">Dashboard</label>
                     </li>
                 </div>
-                <li className="log">
+                <p className="log">
                     <div onClick={handleLogout}>Log out</div>
-                </li>
+                </p>
             </ul>
         </>
     );

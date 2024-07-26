@@ -4,10 +4,10 @@
 
 .box {
     position: absolute;
-    width: 235px;
+    width: 296px;
     height: 835px;
     top: 76px;
-    left: 90px;
+    left: 153px;
     gap: 0px;
     opacity: 0px;
     background: linear-gradient(179.99deg, #E4FFEC 0.01%, #E9F0FF 102.39%);
@@ -113,16 +113,15 @@
 }
 
 .box1 {
-    margin-left: 120%;
+    margin-left: 123%;
     width: 1282px;
     height: 730px;
     margin-top: -145px;
     gap: 0px;
-    border-radius: 15px;
-    border: 2px;
+  
     opacity: 0px;
     background: #FFFFFFBF;
-    border: 2px solid #EDEFF2;
+  
     display: flexbox;
 }
 
@@ -139,9 +138,9 @@
     font-family: 'Roboto', sans-serif;
     font-weight: 900;
     text-align: left;
-    color: #3361FF;
-    width: 180px;
-    height: Hug (40px)px;
+    color: hsl(226, 100%, 60%);
+    width: 243px;
+    height: 40px;
     padding: 10px;
     border-radius: 10px;
     border: 1px 0px 0px 0px;
@@ -172,7 +171,7 @@
 .dropdown-icon {
     width: 16px;
     height: 8px;
-    margin-left: 25px;
+    margin-left: 82px;
 }
 
 .search-address-dropdown .dropdown-toggle::after {
