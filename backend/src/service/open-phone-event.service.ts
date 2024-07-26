@@ -335,4 +335,28 @@ export class OpenPhoneEventService {
     return eventsWithoutBody;
   }
 
+
+  async findEventBodiesByConversationId(conversationId: string): Promise<{ event_type_id: number, body: string }[]> {
+    try {
+      // Fetch events by conversation_id and order by id in ascending order
+      const events = await this.openPhoneEventRepository.find({
+        where: { conversation_id: conversationId },
+        order: { id: 'ASC' }, // Sort by id in ascending order
+      });
+
+      // Check if events are found
+      if (events.length === 0) {
+        throw new NotFoundException(`No events found for conversation_id: ${conversationId}`);
+      }
+
+      // Extract the 'event_type_id' and 'body' value from each event
+      return events.map(event => ({
+        event_type_id: event.event_type_id,
+        body: event.body,
+      }));
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      throw error;
+    }
+  }
 }
