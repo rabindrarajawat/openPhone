@@ -218,10 +218,10 @@ const Dashboard = () => {
                                 onChange={() => handleOptionToggle('not delivered')}
                             />
                             <label className="form-check-label" htmlFor="checkbox-not-delivered">
-                                Not Delivered
+                                Received
                             </label>
                         </div>
-                        <div className="form-check custom-dropdown-item">
+                        {/* <div className="form-check custom-dropdown-item">
                             <input
                                 className="form-check-input"
                                 type="checkbox"
@@ -232,7 +232,7 @@ const Dashboard = () => {
                             <label className="form-check-label" htmlFor="checkbox-pending">
                                 Pending
                             </label>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
                 <div className={`dropdown ${statusDropdownOpen ? 'show' : ''}`}>
@@ -309,7 +309,7 @@ const Dashboard = () => {
                                 Monthly
                             </label>
                         </div>
-                        <div className="form-check custom-dropdown-item">
+                        {/* <div className="form-check custom-dropdown-item">
                             <input
                                 className="form-check-input"
                                 type="checkbox"
@@ -320,9 +320,9 @@ const Dashboard = () => {
                             <label className="form-check-label" htmlFor="checkbox-custom">
                                 Custom
                             </label>
-                        </div>
+                        </div> */}
                     </div>
-                    <div className="form-check call custom-dropdown-item">
+                    {/* <div className="form-check call custom-dropdown-item">
                         <input
                             className="form-check-input"
                             type="checkbox"
@@ -333,7 +333,7 @@ const Dashboard = () => {
                         <label className="form-check-label" htmlFor="checkbox-call">
                             Calls
                         </label>
-                    </div>
+                    </div> */}
                 </div>
 
                 <div className='box1'>
@@ -446,7 +446,7 @@ const Dashboard = () => {
                             <table className="table table-hover">
                                 <thead>
                                     <tr className='datatable'>
-                                        <th scope="col">Owner ID</th>
+                                        <th scope="col">Conversation ID</th>
                                         <th scope="col">Phone Number</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">Responses</th>
