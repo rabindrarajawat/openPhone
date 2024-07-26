@@ -98,7 +98,16 @@
 //   const addressData = await this.addressRepository.findOne({
 //     where: { address: address },
 //   });
+// async findOpenPhoneEventsByAddress(
+//   address: string
+// ): Promise<Partial<OpenPhoneEventEntity>[]> {
+//   const addressData = await this.addressRepository.findOne({
+//     where: { address: address },
+//   });
 
+//   if (!addressData) {
+//     throw new NotFoundException(`Address not found: ${address}`);
+//   }
 //   if (!addressData) {
 //     throw new NotFoundException(`Address not found: ${address}`);
 //   }
@@ -106,7 +115,15 @@
 //   // const openPhoneEvents = await this.openPhoneEventRepository.find({
 //   //   where: { conversation_id: addressData.conversation_id },
 //   // });
+//   // const openPhoneEvents = await this.openPhoneEventRepository.find({
+//   //   where: { conversation_id: addressData.conversation_id },
+//   // });
 
+// //   if (openPhoneEvents.length === 0) {
+// //     throw new NotFoundException(
+// //       `No OpenPhoneEvents found for address: ${address}`
+// //     );
+// //   }
 // //   if (openPhoneEvents.length === 0) {
 // //     throw new NotFoundException(
 // //       `No OpenPhoneEvents found for address: ${address}`
@@ -117,7 +134,13 @@
 // //     const { body, ...eventWithoutBody } = event;
 // //     return eventWithoutBody;
 // //   });
+// //   const eventsWithoutBody = openPhoneEvents.map((event) => {
+// //     const { body, ...eventWithoutBody } = event;
+// //     return eventWithoutBody;
+// //   });
 
+// //   return eventsWithoutBody;
+// // }
 // //   return eventsWithoutBody;
 // // }
 
@@ -155,11 +178,12 @@ export class OpenPhoneEventService {
     private addressRepository: Repository<AddressEntity>,
     private addressService: AddressService,
     private auctionService: AuctionEventService
-  ) {}
+  ) { }
 
   async create(payload: any) {
     const messageData = payload.data.object;
     const body = messageData.body;
+
 
     let addressId = null;
     let addressCreated = false;
@@ -167,6 +191,7 @@ export class OpenPhoneEventService {
     // Extract address from body and save it
     if (body) {
       const extractedInfo = this.extractInformation(body);
+
 
       if (extractedInfo.address) {
         // Check if the address already exists
@@ -301,29 +326,58 @@ export class OpenPhoneEventService {
   async findOpenPhoneEventsByAddress(
     address: string
   ): Promise<Partial<OpenPhoneEventEntity>[]> {
+    // Fetch address data based on the provided address
     const addressData = await this.addressRepository.findOne({
       where: { address: address },
     });
 
+    // If address is not found, throw an exception
     if (!addressData) {
       throw new NotFoundException(`Address not found: ${address}`);
     }
 
+    // Fetch OpenPhone events using the address_id from the found address
     const openPhoneEvents = await this.openPhoneEventRepository.find({
       where: { address_id: addressData.id },
     });
 
+    // If no events are found, throw an exception
     if (openPhoneEvents.length === 0) {
-      throw new NotFoundException(
-        `No OpenPhoneEvents found for address: ${address}`
-      );
+      throw new NotFoundException(`No OpenPhoneEvents found for address: ${address}`);
     }
 
+    // Map through the events and remove the body field from each event
     const eventsWithoutBody = openPhoneEvents.map((event) => {
       const { body, ...eventWithoutBody } = event;
       return eventWithoutBody;
     });
 
+    // Return the events without their body field
     return eventsWithoutBody;
+  }
+
+
+  async findEventBodiesByConversationId(conversationId: string): Promise<{ event_type_id: number, body: string }[]> {
+    try {
+      // Fetch events by conversation_id and order by id in ascending order
+      const events = await this.openPhoneEventRepository.find({
+        where: { conversation_id: conversationId },
+        order: { id: 'ASC' }, // Sort by id in ascending order
+      });
+
+      // Check if events are found
+      if (events.length === 0) {
+        throw new NotFoundException(`No events found for conversation_id: ${conversationId}`);
+      }
+
+      // Extract the 'event_type_id' and 'body' value from each event
+      return events.map(event => ({
+        event_type_id: event.event_type_id,
+        body: event.body,
+      }));
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      throw error;
+    }
   }
 }

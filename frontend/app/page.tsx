@@ -78,7 +78,16 @@ export default function Home() {
             >
               <span className='d-flex-column '>
 
+              <span className='d-flex-column '>
+
               <span className={styles.loginSet}>Login to Your Account</span>
+              <span className={styles.arrow}>
+              <i className="">        
+                <Image src="/arrow.png" alt="" className='logo1' width={25} height={20} />
+              </i>
+              </span>
+
+              </span>
               <span className={styles.arrow}>
               <i className="">        
                 <Image src="/arrow.png" alt="" className='logo1' width={25} height={20} />

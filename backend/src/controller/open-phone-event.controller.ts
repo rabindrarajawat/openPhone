@@ -82,7 +82,7 @@ export class OpenPhoneEventController {
   constructor(
     private readonly openPhoneEventService: OpenPhoneEventService,
     private readonly addressService: AddressService
-  ) {}
+  ) { }
   @Post()
   async createOpenPhoneEvent(@Body() payload: any) {
     const { openPhoneEvent, addressCreated } =
@@ -111,6 +111,16 @@ export class OpenPhoneEventController {
     return {
       message: `OpenPhoneEvents found for address: ${address}`,
       data: openPhoneEvents,
+    };
+  }
+
+  @Get("events-by-conversation")
+  async getEventBodiesByConversationId(@Query("conversation_id") conversationId: string) {
+    // Fetch the event bodies using the service
+    const eventBodies = await this.openPhoneEventService.findEventBodiesByConversationId(conversationId);
+    return {
+      message: `Event bodies fetched successfully for conversation_id: ${conversationId}`,
+      data: eventBodies,
     };
   }
 

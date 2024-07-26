@@ -521,14 +521,14 @@ const Dashboard = () => {
                                         apiResponseBody.map((message, index) => (
                                             <div
                                                 key={index}
-                                                className={message.event_type_id === 2 ? 'chat-message-right' : 'chat-message-left'}
+                                                className={message.event_type_id === 1 ? 'chat-message-right' : 'chat-message-left'}
                                             >
                                                 {expandedMessages.has(index) ? (
                                                     <div>
                                                         {message.body}
                                                         <button
                                                             onClick={() => toggleMessageExpansion(index)}
-                                                            className={`read-more-btn ${message.event_type_id === 2 ? 'read-more-btn-right' : 'read-more-btn-left'}`}
+                                                            className={`read-more-btn ${message.event_type_id === 1 ? 'read-more-btn-right' : 'read-more-btn-left'}`}
                                                         >
                                                             Read Less
                                                         </button>
