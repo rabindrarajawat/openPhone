@@ -249,18 +249,6 @@ const Dashboard = () => {
                                 Received
                             </label>
                         </div>
-                        {/* <div className="form-check custom-dropdown-item">
-                            <input
-                                className="form-check-input"
-                                type="checkbox"
-                                id="checkbox-pending"
-                                checked={selectedOptions.includes('pending')}
-                                onChange={() => handleOptionToggle('pending')}
-                            />
-                            <label className="form-check-label" htmlFor="checkbox-pending">
-                                Pending
-                            </label>
-                        </div> */}
                     </div>
                 </div>
                 <div className={`dropdown ${statusDropdownOpen ? 'show' : ''}`}>

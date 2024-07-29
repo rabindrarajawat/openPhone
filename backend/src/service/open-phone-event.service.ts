@@ -380,4 +380,33 @@ export class OpenPhoneEventService {
       throw error;
     }
   }
+
+  async findConversationsWithoutAddress(): Promise<any[]> {
+    const subQuery = this.openPhoneEventRepository
+      .createQueryBuilder("sub_event")
+      .select("sub_event.conversation_id")
+      .where("sub_event.address_id IS NOT NULL");
+
+    const openPhoneEvents = await this.openPhoneEventRepository
+      .createQueryBuilder("event")
+      .select([
+        "event.conversation_id",
+        "event.from",
+        "event.to",
+        "event.body"
+      ])
+      .where("event.address_id IS NULL")
+      .andWhere("event.conversation_id NOT IN (" + subQuery.getQuery() + ")")
+      .distinct(true)
+      .getRawMany();
+
+    return openPhoneEvents.map(event => ({
+      conversation_id: event.event_conversation_id,
+      from: event.event_from,
+      to: event.event_to,
+      body: event.event_body,
+    }));
+  }
+
+
 }

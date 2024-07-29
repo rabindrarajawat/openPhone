@@ -124,6 +124,15 @@ export class OpenPhoneEventController {
     };
   }
 
+  @Get('getConversationsWithoutAddress')
+  async getConversationsWithoutAddress() {
+    const conversationIds = await this.openPhoneEventService.findConversationsWithoutAddress();
+    return {
+      message: "Conversations without address IDs fetched successfully.",
+      data: conversationIds,
+    };
+  }
+
   @Get()
   async getAllOpenPhoneEvents() {
     return this.openPhoneEventService.findAll();
