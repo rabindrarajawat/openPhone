@@ -88,11 +88,11 @@ export default function Home() {
               </span>
 
               </span>
-              <span className={styles.arrow}>
+              {/* <span className={styles.arrow}>
               <i className="">        
                 <Image src="/arrow.png" alt="" className='logo1' width={25} height={20} />
               </i>
-              </span>
+              </span> */}
 
               </span>
             </button>
