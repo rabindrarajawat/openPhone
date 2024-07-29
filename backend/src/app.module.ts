@@ -22,6 +22,8 @@ import { UserEntity } from "./entities/users.entity"
 import { RoleEntity } from "./entities/role.entity";
 import { usersModule } from "./module/users.module";
 import { RoleModule } from "./module/role.module";
+import { conversationmapping } from "./entities/conversation-mapping.entity";
+import { ConversationMappingModule } from "./module/conversation-mapping.modules";
 
 @Module({
   imports: [
@@ -43,7 +45,7 @@ import { RoleModule } from "./module/role.module";
           OpenPhoneEventDirectionEntity,
           CaseEventEntity,
           TaxDeadEntity,
-          MessageMasterEntity,MessageMasterEntity,AddressMappingEntity,UserEntity,RoleEntity
+          MessageMasterEntity, MessageMasterEntity, AddressMappingEntity, UserEntity, RoleEntity, conversationmapping
         ],
         synchronize: true,
         migrations: [__dirname + "/migrations/**/*{.ts,.js}"],
@@ -56,7 +58,7 @@ import { RoleModule } from "./module/role.module";
     OpenPhoneEventDirectionModule,
     OpenPhoneEventTypeModule,
     CaseEventModule,
-    AuctionEventModule,TaxDeadModule,MessageMasterModule,RoleModule,usersModule
+    AuctionEventModule, TaxDeadModule, MessageMasterModule, RoleModule, usersModule, ConversationMappingModule
   ],
 })
-export class AppModule {}
+export class AppModule { }

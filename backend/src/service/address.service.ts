@@ -10,7 +10,7 @@ export class AddressService {
   constructor(
     @InjectRepository(AddressEntity)
     private addressRepository: Repository<AddressEntity>
-  ) {}
+  ) { }
 
   // async createAddress(addressDto: AddressDto): Promise<AddressEntity> {
   //   const result = this.extractInformation(addressDto.address);
@@ -47,7 +47,7 @@ export class AddressService {
   }
 
 
-  
+
 
   async findAll(): Promise<AddressEntity[]> {
     return this.addressRepository.find();
@@ -61,5 +61,14 @@ export class AddressService {
       ],
       take: 10,
     });
+  }
+
+  async getAddressIdByAddress(address: string): Promise<number | null> {
+    const foundAddress = await this.addressRepository.findOne({
+      where: { address },
+      select: ["id"], // Only select the 'id' field
+    });
+
+    return foundAddress ? foundAddress.id : null;
   }
 }
