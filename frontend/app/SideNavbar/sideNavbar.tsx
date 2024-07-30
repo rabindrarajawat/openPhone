@@ -13,7 +13,7 @@ const SideBar = () => {
     const handleLogout = () => {
         // Remove the token from local storage
         localStorage.removeItem('authToken');
-        
+
         // Redirect to the home page
         router.push('/');
     };
@@ -23,17 +23,22 @@ const SideBar = () => {
             <ul className='sidebar'>
                 <div>
                     <li className="nav">
-                        <Image src="/upicon.svg" alt="Logo" className='logo2' width={50} height={50} />
-                        <label className='dash' htmlFor="">Dashboard</label>
+                        <a href="/Dashboard">
+                            <Image src="/upicon.svg" alt="Logo" className='logo2' width={50} height={50} />
+                        </a>
+                        <a href='/Dashboard' className='dash'>Dashboard</a>
                     </li>
                 </div>
+
                 <div>
-      <li className="nav">
-        <Link href="/conversationmapping">
-          <p className='dash'>conversation mapping</p>
-        </Link>
-      </li>
-    </div>
+                    <li className="nav">
+                        <Link href="/conversationmapping">
+                            <Image src="/.svg" alt="Logo" className='logo2' width={30} height={30} />
+
+                            <p className='dash'>Mapped Address</p>
+                        </Link>
+                    </li>
+                </div>
 
                 <p className="log">
                     <div onClick={handleLogout}>Log out</div>
