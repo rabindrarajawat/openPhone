@@ -127,3 +127,21 @@
     opacity: 0px;
 
 }
+.dashboard {
+    font-size: 14px; /* Adjust size as needed */
+    display: flex;
+    align-items: center;
+  }
+  
+  .link {
+    color: blue;
+    text-decoration: none;
+   
+    
+
+  }
+  
+  .link:hover {
+    text-decoration: underline;
+  }
+  

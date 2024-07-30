@@ -1,68 +1,64 @@
-/* styles/ConversationMapping.module.css */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+/* src/components/page.module.css */
 
-.mainContainer { 
-    background-color: rgba(255, 250, 253, 0.9); /* Slightly transparent white */
-    font-family: 'Roboto', sans-serif; /* Apply Roboto font */
-    width: 100%;
-    height: 100vh;
+.mainContainer {
     display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.container {
-    font-family: 'Roboto', sans-serif; /* Apply Roboto font */
-    background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white */
-    width: 80%;
-    padding: 2% 2% 1% 2%;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.table {
-    margin-top: 20px;
-    background-color: rgba(246, 235, 235, 0.6); 
-    backdrop-filter: blur(20px); /* Blur effect */
-    border-radius: 10px;
-    width: 100%;
-    border-collapse: collapse; /* Ensure border-collapse for correct styling */
-}
-
-/* Ensure table headers and cells have a solid white background */
-.table th, .table td {
-    background-color: #ffffff; /* Solid white background for cells */
-    backdrop-filter: none; /* Remove blur effect from cells */
-    border: 1px solid #dee2e6; /* Optional: Add border to cells */
-    font-family: 'Roboto', sans-serif; /* Apply Roboto font */
-}
-
-/* Ensure all rows have a white background */
-.table tbody tr {
-    background-color: #ffffff; /* Solid white background for rows */
-    font-family: 'Roboto', sans-serif; /* Apply Roboto font */
-}
-
-/* Hover effect for rows */
-.table tbody tr:hover {
-    background-color: #f8f9fa; /* Light grey background on hover */
-}
-
-/* Remove Bootstrap's striped effect */
-.table-striped tbody tr:nth-of-type(even) {
-    background-color: #ffffff; /* Override Bootstrap's striped effect */
-}
-.form-control-custom{
-    line-height: 0.5%;
-    padding: 1.375rem 0.75rem
+    flex-direction: column;
+    align-items: center; /* Center horizontally */
+    min-height: 100vh;
+    background: #f8f9fa;
+  }
   
-}
-.buttons {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 20px;
-}
-
-.button {
-    margin-left: 10px;
-}
+  .container {
+    width: 80%;
+    background-color: #fff;
+    padding: 20px;
+    margin-top:7%;
+    border-radius: 10px; /* Optional: For rounded corners around the container */
+  }
+  
+  .tableHeading {
+    align-self: flex-start; /* Align the heading to the left */
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+  }
+  
+  .conversationTable {
+    width: 100%;
+    background-color: white;
+    border-collapse: collapse; /* Collapse borders to avoid double borders */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px; /* Add border-radius */
+    overflow: hidden; /* Ensure the radius is applied to the whole table */
+  }
+  
+  .conversationTable th,
+  .conversationTable td {
+    border: none; /* Remove all borders */
+  }
+  
+  .conversationTable th {
+    border-bottom: none; /* Ensure header has no horizontal border */
+  }
+  
+  .conversationTable td {
+    border-right: 1px solid #dee2e6; /* Vertical borders for table cells */
+  }
+  
+  .conversationTable td:last-child {
+    border-right: none; /* Remove the border from the last cell in each row */
+  }
+  
+  .conversationTable thead th {
+    border-bottom: 1px solid #dee2e6; /* Optional: Horizontal border for header cells */
+  }
+  
+  .conversationTable tbody tr {
+    border-bottom: none; /* Remove bottom border between rows */
+  }
+  
+  .conversationTable tbody tr:hover {
+    backdrop-filter: blur(5px);
+    transition: backdrop-filter 0.3s;
+  }
+  

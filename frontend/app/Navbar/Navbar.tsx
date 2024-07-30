@@ -1,3 +1,4 @@
+"use client"
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { jwtDecode } from "jwt-decode";
@@ -70,6 +71,8 @@ const Navbar: React.FC<SearchBarProps> = ({ setResults, onSelectAddress }) => {
         <div className="navbar-brand1">
           OpenPhone <br />
           <p className="dashboard">Dashboard</p>
+
+
         </div>
 
         <div className="collapse navbar-collapse" id="navbarSupportedContent">

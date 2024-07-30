@@ -256,6 +256,12 @@
 }
 
 
+.selected-row {
+  background-color: grey; /* Highlight color for selected row */
+  color: white; /* Text color for better visibility */
+}
+
+
 
 .logo3 {
     width: 30px;

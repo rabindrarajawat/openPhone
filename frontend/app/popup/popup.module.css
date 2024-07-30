@@ -1,8 +1,37 @@
-/* components/Popup.module.css */
-.dropdown {
-    width: 100%;
-    padding-top: 2%;
-    
+/* src/components/popup.module.css */
 
-  }
-  
+.dropdown {
+  width: 100%;
+}
+
+.dropdown-menu {
+  max-height: 150px; /* Limit the height of the dropdown menu */
+  overflow-y: auto;  /* Enable vertical scrolling */
+  background-color: white; /* Ensure background color is white */
+  border: 1px solid #dee2e6; /* Add a border around the dropdown */
+  border-radius: 4px; /* Add rounded corners */
+}
+
+.dropdown-menu .dropdown-item {
+  background-color: white; /* Ensure background color is white for items */
+  color: #333; /* Adjust text color if needed */
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem; /* Add padding for spacing */
+}
+
+.modal-content {
+  border-radius: 8px; /* Add rounded corners for the modal */
+}
+
+.modal-header {
+  border-bottom: none; /* Remove border from the header if needed */
+}
+
+.modal-footer {
+  border-top: none; /* Remove border from the footer if needed */
+}
