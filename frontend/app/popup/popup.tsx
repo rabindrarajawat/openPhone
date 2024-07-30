@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { Modal, Button, Form, Dropdown } from 'react-bootstrap';
+import { Modal, Button, Form } from 'react-bootstrap';
 import styles from './popup.module.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -17,6 +17,7 @@ const Popup = ({ show, onHide, conversationId }: PopupProps) => {
   const [filteredAddresses, setFilteredAddresses] = useState<string[]>([]);
   const [selectedAddress, setSelectedAddress] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownToggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -67,7 +68,10 @@ const Popup = ({ show, onHide, conversationId }: PopupProps) => {
       toast.error('Failed to save data.');
     }
   };
-  
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(prev => !prev);
+  };
 
   return (
     <>
@@ -76,44 +80,46 @@ const Popup = ({ show, onHide, conversationId }: PopupProps) => {
           <Modal.Title>Select Address</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Dropdown className={styles.dropdown}>
-            <Dropdown.Toggle
-              id="dropdown-basic-button"
+          <div className={styles.dropdownContainer}>
+            <button
               ref={dropdownToggleRef}
-              className={styles.dropdownToggle}
+              className={`${styles.dropdownButton} ${styles.dropdownToggle}`}
+              onClick={toggleDropdown}
             >
               {selectedAddress || 'Search Address'}
-            </Dropdown.Toggle>
-            <Dropdown.Menu
-              className={styles.dropdownMenu}
-              style={{
-                minWidth: dropdownToggleRef.current?.offsetWidth,
-              }}
-            >
-              <Form.Control
-                type="text"
-                placeholder="Search Address"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className={styles.searchInput}
-              />
-              {filteredAddresses.length > 0 ? (
-                filteredAddresses.map((address, index) => (
-                  <Dropdown.Item
-                    key={index}
-                    onClick={() => {
-                      setSelectedAddress(address);
-                      setSearchTerm('');
-                    }}
-                  >
-                    {address}
-                  </Dropdown.Item>
-                ))
-              ) : (
-                <Dropdown.Item disabled>No addresses found</Dropdown.Item>
-              )}
-            </Dropdown.Menu>
-          </Dropdown>
+              <span className={`${styles.dropdownIcon} ${isDropdownOpen ? styles.open : ''}`}>▼</span>
+            </button>
+            {isDropdownOpen && (
+              <div className={styles.dropdownMenu}>
+                <Form.Control
+                  type="text"
+                  placeholder="Search Address"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className={styles.searchInput}
+                />
+                {filteredAddresses.length > 0 ? (
+                  filteredAddresses.map((address, index) => (
+                    <div
+                      key={index}
+                      className={styles.dropdownItem}
+                      onClick={() => {
+                        setSelectedAddress(address);
+                        setSearchTerm('');
+                        setIsDropdownOpen(false); // Close dropdown after selection
+                      }}
+                    >
+                      {address}
+                    </div>
+                  ))
+                ) : (
+                  <div className={styles.dropdownItem} style={{ cursor: 'not-allowed' }}>
+                    No addresses found
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={handleSave}>

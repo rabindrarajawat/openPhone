@@ -14,7 +14,7 @@ type ConversationRecord = {
   to: string;
   body: string;
 };
-  
+
 interface Address {
   fullAddress: string;
 }

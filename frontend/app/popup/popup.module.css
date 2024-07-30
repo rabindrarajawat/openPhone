@@ -1,23 +1,63 @@
 /* src/components/popup.module.css */
 
-.dropdown {
-  margin-top: 4px;
-  margin-bottom: 5px;
-
- 
+.dropdownContainer {
+  position: relative;
+  width: 60%; /* Ensure dropdown and button are 60% width */
+  margin: 1 auto; /* Center align */
 }
 
-.dropdown-menu {
-  overflow-y: auto;  /* Enable vertical scrolling */
-  background-color: white; /* Ensure background color is white */
-  border: 1px solid #dee2e6; /* Add a border around the dropdown */
-  border-radius: 4px; /* Add rounded corners */
- 
+.dropdownButton {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #dee2e6;
+  background-color: white;
+  padding: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  position: relative;
 }
 
-.dropdown-menu .dropdown-item {
-  background-color: white; /* Ensure background color is white for items */
-  color: #333; /* Adjust text color if needed */
+.dropdownIcon {
+  margin-left: auto;
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.open {
+  transform: rotate(180deg); /* Rotate icon when dropdown is open */
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  width: 100%; /* Match width of the button */
+  display: flex;
+  flex-direction: column;
+}
+
+.searchInput {
+  border: none;
+  border-bottom: 1px solid #dee2e6;
+  border-radius: 0;
+}
+
+.dropdownItem {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.dropdownItem:hover {
+  background-color: #f8f9fa;
 }
 
 .modal-body {
@@ -37,19 +77,4 @@
 
 .modal-footer {
   border-top: none; /* Remove border from the footer if needed */
-}
-.dropdownToggle {
- 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.searchInput {
-}
-.dropdownIcon {
-  margin-left: auto;
-}
-.dropdownText {
-  flex-grow: 1;
-  text-align: left;
 }
