@@ -7,6 +7,7 @@
     width: 90px;
     height: 755px;
     top: 76px;
+    z-index: 2;
 }
 
 .nav {
@@ -32,7 +33,8 @@
     text-align: left;
     color: #7D8FB3;
     cursor: pointer;
-    margin-top: 1100%;
+    margin-top: 900%;
+    margin-left: -5px;
 
 }
 

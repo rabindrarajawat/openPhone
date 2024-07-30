@@ -33,8 +33,7 @@ const SideBar = () => {
                 <div>
                     <li className="nav">
                         <Link href="/conversationmapping">
-                            <Image src="/.svg" alt="Logo" className='logo2' width={30} height={30} />
-
+                            <Image src="/svg.svg" alt="Logo" className='logo2' width={50} height={50} />
                             <p className='dash'>Mapped Address</p>
                         </Link>
                     </li>

@@ -11,12 +11,16 @@ import { SearchResultList } from "../SearchResultList/SearchResultList";
 interface Address {
   fullAddress: string;
 }
+interface NavbarProps extends SearchBarProps {
+  toggleSidebar: () => void;
+}
+
 interface SearchBarProps {
   setResults?: (results: Address[]) => void; // Optional prop
   onSelectAddress: (address: Address) => void; // Required prop
 }
 
-const Navbar: React.FC<SearchBarProps> = ({ setResults, onSelectAddress }) => {
+const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddress }) => {
   const [userName, setUserName] = useState<string>('');
   const [input, setInput] = useState<string>('');
   const [results, setResultsState] = useState<Address[]>([]);
@@ -38,7 +42,7 @@ const Navbar: React.FC<SearchBarProps> = ({ setResults, onSelectAddress }) => {
   const fetchData = async (value: string) => {
     try {
       const response = await axios.get(`http://localhost:8000/address/search?address=${encodeURIComponent(value)}`);
-      const results = response.data.results.filter((address: Address) => 
+      const results = response.data.results.filter((address: Address) =>
         address.fullAddress.toLowerCase().includes(value.toLowerCase())
       );
       setResultsState(results);
@@ -51,7 +55,7 @@ const Navbar: React.FC<SearchBarProps> = ({ setResults, onSelectAddress }) => {
   };
   const handleChange = (value: string) => {
     setInput(value);
-    fetchData(value); 
+    fetchData(value);
   };
 
   const handleSelectAddress = (address: Address) => {
@@ -66,8 +70,14 @@ const Navbar: React.FC<SearchBarProps> = ({ setResults, onSelectAddress }) => {
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
       <div className="container-fluid">
-        <Image src="/line.svg" alt="Logo" className='logo1' width={50} height={50} />
-        <div className="navbar-brand1">
+        <Image
+          src="/line.svg"
+          alt="Logo"
+          className="logo1"
+          width={50}
+          height={50}
+          onClick={toggleSidebar}
+        />        <div className="navbar-brand1">
           OpenPhone <br />
           <p className="dashboard">Dashboard</p>
         </div>
@@ -83,9 +93,9 @@ const Navbar: React.FC<SearchBarProps> = ({ setResults, onSelectAddress }) => {
                 value={input}
                 onChange={(e) => handleChange(e.target.value)}
               />
-            {results.length > 0 && (
-        <SearchResultList results={results} onSelect={handleSelectAddress} />
-      )}
+              {results.length > 0 && (
+                <SearchResultList results={results} onSelect={handleSelectAddress} />
+              )}
             </div>
             <ToastContainer />
           </form>
