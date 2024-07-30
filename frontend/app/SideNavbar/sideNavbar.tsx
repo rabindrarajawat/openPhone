@@ -50,9 +50,9 @@ const SideBar = () => {
           </li>
         </div>
 
-        <p className="log">
+        <div className="log">
           <div onClick={handleLogout}>Log out</div>
-        </p>
+        </div>
       </ul>
     </>
   );
