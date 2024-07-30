@@ -64,7 +64,9 @@ const ConversationTable = () => {
 
   return (
     <div>
-      <Navbar onSelectAddress={handleAddressSelect1} />
+      <Navbar onSelectAddress={handleAddressSelect1} toggleSidebar={function (): void {
+        throw new Error("Function not implemented.");
+      } } />
       <SideBar />
       <div className={styles.mainContainer}>
         <Container className={styles.container}>
