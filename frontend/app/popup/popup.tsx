@@ -1,9 +1,7 @@
-// components/Popup.tsx
-
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { Modal, Dropdown, DropdownButton, Button } from 'react-bootstrap';
+import { Modal, Button, Form, Dropdown } from 'react-bootstrap';
 import styles from './popup.module.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -16,7 +14,10 @@ type PopupProps = {
 
 const Popup = ({ show, onHide, conversationId }: PopupProps) => {
   const [addresses, setAddresses] = useState<string[]>([]);
+  const [filteredAddresses, setFilteredAddresses] = useState<string[]>([]);
   const [selectedAddress, setSelectedAddress] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const dropdownToggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const fetchAddresses = async () => {
@@ -27,9 +28,7 @@ const Popup = ({ show, onHide, conversationId }: PopupProps) => {
         if (Array.isArray(response.data)) {
           const addressesArray = response.data.map((item: any) => item.address);
           setAddresses(addressesArray);
-          if (addressesArray.length > 0) {
-            setSelectedAddress(addressesArray[0]);
-          }
+          setFilteredAddresses(addressesArray);
         } else {
           console.error('Unexpected API response format:', response.data);
         }
@@ -41,19 +40,34 @@ const Popup = ({ show, onHide, conversationId }: PopupProps) => {
     fetchAddresses();
   }, []);
 
+  useEffect(() => {
+    setFilteredAddresses(
+      addresses.filter((address) =>
+        address.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [searchTerm, addresses]);
+
   const handleSave = async () => {
+    console.log('Save button clicked'); // Debug line
+    if (!selectedAddress) {
+      toast.error('Please select an address before saving.');
+      return;
+    }
+  
     try {
       await axios.post('http://localhost:8000/conversation-mapping/map', {
         conversationId,
         address: selectedAddress,
       });
-      setTimeout(() => toast.success('Saved successfully!'), 100); 
-    
+      toast.success('Saved successfully!');
+      setTimeout(() => onHide(), 2000); // Delay hiding the modal to allow toast to show
     } catch (error) {
       console.error('Error saving data:', error);
-      setTimeout(() => toast.error('Failed to save data.'), 100); // Add delay
+      toast.error('Failed to save data.');
     }
   };
+  
 
   return (
     <>
@@ -62,22 +76,44 @@ const Popup = ({ show, onHide, conversationId }: PopupProps) => {
           <Modal.Title>Select Address</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <DropdownButton
-            id="dropdown-basic-button"
-            title={selectedAddress || 'Select Address'}
-            className={styles.dropdown}
-          >
-            <div className={styles.dropdownMenu}>
-              {addresses.map((address, index) => (
-                <Dropdown.Item
-                  key={index}
-                  onClick={() => setSelectedAddress(address)}
-                >
-                  {address}
-                </Dropdown.Item>
-              ))}
-            </div>
-          </DropdownButton>
+          <Dropdown className={styles.dropdown}>
+            <Dropdown.Toggle
+              id="dropdown-basic-button"
+              ref={dropdownToggleRef}
+              className={styles.dropdownToggle}
+            >
+              {selectedAddress || 'Search Address'}
+            </Dropdown.Toggle>
+            <Dropdown.Menu
+              className={styles.dropdownMenu}
+              style={{
+                minWidth: dropdownToggleRef.current?.offsetWidth,
+              }}
+            >
+              <Form.Control
+                type="text"
+                placeholder="Search Address"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className={styles.searchInput}
+              />
+              {filteredAddresses.length > 0 ? (
+                filteredAddresses.map((address, index) => (
+                  <Dropdown.Item
+                    key={index}
+                    onClick={() => {
+                      setSelectedAddress(address);
+                      setSearchTerm('');
+                    }}
+                  >
+                    {address}
+                  </Dropdown.Item>
+                ))
+              ) : (
+                <Dropdown.Item disabled>No addresses found</Dropdown.Item>
+              )}
+            </Dropdown.Menu>
+          </Dropdown>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={handleSave}>

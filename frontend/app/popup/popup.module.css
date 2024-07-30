@@ -1,15 +1,18 @@
 /* src/components/popup.module.css */
 
 .dropdown {
-  width: 100%;
+  margin-top: 4px;
+  margin-bottom: 5px;
+
+ 
 }
 
 .dropdown-menu {
-  max-height: 150px; /* Limit the height of the dropdown menu */
   overflow-y: auto;  /* Enable vertical scrolling */
   background-color: white; /* Ensure background color is white */
   border: 1px solid #dee2e6; /* Add a border around the dropdown */
   border-radius: 4px; /* Add rounded corners */
+ 
 }
 
 .dropdown-menu .dropdown-item {
@@ -34,4 +37,19 @@
 
 .modal-footer {
   border-top: none; /* Remove border from the footer if needed */
+}
+.dropdownToggle {
+ 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.searchInput {
+}
+.dropdownIcon {
+  margin-left: auto;
+}
+.dropdownText {
+  flex-grow: 1;
+  text-align: left;
 }

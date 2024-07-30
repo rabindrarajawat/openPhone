@@ -39,13 +39,14 @@
 .dash {
     color: #7D8FB3;
     font-family: 'Inter', sans-serif;
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 400;
-    line-height: 14.52px;
+    line-height: 22.52px;
     /* text-align: left; */
-    width: 62px;
+    width: 134px;
     height: 15px;
-    margin-left: -10px;
+    margin-left: -11px;
     cursor: pointer;
+
 
 }
