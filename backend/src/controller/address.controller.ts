@@ -4,7 +4,7 @@ import { AddressService } from "src/service/address.service";
 
 @Controller("address")
 export class AddressController {
-  constructor(private readonly addressService: AddressService) {}
+  constructor(private readonly addressService: AddressService) { }
 
   @Post()
   async createAddress(@Body() addressDto: AddressDto) {
@@ -36,4 +36,15 @@ export class AddressController {
       })),
     };
   }
+
+  @Get("getaddressid")
+  async getAddressId(@Query("address") address: string) {
+    const addressId = await this.addressService.getAddressIdByAddress(address);
+    if (addressId !== null) {
+      return { addressId };
+    } else {
+      return { message: "Address not found" };
+    }
+  }
+
 }
