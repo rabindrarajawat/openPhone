@@ -1,6 +1,3 @@
-
-
-
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { jwtDecode } from "jwt-decode";

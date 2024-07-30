@@ -1,8 +1,11 @@
 "use client";
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+
 import { useRouter } from 'next/navigation';
 import './SideNavbar.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const SideBar = () => {
     const router = useRouter();
@@ -24,9 +27,17 @@ const SideBar = () => {
                         <label className='dash' htmlFor="">Dashboard</label>
                     </li>
                 </div>
-                <li className="log">
+                <div>
+      <li className="nav">
+        <Link href="/conversationmapping">
+          <p className='dash'>conversation mapping</p>
+        </Link>
+      </li>
+    </div>
+
+                <p className="log">
                     <div onClick={handleLogout}>Log out</div>
-                </li>
+                </p>
             </ul>
         </>
     );
