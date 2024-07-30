@@ -16,6 +16,10 @@
     color: #ABABAB;
 }
 
+.logo1 {
+    cursor: pointer;
+}
+
 .navbar-brand1 {
     width: 95px;
     height: 30px;

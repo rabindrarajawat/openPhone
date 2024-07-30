@@ -4,13 +4,14 @@
 
 .box {
     position: absolute;
-    width: 235px;
+    width: 305px;
     height: 755px;
     top: 76px;
-    left: 90px;
+    /* left: 90px; */
     gap: 0px;
     opacity: 0px;
     background: linear-gradient(179.99deg, #E4FFEC 0.01%, #E9F0FF 102.39%);
+    z-index: 1;
 }
 
 .dropdown,
@@ -43,12 +44,18 @@
     border-color: none;
 }
 
+.mg-1 {
+    padding-left: 20px;
+    margin-left: 90px;
+    background: linear-gradient(179.99deg, #E4FFEC 0.01%, #E9F0FF 102.39%);
+}
+
 
 
 .dropdown {
     font-family: 'Inter', sans-serif;
-    border: 1px solid #E4FFEC;
-    background-color: #E4FFEC;
+    border: none;
+    background-color: inherit;
     margin-left: 14px;
     margin-top: 20px;
     width: 38px;
