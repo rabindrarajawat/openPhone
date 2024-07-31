@@ -241,7 +241,9 @@ const Dashboard = () => {
             <Navbar toggleSidebar={toggleSidebar} onSelectAddress={handleAddressSelect1} />
             {isSidebarVisible && <SideBar />}
             {/* <SideBar /> */}
-            <div className='box'>
+            {/* <div className='box'> */}
+            <div className={`box ${isSidebarVisible ? 'sidebar-visible' : ''}`}>
+
                 <div className='mg-1'>
 
 
