@@ -68,6 +68,12 @@ const Dashboard = () => {
 
     const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
+    const [messageDelivered, setMessageDelivered] = useState<number>(0);
+    const [messageResponse, setMessageResponse] = useState<number>(0);
+    const [call, setCall] = useState<number>(0);
+    const [callResponse, setCallResponse] = useState<number>(0);
+
+
 
 
 
@@ -92,16 +98,24 @@ const Dashboard = () => {
         if (selectedAddress && selectedAddress !== 'Search Address') {
             axios.get(`http://localhost:8000/openPhoneEventData/events?address=${encodeURIComponent(selectedAddress)}`)
                 .then(response => {
-                    const data = response.data.data;
-                    setEventData(data); // Set the new event data based on the selected address
-                    if (data.length > 0) {
-                        setPhoneNumber(data[0].to); // Assuming you want the 'to' value from the first item
-                        setFromNumber(data[0].from); // Set the 'from' value from the first item
+                    const data = response.data.data; // Access the data property
+                    if (data && Array.isArray(data.events)) {
+                        setEventData(data.events); // Set the events array to eventData
+                        if (data.events.length > 0) {
+                            setPhoneNumber(data.events[0].to); // Assuming you want the 'to' value from the first item
+                            setFromNumber(data.events[0].from); // Set the 'from' value from the first item
+                        } else {
+                            setPhoneNumber(''); // Clear phone number if no data
+                            setFromNumber(''); // Clear from number if no data
+                        }
 
+                        // Extract and set additional values
+                        setMessageDelivered(data.messageDelivered || 0);
+                        setMessageResponse(data.messageResponse || 0);
+                        setCall(data.call || 0);
+                        setCallResponse(data.callResponse || 0);
                     } else {
-                        setPhoneNumber(''); // Clear phone number if no data
-                        setFromNumber(''); // Clear from number if no data
-
+                        console.error('Events data is not an array or is missing');
                     }
                 })
                 .catch(error => {
@@ -109,6 +123,8 @@ const Dashboard = () => {
                 });
         }
     }, [selectedAddress]);
+
+
 
 
     const handleRowClick = (ownerId: number) => {
@@ -142,12 +158,15 @@ const Dashboard = () => {
 
 
 
-    const tableData = eventData.map((event: EventItem) => ({
-        ownerid: event.conversation_id,
-        PhoneNumber: event.to,
-        Status: event.is_stop ? 'Inactive' : 'Active',  // Use 'Inactive' if is_stop is true, otherwise 'Active'
-        Responses: event.is_stop ? 'Stop' : 'Interested' // Use 'Dead' if is_stop is true, otherwise 'Interested'
-    }));
+    const tableData = eventData
+        .filter((event: EventItem) => event.address_id !== null && event.address_id !== undefined)
+        .map((event: EventItem) => ({
+            ownerid: event.conversation_id,
+            PhoneNumber: event.to,
+            Status: event.is_stop ? 'Inactive' : 'Active',  // Use 'Inactive' if is_stop is true, otherwise 'Active'
+            Responses: event.is_stop ? 'Stop' : 'Interested' // Use 'Stop' if is_stop is true, otherwise 'Interested'
+        }));
+
 
 
 
@@ -408,19 +427,19 @@ const Dashboard = () => {
                         <div className="logos-row-msg">
                             <div className="nav-msg">
                                 <div className='message'>Message Delivered</div>
-                                <input type="text" className="round-input" placeholder="5" readOnly />
+                                <input type="text" className="round-input" value={messageDelivered} readOnly />
                             </div>
                             <div className="nav-msg">
                                 <div className='message response '>Message Response</div>
-                                <input type="text" className="round-input" placeholder="5" readOnly />
+                                <input type="text" className="round-input" value={messageResponse} readOnly />
                             </div>
                             <div className="nav-msg">
                                 <div className='message call-'>Call </div>
-                                <input type="text" className="round-input" placeholder="5" readOnly />
+                                <input type="text" className="round-input" value={call} readOnly />
                             </div>
                             <div className="nav-msg">
                                 <div className='message call-response'>Call Response</div>
-                                <input type="text" className="round-input" placeholder="5" readOnly />
+                                <input type="text" className="round-input" value={callResponse} readOnly />
                             </div>
                         </div>
                         <div className='tracking-container'>
