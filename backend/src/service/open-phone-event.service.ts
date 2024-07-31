@@ -167,7 +167,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { OpenPhoneEventEntity } from "../entities/open-phone-event.entity";
 import { AddressService } from "./address.service";
 import { AddressDto } from "../dto/address.dto";
@@ -711,6 +711,39 @@ export class OpenPhoneEventService {
     };
   }
 
+  // async findOpenPhoneEventsByAddress(
+  //   address: string
+  // ): Promise<Partial<OpenPhoneEventEntity>[]> {
+  //   // Fetch address data based on the provided address
+  //   const addressData = await this.addressRepository.findOne({
+  //     where: { address: address },
+  //   });
+
+  //   // If address is not found, throw an exception
+  //   if (!addressData) {
+  //     throw new NotFoundException(`Address not found: ${address}`);
+  //   }
+
+  //   // Fetch OpenPhone events using the address_id from the found address
+  //   const openPhoneEvents = await this.openPhoneEventRepository.find({
+  //     where: { address_id: addressData.id },
+  //   });
+
+  //   // If no events are found, throw an exception
+  //   if (openPhoneEvents.length === 0) {
+  //     throw new NotFoundException(`No OpenPhoneEvents found for address: ${address}`);
+  //   }
+
+  //   // Map through the events and remove the body field from each event
+  //   const eventsWithoutBody = openPhoneEvents.map((event) => {
+  //     const { body, ...eventWithoutBody } = event;
+  //     return eventWithoutBody;
+  //   });
+
+  //   // Return the events without their body field
+  //   return eventsWithoutBody;
+  // }
+
   async findOpenPhoneEventsByAddress(
     address: string
   ): Promise<Partial<OpenPhoneEventEntity>[]> {
@@ -725,17 +758,33 @@ export class OpenPhoneEventService {
     }
 
     // Fetch OpenPhone events using the address_id from the found address
-    const openPhoneEvents = await this.openPhoneEventRepository.find({
+    const initialEvents = await this.openPhoneEventRepository.find({
       where: { address_id: addressData.id },
+      order: { id: 'ASC' }
     });
 
+    // Collect all conversation IDs from the initial events
+    const conversationIds = initialEvents.map(event => event.conversation_id);
+
+    // Fetch additional events based on collected conversation IDs
+    const additionalEvents = await this.openPhoneEventRepository.find({
+      where: { conversation_id: In(conversationIds) },
+      order: { id: 'ASC' }
+    });
+
+    // Combine initial and additional events, ensuring no duplicates
+    const allEvents = [...initialEvents, ...additionalEvents.filter(event => !initialEvents.some(e => e.id === event.id))];
+
+    // Sort the combined events by id in ascending order
+    allEvents.sort((a, b) => a.id - b.id);
+
     // If no events are found, throw an exception
-    if (openPhoneEvents.length === 0) {
+    if (allEvents.length === 0) {
       throw new NotFoundException(`No OpenPhoneEvents found for address: ${address}`);
     }
 
     // Map through the events and remove the body field from each event
-    const eventsWithoutBody = openPhoneEvents.map((event) => {
+    const eventsWithoutBody = allEvents.map((event) => {
       const { body, ...eventWithoutBody } = event;
       return eventWithoutBody;
     });
@@ -743,6 +792,7 @@ export class OpenPhoneEventService {
     // Return the events without their body field
     return eventsWithoutBody;
   }
+
 
 
   async findEventBodiesByConversationId(conversationId: string): Promise<{ event_type_id: number, body: string }[]> {
