@@ -24,6 +24,8 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
   const [userName, setUserName] = useState<string>('');
   const [input, setInput] = useState<string>('');
   const [results, setResultsState] = useState<Address[]>([]);
+
+
   useEffect(() => {
     const token = localStorage.getItem('authToken');
 
@@ -77,7 +79,8 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
           width={50}
           height={50}
           onClick={toggleSidebar}
-        />        <div className="navbar-brand1">
+        />
+        <div className="navbar-brand1">
           OpenPhone <br />
           <p className="dashboard">Dashboard</p>
         </div>

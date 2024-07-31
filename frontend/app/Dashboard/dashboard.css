@@ -4,14 +4,21 @@
 
 .box {
     position: absolute;
-    width: 305px;
+    /* width: 305px; */
+    width: 255px;
     height: 755px;
     top: 76px;
     /* left: 90px; */
+    transition: margin-left 0.1s ease;
     gap: 0px;
     opacity: 0px;
     background: linear-gradient(179.99deg, #E4FFEC 0.01%, #E9F0FF 102.39%);
     z-index: 1;
+}
+
+.box.sidebar-visible {
+    margin-left: 90px;
+    /* Adjust as needed */
 }
 
 .dropdown,
@@ -46,7 +53,7 @@
 
 .mg-1 {
     padding-left: 20px;
-    margin-left: 90px;
+    /* margin-left: 90px; */
     background: linear-gradient(179.99deg, #E4FFEC 0.01%, #E9F0FF 102.39%);
 }
 
