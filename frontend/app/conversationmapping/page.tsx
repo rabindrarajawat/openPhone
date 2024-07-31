@@ -4,8 +4,8 @@ import React, { useState, useEffect } from "react";
 import { Table, Container } from "react-bootstrap";
 import axios from 'axios';
 import ReactPaginate from 'react-paginate';
-import Popup from '../popup/popup'; 
-import styles from './page.module.css'; 
+import Popup from '../popup/popup';
+import styles from './page.module.css';
 import SideBar from "../SideNavbar/sideNavbar";
 import Navbar from '../Navbar/Navbar';
 
@@ -27,26 +27,28 @@ const ConversationTable = () => {
   const [selectedAddress, setSelectedAddress] = useState('Search Address');
   const [currentPage, setCurrentPage] = useState(0);
   const recordsPerPage = 5; // Set records per page to 5
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/openPhoneEventData/getConversationsWithoutAddress');
+      console.log('API response:', response);
+
+      const data = response.data.data; // Adjusted to match your response structure
+      console.log('Data:', data);
+
+      if (Array.isArray(data)) {
+        setRecords(data);
+      } else {
+        console.error('API response is not an array:', data);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('http://localhost:8000/openPhoneEventData/getConversationsWithoutAddress');
-        console.log('API response:', response);
-
-        const data = response.data.data; // Adjusted to match your response structure
-        console.log('Data:', data);
-
-        if (Array.isArray(data)) {
-          setRecords(data);
-        } else {
-          console.error('API response is not an array:', data);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
     fetchData();
   }, []);
 
@@ -72,14 +74,16 @@ const ConversationTable = () => {
   const currentPageData = records.slice(offset, offset + recordsPerPage);
   const pageCount = Math.ceil(records.length / recordsPerPage);
 
+  const toggleSidebar = () => {
+    setIsSidebarVisible(prevState => !prevState);
+  };
+
   return (
     <div>
-      <Navbar toggleSidebar={function (): void {
-        throw new Error("Function not implemented.");
-      } } onSelectAddress={function (address: Address): void {
-        throw new Error("Function not implemented.");
-      } }/>
-      <SideBar />
+      {/* <Navbar onSelectAddress={handleAddressSelect1} /> */}
+      <Navbar toggleSidebar={toggleSidebar} onSelectAddress={handleAddressSelect1} />
+      {isSidebarVisible && <SideBar />}
+      {/* <SideBar /> */}
       <div className={styles.mainContainer}>
         <Container className={styles.container}>
           <h2 className={styles.tableHeading}>Conversation Mapping</h2>
@@ -125,6 +129,7 @@ const ConversationTable = () => {
               show={showPopup}
               onHide={handlePopupClose}
               conversationId={selectedRecord.conversation_id}
+              onSaveSuccess={fetchData} // Pass the fetchData function to Popup
             />
           )}
         </Container>

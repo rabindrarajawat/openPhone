@@ -9,12 +9,6 @@
   background: #f8f9fa;
 }
 
-.tbody {
-  border-color: inherit;
-  border-style: solid;
-  border-width: 0;
-  cursor: pointer;
-}
 
 .container {
   width: 80%;
@@ -42,7 +36,7 @@
   border-radius: 10px;
   /* Add border-radius */
   overflow: hidden;
-  /* Ensure the radius is applied to the whole table */
+  cursor: pointer;
 }
 
 .conversationTable th,
