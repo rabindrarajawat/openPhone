@@ -72,6 +72,8 @@ const Dashboard = () => {
     const [messageResponse, setMessageResponse] = useState<number>(0);
     const [call, setCall] = useState<number>(0);
     const [callResponse, setCallResponse] = useState<number>(0);
+    const [selectedFilter, setSelectedFilter] = useState('delivered');
+
 
 
 
@@ -98,18 +100,16 @@ const Dashboard = () => {
         if (selectedAddress && selectedAddress !== 'Search Address') {
             axios.get(`http://localhost:8000/openPhoneEventData/events?address=${encodeURIComponent(selectedAddress)}`)
                 .then(response => {
-                    const data = response.data.data; // Access the data property
+                    const data = response.data.data;
                     if (data && Array.isArray(data.events)) {
-                        setEventData(data.events); // Set the events array to eventData
+                        setEventData(data.events);
                         if (data.events.length > 0) {
-                            setPhoneNumber(data.events[0].to); // Assuming you want the 'to' value from the first item
-                            setFromNumber(data.events[0].from); // Set the 'from' value from the first item
+                            setPhoneNumber(data.events[0].to);
+                            setFromNumber(data.events[0].from);
                         } else {
-                            setPhoneNumber(''); // Clear phone number if no data
-                            setFromNumber(''); // Clear from number if no data
+                            setPhoneNumber('');
+                            setFromNumber('');
                         }
-
-                        // Extract and set additional values
                         setMessageDelivered(data.messageDelivered || 0);
                         setMessageResponse(data.messageResponse || 0);
                         setCall(data.call || 0);
@@ -156,15 +156,22 @@ const Dashboard = () => {
         });
     };
 
+    const filteredData = eventData.filter(event => {
+        if (selectedFilter === 'delivered') {
+            return event.event_type_id === 2;
+        } else if (selectedFilter === 'received') {
+            return event.event_type_id === 1;
+        }
+        return true;
+    });
 
-
-    const tableData = eventData
-        .filter((event: EventItem) => event.address_id !== null && event.address_id !== undefined)
-        .map((event: EventItem) => ({
+    const tableData = filteredData
+        .filter(event => event.address_id !== null && event.address_id !== undefined)
+        .map(event => ({
             ownerid: event.conversation_id,
             PhoneNumber: event.to,
-            Status: event.is_stop ? 'Inactive' : 'Active',  // Use 'Inactive' if is_stop is true, otherwise 'Active'
-            Responses: event.is_stop ? 'Stop' : 'Interested' // Use 'Stop' if is_stop is true, otherwise 'Interested'
+            Status: event.is_stop ? 'Inactive' : 'Active',
+            Responses: event.is_stop ? 'Stop' : 'Interested'
         }));
 
 
@@ -194,6 +201,8 @@ const Dashboard = () => {
     const handleOptionToggle = (option: string) => { // Ensure option is explicitly typed as string
         if (selectedOptions.includes(option)) {
             setSelectedOptions(selectedOptions.filter(item => item !== option));
+            setSelectedFilter(option);
+
         } else {
             setSelectedOptions([...selectedOptions, option]);
         }
@@ -219,6 +228,33 @@ const Dashboard = () => {
             }
         }
     }, [tableData, selectedRowId]);
+    useEffect(() => {
+        if (selectedAddress && selectedAddress !== 'Search Address') {
+            axios.get(`http://localhost:8000/openPhoneEventData/events?address=${encodeURIComponent(selectedAddress)}`)
+                .then(response => {
+                    const data = response.data.data;
+                    if (data && Array.isArray(data.events)) {
+                        setEventData(data.events);
+                        if (data.events.length > 0) {
+                            setPhoneNumber(data.events[0].to);
+                            setFromNumber(data.events[0].from);
+                        } else {
+                            setPhoneNumber('');
+                            setFromNumber('');
+                        }
+                        setMessageDelivered(data.messageDelivered || 0);
+                        setMessageResponse(data.messageResponse || 0);
+                        setCall(data.call || 0);
+                        setCallResponse(data.callResponse || 0);
+                    } else {
+                        console.error('Events data is not an array or is missing');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching event data:', error);
+                });
+        }
+    }, [selectedAddress]);
 
 
     // const handleRowClick = (ownerId: number) => {
@@ -238,7 +274,8 @@ const Dashboard = () => {
     return (
         <div>
             {/* <Navbar onSelectAddress={handleAddressSelect1} /> */}
-            <Navbar onSelectAddress={handleAddressSelect1} />
+            <Navbar onSelectAddress={handleAddressSelect1}
+         />
             {isSidebarVisible && <SideBar />}
             {/* <SideBar /> */}
             <div className='box'>
@@ -251,31 +288,31 @@ const Dashboard = () => {
                             Status
                         </button>
                         <div className={`dropdown-menu ${dropdownOpen ? 'show' : ''}`}>
-                            <div className="form-check custom-dropdown-item">
-                                <input
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    id="checkbox-delivered"
-                                    checked={selectedOptions.includes('delivered')}
-                                    onChange={() => handleOptionToggle('delivered')}
-                                />
-                                <label className="form-check-label" htmlFor="checkbox-delivered">
-                                    Delivered
-                                </label>
-                            </div>
+                        <div className="form-check custom-dropdown-item">
+                    <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="checkbox-delivered"
+                        checked={selectedFilter === 'delivered'}
+                        onChange={() => handleOptionToggle('delivered')}
+                    />
+                    <label className="form-check-label" htmlFor="checkbox-delivered">
+                        Delivered
+                    </label>
+                </div>
 
-                            <div className="form-check custom-dropdown-item">
-                                <input
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    id="checkbox-not-delivered"
-                                    checked={selectedOptions.includes('not delivered')}
-                                    onChange={() => handleOptionToggle('not delivered')}
-                                />
-                                <label className="form-check-label" htmlFor="checkbox-not-delivered">
-                                    Received
-                                </label>
-                            </div>
+                <div className="form-check custom-dropdown-item">
+                    <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="checkbox-not-delivered"
+                        checked={selectedFilter === 'received'}
+                        onChange={() => handleOptionToggle('received')}
+                    />
+                    <label className="form-check-label" htmlFor="checkbox-not-delivered">
+                        Received
+                    </label>
+                </div>
                         </div>
                     </div>
                     <div className={`dropdown ${statusDropdownOpen ? 'show' : ''}`}>
@@ -497,9 +534,9 @@ const Dashboard = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {tableData.map((row) => (
-                                            <tr
-                                                key={row.ownerid}
+                                        {tableData.map((row,index) => (
+                                            <tr 
+                                                key={index}
                                                 className={`center-align ${selectedRowId === row.ownerid ? 'selected-row' : ''}`}
                                                 onClick={() => handleRowClick(row.ownerid)}
                                             >
