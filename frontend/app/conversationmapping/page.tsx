@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { Table, Container } from "react-bootstrap";
 import axios from 'axios';
-import Popup from '../popup/popup'; // Adjust the path as needed
-import styles from './page.module.css'; // Ensure this path is correct
+import ReactPaginate from 'react-paginate';
+import Popup from '../popup/popup'; 
+import styles from './page.module.css'; 
 import SideBar from "../SideNavbar/sideNavbar";
 import Navbar from '../Navbar/Navbar';
 
@@ -24,7 +25,8 @@ const ConversationTable = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<ConversationRecord | null>(null);
   const [selectedAddress, setSelectedAddress] = useState('Search Address');
-
+  const [currentPage, setCurrentPage] = useState(0);
+  const recordsPerPage = 5; // Set records per page to 5
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,10 +64,20 @@ const ConversationTable = () => {
     setSelectedAddress(address.fullAddress);
   };
 
+  const handlePageClick = (selectedItem: { selected: number }) => {
+    setCurrentPage(selectedItem.selected);
+  };
+
+  const offset = currentPage * recordsPerPage;
+  const currentPageData = records.slice(offset, offset + recordsPerPage);
+  const pageCount = Math.ceil(records.length / recordsPerPage);
+
   return (
     <div>
-      <Navbar onSelectAddress={handleAddressSelect1} />
-      <SideBar />
+      <Navbar onSelectAddress={function (address: Address): void {
+        throw new Error("Function not implemented.");
+      } }/>
+      <SideBar/>
       <div className={styles.mainContainer}>
         <Container className={styles.container}>
           <h2 className={styles.tableHeading}>Conversation Mapping</h2>
@@ -79,8 +91,8 @@ const ConversationTable = () => {
               </tr>
             </thead>
             <tbody>
-              {records.length > 0 ? (
-                records.map((record, index) => (
+              {currentPageData.length > 0 ? (
+                currentPageData.map((record, index) => (
                   <tr key={index} onClick={() => handleRowClick(record)}>
                     <td>{record.conversation_id}</td>
                     <td>{record.from}</td>
@@ -95,6 +107,17 @@ const ConversationTable = () => {
               )}
             </tbody>
           </Table>
+          <ReactPaginate
+            previousLabel={'<'}
+            nextLabel={'>'}
+            breakLabel={'...'}
+            pageCount={pageCount}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={3}
+            onPageChange={handlePageClick}
+            containerClassName={styles.pagination}
+            activeClassName={styles.active}
+          />
           {selectedRecord && (
             <Popup
               show={showPopup}
