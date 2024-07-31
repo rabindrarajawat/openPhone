@@ -615,6 +615,11 @@
     word-break: break-word;
 }
 
+/* .selected-row {
+    border: 2px solid gray;
+    border-radius: 500px;
+} */
+
 
 .inbox-chat {
     display: flex;
