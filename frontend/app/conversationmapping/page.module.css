@@ -7,6 +7,13 @@
   /* Center horizontally */
   min-height: 100vh;
   background: #f8f9fa;
+  transition: margin-left 0.1s ease;
+
+}
+
+.mainContainer.sidebar-visible {
+  margin-left: 90px;
+  /* Adjust as needed */
 }
 
 

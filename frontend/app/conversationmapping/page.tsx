@@ -84,7 +84,9 @@ const ConversationTable = () => {
       <Navbar toggleSidebar={toggleSidebar} onSelectAddress={handleAddressSelect1} />
       {isSidebarVisible && <SideBar />}
       {/* <SideBar /> */}
-      <div className={styles.mainContainer}>
+      {/* <div className={styles.mainContainer}> */}
+      <div className={`styles.mainContainer ${isSidebarVisible ? 'sidebar-visible' : ''}`}>
+
         <Container className={styles.container}>
           <h2 className={styles.tableHeading}>Conversation Mapping</h2>
           <Table bordered hover className={styles.conversationTable}>
