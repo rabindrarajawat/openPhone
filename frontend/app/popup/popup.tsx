@@ -1,4 +1,5 @@
-"use client";
+// src/popup/Popup.jsx
+'use client';
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { Modal, Button, Form } from 'react-bootstrap';
@@ -9,10 +10,11 @@ import 'react-toastify/dist/ReactToastify.css';
 type PopupProps = {
   show: boolean;
   onHide: () => void;
-  conversationId: string; 
+  conversationId: string;
+  onSaveSuccess: () => void; // Add the onSaveSuccess prop
 };
 
-const Popup = ({ show, onHide, conversationId }: PopupProps) => {
+const Popup = ({ show, onHide, conversationId, onSaveSuccess }: PopupProps) => {
   const [addresses, setAddresses] = useState<string[]>([]);
   const [filteredAddresses, setFilteredAddresses] = useState<string[]>([]);
   const [selectedAddress, setSelectedAddress] = useState('');
@@ -55,14 +57,17 @@ const Popup = ({ show, onHide, conversationId }: PopupProps) => {
       toast.error('Please select an address before saving.');
       return;
     }
-  
+
     try {
       await axios.post('http://localhost:8000/conversation-mapping/map', {
         conversationId,
         address: selectedAddress,
       });
       toast.success('Saved successfully!');
-      setTimeout(() => onHide(), 2000); // Delay hiding the modal to allow toast to show
+      setTimeout(() => {
+        onHide();
+        onSaveSuccess(); // Call the function to refresh data
+      }, 2000); // Delay hiding the modal to allow toast to show
     } catch (error) {
       console.error('Error saving data:', error);
       toast.error('Failed to save data.');
@@ -130,7 +135,7 @@ const Popup = ({ show, onHide, conversationId }: PopupProps) => {
           </Button>
         </Modal.Footer>
       </Modal>
-      <ToastContainer /> {/* Include ToastContainer here */}
+      <ToastContainer />
     </>
   );
 };
