@@ -746,7 +746,13 @@ export class OpenPhoneEventService {
 
   async findOpenPhoneEventsByAddress(
     address: string
-  ): Promise<Partial<OpenPhoneEventEntity>[]> {
+  ): Promise<{
+    events: Partial<OpenPhoneEventEntity>[],
+    messageDelivered: number,
+    messageResponse: number,
+    call: number,
+    callResponse: number
+  }> {
     // Fetch address data based on the provided address
     const addressData = await this.addressRepository.findOne({
       where: { address: address },
@@ -789,9 +795,22 @@ export class OpenPhoneEventService {
       return eventWithoutBody;
     });
 
-    // Return the events without their body field
-    return eventsWithoutBody;
+    // Calculate counts for each event_type_id
+    const messageDelivered = allEvents.filter(event => event.event_type_id === 2).length;
+    const messageResponse = allEvents.filter(event => event.event_type_id === 1).length;
+    const call = allEvents.filter(event => event.event_type_id === 3).length;
+    const callResponse = allEvents.filter(event => event.event_type_id === 4).length;
+
+    // Return the events without their body field and the counts
+    return {
+      events: eventsWithoutBody,
+      messageDelivered,
+      messageResponse,
+      call,
+      callResponse
+    };
   }
+
 
 
 

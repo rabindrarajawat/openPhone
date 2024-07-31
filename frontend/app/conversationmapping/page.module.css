@@ -3,9 +3,17 @@
 .mainContainer {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center horizontally */
+  align-items: center;
+  /* Center horizontally */
   min-height: 100vh;
   background: #f8f9fa;
+}
+
+.tbody {
+  border-color: inherit;
+  border-style: solid;
+  border-width: 0;
+  cursor: pointer;
 }
 
 .container {
@@ -13,11 +21,13 @@
   background-color: #fff;
   padding: 20px;
   margin-top: 7%;
-  border-radius: 10px; /* Optional: For rounded corners around the container */
+  border-radius: 10px;
+  /* Optional: For rounded corners around the container */
 }
 
 .tableHeading {
-  align-self: flex-start; /* Align the heading to the left */
+  align-self: flex-start;
+  /* Align the heading to the left */
   margin-bottom: 20px;
   font-size: 24px;
   color: #333;
@@ -26,35 +36,44 @@
 .conversationTable {
   width: 100%;
   background-color: white;
-  border-collapse: collapse; /* Collapse borders to avoid double borders */
+  border-collapse: collapse;
+  /* Collapse borders to avoid double borders */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 10px; /* Add border-radius */
-  overflow: hidden; /* Ensure the radius is applied to the whole table */
+  border-radius: 10px;
+  /* Add border-radius */
+  overflow: hidden;
+  /* Ensure the radius is applied to the whole table */
 }
 
 .conversationTable th,
 .conversationTable td {
-  border: none; /* Remove all borders */
+  border: none;
+  /* Remove all borders */
 }
 
 .conversationTable th {
-  border-bottom: none; /* Ensure header has no horizontal border */
+  border-bottom: none;
+  /* Ensure header has no horizontal border */
 }
 
 .conversationTable td {
-  border-right: 1px solid #dee2e6; /* Vertical borders for table cells */
+  border-right: 1px solid #dee2e6;
+  /* Vertical borders for table cells */
 }
 
 .conversationTable td:last-child {
-  border-right: none; /* Remove the border from the last cell in each row */
+  border-right: none;
+  /* Remove the border from the last cell in each row */
 }
 
 .conversationTable thead th {
-  border-bottom: 1px solid #dee2e6; /* Optional: Horizontal border for header cells */
+  border-bottom: 1px solid #dee2e6;
+  /* Optional: Horizontal border for header cells */
 }
 
 .conversationTable tbody tr {
-  border-bottom: none; /* Remove bottom border between rows */
+  border-bottom: none;
+  /* Remove bottom border between rows */
 }
 
 .conversationTable tbody tr:hover {
