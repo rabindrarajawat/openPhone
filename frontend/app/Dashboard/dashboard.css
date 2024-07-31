@@ -8,7 +8,7 @@
     width: 255px;
     height: 755px;
     top: 76px;
-    left: 90px;
+    /* left: 90px; */
     transition: margin-left 0.1s ease;
     gap: 0px;
     opacity: 0px;
