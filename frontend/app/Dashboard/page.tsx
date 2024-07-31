@@ -96,33 +96,31 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (selectedAddress && selectedAddress !== 'Search Address') {
-      axios.get(`http://localhost:8000/openPhoneEventData/events?address=${encodeURIComponent(selectedAddress)}`)
-        .then(response => {
-          const data = response.data.data; // Access the data property
-          if (data && Array.isArray(data.events)) {
-            setEventData(data.events); // Set the events array to eventData
-            if (data.events.length > 0) {
-              setPhoneNumber(data.events[0].to); // Assuming you want the 'to' value from the first item
-              setFromNumber(data.events[0].from); // Set the 'from' value from the first item
-            } else {
-              setPhoneNumber(''); // Clear phone number if no data
-              setFromNumber(''); // Clear from number if no data
-            }
-
-            // Extract and set additional values
-            setMessageDelivered(data.messageDelivered || 0);
-            setMessageResponse(data.messageResponse || 0);
-            setCall(data.call || 0);
-            setCallResponse(data.callResponse || 0);
-          } else {
-            console.error('Events data is not an array or is missing');
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching event data:', error);
-        });
+        axios.get(`http://localhost:8000/openPhoneEventData/events?address=${encodeURIComponent(selectedAddress)}`)
+            .then(response => {
+                const data = response.data.data;
+                if (data && Array.isArray(data.events)) {
+                    setEventData(data.events);
+                    if (data.events.length > 0) {
+                        setPhoneNumber(data.events[0].to);
+                        setFromNumber(data.events[0].from);
+                    } else {
+                        setPhoneNumber('');
+                        setFromNumber('');
+                    }
+                    setMessageDelivered(data.messageDelivered || 0);
+                    setMessageResponse(data.messageResponse || 0);
+                    setCall(data.call || 0);
+                    setCallResponse(data.callResponse || 0);
+                } else {
+                    console.error('Events data is not an array or is missing');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching event data:', error);
+            });
     }
-  }, [selectedAddress]);
+}, [selectedAddress]);
 
 
 
@@ -158,13 +156,24 @@ const Dashboard = () => {
 
 
 
-  const tableData = eventData
-    .filter((event: EventItem) => event.address_id !== null && event.address_id !== undefined)
-    .map((event: EventItem) => ({
-      ownerid: event.conversation_id,
-      PhoneNumber: event.to,
-      Status: event.is_stop ? 'Inactive' : 'Active',  // Use 'Inactive' if is_stop is true, otherwise 'Active'
-      Responses: event.is_stop ? 'Stop' : 'Interested' // Use 'Stop' if is_stop is true, otherwise 'Interested'
+  const filteredData = eventData.filter(event => {
+    if (selectedOptions.includes('delivered') && selectedOptions.includes('received')) {
+        return event.event_type_id === 2 || event.event_type_id === 1;
+    } else if (selectedOptions.includes('delivered')) {
+        return event.event_type_id === 2;
+    } else if (selectedOptions.includes('received')) {
+        return event.event_type_id === 1;
+    }
+    return true;
+});
+
+const tableData = filteredData
+    .filter(event => event.address_id !== null && event.address_id !== undefined)
+    .map(event => ({
+        ownerid: event.conversation_id,
+        PhoneNumber: event.to,
+        Status: event.is_stop ? 'Inactive' : 'Active',
+        Responses: event.is_stop ? 'Stop' : 'Interested'
     }));
 
 
@@ -191,13 +200,16 @@ const Dashboard = () => {
     setBox1DropdownOpen(!box1DropdownOpen);
   };
 
-  const handleOptionToggle = (option: string) => { // Ensure option is explicitly typed as string
-    if (selectedOptions.includes(option)) {
-      setSelectedOptions(selectedOptions.filter(item => item !== option));
-    } else {
-      setSelectedOptions([...selectedOptions, option]);
-    }
-  };
+  const handleOptionToggle = (option: string) => {
+    setSelectedOptions((prevSelectedOptions) => {
+        if (prevSelectedOptions.includes(option)) {
+            return prevSelectedOptions.filter((filter) => filter !== option);
+        } else {
+            return [...prevSelectedOptions, option];
+        }
+    });
+};
+
 
   const handleAddressSelect = (address: string) => {
     setSelectedAddress(address);
@@ -251,31 +263,31 @@ const Dashboard = () => {
               Status
             </button>
             <div className={`dropdown-menu ${dropdownOpen ? 'show' : ''}`}>
-              <div className="form-check custom-dropdown-item">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="checkbox-delivered"
-                  checked={selectedOptions.includes('delivered')}
-                  onChange={() => handleOptionToggle('delivered')}
-                />
-                <label className="form-check-label" htmlFor="checkbox-delivered">
-                  Delivered
-                </label>
-              </div>
+            <div className="form-check custom-dropdown-item">
+                    <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="checkbox-delivered"
+                        checked={selectedOptions.includes('delivered')}
+                        onChange={() => handleOptionToggle('delivered')}
+                    />
+                    <label className="form-check-label" htmlFor="checkbox-delivered">
+                        Delivered
+                    </label>
+                </div>
 
-              <div className="form-check custom-dropdown-item">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="checkbox-not-delivered"
-                  checked={selectedOptions.includes('not delivered')}
-                  onChange={() => handleOptionToggle('not delivered')}
-                />
-                <label className="form-check-label" htmlFor="checkbox-not-delivered">
-                  Received
-                </label>
-              </div>
+                <div className="form-check custom-dropdown-item">
+                    <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="checkbox-not-delivered"
+                        checked={selectedOptions.includes('received')}
+                        onChange={() => handleOptionToggle('received')}
+                    />
+                    <label className="form-check-label" htmlFor="checkbox-not-delivered">
+                        Received
+                    </label>
+                </div>
             </div>
           </div>
           <div className={`dropdown ${statusDropdownOpen ? 'show' : ''}`}>
