@@ -7,6 +7,8 @@ import Image from "next/image";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./dashboard.css";
 import axios from "axios";
+import ReactPaginate from 'react-paginate';
+
 
 interface Address {
   fullAddress: string;
@@ -70,7 +72,7 @@ const Dashboard = () => {
   const [messageResponse, setMessageResponse] = useState<number>(0);
   const [call, setCall] = useState<number>(0);
   const [callResponse, setCallResponse] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState<number>(0);
   const recordsPerPage = 7;
 
   useEffect(() => {
@@ -154,19 +156,24 @@ const Dashboard = () => {
     });
   };
 
-  const filteredData = eventData.filter((event) => {
-    if (
-      selectedOptions.includes("delivered") &&
-      selectedOptions.includes("received")
-    ) {
-      return event.event_type_id === 2 || event.event_type_id === 1;
-    } else if (selectedOptions.includes("delivered")) {
-      return event.event_type_id === 2;
-    } else if (selectedOptions.includes("received")) {
-      return event.event_type_id === 1;
+  const filteredData = eventData.filter(event => {
+    if (selectedOptions.includes('delivered') && selectedOptions.includes('received')) {
+        return event.event_type_id === 2 || event.event_type_id === 1;
+    } else if (selectedOptions.includes('delivered')) {
+        return event.event_type_id === 2;
+    } else if (selectedOptions.includes('received')) {
+        return event.event_type_id === 1;
     }
     return true;
-  });
+});
+
+const handlePageClick = (selectedItem: { selected: number }) => {
+    setCurrentPage(selectedItem.selected);
+};
+
+const offset = currentPage * recordsPerPage;
+const currentRecords = filteredData.slice(offset, offset + recordsPerPage);
+const pageCount = Math.ceil(filteredData.length / recordsPerPage);
 
   const tableData = filteredData
     .filter(
@@ -178,14 +185,7 @@ const Dashboard = () => {
       Status: event.is_stop ? "Inactive" : "Active",
       Responses: event.is_stop ? "Stop" : "Interested",
     }));
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = tableData.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(tableData.length / recordsPerPage);
-
-  const handlePageChange = (pageNumber: React.SetStateAction<number>) => {
-    setCurrentPage(pageNumber);
-  };
+  
 
   const handleFollowUpClick = () => {
     setIsFollowUpClicked(!isFollowUpClicked); // Toggle the Follow-up button state
@@ -209,13 +209,13 @@ const Dashboard = () => {
 
   const handleOptionToggle = (option: string) => {
     setSelectedOptions((prevSelectedOptions) => {
-      if (prevSelectedOptions.includes(option)) {
-        return prevSelectedOptions.filter((filter) => filter !== option);
-      } else {
-        return [...prevSelectedOptions, option];
-      }
+        if (prevSelectedOptions.includes(option)) {
+            return prevSelectedOptions.filter((filter) => filter !== option);
+        } else {
+            return [...prevSelectedOptions, option];
+        }
     });
-  };
+};
 
   const handleAddressSelect = (address: string) => {
     setSelectedAddress(address);
@@ -595,7 +595,7 @@ const Dashboard = () => {
               <div className="tracking-container">
                 <div className="call-tracking">
                   <Image
-                    src="/Vector.svg"
+                    src="/vector.svg"
                     alt="Activity Logo"
                     className="vector"
                     width={50}
@@ -671,76 +671,45 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="tracking-container-box">
-                <div className="datatable-box ">
-                  <table className="table table-hover">
+              <div className='datatable-box'>
+                <table className="table table-hover">
                     <thead>
-                      <tr className="datatable">
-                        <th scope="col">Conversation ID</th>
-                        <th scope="col">Phone Number</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Responses</th>
-                      </tr>
+                        <tr className='datatable'>
+                            <th scope="col">Conversation ID</th>
+                            <th scope="col">Phone Number</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Responses</th>
+                        </tr>
                     </thead>
                     <tbody>
-                      {tableData.map((row, index) => (
-                        <tr
-                          key={index}
-                          className={`center-align ${
-                            selectedRowId === row.ownerid ? "selected-row" : ""
-                          }`}
-                          onClick={() => handleRowClick(row.ownerid)}
-                        >
-                          <td>{row.ownerid}</td>
-                          <td>{row.PhoneNumber}</td>
-                          <td>{row.Status}</td>
-                          <td
-                            className={
-                              row.Responses === "Interested"
-                                ? "interested"
-                                : row.Responses === "Stop"
-                                ? "stop"
-                                : ""
-                            }
-                          >
-                            {row.Responses}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  <div className="pagination-container">
-                <ul className="pagination">
-                    <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                        <button
-                            className="page-link"
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            disabled={currentPage === 1}
-                        >
-                            &lt;
-                        </button>
-                    </li>
-                    {[...Array(totalPages)].map((_, i) => (
-                        <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
-                            <button
-                                className="page-link"
-                                onClick={() => handlePageChange(i + 1)}
+                        {currentRecords.map((row, index) => (
+                            <tr 
+                                key={index}
+                                className={`center-align ${selectedRowId === row.conversation_id ? 'selected-row' : ''}`}
+                                onClick={() => handleRowClick(row.conversation_id)}
                             >
-                                {i + 1}
-                            </button>
-                        </li>
-                    ))}
-                    <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                        <button
-                            className="page-link"
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                        >
-                            &gt;
-                        </button>
-                    </li>
-                </ul>
+                                <td>{row.conversation_id}</td>
+                                <td>{row.to}</td>
+                                <td>{row.is_stop ? 'Inactive' : 'Active'}</td>
+                                <td className={row.is_stop ? 'stop' : 'interested'}>
+                                    {row.is_stop ? 'Stop' : 'Interested'}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                  <ReactPaginate
+                previousLabel={'<'}
+                nextLabel={'>'}
+                breakLabel={'...'}
+                pageCount={pageCount}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={3}
+                onPageChange={handlePageClick}
+                containerClassName="pagination"
+                activeClassName="active"
+            />
             </div>
-                </div>
 
 
                 <div className="input-msg">
