@@ -88,6 +88,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <form className="d-flex" role="search" onSubmit={(e) => e.preventDefault()}>
             <div className="search-wrapper">
+         
               <input
                 className="search"
                 type="search"
