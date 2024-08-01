@@ -595,7 +595,7 @@ const Dashboard = () => {
               <div className="tracking-container">
                 <div className="call-tracking">
                   <Image
-                    src="/vector.svg"
+                    src="/Vector.svg"
                     alt="Activity Logo"
                     className="vector"
                     width={50}

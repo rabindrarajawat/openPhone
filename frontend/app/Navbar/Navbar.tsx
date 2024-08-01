@@ -1,17 +1,18 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from 'jwt-decode';
 import axios from 'axios';
 import './Navbar.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { SearchResultList } from "../SearchResultList/SearchResultList";
-
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 interface Address {
   fullAddress: string;
 }
+
 interface SearchBarProps {
   setResults?: (results: Address[]) => void; // Optional prop
   onSelectAddress: (address: Address) => void; // Required prop
@@ -21,12 +22,11 @@ const Navbar: React.FC<SearchBarProps> = ({ setResults, onSelectAddress }) => {
   const [userName, setUserName] = useState<string>('');
   const [input, setInput] = useState<string>('');
   const [results, setResultsState] = useState<Address[]>([]);
+
   useEffect(() => {
     const token = localStorage.getItem('authToken');
-
     if (token) {
       try {
-        // Decode the token
         const decodedToken: any = jwtDecode(token);
         setUserName(decodedToken.name);
         console.log("decodedToken", decodedToken);
@@ -39,7 +39,7 @@ const Navbar: React.FC<SearchBarProps> = ({ setResults, onSelectAddress }) => {
   const fetchData = async (value: string) => {
     try {
       const response = await axios.get(`http://localhost:8000/address/search?address=${encodeURIComponent(value)}`);
-      const results = response.data.results.filter((address: Address) => 
+      const results = response.data.results.filter((address: Address) =>
         address.fullAddress.toLowerCase().includes(value.toLowerCase())
       );
       setResultsState(results);
@@ -50,19 +50,19 @@ const Navbar: React.FC<SearchBarProps> = ({ setResults, onSelectAddress }) => {
       console.error("Error fetching data:", error);
     }
   };
+
   const handleChange = (value: string) => {
     setInput(value);
-    fetchData(value); 
+    fetchData(value);
   };
 
   const handleSelectAddress = (address: Address) => {
     setInput(address.fullAddress);
     setResultsState([]);
     if (onSelectAddress) {
-      onSelectAddress(address); // Call the callback function when an address is selected
+      onSelectAddress(address);
     }
   };
-
 
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -71,14 +71,13 @@ const Navbar: React.FC<SearchBarProps> = ({ setResults, onSelectAddress }) => {
         <div className="navbar-brand1">
           OpenPhone <br />
           <p className="dashboard">Dashboard</p>
-
-
         </div>
 
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <form className="d-flex" role="search" onSubmit={(e) => e.preventDefault()}>
             <div className="search-wrapper">
-              <input
+            <Image src="/Icon.svg" alt="icon" className='search-icon' width={18} height={18} />
+            <input
                 className="search"
                 type="search"
                 placeholder="Search Address"
@@ -86,9 +85,9 @@ const Navbar: React.FC<SearchBarProps> = ({ setResults, onSelectAddress }) => {
                 value={input}
                 onChange={(e) => handleChange(e.target.value)}
               />
-            {results.length > 0 && (
-        <SearchResultList results={results} onSelect={handleSelectAddress} />
-      )}
+              {results.length > 0 && (
+                <SearchResultList results={results} onSelect={handleSelectAddress} />
+              )}
             </div>
             <ToastContainer />
           </form>
