@@ -71,7 +71,7 @@ const Dashboard = () => {
   const [call, setCall] = useState<number>(0);
   const [callResponse, setCallResponse] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 6;
+  const recordsPerPage = 5;
 
   useEffect(() => {
     axios
@@ -179,7 +179,7 @@ const Dashboard = () => {
       Responses: event.is_stop ? "Stop" : "Interested",
     }));
 
-    const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
   const currentRecords = tableData.slice(indexOfFirstRecord, indexOfLastRecord);
   const totalPages = Math.ceil(tableData.length / recordsPerPage);
@@ -414,9 +414,8 @@ const Dashboard = () => {
 
           <div className="box1">
             <div
-              className={`dropdown search-address-dropdown custom-dropdown ${
-                box1DropdownOpen ? "show" : ""
-              }`}
+              className={`dropdown search-address-dropdown custom-dropdown ${box1DropdownOpen ? "show" : ""
+                }`}
             >
               <button
                 className="btn btn-secondary dropdown-toggle custom-dropdown-button"
@@ -435,9 +434,8 @@ const Dashboard = () => {
                 />
               </button>
               <div
-                className={`dropdown-menu custom-dropdown-menu ${
-                  box1DropdownOpen ? "show" : ""
-                }`}
+                className={`dropdown-menu custom-dropdown-menu ${box1DropdownOpen ? "show" : ""
+                  }`}
               >
                 {addresses.map((address, index) => (
                   <button
@@ -456,16 +454,14 @@ const Dashboard = () => {
                 <Image
                   src="/follow.svg"
                   alt="Follow-up Logo"
-                  className={`logo3 ${
-                    isFollowUpClicked ? "follow-up-heading" : ""
-                  }`}
+                  className={`logo3 ${isFollowUpClicked ? "follow-up-heading" : ""
+                    }`}
                   width={50}
                   height={50}
                 />
                 <label
-                  className={`Activity ${
-                    isFollowUpClicked ? "follow-up-heading" : ""
-                  }`}
+                  className={`Activity ${isFollowUpClicked ? "follow-up-heading" : ""
+                    }`}
                   htmlFor=""
                   onClick={handleFollowUpClick}
                 >
@@ -566,16 +562,14 @@ const Dashboard = () => {
                   <Image
                     src="/redo.svg"
                     alt="redo Logo"
-                    className={`vector redo ${
-                      isFollowUpClicked ? "follow-up-heading" : ""
-                    }`}
+                    className={`vector redo ${isFollowUpClicked ? "follow-up-heading" : ""
+                      }`}
                     width={50}
                     height={50}
                   />
                   <div
-                    className={`text-follow ${
-                      isFollowUpClicked ? "follow-up-heading" : ""
-                    }`}
+                    className={`text-follow ${isFollowUpClicked ? "follow-up-heading" : ""
+                      }`}
                   >
                     Follow-up tracking of search address{" "}
                   </div>
@@ -593,9 +587,8 @@ const Dashboard = () => {
                 <div className="time">Action</div>
               </div>
               <div
-                className={`follow-status ${
-                  isFollowUpClicked ? "follow-up-heading" : ""
-                }`}
+                className={`follow-status ${isFollowUpClicked ? "follow-up-heading" : ""
+                  }`}
               >
                 <div className="time  ">Owner ID</div>
                 <div className="vertical-line"></div>
@@ -667,64 +660,64 @@ const Dashboard = () => {
                   </tbody>
                 </table> */}
                 <table className="table table-hover">
-                    <thead>
-                        <tr className='datatable'>
-                            <th scope="col">Conversation ID</th>
-                            <th scope="col">Phone Number</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Responses</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {currentRecords.map((row, index) => (
-                            <tr 
-                                key={index}
-                                className={`center-align ${selectedRowId === row.ownerid ? 'selected-row' : ''}`}
-                                onClick={() => handleRowClick(row.ownerid)}
-                            >
-                                <td>{row.ownerid}</td>
-                                <td>{row.PhoneNumber}</td>
-                                <td>{row.Status}</td>
-                                <td className={row.Responses === 'Interested' ? 'interested' : row.Responses === 'Stop' ? 'stop' : ''}>
-                                    {row.Responses}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
+                  <thead>
+                    <tr className='datatable'>
+                      <th scope="col">Conversation ID</th>
+                      <th scope="col">Phone Number</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Responses</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentRecords.map((row, index) => (
+                      <tr
+                        key={index}
+                        className={`center-align ${selectedRowId === row.ownerid ? 'selected-row' : ''}`}
+                        onClick={() => handleRowClick(row.ownerid)}
+                      >
+                        <td>{row.ownerid}</td>
+                        <td>{row.PhoneNumber}</td>
+                        <td>{row.Status}</td>
+                        <td className={row.Responses === 'Interested' ? 'interested' : row.Responses === 'Stop' ? 'stop' : ''}>
+                          {row.Responses}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
                 </table>
-            
-              <div className="pagination-container">
-                <ul className="pagination">
+
+                <div className="pagination-container">
+                  <ul className="pagination">
                     <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                        <button
-                            className="page-link"
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            disabled={currentPage === 1}
-                        >
-                            &lt;
-                        </button>
+                      <button
+                        className="page-link"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        &lt;
+                      </button>
                     </li>
                     {[...Array(totalPages)].map((_, i) => (
-                        <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
-                            <button
-                                className="page-link"
-                                onClick={() => handlePageChange(i + 1)}
-                            >
-                                {i + 1}
-                            </button>
-                        </li>
+                      <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                        <button
+                          className="page-link"
+                          onClick={() => handlePageChange(i + 1)}
+                        >
+                          {i + 1}
+                        </button>
+                      </li>
                     ))}
                     <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                        <button
-                            className="page-link"
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                        >
-                            &gt;
-                        </button>
+                      <button
+                        className="page-link"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        &gt;
+                      </button>
                     </li>
-                </ul>
-            </div>
+                  </ul>
+                </div>
               </div>
 
               <div className="input-msg">
@@ -746,53 +739,51 @@ const Dashboard = () => {
                   <div className="inbox-chat">
                     {apiResponseBody.length > 0
                       ? apiResponseBody.map((message, index) => (
-                          <div
-                            key={index}
-                            className={
-                              message.event_type_id === 1
-                                ? "chat-message-right"
-                                : "chat-message-left"
-                            }
-                          >
-                            {expandedMessages.has(index) ? (
-                              <div>
-                                {message.body}
-                                <button
-                                  onClick={() => toggleMessageExpansion(index)}
-                                  className={`read-more-btn ${
-                                    message.event_type_id === 1
+                        <div
+                          key={index}
+                          className={
+                            message.event_type_id === 1
+                              ? "chat-message-right"
+                              : "chat-message-left"
+                          }
+                        >
+                          {expandedMessages.has(index) ? (
+                            <div>
+                              {message.body}
+                              <button
+                                onClick={() => toggleMessageExpansion(index)}
+                                className={`read-more-btn ${message.event_type_id === 1
+                                  ? "read-more-btn-right"
+                                  : "read-more-btn-left"
+                                  }`}
+                              >
+                                Read Less
+                              </button>
+                            </div>
+                          ) : (
+                            <div>
+                              {message.body.length > 100 ? (
+                                <>
+                                  {message.body.substring(0, 100)}...
+                                  <button
+                                    onClick={() =>
+                                      toggleMessageExpansion(index)
+                                    }
+                                    className={`read-more-btn ${message.event_type_id === 2
                                       ? "read-more-btn-right"
                                       : "read-more-btn-left"
-                                  }`}
-                                >
-                                  Read Less
-                                </button>
-                              </div>
-                            ) : (
-                              <div>
-                                {message.body.length > 100 ? (
-                                  <>
-                                    {message.body.substring(0, 100)}...
-                                    <button
-                                      onClick={() =>
-                                        toggleMessageExpansion(index)
-                                      }
-                                      className={`read-more-btn ${
-                                        message.event_type_id === 2
-                                          ? "read-more-btn-right"
-                                          : "read-more-btn-left"
                                       }`}
-                                    >
-                                      Read More
-                                    </button>
-                                  </>
-                                ) : (
-                                  message.body
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        ))
+                                  >
+                                    Read More
+                                  </button>
+                                </>
+                              ) : (
+                                message.body
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ))
                       : "Loading..."}
                   </div>
                 </div>
