@@ -261,9 +261,10 @@ const Dashboard = () => {
     <div>
       {/* <Navbar onSelectAddress={handleAddressSelect1} /> */}
       <Navbar
-        toggleSidebar={toggleSidebar}
-        onSelectAddress={handleAddressSelect1}
-      />
+        // toggleSidebar={toggleSidebar}
+        onSelectAddress={handleAddressSelect1} toggleSidebar={function (): void {
+          throw new Error("Function not implemented.");
+        } }      />
       {isSidebarVisible && <SideBar />}
       {/* <SideBar /> */}
       <div className={`box ${isSidebarVisible ? "sidebar-visible" : ""}`}>
