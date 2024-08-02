@@ -7,6 +7,8 @@ import Image from "next/image";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./dashboard.css";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+
 
 interface Address {
   fullAddress: string;
@@ -246,6 +248,13 @@ const Dashboard = () => {
   const toggleSidebar = () => {
     setIsSidebarVisible((prevState) => !prevState);
   };
+  const router = useRouter();
+useEffect(() => {
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    router.push("/");
+  }
+}, [router]);
 
   return (
     <div>
