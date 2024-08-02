@@ -16,10 +16,6 @@
     color: #ABABAB;
 }
 
-.logo1 {
-    cursor: pointer;
-}
-
 .navbar-brand1 {
     width: 95px;
     height: 30px;
@@ -45,6 +41,12 @@
 .d-flex {
     margin-left: 40%;
 }
+.search-icon {
+    position: absolute;
+    left: 21px;
+    top: 17px;
+    pointer-events: none;
+  }
 
 
 
@@ -131,3 +133,21 @@
     opacity: 0px;
 
 }
+.dashboard {
+    font-size: 14px; /* Adjust size as needed */
+    display: flex;
+    align-items: center;
+  }
+  
+  .link {
+    color: blue;
+    text-decoration: none;
+   
+    
+
+  }
+  
+  .link:hover {
+    text-decoration: underline;
+  }
+  
