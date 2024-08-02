@@ -2,7 +2,6 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-
 import { useRouter } from "next/navigation";
 import "./SideNavbar.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -32,12 +31,12 @@ const SideBar = () => {
             />
             <Link href="/Dashboard">
               <p className="dash">Dashboard</p>
-            </Link>{" "}
+            </Link>
           </li>
         </div>
         <div>
           <li className="nav">
-          <Image
+            <Image
               src="/mapingi.svg"
               alt="Logo"
               className="logo2"
@@ -49,7 +48,6 @@ const SideBar = () => {
             </Link>
           </li>
         </div>
-
         <div className="log">
           <div onClick={handleLogout}>Log out</div>
         </div>
