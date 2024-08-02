@@ -256,13 +256,7 @@ const Dashboard = () => {
   const toggleSidebar = () => {
     setIsSidebarVisible((prevState) => !prevState);
   };
-  const router = useRouter();
-useEffect(() => {
-  const token = localStorage.getItem("authToken");
-  if (!token) {
-    router.push("/");
-  }
-}, [router]);
+ 
 
   return (
     <div>
