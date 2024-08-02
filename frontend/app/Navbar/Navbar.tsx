@@ -1,16 +1,18 @@
-"use client"
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
 import axios from 'axios';
 import './Navbar.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { SearchResultList } from "../SearchResultList/SearchResultList";
-import "bootstrap-icons/font/bootstrap-icons.css";
+
 
 interface Address {
   fullAddress: string;
+}
+interface NavbarProps extends SearchBarProps {
+  toggleSidebar: () => void;
 }
 
 interface SearchBarProps {
@@ -18,15 +20,18 @@ interface SearchBarProps {
   onSelectAddress: (address: Address) => void; // Required prop
 }
 
-const Navbar: React.FC<SearchBarProps> = ({ setResults, onSelectAddress }) => {
+const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddress }) => {
   const [userName, setUserName] = useState<string>('');
   const [input, setInput] = useState<string>('');
   const [results, setResultsState] = useState<Address[]>([]);
 
+
   useEffect(() => {
     const token = localStorage.getItem('authToken');
+
     if (token) {
       try {
+        // Decode the token
         const decodedToken: any = jwtDecode(token);
         setUserName(decodedToken.name);
         console.log("decodedToken", decodedToken);
@@ -50,7 +55,6 @@ const Navbar: React.FC<SearchBarProps> = ({ setResults, onSelectAddress }) => {
       console.error("Error fetching data:", error);
     }
   };
-
   const handleChange = (value: string) => {
     setInput(value);
     fetchData(value);
@@ -60,14 +64,22 @@ const Navbar: React.FC<SearchBarProps> = ({ setResults, onSelectAddress }) => {
     setInput(address.fullAddress);
     setResultsState([]);
     if (onSelectAddress) {
-      onSelectAddress(address);
+      onSelectAddress(address); // Call the callback function when an address is selected
     }
   };
+
 
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
       <div className="container-fluid">
-        <Image src="/line.svg" alt="Logo" className='logo1' width={50} height={50} />
+        <Image
+          src="/line.svg"
+          alt="Logo"
+          className="logo1"
+          width={50}
+          height={50}
+          onClick={toggleSidebar}
+        />
         <div className="navbar-brand1">
           OpenPhone <br />
           <p className="dashboard">Dashboard</p>
@@ -76,8 +88,8 @@ const Navbar: React.FC<SearchBarProps> = ({ setResults, onSelectAddress }) => {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <form className="d-flex" role="search" onSubmit={(e) => e.preventDefault()}>
             <div className="search-wrapper">
-            <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} />
-            <input
+
+              <input
                 className="search"
                 type="search"
                 placeholder="Search Address"
