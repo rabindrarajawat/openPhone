@@ -90,6 +90,10 @@
   .fontCommon {
     font-size: 14px;
   }
+  .arrow {
+    margin-right: 27px;
+    margin-left: -80px;
+  }
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
@@ -117,3 +121,4 @@
     margin-left: 30%;
   }
 }
+
