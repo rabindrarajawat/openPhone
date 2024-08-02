@@ -613,11 +613,11 @@ const Dashboard = () => {
                   <Image
                     src="/msg.svg"
                     alt="msg Logo"
-                    className="vector redo"
+                    className="vector redo message-logo"
                     width={50}
                     height={50}
                   />
-                  <div className="text-follow ">Message Detail </div>
+                  <div className="text-follow msg-follow">Message Detail </div>
                 </div>
               </div>
             </div>

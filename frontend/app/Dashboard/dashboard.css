@@ -375,6 +375,14 @@
     margin-left: -2px;
 }
 
+.message-logo {
+    margin-left: -28px;
+}
+
+.msg-follow {
+    margin-left: 30px !important;
+}
+
 
 .text {
     margin-left: 70px;
@@ -541,7 +549,7 @@
     width: 500px;
     height: 290px;
     margin-top: 10px;
-    margin-left: 25px;
+    margin-left: -65px;
     border-radius: 5px 0px 0px 0px;
     border: 2px solid red;
     background: linear-gradient(171.76deg, #CBE3FF 4.95%, #D2FFCC 92.28%);
