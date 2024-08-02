@@ -256,6 +256,13 @@ const Dashboard = () => {
   const toggleSidebar = () => {
     setIsSidebarVisible((prevState) => !prevState);
   };
+  const router = useRouter();
+useEffect(() => {
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    router.push("/");
+  }
+}, [router]);
 
   return (
     <div>
@@ -624,11 +631,11 @@ const Dashboard = () => {
                   <Image
                     src="/msg.svg"
                     alt="msg Logo"
-                    className="vector redo"
+                    className="vector redo message-logo"
                     width={50}
                     height={50}
                   />
-                  <div className="text-follow ">Message Detail </div>
+                  <div className="text-follow msg-follow">Message Detail </div>
                 </div>
               </div>
             </div>
@@ -777,25 +784,22 @@ const Dashboard = () => {
                             </div>
                           ) : (
                             <div>
-                              {message.body.length > 100 ? (
+                              {message.body && message.body.length > 100 ? (
                                 <>
                                   {message.body.substring(0, 100)}...
                                   <button
-                                    onClick={() =>
-                                      toggleMessageExpansion(index)
-                                    }
-                                    className={`read-more-btn ${message.event_type_id === 2
-                                      ? "read-more-btn-right"
-                                      : "read-more-btn-left"
+                                    onClick={() => toggleMessageExpansion(index)}
+                                    className={`read-more-btn ${message.event_type_id === 2 ? "read-more-btn-right" : "read-more-btn-left"
                                       }`}
                                   >
                                     Read More
                                   </button>
                                 </>
                               ) : (
-                                message.body
+                                message.body || "No message body"
                               )}
                             </div>
+
                           )}
                         </div>
                       ))
