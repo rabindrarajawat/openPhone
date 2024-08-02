@@ -766,25 +766,22 @@ const Dashboard = () => {
                             </div>
                           ) : (
                             <div>
-                              {message.body.length > 100 ? (
+                              {message.body && message.body.length > 100 ? (
                                 <>
                                   {message.body.substring(0, 100)}...
                                   <button
-                                    onClick={() =>
-                                      toggleMessageExpansion(index)
-                                    }
-                                    className={`read-more-btn ${message.event_type_id === 2
-                                      ? "read-more-btn-right"
-                                      : "read-more-btn-left"
+                                    onClick={() => toggleMessageExpansion(index)}
+                                    className={`read-more-btn ${message.event_type_id === 2 ? "read-more-btn-right" : "read-more-btn-left"
                                       }`}
                                   >
                                     Read More
                                   </button>
                                 </>
                               ) : (
-                                message.body
+                                message.body || "No message body"
                               )}
                             </div>
+
                           )}
                         </div>
                       ))
