@@ -7,6 +7,8 @@ import Image from "next/image";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./dashboard.css";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+
 
 interface Address {
   fullAddress: string;
@@ -72,6 +74,14 @@ const Dashboard = () => {
   const [callResponse, setCallResponse] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 6;
+
+  const router = useRouter();
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      router.push("/");
+    }
+  }, [router]);
 
   useEffect(() => {
     axios

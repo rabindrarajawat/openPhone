@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
-
 import "bootstrap/dist/js/bootstrap.bundle.min";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
@@ -41,11 +40,10 @@ export default function Home() {
         </h1>
 
         <h5 className={`text-center text-secondary mt-4 ${styles.fontCommon}`}>
-          "Welcome to the Admin Portal."
+          Welcome to the Admin Portal.
         </h5>
         <h5 className={`text-center text-secondary ${styles.fontCommon}`}>
-          Please log in to access and manage your system's settings and data
-          securely."
+          Please log in to access and manage your system's settings and data securely.
         </h5>
       </div>
       <div className={`${styles.textBox}`}>
@@ -72,19 +70,17 @@ export default function Home() {
           </div>
           {error && <div className="text-danger mt-3">{error}</div>}
           <div>
-          <button
-              className={`btn btn-outline-secondary px-3 py-3 mt-3 text-dark  ${styles.loginButton}`}
+            <button
+              className={`btn btn-outline-secondary px-3 py-3 mt-3 text-dark ${styles.loginButton}`}
               onClick={handleLogin}
             >
               <span className='d-flex-column '>
-
-              <span className={styles.loginSet}>Login to Your Account</span>
-              <span className={styles.arrow}>
-              <i className="">        
-                <Image src="/arrow.png" alt="" className='logo1' width={25} height={20} />
-              </i>
-              </span>
-
+                <span className={styles.loginSet}>Login to Your Account</span>
+                <span className={styles.arrow}>
+                  <i className="">
+                    <Image src="/arrow.png" alt="" className='logo1' width={25} height={20} />
+                  </i>
+                </span>
               </span>
             </button>
           </div>
