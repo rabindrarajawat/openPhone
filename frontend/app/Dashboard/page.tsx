@@ -71,7 +71,7 @@ const Dashboard = () => {
   const [call, setCall] = useState<number>(0);
   const [callResponse, setCallResponse] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 5;
+  const recordsPerPage = 6;
 
   useEffect(() => {
     axios
@@ -622,8 +622,10 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="tracking-container-box">
-              <div className="datatable-box ">
-                {/* <table className="table table-hover">
+
+              <div >
+                <div className="datatable-box ">
+                  {/* <table className="table table-hover">
                   <thead>
                     <tr className="datatable">
                       <th scope="col">Conversation ID</th>
@@ -659,33 +661,35 @@ const Dashboard = () => {
                     ))}
                   </tbody>
                 </table> */}
-                <table className="table table-hover">
-                  <thead>
-                    <tr className='datatable'>
-                      <th scope="col">Conversation ID</th>
-                      <th scope="col">Phone Number</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Responses</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentRecords.map((row, index) => (
-                      <tr
-                        key={index}
-                        className={`center-align ${selectedRowId === row.ownerid ? 'selected-row' : ''}`}
-                        onClick={() => handleRowClick(row.ownerid)}
-                      >
-                        <td>{row.ownerid}</td>
-                        <td>{row.PhoneNumber}</td>
-                        <td>{row.Status}</td>
-                        <td className={row.Responses === 'Interested' ? 'interested' : row.Responses === 'Stop' ? 'stop' : ''}>
-                          {row.Responses}
-                        </td>
+                  <table className="table table-hover">
+                    <thead>
+                      <tr className='datatable'>
+                        <th scope="col">Conversation ID</th>
+                        <th scope="col">Phone Number</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Responses</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {currentRecords.map((row, index) => (
+                        <tr
+                          key={index}
+                          className={`center-align ${selectedRowId === row.ownerid ? 'selected-row' : ''}`}
+                          onClick={() => handleRowClick(row.ownerid)}
+                        >
+                          <td>{row.ownerid}</td>
+                          <td>{row.PhoneNumber}</td>
+                          <td>{row.Status}</td>
+                          <td className={row.Responses === 'Interested' ? 'interested' : row.Responses === 'Stop' ? 'stop' : ''}>
+                            {row.Responses}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
 
+
+                </div>
                 <div className="pagination-container">
                   <ul className="pagination">
                     <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
@@ -807,6 +811,7 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
