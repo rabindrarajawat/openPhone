@@ -3,8 +3,13 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  OneToMany,
+  ManyToOne,
 } from "typeorm";
 import { CommonEntity } from "./common-columns.entity";
+import { NotificationEntity } from "./notification.entity";
+import { BookmarkEntity } from "./bookmark.entity";
+import { AddressEntity } from "./address.entity";
 
 @Entity("open_phone_event")
 // export class OpenPhoneEventEntity extends CommonEntity {
@@ -69,4 +74,11 @@ import { CommonEntity } from "./common-columns.entity";
 
   @Column({ nullable: true })
   user_id: string;
+
+
+  @ManyToOne(() => AddressEntity, address => address.events)
+  address: AddressEntity;
+
+  @OneToMany(() => NotificationEntity, notification => notification.event)
+  notifications: NotificationEntity[];
 }
