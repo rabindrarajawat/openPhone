@@ -176,6 +176,7 @@ import { AuctionEventService } from "./auction-event.service";
 import { AuctionEventDto } from "src/dto/auction-event.dto";
 import { validate } from "class-validator";
 import { OpenPhoneEventDto } from "../dto/open-phone-event.dto";
+import { NotificationService } from "./notification.service";
 @Injectable()
 export class OpenPhoneEventService {
   constructor(
@@ -184,7 +185,8 @@ export class OpenPhoneEventService {
     @InjectRepository(AddressEntity)
     private addressRepository: Repository<AddressEntity>,
     private addressService: AddressService,
-    private auctionService: AuctionEventService
+    private auctionService: AuctionEventService,
+    private notificationService: NotificationService
   ) { }
 
   // async create(payload: any) {
@@ -598,8 +600,9 @@ export class OpenPhoneEventService {
         throw new BadRequestException(`Invalid open phone event data: ${errorMessages.join(", ")}`);
       }
 
-      const savedOpenPhoneEvent = await this.openPhoneEventRepository.save(openPhoneEvent);
-
+      const savedOpenPhoneEvent =
+        await this.openPhoneEventRepository.save(openPhoneEvent);
+        await this.notificationService.createNotification(savedOpenPhoneEvent.id);
       const auctionEventDto: AuctionEventDto = {
         event_id: savedOpenPhoneEvent.id,
         created_by: "Ram",
