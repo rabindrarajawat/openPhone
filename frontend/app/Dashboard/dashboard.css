@@ -910,3 +910,12 @@
     font-size: 12px;
 
 }
+/* CSS file or style block */
+
+  
+  /* If you want to target all mobile screens, you might also want to consider adding a max-width for even smaller screens */
+  @media (max-width: 576px) {
+    .box {
+      width: 400px;
+    }
+  }

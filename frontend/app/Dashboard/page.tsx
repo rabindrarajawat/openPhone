@@ -256,16 +256,16 @@ const Dashboard = () => {
   const toggleSidebar = () => {
     setIsSidebarVisible((prevState) => !prevState);
   };
- 
+
+
 
   return (
     <div>
       {/* <Navbar onSelectAddress={handleAddressSelect1} /> */}
       <Navbar
-        // toggleSidebar={toggleSidebar}
-        onSelectAddress={handleAddressSelect1} toggleSidebar={function (): void {
-          throw new Error("Function not implemented.");
-        } }      />
+        toggleSidebar={toggleSidebar}
+        onSelectAddress={handleAddressSelect1}
+      />
       {isSidebarVisible && <SideBar />}
       {/* <SideBar /> */}
       <div className={`box ${isSidebarVisible ? "sidebar-visible" : ""}`}>
@@ -397,6 +397,7 @@ const Dashboard = () => {
                   Monthly
                 </label>
               </div>
+              
               {/* <div className="form-check custom-dropdown-item">
                             <input
                                 className="form-check-input"
@@ -423,8 +424,10 @@ const Dashboard = () => {
                         </label>
                     </div> */}
           </div>
+          </div>
+         
 
-          <div className="box1">
+          <div className="box1 d-none d-sm-block">
             <div
               className={`dropdown search-address-dropdown custom-dropdown ${box1DropdownOpen ? "show" : ""
                 }`}
@@ -561,7 +564,7 @@ const Dashboard = () => {
             <div className="tracking-container">
               <div className="call-tracking">
                 <Image
-                  src="/vector.svg"
+                  src="/Vector.svg"
                   alt="Activity Logo"
                   className="vector"
                   width={50}
@@ -822,7 +825,7 @@ const Dashboard = () => {
             </div>
 
           </div>
-        </div>
+       
       </div>
     </div>
   );
