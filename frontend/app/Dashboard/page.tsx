@@ -100,7 +100,7 @@ const Dashboard = () => {
       });
   }, []);
 
-  useEffect(() => {
+ useEffect(() => {
     if (selectedAddress && selectedAddress !== "Search Address") {
       axios
         .get(
@@ -131,7 +131,7 @@ const Dashboard = () => {
           console.error("Error fetching event data:", error);
         });
     }
-  }, [selectedAddress]);
+  }, [selectedAddress]);            
 
   const handleRowClick = (ownerId: number) => {
     if (selectedRowId !== ownerId) {
@@ -230,8 +230,19 @@ const Dashboard = () => {
 
   const handleAddressSelect = (address: string) => {
     setSelectedAddress(address);
+    setSelectedAddress1(address); // You can set it as needed
+
     setEventData([]); // Clear existing event data to ensure new data is shown
     setBox1DropdownOpen(false); // Close the dropdown after selection
+  };
+  const handleCheckboxClick = (addressId: any) => {
+    axios.post(`http://localhost:8000/bookmarks/${addressId}`)
+      .then(response => {
+        console.log('Bookmark added successfully:', response.data);
+      })
+      .catch(error => {
+        console.error('Error adding bookmark:', error);
+      });
   };
   const handleAddressSelect1 = (address: Address) => {
     setSelectedAddress(address.fullAddress);
@@ -428,41 +439,45 @@ const Dashboard = () => {
          
 
           <div className="box1 d-none d-sm-block">
-            <div
-              className={`dropdown search-address-dropdown custom-dropdown ${box1DropdownOpen ? "show" : ""
-                }`}
-            >
-              <button
-                className="btn btn-secondary dropdown-toggle custom-dropdown-button"
-                type="button"
-                onClick={toggleBox1Dropdown}
-              >
-                {selectedAddress1}
-                {selectedAddress}
+           <div
+  className={`dropdown search-address-dropdown custom-dropdown ${box1DropdownOpen ? "show" : ""}`}
+>
+  <button
+    className="btn btn-secondary dropdown-toggle custom-dropdown-button"
+    type="button"
+    onClick={toggleBox1Dropdown}
+  >
+    {selectedAddress1}
+    {selectedAddress}
 
-                <Image
-                  src="/dropdownicon.svg"
-                  alt="Dropdown Icon"
-                  className={`dropdown-icon ${box1DropdownOpen ? "open" : ""}`}
-                  width={50}
-                  height={50}
-                />
-              </button>
-              <div
-                className={`dropdown-menu custom-dropdown-menu ${box1DropdownOpen ? "show" : ""
-                  }`}
-              >
-                {addresses.map((address, index) => (
-                  <button
-                    key={index}
-                    className="dropdown-item custom-dropdown-item"
-                    onClick={() => handleAddressSelect(address)}
-                  >
-                    {address}
-                  </button>
-                ))}
-              </div>
-            </div>
+    <Image
+      src="/dropdownicon.svg"
+      alt="Dropdown Icon"
+      className={`dropdown-icon ${box1DropdownOpen ? "open" : ""}`}
+      width={50}
+      height={50}
+    />
+  </button>
+  <div
+    className={`dropdown-menu custom-dropdown-menu ${box1DropdownOpen ? "show" : ""}`}
+  >
+    {addresses.map((address, index) => (
+      <div key={index} className="dropdown-item custom-dropdown-item d-flex align-items-center">
+        <input 
+          type="checkbox" 
+          className="form-check-input me-2" 
+        />
+        <button
+          className="btn btn-link p-0 text-decoration-none"
+          onClick={() => handleAddressSelect(address)}
+        >
+          {address}
+        </button>
+      </div>
+    ))}
+  </div>
+</div>
+
 
             <div className="logos-row">
               <div className="nav1">
