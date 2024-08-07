@@ -115,15 +115,15 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
     setShowDropdown(!showDropdown);
   };
 
-  const handleMarkAsRead = async (eventId: number) => {
+  const handleMarkAsRead = async (event_id: number) => {
     try {
-      const response = await axios.post(`http://localhost:8000/notifications/${eventId}/read`);
+      const response = await axios.post(`http://localhost:8000/notifications/${event_id}/read`);
       console.log("Backend Response:", response);
 
       if (response.status === 200 || response.status === 201) {
         // Update notifications state
         setNotifications(prevNotifications =>
-          prevNotifications.filter(notification => notification.event_id !== eventId)
+          prevNotifications.filter(notification => notification.event_id !== event_id)
         );
       } else {
         console.error("Failed to mark notification as read:", response);
@@ -186,21 +186,21 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
         </div>
 
         {showDropdown && (
-          <div className="notification-dropdown">
-            <div>{newNotificationCount} new messages</div>
-            <ul>
-              {notifications.map(notification => (
-                <li key={notification.event_id} className={!notification.is_read ? 'new-notification' : ''}>
-                  <strong>From: {notification.event.from}</strong><br />
-                  {}
-                  <button onClick={() => handleMarkAsRead(notification.event_id)} className="mark-as-read-button">
-                    Mark as read
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+  <div className="notification-dropdown">
+    <div>{newNotificationCount} new messages</div>
+    <ul>
+      {notifications.map(notification => (
+        <li key={notification.event_id} className={!notification.is_read ? 'new-notification' : ''}>
+          <strong onClick={() => handleMarkAsRead(notification.event_id)}>
+            From: {notification.event.from}
+          </strong><br />
+          {/* Other notification content can go here */}
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
       </div>
     </nav>
   );
