@@ -9,7 +9,6 @@ import "./dashboard.css";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-
 interface Address {
   fullAddress: string;
 }
@@ -54,7 +53,9 @@ const Dashboard = () => {
   const [isFollowUpClicked, setIsFollowUpClicked] = useState(false); // Add state for Follow-up button
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [selectedAddress, setSelectedAddress] = useState("Search Address");
-  const [addresses, setAddresses] = useState<string[]>([]); // State to store addresses
+  const [addresses, setAddresses] = useState([]); // Assuming you have an array of addresses
+  const [addressId, setAddressId] = useState(null);
+
   const [eventData, setEventData] = useState<EventItem[]>([]);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [fromNumber, setFromNumber] = useState("");
@@ -100,7 +101,7 @@ const Dashboard = () => {
       });
   }, []);
 
- useEffect(() => {
+  useEffect(() => {
     if (selectedAddress && selectedAddress !== "Search Address") {
       axios
         .get(
@@ -115,9 +116,11 @@ const Dashboard = () => {
             if (data.events.length > 0) {
               setPhoneNumber(data.events[0].to);
               setFromNumber(data.events[0].from);
+              setAddressId(data.events[0].address_id); // Store address_id
             } else {
               setPhoneNumber("");
               setFromNumber("");
+              setAddressId(null); // Reset address_id if no events
             }
             setMessageDelivered(data.messageDelivered || 0);
             setMessageResponse(data.messageResponse || 0);
@@ -131,7 +134,7 @@ const Dashboard = () => {
           console.error("Error fetching event data:", error);
         });
     }
-  }, [selectedAddress]);            
+  }, [selectedAddress]);
 
   const handleRowClick = (ownerId: number) => {
     if (selectedRowId !== ownerId) {
@@ -235,22 +238,24 @@ const Dashboard = () => {
     setEventData([]); // Clear existing event data to ensure new data is shown
     setBox1DropdownOpen(false); // Close the dropdown after selection
   };
-  const handleCheckboxClick = (addressId: any) => {
-    axios.post(`http://localhost:8000/bookmarks/${addressId}`)
-      .then(response => {
-        console.log('Bookmark added successfully:', response.data);
-      })
-      .catch(error => {
-        console.error('Error adding bookmark:', error);
-      });
-  };
+ 
   const handleAddressSelect1 = (address: Address) => {
     setSelectedAddress(address.fullAddress);
   };
+  const handleBookmark = (addressId: any) => {
+    axios
+      .post(`http://localhost:8000/bookmarks/${addressId}`)
+      .then((response) => {
+        console.log('Bookmark successful:', response.data);
+      })
+      .catch((error) => {
+        console.error('Error bookmarking address:', error);
+      });
+  };
+
 
   useEffect(() => {
     if (tableData.length > 0) {
-      // Set default selectedRowId only if it is not already set
       if (selectedRowId === null && tableData.length > 0) {
         const firstRowId = tableData[0].ownerid;
         setSelectedRowId(firstRowId);
@@ -267,8 +272,6 @@ const Dashboard = () => {
   const toggleSidebar = () => {
     setIsSidebarVisible((prevState) => !prevState);
   };
-
-
 
   return (
     <div>
@@ -408,7 +411,7 @@ const Dashboard = () => {
                   Monthly
                 </label>
               </div>
-              
+
               {/* <div className="form-check custom-dropdown-item">
                             <input
                                 className="form-check-input"
@@ -435,227 +438,235 @@ const Dashboard = () => {
                         </label>
                     </div> */}
           </div>
-          </div>
-         
+        </div>
 
-          <div className="box1 d-none d-sm-block">
-           <div
-  className={`dropdown search-address-dropdown custom-dropdown ${box1DropdownOpen ? "show" : ""}`}
->
-  <button
-    className="btn btn-secondary dropdown-toggle custom-dropdown-button"
-    type="button"
-    onClick={toggleBox1Dropdown}
-  >
-    {selectedAddress1}
-    {selectedAddress}
-
-    <Image
-      src="/dropdownicon.svg"
-      alt="Dropdown Icon"
-      className={`dropdown-icon ${box1DropdownOpen ? "open" : ""}`}
-      width={50}
-      height={50}
-    />
-  </button>
-  <div
-    className={`dropdown-menu custom-dropdown-menu ${box1DropdownOpen ? "show" : ""}`}
-  >
-    {addresses.map((address, index) => (
-      <div key={index} className="dropdown-item custom-dropdown-item d-flex align-items-center">
-        <input 
-          type="checkbox" 
-          className="form-check-input me-2" 
-        />
+        <div className="box1 d-none d-sm-block">
+        <div
+        className={`dropdown search-address-dropdown custom-dropdown ${
+          box1DropdownOpen ? "show" : ""
+        }`}
+      >
         <button
-          className="btn btn-link p-0 text-decoration-none"
-          onClick={() => handleAddressSelect(address)}
+          className="btn btn-secondary dropdown-toggle custom-dropdown-button"
+          type="button"
+          onClick={toggleBox1Dropdown}
         >
-          {address}
+          {selectedAddress}
+          <Image
+            src="/dropdownicon.svg"
+            alt="Dropdown Icon"
+            className={`dropdown-icon ${box1DropdownOpen ? "open" : ""}`}
+            width={50}
+            height={50}
+          />
         </button>
-      </div>
-    ))}
-  </div>
-</div>
-
-
-            <div className="logos-row">
-              <div className="nav1">
-                <Image
-                  src="/follow.svg"
-                  alt="Follow-up Logo"
-                  className={`logo3 ${isFollowUpClicked ? "follow-up-heading" : ""
-                    }`}
-                  width={50}
-                  height={50}
-                />
-                <label
-                  className={`Activity ${isFollowUpClicked ? "follow-up-heading" : ""
-                    }`}
-                  htmlFor=""
-                  onClick={handleFollowUpClick}
-                >
-                  Follow-up
-                </label>
-              </div>
-              <div className="nav1">
-                <Image
-                  src="/id.svg"
-                  alt="ID Logo"
-                  className="logo3"
-                  width={50}
-                  height={50}
-                />
-                <label className="Activity" htmlFor="">
-                  ID
-                </label>
-              </div>
-              <div className="nav1">
-                <Image
-                  src="/call.svg"
-                  alt="Call Logo"
-                  className="logo3"
-                  width={50}
-                  height={50}
-                />
-                <label className="Activity" htmlFor="">
-                  Call
-                </label>
-              </div>
-              <div className="nav1">
-                <Image
-                  src="/activity.svg"
-                  alt="Activity Logo"
-                  className="logo3"
-                  width={50}
-                  height={50}
-                />
-                <label className="Activity" htmlFor="">
-                  Activity
-                </label>
-              </div>
-            </div>
-
-            <div className="line"></div>
-            <div className="heading">Comprehensive view of Address</div>
-            <div className="logos-row-msg">
-              <div className="nav-msg">
-                <div className="message">Message Delivered</div>
-                <input
-                  type="text"
-                  className="round-input"
-                  value={messageDelivered}
-                  readOnly
-                />
-              </div>
-              <div className="nav-msg">
-                <div className="message response ">Message Response</div>
-                <input
-                  type="text"
-                  className="round-input"
-                  value={messageResponse}
-                  readOnly
-                />
-              </div>
-              <div className="nav-msg">
-                <div className="message call-">Call </div>
-                <input
-                  type="text"
-                  className="round-input"
-                  value={call}
-                  readOnly
-                />
-              </div>
-              <div className="nav-msg">
-                <div className="message call-response">Call Response</div>
-                <input
-                  type="text"
-                  className="round-input"
-                  value={callResponse}
-                  readOnly
-                />
-              </div>
-            </div>
-            <div className="tracking-container">
-              <div className="call-tracking">
-                <Image
-                  src="/Vector.svg"
-                  alt="Activity Logo"
-                  className="vector"
-                  width={50}
-                  height={50}
-                />
-                <div className="text">Call tracking of search address </div>
-              </div>
-              <div className="follow-up">
-                <div>
-                  <Image
-                    src="/redo.svg"
-                    alt="redo Logo"
-                    className={`vector redo ${isFollowUpClicked ? "follow-up-heading" : ""
-                      }`}
-                    width={50}
-                    height={50}
-                  />
-                  <div
-                    className={`text-follow ${isFollowUpClicked ? "follow-up-heading" : ""
-                      }`}
-                  >
-                    Follow-up tracking of search address{" "}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="tracking-container-box">
-              <div className="check-status">
-                <div className="time  ">Times</div>
-                <div className="vertical-line"></div>
-                <div className="time">Duration</div>
-                <div className="vertical-line"></div>
-                <div className="time">Status</div>
-                <div className="vertical-line"></div>
-                <div className="time">Action</div>
-              </div>
-              <div
-                className={`follow-status ${isFollowUpClicked ? "follow-up-heading" : ""
-                  }`}
+        <div
+          className={`dropdown-menu custom-dropdown-menu ${
+            box1DropdownOpen ? "show" : ""
+          }`}
+        >
+          {addresses.map((address, index) => (
+            <div
+              key={index}
+              className="dropdown-item custom-dropdown-item d-flex align-items-center"
+            >
+              <input
+                type="checkbox"
+                className="form-check-input me-2"
+                onClick={() => handleBookmark(addressId)}
+              />
+              <button
+                className="btn btn-link p-0 text-decoration-none"
+                onClick={() => handleAddressSelect(address)}
               >
-                <div className="time  ">Owner ID</div>
-                <div className="vertical-line"></div>
-                <div className="time">Status</div>
-                <div className="vertical-line"></div>
-                <div className="time">Last Follow-up</div>
-              </div>
+                {address}
+              </button>
             </div>
-            <div className="tracking-container">
-              <div className="call-tracking">
+          ))}
+        </div>
+      </div>
+
+          <div className="logos-row">
+            <div className="nav1">
+              <Image
+                src="/follow.svg"
+                alt="Follow-up Logo"
+                className={`logo3 ${
+                  isFollowUpClicked ? "follow-up-heading" : ""
+                }`}
+                width={50}
+                height={50}
+              />
+              <label
+                className={`Activity ${
+                  isFollowUpClicked ? "follow-up-heading" : ""
+                }`}
+                htmlFor=""
+                onClick={handleFollowUpClick}
+              >
+                Follow-up
+              </label>
+            </div>
+            <div className="nav1">
+              <Image
+                src="/id.svg"
+                alt="ID Logo"
+                className="logo3"
+                width={50}
+                height={50}
+              />
+              <label className="Activity" htmlFor="">
+                ID
+              </label>
+            </div>
+            <div className="nav1">
+              <Image
+                src="/call.svg"
+                alt="Call Logo"
+                className="logo3"
+                width={50}
+                height={50}
+              />
+              <label className="Activity" htmlFor="">
+                Call
+              </label>
+            </div>
+            <div className="nav1">
+              <Image
+                src="/activity.svg"
+                alt="Activity Logo"
+                className="logo3"
+                width={50}
+                height={50}
+              />
+              <label className="Activity" htmlFor="">
+                Activity
+              </label>
+            </div>
+          </div>
+
+          <div className="line"></div>
+          <div className="heading">Comprehensive view of Address</div>
+          <div className="logos-row-msg">
+            <div className="nav-msg">
+              <div className="message">Message Delivered</div>
+              <input
+                type="text"
+                className="round-input"
+                value={messageDelivered}
+                readOnly
+              />
+            </div>
+            <div className="nav-msg">
+              <div className="message response ">Message Response</div>
+              <input
+                type="text"
+                className="round-input"
+                value={messageResponse}
+                readOnly
+              />
+            </div>
+            <div className="nav-msg">
+              <div className="message call-">Call </div>
+              <input
+                type="text"
+                className="round-input"
+                value={call}
+                readOnly
+              />
+            </div>
+            <div className="nav-msg">
+              <div className="message call-response">Call Response</div>
+              <input
+                type="text"
+                className="round-input"
+                value={callResponse}
+                readOnly
+              />
+            </div>
+          </div>
+          <div className="tracking-container">
+            <div className="call-tracking">
+              <Image
+                src="/Vector.svg"
+                alt="Activity Logo"
+                className="vector"
+                width={50}
+                height={50}
+              />
+              <div className="text">Call tracking of search address </div>
+            </div>
+            <div className="follow-up">
+              <div>
                 <Image
-                  src="/converstation.svg"
-                  alt="converstation Logo"
-                  className="vector"
+                  src="/redo.svg"
+                  alt="redo Logo"
+                  className={`vector redo ${
+                    isFollowUpClicked ? "follow-up-heading" : ""
+                  }`}
                   width={50}
                   height={50}
                 />
-                <div className="text"> Conversation From {fromNumber}</div>
-              </div>
-              <div className="">
-                <div>
-                  <Image
-                    src="/msg.svg"
-                    alt="msg Logo"
-                    className="vector redo message-logo"
-                    width={50}
-                    height={50}
-                  />
-                  <div className="text-follow msg-follow">Message Detail </div>
+                <div
+                  className={`text-follow ${
+                    isFollowUpClicked ? "follow-up-heading" : ""
+                  }`}
+                >
+                  Follow-up tracking of search address{" "}
                 </div>
               </div>
             </div>
-            <div className="tracking-container-box">
-
-              <div >
-                <div className="datatable-box ">
-                  {/* <table className="table table-hover">
+          </div>
+          <div className="tracking-container-box">
+            <div className="check-status">
+              <div className="time  ">Times</div>
+              <div className="vertical-line"></div>
+              <div className="time">Duration</div>
+              <div className="vertical-line"></div>
+              <div className="time">Status</div>
+              <div className="vertical-line"></div>
+              <div className="time">Action</div>
+            </div>
+            <div
+              className={`follow-status ${
+                isFollowUpClicked ? "follow-up-heading" : ""
+              }`}
+            >
+              <div className="time  ">Owner ID</div>
+              <div className="vertical-line"></div>
+              <div className="time">Status</div>
+              <div className="vertical-line"></div>
+              <div className="time">Last Follow-up</div>
+            </div>
+          </div>
+          <div className="tracking-container">
+            <div className="call-tracking">
+              <Image
+                src="/converstation.svg"
+                alt="converstation Logo"
+                className="vector"
+                width={50}
+                height={50}
+              />
+              <div className="text"> Conversation From {fromNumber}</div>
+            </div>
+            <div className="">
+              <div>
+                <Image
+                  src="/msg.svg"
+                  alt="msg Logo"
+                  className="vector redo message-logo"
+                  width={50}
+                  height={50}
+                />
+                <div className="text-follow msg-follow">Message Detail </div>
+              </div>
+            </div>
+          </div>
+          <div className="tracking-container-box">
+            <div>
+              <div className="datatable-box ">
+                <table className="table table-hover">
                   <thead>
                     <tr className="datatable">
                       <th scope="col">Conversation ID</th>
@@ -665,9 +676,9 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {tableData.map((row) => (
+                    {currentRecords.map((row, index) => (
                       <tr
-                        key={row.ownerid}
+                        key={index}
                         className={`center-align ${
                           selectedRowId === row.ownerid ? "selected-row" : ""
                         }`}
@@ -690,89 +701,74 @@ const Dashboard = () => {
                       </tr>
                     ))}
                   </tbody>
-                </table> */}
-                  <table className="table table-hover">
-                    <thead>
-                      <tr className='datatable'>
-                        <th scope="col">Conversation ID</th>
-                        <th scope="col">Phone Number</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Responses</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentRecords.map((row, index) => (
-                        <tr
-                          key={index}
-                          className={`center-align ${selectedRowId === row.ownerid ? 'selected-row' : ''}`}
-                          onClick={() => handleRowClick(row.ownerid)}
-                        >
-                          <td>{row.ownerid}</td>
-                          <td>{row.PhoneNumber}</td>
-                          <td>{row.Status}</td>
-                          <td className={row.Responses === 'Interested' ? 'interested' : row.Responses === 'Stop' ? 'stop' : ''}>
-                            {row.Responses}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                </table>
+              </div>
+              <div className="pagination-container">
+                <ul className="pagination">
+                  <li
+                    className={`page-item ${
+                      currentPage === 1 ? "disabled" : ""
+                    }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      &lt;
+                    </button>
+                  </li>
+                  {[...Array(totalPages)].map((_, i) => (
+                    <li
+                      key={i}
+                      className={`page-item ${
+                        currentPage === i + 1 ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() => handlePageChange(i + 1)}
+                      >
+                        {i + 1}
+                      </button>
+                    </li>
+                  ))}
+                  <li
+                    className={`page-item ${
+                      currentPage === totalPages ? "disabled" : ""
+                    }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      &gt;
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
 
-
+            <div className="input-msg">
+              <div className="chat-heading">
+                <div className="chat-heading-msg">
+                  <div className="msg-id">Message ID</div>
+                  <div className="msg-auction">011045</div>
                 </div>
-                <div className="pagination-container">
-                  <ul className="pagination">
-                    <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                      <button
-                        className="page-link"
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                      >
-                        &lt;
-                      </button>
-                    </li>
-                    {[...Array(totalPages)].map((_, i) => (
-                      <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
-                        <button
-                          className="page-link"
-                          onClick={() => handlePageChange(i + 1)}
-                        >
-                          {i + 1}
-                        </button>
-                      </li>
-                    ))}
-                    <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                      <button
-                        className="page-link"
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                      >
-                        &gt;
-                      </button>
-                    </li>
-                  </ul>
+                <div className="chat-heading-msg">
+                  <div className="msg-id">Message Status</div>
+                  <div className="msg-auction">Delivered</div>
+                </div>
+                <div className="chat-heading-msg">
+                  <div className="msg-id">Type</div>
+                  <div className="msg-auction">Auction</div>
                 </div>
               </div>
-
-              <div className="input-msg">
-                <div className="chat-heading">
-                  <div className="chat-heading-msg">
-                    <div className="msg-id">Message ID</div>
-                    <div className="msg-auction">011045</div>
-                  </div>
-                  <div className="chat-heading-msg">
-                    <div className="msg-id">Message Status</div>
-                    <div className="msg-auction">Delivered</div>
-                  </div>
-                  <div className="chat-heading-msg">
-                    <div className="msg-id">Type</div>
-                    <div className="msg-auction">Auction</div>
-                  </div>
-                </div>
-                <div className="screenshot-msg">
-                  <div className="inbox-chat">
-                    {apiResponseBody.length > 0
-                      ? apiResponseBody.map((message, index) => (
+              <div className="screenshot-msg">
+                <div className="inbox-chat">
+                  {apiResponseBody.length > 0
+                    ? apiResponseBody.map((message, index) => (
                         <div
                           key={index}
                           className={
@@ -786,10 +782,11 @@ const Dashboard = () => {
                               {message.body}
                               <button
                                 onClick={() => toggleMessageExpansion(index)}
-                                className={`read-more-btn ${message.event_type_id === 1
-                                  ? "read-more-btn-right"
-                                  : "read-more-btn-left"
-                                  }`}
+                                className={`read-more-btn ${
+                                  message.event_type_id === 1
+                                    ? "read-more-btn-right"
+                                    : "read-more-btn-left"
+                                }`}
                               >
                                 Read Less
                               </button>
@@ -800,9 +797,14 @@ const Dashboard = () => {
                                 <>
                                   {message.body.substring(0, 100)}...
                                   <button
-                                    onClick={() => toggleMessageExpansion(index)}
-                                    className={`read-more-btn ${message.event_type_id === 2 ? "read-more-btn-right" : "read-more-btn-left"
-                                      }`}
+                                    onClick={() =>
+                                      toggleMessageExpansion(index)
+                                    }
+                                    className={`read-more-btn ${
+                                      message.event_type_id === 2
+                                        ? "read-more-btn-right"
+                                        : "read-more-btn-left"
+                                    }`}
                                   >
                                     Read More
                                   </button>
@@ -811,36 +813,33 @@ const Dashboard = () => {
                                 message.body || "No message body"
                               )}
                             </div>
-
                           )}
                         </div>
                       ))
-                      : "Loading..."}
-                  </div>
-                </div>
-
-                <div className="chat-heading-follow">
-                  <div className="chat-heading-msg">
-                    <div className="follow-id">Follow Up</div>
-                    <div className="msg-auction">03 Times</div>
-                  </div>
-                  <div className="chat-heading-msg">
-                    <div className="follow-id">Lead Status</div>
-                    <div className="stop ">Dead</div>
-                  </div>
-                  <div className="chat-heading-msg">
-                    <div className="follow-id">Response</div>
-                    <div className=" stop">Stop</div>
-                  </div>
-                  <button type="button" className="btn-call">
-                    Call Now
-                  </button>
+                    : "Loading..."}
                 </div>
               </div>
-            </div>
 
+              <div className="chat-heading-follow">
+                <div className="chat-heading-msg">
+                  <div className="follow-id">Follow Up</div>
+                  <div className="msg-auction">03 Times</div>
+                </div>
+                <div className="chat-heading-msg">
+                  <div className="follow-id">Lead Status</div>
+                  <div className="stop ">Dead</div>
+                </div>
+                <div className="chat-heading-msg">
+                  <div className="follow-id">Response</div>
+                  <div className=" stop">Stop</div>
+                </div>
+                <button type="button" className="btn-call">
+                  Call Now
+                </button>
+              </div>
+            </div>
           </div>
-       
+        </div>
       </div>
     </div>
   );
