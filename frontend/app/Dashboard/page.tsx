@@ -10,8 +10,14 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { SearchResultList } from "../SearchResultList/SearchResultList";
 
+
 interface Address {
   fullAddress: string;
+  is_bookmarked: boolean;
+  id: number; 
+
+
+  
 }
 
 interface Message {
@@ -53,14 +59,9 @@ const Dashboard = () => {
   const [box1DropdownOpen, setBox1DropdownOpen] = useState(false);
   const [isFollowUpClicked, setIsFollowUpClicked] = useState(false); // Add state for Follow-up button
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  const [selectedAddress, setSelectedAddress] = useState("Search Address");
-  const [addresses, setAddresses] = useState([]); // Assuming you have an array of addresses
-  const [addressId, setAddressId] = useState(null);
-
   const [eventData, setEventData] = useState<EventItem[]>([]);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [fromNumber, setFromNumber] = useState("");
-  const [selectedAddress1, setSelectedAddress1] = useState<string>("");
   const [apiResponseBody, setApiResponseBody] = useState<Message[]>([]);
   const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
   const [isMessageExpanded, setIsMessageExpanded] = useState(false);
@@ -74,18 +75,18 @@ const Dashboard = () => {
   const [messageResponse, setMessageResponse] = useState<number>(0);
   const [call, setCall] = useState<number>(0);
   const [callResponse, setCallResponse] = useState<number>(0);
-  const [bookmarkedAddresses, setBookmarkedAddresses] = useState(new Array(addresses.length).fill(false));
   const [input, setInput] = useState<string>('');
   const [results, setResultsState] = useState<Address[]>([]);
   const [allSelected, setAllSelected] = useState(false);
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [selectedAddresses, setSelectedAddresses] = useState<number[]>([]);
+
+
 
 
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [bookmarkedAddresses, setBookmarkedAddresses] = useState(new Set());
-  
-
-  const recordsPerPage = 6; 
+  const recordsPerPage = 6;
 
   const router = useRouter();
   useEffect(() => {
@@ -99,74 +100,101 @@ const Dashboard = () => {
     axios
       .get("http://localhost:8000/address/getalladdress")
       .then((response) => {
-        const addressData = response.data.map(
-          (address: any) => address.address
+        console.log('API Response:', response.data);
+        const formattedAddresses = response.data.map((item:any)=>({
+          id:item.id,
+          fullAddress: item.address,
+          is_bookmarked:item.is_bookmarked,
+        }));
+        setAddresses(formattedAddresses);
+        setSelectedAddresses(
+          formattedAddresses.filter((address: {is_bookmarked:any;})=> address.is_bookmarked).map((address:{id:any;})=>address.id)
+
         );
-        setAddresses(addressData);
-        if (addressData.length > 0) {
-          setSelectedAddress(addressData[0]); // Set the first address as the default selected address
-        }
+       
       })
       .catch((error) => {
         console.error("Error fetching addresses:", error);
       });
   }, []);
+  const handleBookmarkClick = (addressId: number) => {
+    const address = addresses.find(a => a.id === addressId);
+    if (!address) return;
 
-  useEffect(() => {
-  useEffect(() => {
-    if (selectedAddress && selectedAddress !== "Search Address") {
-      axios
-        .get(
-          `http://localhost:8000/openPhoneEventData/events?address=${encodeURIComponent(
-            selectedAddress
-          )}`
-        )
-        .then((response) => {
-          const data = response.data.data;
-          if (data && Array.isArray(data.events)) {
-            setEventData(data.events);
-            if (data.events.length > 0) {
-              setPhoneNumber(data.events[0].to);
-              setFromNumber(data.events[0].from);
-              setAddressId(data.events[0].address_id); // Store address_id
-            } else {
-              setPhoneNumber("");
-              setFromNumber("");
-              setAddressId(null); // Reset address_id if no events
-            }
-            setMessageDelivered(data.messageDelivered || 0);
-            setMessageResponse(data.messageResponse || 0);
-            setCall(data.call || 0);
-            setCallResponse(data.callResponse || 0);
-          } else {
-            console.error("Events data is not an array or is missing");
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching event data:", error);
-        });
-    }
-  }, [selectedAddress]);
-  }, [selectedAddress]);
+    const newIsBookmarked = !address.is_bookmarked;
 
-  const handleRowClick = (ownerId: number) => {
-    if (selectedRowId !== ownerId) {
-      setSelectedRowId(ownerId);
-      console.log("Selected owner ID:", ownerId);
+    console.log(`Toggling bookmark status for address ID ${addressId} to ${newIsBookmarked}`);
 
-      axios
-        .get<ApiResponse>(
-          `http://localhost:8000/openPhoneEventData/events-by-conversation?conversation_id=${ownerId}`
-        )
-        .then((response) => {
-          console.log("API response for selected owner ID:", response.data);
-          setApiResponseBody(response.data.data); // Store the data array in state
-        })
-        .catch((error) => {
-          console.error("Error fetching data for selected owner ID:", error);
-        });
-    }
+    axios.post(`http://localhost:8000/bookmarks/${addressId}`, {
+      is_bookmarked: newIsBookmarked
+    })
+      .then(response => {
+        console.log(`API Response for bookmarking:`, response.data);
+        // Update the state only if the API call was successful
+        setAddresses(prevAddresses =>
+          prevAddresses.map(a =>
+            a.id === addressId
+              ? { ...a, is_bookmarked: newIsBookmarked }
+              : a
+          )
+        );
+      })
+      .catch(error => {
+        console.error('Error updating bookmark status:', error);
+      });
   };
+
+  // useEffect(() => {
+  //   if (selectedAddress && selectedAddress !== "Search Address") {
+  //     axios
+  //       .get(
+  //         `http://localhost:8000/openPhoneEventData/events?address=${encodeURIComponent(
+  //           selectedAddress
+  //         )}`
+  //       )
+  //       .then((response) => {
+  //         const data = response.data.data;
+  //         if (data && Array.isArray(data.events)) {
+  //           setEventData(data.events);
+  //           if (data.events.length > 0) {
+  //             setPhoneNumber(data.events[0].to);
+  //             setFromNumber(data.events[0].from);
+  //           } else {
+  //             setPhoneNumber("");
+  //             setFromNumber("");
+  //           }
+  //           setMessageDelivered(data.messageDelivered || 0);
+  //           setMessageResponse(data.messageResponse || 0);
+  //           setCall(data.call || 0);
+  //           setCallResponse(data.callResponse || 0);
+  //         } else {
+  //           console.error("Events data is not an array or is missing");
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error fetching event data:", error);
+  //       });
+  //   }
+  // }, [selectedAddress]);
+
+  // const handleRowClick = (ownerId: number) => {
+  //   if (selectedRowId !== ownerId) {
+  //     setSelectedRowId(ownerId);
+  //     console.log("Selected owner ID:", ownerId);
+
+  //     axios
+  //       .get<ApiResponse>(
+  //         `http://localhost:8000/openPhoneEventData/events-by-conversation?conversation_id=${ownerId}`
+  //       )
+  //       .then((response) => {
+  //         console.log("API response for selected owner ID:", response.data);
+  //         setApiResponseBody(response.data.data); // Store the data array in state
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error fetching data for selected owner ID:", error);
+  //       });
+  //   }
+  // };
 
   const toggleMessageExpansion = (index: number) => {
     setExpandedMessages((prev) => {
@@ -245,76 +273,32 @@ const Dashboard = () => {
   };
 
   const handleAddressSelect = (address: string) => {
-    setSelectedAddress(address);
-    setSelectedAddress1(address); // You can set it as needed
+    // setSelectedAddress(address);
+    // setSelectedAddress1(address); // You can set it as needed
 
     setEventData([]); // Clear existing event data to ensure new data is shown
     setBox1DropdownOpen(false); // Close the dropdown after selection
   };
- 
-  const handleAddressSelect1 = (address: Address) => {
-    setSelectedAddress(address.fullAddress);
-  };
-  
-  useEffect(() => {
-    // Fetch the initial addresses
-    axios.get('http://localhost:8000/addresses')
+  const handleCheckboxClick = (addressId: any) => {
+    axios.post(`http://localhost:8000/bookmarks/${addressId}`)
       .then(response => {
-        setAddresses(response.data);
+        console.log('Bookmark added successfully:', response.data);
       })
       .catch(error => {
-        console.error('Error fetching addresses:', error);
+        console.error('Error adding bookmark:', error);
       });
-  
-    // Fetch the initial bookmarked addresses from local storage
-    const savedBookmarkedAddresses = localStorage.getItem('bookmarkedAddresses');
-    if (savedBookmarkedAddresses) {
-      const parsedBookmarkedAddresses = JSON.parse(savedBookmarkedAddresses);
-      setBookmarkedAddresses(new Set(parsedBookmarkedAddresses));
-    }
-  
-    // Fetch the initial bookmarked addresses from the server
-    axios.get('http://localhost:8000/bookmarkedAddresses')
-      .then(response => {
-        const bookmarks = new Set(response.data.map((item: { address_id: any; }) => item.address_id));
-        setBookmarkedAddresses(bookmarks);
-        localStorage.setItem('bookmarkedAddresses', JSON.stringify(Array.from(bookmarks)));
-      })
-      .catch(error => {
-        console.error('Error fetching bookmarked addresses:', error);
-      });
-  }, []);
-  
-  
-  const handleBookmark = (addressId: unknown) => {
-    const updatedBookmarkedAddresses = new Set(bookmarkedAddresses);
-    if (updatedBookmarkedAddresses.has(addressId)) {
-      updatedBookmarkedAddresses.delete(addressId);
-    } else {
-      updatedBookmarkedAddresses.add(addressId);
-    }
-
-    axios
-      .post(`http://localhost:8000/bookmarks/${addressId}`)
-      .then((response) => {
-        console.log('Bookmark successful:', response.data);
-      })
-      .catch((error) => {
-        console.error('Error bookmarking address:', error);
-      });
-      setBookmarkedAddresses(updatedBookmarkedAddresses);
-      console.log("updatedBookmarkedAddresses",)
-
-
   };
-
+  // const handleAddressSelect1 = (address: Address) => {
+  //   setSelectedAddresses(address.fullAddress);
+  // };
 
   useEffect(() => {
     if (tableData.length > 0) {
+      // Set default selectedRowId only if it is not already set
       if (selectedRowId === null && tableData.length > 0) {
         const firstRowId = tableData[0].ownerid;
         setSelectedRowId(firstRowId);
-        handleRowClick(firstRowId);
+        // handleRowClick(firstRowId);
       }
     }
   }, [tableData, selectedRowId]);
@@ -343,13 +327,34 @@ const Dashboard = () => {
     setIsSidebarVisible((prevState) => !prevState);
   };
 
+  // const handleBookmarkClick = (index: any) => {
+  //   const newBookmarkedAddresses = [...bookmarkedAddresses];
+  //   newBookmarkedAddresses[index] = !newBookmarkedAddresses[index];
+  //   setBookmarkedAddresses(newBookmarkedAddresses);
+  // };
+
+
+
+
+
+  const handleChange = (value: string) => {
+    setInput(value);
+    fetchData(value);
+  };
+
+  const handleSelectAddress = (address: Address) => {
+    setInput(address.fullAddress);
+    setResultsState([]);
+    // if (onSelectAddress) {
+    //   onSelectAddress(address);
+    // }
+  };
+
+
   return (
     <div>
       {/* <Navbar onSelectAddress={handleAddressSelect1} /> */}
-      <Navbar
-        toggleSidebar={toggleSidebar}
-        onSelectAddress={handleAddressSelect1}
-      />
+     
       {isSidebarVisible && <SideBar />}
       {/* <SideBar /> */}
 
@@ -473,20 +478,20 @@ const Dashboard = () => {
                   </label>
                 </div>
 
-              <div className="form-check custom-dropdown-item">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="checkbox-monthly"
-                  checked={selectedOptions.includes("Monthly")}
-                  onChange={() => handleOptionToggle("Monthly")}
-                />
-                <label className="form-check-label" htmlFor="checkbox-monthly">
-                  Monthly
-                </label>
-              </div>
+                <div className="form-check custom-dropdown-item">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="checkbox-monthly"
+                    checked={selectedOptions.includes("Monthly")}
+                    onChange={() => handleOptionToggle("Monthly")}
+                  />
+                  <label className="form-check-label" htmlFor="checkbox-monthly">
+                    Monthly
+                  </label>
+                </div>
 
-              {/* <div className="form-check custom-dropdown-item">
+                {/* <div className="form-check custom-dropdown-item">
                             <input
                                 className="form-check-input"
                                 type="checkbox"
@@ -511,73 +516,64 @@ const Dashboard = () => {
                             Calls
                         </label>
                     </div> */}
+            </div>
           </div>
-        </div>
         </div>
 
         <div className="box1 d-none d-sm-block">
-        <div
-        className={`dropdown search-address-dropdown custom-dropdown ${
-          box1DropdownOpen ? "show" : ""
-        }`}
-      >
-        <button
-          className="btn btn-secondary dropdown-toggle custom-dropdown-button"
-          type="button"
-          onClick={toggleBox1Dropdown}
-        >
-          {selectedAddress}
-          <Image
-            src="/dropdownicon.svg"
-            alt="Dropdown Icon"
-            className={`dropdown-icon ${box1DropdownOpen ? "open" : ""}`}
-            width={50}
-            height={50}
-          />
-        </button>
-        <div
-          className={`dropdown-menu custom-dropdown-menu ${
-            box1DropdownOpen ? "show" : ""
-          }`}
-        >
-          {addresses.map((address, index) => (
-            <div
-              key={index}
-              className="dropdown-item custom-dropdown-item d-flex align-items-center"
+          {/* <div
+            className={`dropdown search-address-dropdown custom-dropdown ${box1DropdownOpen ? "show" : ""}`}
+          >
+            <button
+              className="btn btn-secondary dropdown-toggle custom-dropdown-button"
+              type="button"
+              onClick={toggleBox1Dropdown}
             >
-              <input
-                type="checkbox"
-                className="form-check-input me-2"
-                onClick={() => handleBookmark(addressId)}
+              {selectedAddress1}
+              {selectedAddress}
+
+              <Image
+                src="/dropdownicon.svg"
+                alt="Dropdown Icon"
+                className={`dropdown-icon ${box1DropdownOpen ? "open" : ""}`}
+                width={50}
+                height={50}
               />
-              <button
-                className="btn btn-link p-0 text-decoration-none"
-                onClick={() => handleAddressSelect(address)}
-              >
-                {address}
-              </button>
+            </button>
+            <div
+              className={`dropdown-menu custom-dropdown-menu ${box1DropdownOpen ? "show" : ""}`}
+            >
+              {addresses.map((address, index) => (
+                <div key={index} className="dropdown-item custom-dropdown-item d-flex align-items-center">
+                  <input
+                    type="checkbox"
+                    className="form-check-input me-2"
+                  />
+                  <button
+                    className="btn btn-link p-0 text-decoration-none"
+                    onClick={() => handleAddressSelect(address)}
+                  >
+                    {address}
+                  </button>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
-    
+          </div> */}
 
 
-          <div className="logos-row">
+          {/* <div className="logos-row">
             <div className="nav1">
               <Image
                 src="/follow.svg"
                 alt="Follow-up Logo"
-                className={`logo3 ${
-                  isFollowUpClicked ? "follow-up-heading" : ""
-                }`}
+                className={`logo3 ${isFollowUpClicked ? "follow-up-heading" : ""
+                  }`}
                 width={50}
                 height={50}
               />
               <label
-                className={`Activity ${
-                  isFollowUpClicked ? "follow-up-heading" : ""
-                }`}
+                className={`Activity ${isFollowUpClicked ? "follow-up-heading" : ""
+                  }`}
                 htmlFor=""
                 onClick={handleFollowUpClick}
               >
@@ -620,10 +616,11 @@ const Dashboard = () => {
                 Activity
               </label>
             </div>
-          </div>
+          </div> */}
 
-          <div className="line"></div>
-          <div className="heading">Comprehensive view of Address</div>
+          {/* <div className="line"></div> */}
+          <div className="heading">
+            <img src="done.svg" alt="" /> Comprehensive view of Address</div>
           <div className="logos-row-msg">
             <div className="nav-msg">
               <div className="message">Message Delivered</div>
@@ -662,7 +659,7 @@ const Dashboard = () => {
               />
             </div>
           </div>
-          <div className="tracking-container">
+          {/* <div className="tracking-container">
             <div className="call-tracking">
               <Image
                 src="/Vector.svg"
@@ -678,16 +675,14 @@ const Dashboard = () => {
                 <Image
                   src="/redo.svg"
                   alt="redo Logo"
-                  className={`vector redo ${
-                    isFollowUpClicked ? "follow-up-heading" : ""
-                  }`}
+                  className={`vector redo ${isFollowUpClicked ? "follow-up-heading" : ""
+                    }`}
                   width={50}
                   height={50}
                 />
                 <div
-                  className={`text-follow ${
-                    isFollowUpClicked ? "follow-up-heading" : ""
-                  }`}
+                  className={`text-follow ${isFollowUpClicked ? "follow-up-heading" : ""
+                    }`}
                 >
                   Follow-up tracking of search address{" "}
                 </div>
@@ -705,9 +700,8 @@ const Dashboard = () => {
               <div className="time">Action</div>
             </div>
             <div
-              className={`follow-status ${
-                isFollowUpClicked ? "follow-up-heading" : ""
-              }`}
+              className={`follow-status ${isFollowUpClicked ? "follow-up-heading" : ""
+                }`}
             >
               <div className="time  ">Owner ID</div>
               <div className="vertical-line"></div>
@@ -739,113 +733,74 @@ const Dashboard = () => {
                 <div className="text-follow msg-follow">Message Detail </div>
               </div>
             </div>
-          </div>
+          </div> */}
+          <div className="line"></div>
+
           <div className="tracking-container-box">
-            <div>
-              <div className="datatable-box ">
-                <table className="table table-hover">
-                  <thead>
-                    <tr className="datatable">
-                      <th scope="col">Conversation ID</th>
-                      <th scope="col">Phone Number</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Responses</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentRecords.map((row, index) => (
-                      <tr
-                        key={index}
-                        className={`center-align ${
-                          selectedRowId === row.ownerid ? "selected-row" : ""
-                        }`}
-                        onClick={() => handleRowClick(row.ownerid)}
-                      >
-                        <td>{row.ownerid}</td>
-                        <td>{row.PhoneNumber}</td>
-                        <td>{row.Status}</td>
-                        <td
-                          className={
-                            row.Responses === "Interested"
-                              ? "interested"
-                              : row.Responses === "Stop"
-                              ? "stop"
-                              : ""
-                          }
-                        >
-                          {row.Responses}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+
+            <div >
+
+              <div className="address"> <img src="User.svg" alt="" /> Address</div>
+              <div className='address-list'>
+  <div className="search-wrapper-add">
+    <input
+      className="search-to"
+      type="search"
+      placeholder="Search Address"
+      aria-label="Search"
+      value={input}
+      onChange={(e) => handleChange(e.target.value)}
+    />
+  
+    <img src="/Icon.svg" alt="icon" className="search-icon" />
+  </div>
+
+  {addresses.length > 0 ? (
+          addresses.map((address) => (
+            <li key={address.id} className="list-group-item d-flex justify-content-between align-items-center">
+              <div className="d-flex align-items-center p-3 gap-3">
+                <i
+                  className={`bi ${address.is_bookmarked ? 'bi-bookmark-fill' : 'bi-bookmark'} clickable-icon`}
+                  style={{ cursor: 'pointer', color: address.is_bookmarked ? 'blue' : 'grey' }}
+                  onClick={() => handleBookmarkClick(address.id)}
+                ></i>
+                <span className="ml-2">{address.fullAddress}</span>
               </div>
-              <div className="pagination-container">
-                <ul className="pagination">
-                  <li
-                    className={`page-item ${
-                      currentPage === 1 ? "disabled" : ""
-                    }`}
-                  >
-                    <button
-                      className="page-link"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      &lt;
-                    </button>
-                  </li>
-                  {[...Array(totalPages)].map((_, i) => (
-                    <li
-                      key={i}
-                      className={`page-item ${
-                        currentPage === i + 1 ? "active" : ""
-                      }`}
-                    >
-                      <button
-                        className="page-link"
-                        onClick={() => handlePageChange(i + 1)}
-                      >
-                        {i + 1}
-                      </button>
-                    </li>
-                  ))}
-                  <li
-                    className={`page-item ${
-                      currentPage === totalPages ? "disabled" : ""
-                    }`}
-                  >
-                    <button
-                      className="page-link"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      &gt;
-                    </button>
-                  </li>
-                </ul>
-              </div>
+            </li>
+          ))
+        ) : (
+          <p>No addresses found.</p>
+        )}
+</div>
+            
             </div>
 
-            <div className="input-msg">
-              <div className="chat-heading">
-                <div className="chat-heading-msg">
-                  <div className="msg-id">Message ID</div>
-                  <div className="msg-auction">011045</div>
-                </div>
-                <div className="chat-heading-msg">
-                  <div className="msg-id">Message Status</div>
-                  <div className="msg-auction">Delivered</div>
-                </div>
-                <div className="chat-heading-msg">
-                  <div className="msg-id">Type</div>
-                  <div className="msg-auction">Auction</div>
-                </div>
+
+            <div className="conversation"> <img src="converstation.svg" alt="" /> Conversation From {fromNumber}
+
+              <div className="search-wrapper search-new">
+                {/* <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} /> */}
+                <input
+                  className="search"
+                  type="search"
+                  placeholder="Search To"
+                  aria-label="Search"
+                  value={input}
+                  onChange={(e) => handleChange(e.target.value)}
+                />
+                {/* {results.length > 0 && (
+                  <SearchResultList results={results} onSelect={handleSelectAddress} />
+                )} */}
               </div>
-              <div className="screenshot-msg">
-                <div className="inbox-chat">
-                  {apiResponseBody.length > 0
-                    ? apiResponseBody.map((message, index) => (
+
+
+
+              <div className="input-msg">
+               
+                <div className="screenshot-msg">
+                  <div className="inbox-chat">
+                    {apiResponseBody.length > 0
+                      ? apiResponseBody.map((message, index) => (
                         <div
                           key={index}
                           className={
@@ -859,11 +814,10 @@ const Dashboard = () => {
                               {message.body}
                               <button
                                 onClick={() => toggleMessageExpansion(index)}
-                                className={`read-more-btn ${
-                                  message.event_type_id === 1
-                                    ? "read-more-btn-right"
-                                    : "read-more-btn-left"
-                                }`}
+                                className={`read-more-btn ${message.event_type_id === 1
+                                  ? "read-more-btn-right"
+                                  : "read-more-btn-left"
+                                  }`}
                               >
                                 Read Less
                               </button>
@@ -874,14 +828,9 @@ const Dashboard = () => {
                                 <>
                                   {message.body.substring(0, 100)}...
                                   <button
-                                    onClick={() =>
-                                      toggleMessageExpansion(index)
-                                    }
-                                    className={`read-more-btn ${
-                                      message.event_type_id === 2
-                                        ? "read-more-btn-right"
-                                        : "read-more-btn-left"
-                                    }`}
+                                    onClick={() => toggleMessageExpansion(index)}
+                                    className={`read-more-btn ${message.event_type_id === 2 ? "read-more-btn-right" : "read-more-btn-left"
+                                      }`}
                                   >
                                     Read More
                                   </button>
@@ -890,36 +839,39 @@ const Dashboard = () => {
                                 message.body || "No message body"
                               )}
                             </div>
+
                           )}
                         </div>
                       ))
-                    : "Loading..."}
+                      : "Loading..."}
+                  </div>
                 </div>
-              </div>
 
-              <div className="chat-heading-follow">
-                <div className="chat-heading-msg">
-                  <div className="follow-id">Follow Up</div>
-                  <div className="msg-auction">03 Times</div>
-                </div>
-                <div className="chat-heading-msg">
-                  <div className="follow-id">Lead Status</div>
-                  <div className="stop ">Dead</div>
-                </div>
-                <div className="chat-heading-msg">
-                  <div className="follow-id">Response</div>
-                  <div className=" stop">Stop</div>
-                </div>
-                <button type="button" className="btn-call">
-                  Call Now
-                </button>
+                {/* <div className="chat-heading-follow">
+                  <div className="chat-heading-msg">
+                    <div className="follow-id">Follow Up</div>
+                    <div className="msg-auction">03 Times</div>
+                  </div>
+                  <div className="chat-heading-msg">
+                    <div className="follow-id">Lead Status</div>
+                    <div className="stop ">Dead</div>
+                  </div>
+                  <div className="chat-heading-msg">
+                    <div className="follow-id">Response</div>
+                    <div className=" stop">Stop</div>
+                  </div>
+                  <button type="button" className="btn-call">
+                    Call Now
+                  </button>
+                </div> */}
               </div>
             </div>
           </div>
+
         </div>
+
       </div>
-      </div>
-    
+    </div>
   );
 };
 
