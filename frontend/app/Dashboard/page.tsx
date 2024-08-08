@@ -721,6 +721,9 @@ const Dashboard = () => {
               <div className="address"> <img src="User.svg" alt="" /> Address</div>
               <div className='address-list'>
                 <div className="search-wrapper-add">
+                  <div className="select-all-wrapper" onClick={handleSelectAll}>
+                    <i className={`bookmark-select bi ${allSelected ? 'bi-bookmark-fill' : 'bi-bookmark'}`}></i>
+                  </div>
                   <input
                     className="search-to"
                     type="search"
@@ -734,10 +737,7 @@ const Dashboard = () => {
                   )}
                   <img src="/Icon.svg" alt="icon" className="search-icon" />
 
-                  {/* <div className="select-all-wrapper" onClick={handleSelectAll}>
-                    <i className={`bookmark bi ${allSelected ? 'bi-bookmark-fill' : 'bi-bookmark'}`}></i>
-                    <span>Select All</span>
-                  </div> */}
+
                 </div>
 
                 {addresses.map((address, index) => (
