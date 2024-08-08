@@ -8,6 +8,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./dashboard.css";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { SearchResultList } from "../SearchResultList/SearchResultList";
 
 interface Address {
   fullAddress: string;
@@ -73,6 +74,13 @@ const Dashboard = () => {
   const [messageResponse, setMessageResponse] = useState<number>(0);
   const [call, setCall] = useState<number>(0);
   const [callResponse, setCallResponse] = useState<number>(0);
+  const [bookmarkedAddresses, setBookmarkedAddresses] = useState(new Array(addresses.length).fill(false));
+  const [input, setInput] = useState<string>('');
+  const [results, setResultsState] = useState<Address[]>([]);
+  const [allSelected, setAllSelected] = useState(false);
+
+
+
   const [currentPage, setCurrentPage] = useState(1);
   const [bookmarkedAddresses, setBookmarkedAddresses] = useState(new Set());
   
@@ -104,6 +112,7 @@ const Dashboard = () => {
       });
   }, []);
 
+  useEffect(() => {
   useEffect(() => {
     if (selectedAddress && selectedAddress !== "Search Address") {
       axios
@@ -137,6 +146,7 @@ const Dashboard = () => {
           console.error("Error fetching event data:", error);
         });
     }
+  }, [selectedAddress]);
   }, [selectedAddress]);
 
   const handleRowClick = (ownerId: number) => {
@@ -309,6 +319,21 @@ const Dashboard = () => {
     }
   }, [tableData, selectedRowId]);
 
+  const fetchData = async (value: string) => {
+    try {
+      const response = await axios.get(`http://localhost:8000/address/search?address=${encodeURIComponent(value)}`);
+      const results = response.data.results.filter((address: Address) =>
+        address.fullAddress.toLowerCase().includes(value.toLowerCase())
+      );
+      setResultsState(results);
+      // if (setResults) {
+      //   setResults(results);
+      // }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   // const handleRowClick = (ownerId: number) => {
   //     setSelectedRowId(ownerId);
   //     console.log('Selected owner ID:', ownerId);
@@ -327,122 +352,126 @@ const Dashboard = () => {
       />
       {isSidebarVisible && <SideBar />}
       {/* <SideBar /> */}
+
       <div className={`box ${isSidebarVisible ? "sidebar-visible" : ""}`}>
-        <div className="mg-1">
-          <div className="msg">Message and Calls</div>
-          <div className={`dropdown ${dropdownOpen ? "show" : ""}`}>
-            <button
-              className="dropdown  dropdown-toggle"
-              type="button"
-              onClick={toggleDropdown}
-            >
-              Status
-            </button>
-            <div className={`dropdown-menu ${dropdownOpen ? "show" : ""}`}>
-              <div className="form-check custom-dropdown-item">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="checkbox-delivered"
-                  checked={selectedOptions.includes("delivered")}
-                  onChange={() => handleOptionToggle("delivered")}
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor="checkbox-delivered"
-                >
-                  Delivered
-                </label>
-              </div>
+        <div className="mg-2">
+          <div className="mg-1">
+            <div className="open">OpenPhone</div>
 
-              <div className="form-check custom-dropdown-item">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="checkbox-not-delivered"
-                  checked={selectedOptions.includes("received")}
-                  onChange={() => handleOptionToggle("received")}
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor="checkbox-not-delivered"
-                >
-                  Received
-                </label>
+            <div className="msg">Message and Calls</div>
+            <div className={`msg dropdown ${dropdownOpen ? "show" : ""}`}>
+              <button
+                className="dropdown  dropdown-toggle"
+                type="button"
+                onClick={toggleDropdown}
+              >
+                Status
+              </button>
+              <div className={`dropdown-menu ${dropdownOpen ? "show" : ""}`}>
+                <div className="form-check custom-dropdown-item">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="checkbox-delivered"
+                    checked={selectedOptions.includes("delivered")}
+                    onChange={() => handleOptionToggle("delivered")}
+                  />
+                  <label
+                    className="form-check-label"
+                    htmlFor="checkbox-delivered"
+                  >
+                    Delivered
+                  </label>
+                </div>
+
+                <div className="form-check custom-dropdown-item">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="checkbox-not-delivered"
+                    checked={selectedOptions.includes("received")}
+                    onChange={() => handleOptionToggle("received")}
+                  />
+                  <label
+                    className="form-check-label"
+                    htmlFor="checkbox-not-delivered"
+                  >
+                    Received
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
-          <div className={`dropdown ${statusDropdownOpen ? "show" : ""}`}>
-            <button
-              className="dropdown status  dropdown-toggle"
-              type="button"
-              onClick={toggleStatusDropdown}
-            >
-              Type
-            </button>
-            <div
-              className={`dropdown-menu ${statusDropdownOpen ? "show" : ""}`}
-            >
-              <div className="form-check custom-dropdown-item">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="checkbox-case"
-                  checked={selectedOptions.includes("case")}
-                  onChange={() => handleOptionToggle("case")}
-                />
-                <label className="form-check-label" htmlFor="checkbox-case">
-                  Case
-                </label>
-              </div>
+            <div className={`dropdown ${statusDropdownOpen ? "show" : ""}`}>
+              <button
+                className="dropdown status  dropdown-toggle"
+                type="button"
+                onClick={toggleStatusDropdown}
+              >
+                Type
+              </button>
+              <div
+                className={`dropdown-menu ${statusDropdownOpen ? "show" : ""}`}
+              >
+                <div className="form-check custom-dropdown-item">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="checkbox-case"
+                    checked={selectedOptions.includes("case")}
+                    onChange={() => handleOptionToggle("case")}
+                  />
+                  <label className="form-check-label" htmlFor="checkbox-case">
+                    Case
+                  </label>
+                </div>
 
-              <div className="form-check custom-dropdown-item">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="checkbox-auction"
-                  checked={selectedOptions.includes("auction")}
-                  onChange={() => handleOptionToggle("auction")}
-                />
-                <label className="form-check-label" htmlFor="checkbox-auction">
-                  Auction
-                </label>
-              </div>
-              <div className="form-check custom-dropdown-item">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="checkbox-tax-deed"
-                  checked={selectedOptions.includes("tax-deed")}
-                  onChange={() => handleOptionToggle("tax-deed")}
-                />
-                <label className="form-check-label" htmlFor="checkbox-tax-deed">
-                  Tax deed
-                </label>
+                <div className="form-check custom-dropdown-item">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="checkbox-auction"
+                    checked={selectedOptions.includes("auction")}
+                    onChange={() => handleOptionToggle("auction")}
+                  />
+                  <label className="form-check-label" htmlFor="checkbox-auction">
+                    Auction
+                  </label>
+                </div>
+                <div className="form-check custom-dropdown-item">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="checkbox-tax-deed"
+                    checked={selectedOptions.includes("tax-deed")}
+                    onChange={() => handleOptionToggle("tax-deed")}
+                  />
+                  <label className="form-check-label" htmlFor="checkbox-tax-deed">
+                    Tax deed
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
-          <div className={`dropdown ${dateDropdownOpen ? "show" : ""}`}>
-            <button
-              className="dropdown date  dropdown-toggle"
-              type="button"
-              onClick={toggleDateDropdown}
-            >
-              Date
-            </button>
-            <div className={`dropdown-menu ${dateDropdownOpen ? "show" : ""}`}>
-              <div className="form-check custom-dropdown-item">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="checkbox-weekly"
-                  checked={selectedOptions.includes("Weekly")}
-                  onChange={() => handleOptionToggle("Weekly")}
-                />
-                <label className="form-check-label" htmlFor="checkbox-weekly">
-                  Weekly
-                </label>
-              </div>
+            <div className={`dropdown ${dateDropdownOpen ? "show" : ""}`}>
+              <button
+                className="dropdown date  dropdown-toggle"
+                type="button"
+                onClick={toggleDateDropdown}
+              >
+                Date
+              </button>
+              <div className={`dropdown-menu ${dateDropdownOpen ? "show" : ""}`}>
+                <div className="form-check custom-dropdown-item">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="checkbox-weekly"
+                    checked={selectedOptions.includes("Weekly")}
+                    onChange={() => handleOptionToggle("Weekly")}
+                  />
+                  <label className="form-check-label" htmlFor="checkbox-weekly">
+                    Weekly
+                  </label>
+                </div>
 
               <div className="form-check custom-dropdown-item">
                 <input
@@ -469,8 +498,8 @@ const Dashboard = () => {
                                 Custom
                             </label>
                         </div> */}
-            </div>
-            {/* <div className="form-check call custom-dropdown-item">
+              </div>
+              {/* <div className="form-check call custom-dropdown-item">
                         <input
                             className="form-check-input"
                             type="checkbox"
@@ -483,6 +512,7 @@ const Dashboard = () => {
                         </label>
                     </div> */}
           </div>
+        </div>
         </div>
 
         <div className="box1 d-none d-sm-block">

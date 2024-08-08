@@ -6,6 +6,8 @@ export class AddressDto {
   @IsString()
   address: string;
 
+    is_bookmarked:boolean;
+
   @IsNotEmpty()
   @IsDateString()
   date: Date;
