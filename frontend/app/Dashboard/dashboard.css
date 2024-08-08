@@ -4,21 +4,16 @@
 
 .box {
     position: absolute;
-    /* width: 305px; */
-    width: 255px;
+    width: 10%;
     height: 755px;
     top: 76px;
-    /* left: 90px; */
     transition: margin-left 0.1s ease;
-    gap: 0px;
-    opacity: 0px;
-    background: linear-gradient(179.99deg, #E4FFEC 0.01%, #E9F0FF 102.39%);
+    /* background: linear-gradient(179.99deg, #E4FFEC 0.01%, #E9F0FF 102.39%); */
     z-index: 1;
 }
 
 .box.sidebar-visible {
     margin-left: 90px;
-    /* Adjust as needed */
 }
 
 .dropdown,
@@ -35,13 +30,23 @@
     width: 137px;
     height: 18px;
     margin-top: 45px;
-    margin-left: 30px;
-    font-size: 15px;
     font-weight: 600;
-    line-height: 18.15px;
     text-align: center;
-    color: #7D8FB3;
-    /* font-family: 'Inter', sans-serif; */
+    color: #5A657B;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    line-height: 18.75px;
+    text-align: left;
+}
+
+.open {
+    font-family: 'Roboto', sans-serif;
+    color: #5A657B;
+    border-bottom: 2px solid #EFEEEE;
+    font-size: 23px;
+    font-weight: 700;
+    line-height: 30px;
+    text-align: left;
 
 }
 
@@ -53,8 +58,18 @@
 
 .mg-1 {
     padding-left: 20px;
+    margin-top: -30%;
     /* margin-left: 90px; */
-    background: linear-gradient(179.99deg, #E4FFEC 0.01%, #E9F0FF 102.39%);
+    /* background: linear-gradient(179.99deg, #E4FFEC 0.01%, #E9F0FF 102.39%); */
+}
+
+.mg-2 {
+    display: flex;
+}
+
+.form-check {
+    display: block;
+    padding-left: 0em;
 }
 
 
@@ -63,7 +78,6 @@
     font-family: 'Inter', sans-serif;
     border: none;
     background-color: inherit;
-    margin-left: 14px;
     margin-top: 20px;
     width: 38px;
     height: 15px;
@@ -130,20 +144,19 @@
     margin-left: 120%;
     width: 1282px;
     height: 730px;
-    margin-top: -145px;
-    gap: 0px;
-    border-radius: 15px;
+    margin-top: -129%;
+    /* border-radius: 15px; */
     border: 2px;
     opacity: 0px;
-    background: #FFFFFFBF;
-    border: 2px solid #EDEFF2;
+    /* background: #FFFFFFBF; */
+    /* border: 2px solid #EDEFF2; */
+    border-left: 2px solid#EDEFF2;
     display: flexbox;
 }
 
 .line {
-    width: 1230px;
+    width: 110%;
     margin-top: 30px;
-    left: 291px;
     border: 1px solid #EDEFF2
 }
 
@@ -295,7 +308,7 @@
 }
 
 .heading {
-    width: 291px;
+    width: 50%;
     height: 20px;
     margin-top: 21px;
     margin-left: 15px;
@@ -327,7 +340,6 @@
 .message {
     width: 265px;
     height: 60px;
-    gap: 0px;
     border-radius: 5px 0px 0px 0px;
     opacity: 0px;
     background: linear-gradient(90deg, #FFFFFF 0%, #E5D4FC 100%);
@@ -338,13 +350,61 @@
     align-items: center;
     border-left: 2px solid #8833FF;
     font-family: 'Roboto', sans-serif;
-
     font-size: 12px;
     font-weight: 900;
     line-height: 20px;
     text-align: left;
+}
+
+.address {
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 20px;
+    text-align: left;
+    color: #5A657B;
+    margin-top: 15%;
+    margin-left: 10%;
+}
+
+.bookmark {
+    cursor: pointer;
+    margin-right: 5%;
+}
+
+.bi-bookmark-fill {
+    color: #3361FF;
+}
+
+.conversation {
+    margin-top: 3%;
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 20px;
+    text-align: left;
+    color: #5A657B;
 
 
+}
+
+.address-item {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    text-align: left;
+    color: #898C96;
+    margin-top: 5%;
+    margin-left: 4%;
+}
+
+.address-list {
+    margin-top: 10%;
+    margin-left: 20px;
+    border: 3px solid #D7F5DC;
+    width: 100%;
+    height: 215%;
 }
 
 .response {
@@ -546,32 +606,37 @@
 
 
 .input-msg {
-    width: 500px;
-    height: 290px;
-    margin-top: 10px;
-    margin-left: -65px;
+    width: 295%;
+    height: 254%;
+    margin-top: 25px;
+    /* margin-left: -65px; */
     border-radius: 5px 0px 0px 0px;
-    border: 2px solid red;
-    background: linear-gradient(171.76deg, #CBE3FF 4.95%, #D2FFCC 92.28%);
-    border: 1px solid #DBE3FF;
-    box-shadow: 3px 8px 12.7px 0px #567CFF2E;
+    /* background: linear-gradient(171.76deg, #CBE3FF 4.95%, #D2FFCC 92.28%); */
+    border: 3px solid #D7F5DC;
+    /* box-shadow: 3px 8px 12.7px 0px #567CFF2E; */
     position: relative;
     z-index: 1;
     margin-right: 40px;
+    overflow-y: auto;
+
 }
 
 .screenshot-msg {
-    width: 346px;
-    height: 172px;
-    top: 594px;
-    left: 1029px;
-    border: 1px solid #EEEBEB;
+    width: 90%;
+    height: 90%;
+    /* top: 594px;
+    left: 1029px; */
+    border: 1.02px solid #EEEBEB;
     position: absolute;
-    background-color: white;
+    background-color: #D7F5DC;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 2;
+    box-shadow: 0px 2px 5px 0px #26334D08;
+    display: flex;
+    border-radius: 2%;
+
 }
 
 .text-follow.follow-up-heading {
@@ -760,8 +825,8 @@
     padding-left: 5px;
     padding-right: 5px;
     margin-top: 9px;
-    /* width: 177px; */
-    max-height: 140px;
+    width: 150%;
+    max-height: 140%;
     overflow-y: auto;
     /* Enable vertical scrolling if content exceeds max height */
     overflow-x: hidden;
@@ -910,12 +975,102 @@
     font-size: 12px;
 
 }
-/* CSS file or style block */
 
-  
-  /* If you want to target all mobile screens, you might also want to consider adding a max-width for even smaller screens */
-  @media (max-width: 576px) {
+.search-wrapper {
+    position: relative;
+    margin-top: -15%;
+    margin-left: 220%;
+    padding: 15px 14px 15px 14px;
+    border-radius: 30px 0px 0px 0px;
+    border: 2px;
+    border: 2px solid;
+    border-image-source: linear-gradient(102.59deg, #D7F5DC -59.65%, #DEEFFF 71.41%);
+    width: 70%;
+    height: 30%;
+    display: flex;
+    align-items: center;
+}
+
+.search-wrapper-add {
+    padding: 15px 14px 15px 14px;
+    border-radius: 30px 0px 0px 0px;
+    border: 2px;
+    border: 2px solid;
+    border-image-source: linear-gradient(102.59deg, #D7F5DC -59.65%, #DEEFFF 71.41%);
+    height: 5%;
+    width: 80%;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 20px;
+    cursor: pointer;
+    top: revert-layer;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+}
+
+.select-all-wrapper {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-left: 10px;
+    /* Adjust as needed for spacing */
+}
+
+.select-all-wrapper .bookmark {
+    margin-right: 5px;
+    /* Adjust as needed for spacing */
+}
+
+.search-to {
+    width: 70%;
+    height: 20%;
+    padding: 10px 10px 10px 5px;
+    border-radius: 26px;
+    background-color: white;
+    box-sizing: border-box;
+    border: 1px solid #D7F5DC;
+    /* border-image-source: linear-gradient(102.59deg, #D7F5DC -59.65%, #DEEFFF 71.41%); */
+    box-shadow: 0px 2px 9.2px 0px #26334D0F;
+    padding-left: 30px;
+    flex: 1;
+}
+
+.search {
+    width: 100%;
+    height: 100%;
+    padding: 15px 10px 20px 40px;
+    border-radius: 26px;
+    background-color: white;
+    box-sizing: border-box;
+    border: 2px solid #D7F5DC;
+    /* border-image-source: linear-gradient(102.59deg, #D7F5DC -59.65%, #DEEFFF 71.41%); */
+    box-shadow: 0px 2px 9.2px 0px #26334D0F;
+    /* Hide the default browser search icon */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.search-wrapper::before {
+    content: url('/icon.svg');
+    position: absolute;
+    left: 15px;
+    top: 44%;
+    transform: translateY(-50%);
+    width: 17.05px;
+    height: 17.06px;
+}
+
+
+/* If you want to target all mobile screens, you might also want to consider adding a max-width for even smaller screens */
+@media (max-width: 576px) {
     .box {
-      width: 400px;
+        width: 400px;
     }
-  }
+}
