@@ -540,6 +540,7 @@ export class OpenPhoneEventService {
             date: extractedInfo.date || new Date(),
             created_by: "Ram",
             is_active: true,
+            is_bookmarked:false,
           };
 
           // Validate the addressDto
@@ -836,6 +837,4 @@ export class OpenPhoneEventService {
       body: event.event_body,
     }));
   }
-
-
 }
