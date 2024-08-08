@@ -19,7 +19,10 @@ export class BookmarkService {
     if (!address) {
       throw new NotFoundException('Address not found');
     }
-  
+    address.is_bookmarked = !address.is_bookmarked; 
+    await this.addressRepository.save(address);
+
+
     let bookmark = await this.bookmarkRepository.findOne({ where: { address_id: addressId } });
     if (bookmark) {
       await this.bookmarkRepository.remove(bookmark);
