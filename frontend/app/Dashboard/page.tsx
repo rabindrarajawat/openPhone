@@ -74,7 +74,10 @@ const Dashboard = () => {
   const [call, setCall] = useState<number>(0);
   const [callResponse, setCallResponse] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 6;
+  const [bookmarkedAddresses, setBookmarkedAddresses] = useState(new Set());
+  
+
+  const recordsPerPage = 6; 
 
   const router = useRouter();
   useEffect(() => {
@@ -242,7 +245,45 @@ const Dashboard = () => {
   const handleAddressSelect1 = (address: Address) => {
     setSelectedAddress(address.fullAddress);
   };
-  const handleBookmark = (addressId: any) => {
+  
+  useEffect(() => {
+    // Fetch the initial addresses
+    axios.get('http://localhost:8000/addresses')
+      .then(response => {
+        setAddresses(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching addresses:', error);
+      });
+  
+    // Fetch the initial bookmarked addresses from local storage
+    const savedBookmarkedAddresses = localStorage.getItem('bookmarkedAddresses');
+    if (savedBookmarkedAddresses) {
+      const parsedBookmarkedAddresses = JSON.parse(savedBookmarkedAddresses);
+      setBookmarkedAddresses(new Set(parsedBookmarkedAddresses));
+    }
+  
+    // Fetch the initial bookmarked addresses from the server
+    axios.get('http://localhost:8000/bookmarkedAddresses')
+      .then(response => {
+        const bookmarks = new Set(response.data.map((item: { address_id: any; }) => item.address_id));
+        setBookmarkedAddresses(bookmarks);
+        localStorage.setItem('bookmarkedAddresses', JSON.stringify(Array.from(bookmarks)));
+      })
+      .catch(error => {
+        console.error('Error fetching bookmarked addresses:', error);
+      });
+  }, []);
+  
+  
+  const handleBookmark = (addressId: unknown) => {
+    const updatedBookmarkedAddresses = new Set(bookmarkedAddresses);
+    if (updatedBookmarkedAddresses.has(addressId)) {
+      updatedBookmarkedAddresses.delete(addressId);
+    } else {
+      updatedBookmarkedAddresses.add(addressId);
+    }
+
     axios
       .post(`http://localhost:8000/bookmarks/${addressId}`)
       .then((response) => {
@@ -251,6 +292,10 @@ const Dashboard = () => {
       .catch((error) => {
         console.error('Error bookmarking address:', error);
       });
+      setBookmarkedAddresses(updatedBookmarkedAddresses);
+      console.log("updatedBookmarkedAddresses",)
+
+
   };
 
 
@@ -485,6 +530,8 @@ const Dashboard = () => {
           ))}
         </div>
       </div>
+    
+
 
           <div className="logos-row">
             <div className="nav1">
@@ -841,7 +888,8 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    
   );
 };
 
