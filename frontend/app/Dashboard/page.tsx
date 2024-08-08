@@ -13,11 +13,14 @@ import { SearchResultList } from "../SearchResultList/SearchResultList";
 
 interface Address {
   fullAddress: string;
-  is_bookmarked: boolean;
-  id: number; 
-
+ 
 
   
+}
+interface Address1{
+  is_bookmarked:boolean;
+  displayAddress:string;
+  id:number;
 }
 
 interface Message {
@@ -59,9 +62,12 @@ const Dashboard = () => {
   const [box1DropdownOpen, setBox1DropdownOpen] = useState(false);
   const [isFollowUpClicked, setIsFollowUpClicked] = useState(false); // Add state for Follow-up button
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState("Search Address");
+  const [addresses, setAddresses] = useState<string[]>([]); // State to store addresses
   const [eventData, setEventData] = useState<EventItem[]>([]);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [fromNumber, setFromNumber] = useState("");
+  const [selectedAddress1, setSelectedAddress1] = useState<string>("");
   const [apiResponseBody, setApiResponseBody] = useState<Message[]>([]);
   const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
   const [isMessageExpanded, setIsMessageExpanded] = useState(false);
@@ -78,10 +84,7 @@ const Dashboard = () => {
   const [input, setInput] = useState<string>('');
   const [results, setResultsState] = useState<Address[]>([]);
   const [allSelected, setAllSelected] = useState(false);
-  const [addresses, setAddresses] = useState<Address[]>([]);
-  const [selectedAddresses, setSelectedAddresses] = useState<number[]>([]);
-
-
+  const [addresses1, setAddresses1] = useState<Address1[]>([]);
 
 
 
@@ -100,25 +103,27 @@ const Dashboard = () => {
     axios
       .get("http://localhost:8000/address/getalladdress")
       .then((response) => {
-        console.log('API Response:', response.data);
-        const formattedAddresses = response.data.map((item:any)=>({
-          id:item.id,
-          fullAddress: item.address,
-          is_bookmarked:item.is_bookmarked,
+        console.log('API Response:',response.data);
+        const formattedAddresses = response.data.map((item:any) =>({
+          id: item.id,
+          displayAddress: item.address, 
+          is_bookmarked: item.is_bookmarked, 
         }));
-        setAddresses(formattedAddresses);
-        setSelectedAddresses(
-          formattedAddresses.filter((address: {is_bookmarked:any;})=> address.is_bookmarked).map((address:{id:any;})=>address.id)
-
+        setAddresses1(formattedAddresses)
+        const addressData = response.data.map(
+          (address: any) => address.address
         );
-       
+        setAddresses(addressData);
+        if (addressData.length > 0) {
+          setSelectedAddress(addressData[0]); // Set the first address as the default selected address
+        }
       })
       .catch((error) => {
         console.error("Error fetching addresses:", error);
       });
   }, []);
   const handleBookmarkClick = (addressId: number) => {
-    const address = addresses.find(a => a.id === addressId);
+    const address = addresses1.find(a => a.id === addressId);
     if (!address) return;
 
     const newIsBookmarked = !address.is_bookmarked;
@@ -131,7 +136,7 @@ const Dashboard = () => {
       .then(response => {
         console.log(`API Response for bookmarking:`, response.data);
         // Update the state only if the API call was successful
-        setAddresses(prevAddresses =>
+        setAddresses1(prevAddresses =>
           prevAddresses.map(a =>
             a.id === addressId
               ? { ...a, is_bookmarked: newIsBookmarked }
@@ -144,57 +149,57 @@ const Dashboard = () => {
       });
   };
 
-  // useEffect(() => {
-  //   if (selectedAddress && selectedAddress !== "Search Address") {
-  //     axios
-  //       .get(
-  //         `http://localhost:8000/openPhoneEventData/events?address=${encodeURIComponent(
-  //           selectedAddress
-  //         )}`
-  //       )
-  //       .then((response) => {
-  //         const data = response.data.data;
-  //         if (data && Array.isArray(data.events)) {
-  //           setEventData(data.events);
-  //           if (data.events.length > 0) {
-  //             setPhoneNumber(data.events[0].to);
-  //             setFromNumber(data.events[0].from);
-  //           } else {
-  //             setPhoneNumber("");
-  //             setFromNumber("");
-  //           }
-  //           setMessageDelivered(data.messageDelivered || 0);
-  //           setMessageResponse(data.messageResponse || 0);
-  //           setCall(data.call || 0);
-  //           setCallResponse(data.callResponse || 0);
-  //         } else {
-  //           console.error("Events data is not an array or is missing");
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error fetching event data:", error);
-  //       });
-  //   }
-  // }, [selectedAddress]);
+  useEffect(() => {
+    if (selectedAddress && selectedAddress !== "Search Address") {
+      axios
+        .get(
+          `http://localhost:8000/openPhoneEventData/events?address=${encodeURIComponent(
+            selectedAddress
+          )}`
+        )
+        .then((response) => {
+          const data = response.data.data;
+          if (data && Array.isArray(data.events)) {
+            setEventData(data.events);
+            if (data.events.length > 0) {
+              setPhoneNumber(data.events[0].to);
+              setFromNumber(data.events[0].from);
+            } else {
+              setPhoneNumber("");
+              setFromNumber("");
+            }
+            setMessageDelivered(data.messageDelivered || 0);
+            setMessageResponse(data.messageResponse || 0);
+            setCall(data.call || 0);
+            setCallResponse(data.callResponse || 0);
+          } else {
+            console.error("Events data is not an array or is missing");
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching event data:", error);
+        });
+    }
+  }, [selectedAddress]);
 
-  // const handleRowClick = (ownerId: number) => {
-  //   if (selectedRowId !== ownerId) {
-  //     setSelectedRowId(ownerId);
-  //     console.log("Selected owner ID:", ownerId);
+  const handleRowClick = (ownerId: number) => {
+    if (selectedRowId !== ownerId) {
+      setSelectedRowId(ownerId);
+      console.log("Selected owner ID:", ownerId);
 
-  //     axios
-  //       .get<ApiResponse>(
-  //         `http://localhost:8000/openPhoneEventData/events-by-conversation?conversation_id=${ownerId}`
-  //       )
-  //       .then((response) => {
-  //         console.log("API response for selected owner ID:", response.data);
-  //         setApiResponseBody(response.data.data); // Store the data array in state
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error fetching data for selected owner ID:", error);
-  //       });
-  //   }
-  // };
+      axios
+        .get<ApiResponse>(
+          `http://localhost:8000/openPhoneEventData/events-by-conversation?conversation_id=${ownerId}`
+        )
+        .then((response) => {
+          console.log("API response for selected owner ID:", response.data);
+          setApiResponseBody(response.data.data); // Store the data array in state
+        })
+        .catch((error) => {
+          console.error("Error fetching data for selected owner ID:", error);
+        });
+    }
+  };
 
   const toggleMessageExpansion = (index: number) => {
     setExpandedMessages((prev) => {
@@ -273,8 +278,8 @@ const Dashboard = () => {
   };
 
   const handleAddressSelect = (address: string) => {
-    // setSelectedAddress(address);
-    // setSelectedAddress1(address); // You can set it as needed
+    setSelectedAddress(address);
+    setSelectedAddress1(address); // You can set it as needed
 
     setEventData([]); // Clear existing event data to ensure new data is shown
     setBox1DropdownOpen(false); // Close the dropdown after selection
@@ -288,9 +293,9 @@ const Dashboard = () => {
         console.error('Error adding bookmark:', error);
       });
   };
-  // const handleAddressSelect1 = (address: Address) => {
-  //   setSelectedAddresses(address.fullAddress);
-  // };
+  const handleAddressSelect1 = (address: Address) => {
+    setSelectedAddress(address.fullAddress);
+  };
 
   useEffect(() => {
     if (tableData.length > 0) {
@@ -298,7 +303,7 @@ const Dashboard = () => {
       if (selectedRowId === null && tableData.length > 0) {
         const firstRowId = tableData[0].ownerid;
         setSelectedRowId(firstRowId);
-        // handleRowClick(firstRowId);
+        handleRowClick(firstRowId);
       }
     }
   }, [tableData, selectedRowId]);
@@ -354,7 +359,10 @@ const Dashboard = () => {
   return (
     <div>
       {/* <Navbar onSelectAddress={handleAddressSelect1} /> */}
-     
+      <Navbar
+        toggleSidebar={toggleSidebar}
+        onSelectAddress={handleAddressSelect1}
+      />
       {isSidebarVisible && <SideBar />}
       {/* <SideBar /> */}
 
@@ -742,37 +750,103 @@ const Dashboard = () => {
 
               <div className="address"> <img src="User.svg" alt="" /> Address</div>
               <div className='address-list'>
-  <div className="search-wrapper-add">
-    <input
-      className="search-to"
-      type="search"
-      placeholder="Search Address"
-      aria-label="Search"
-      value={input}
-      onChange={(e) => handleChange(e.target.value)}
-    />
-  
-    <img src="/Icon.svg" alt="icon" className="search-icon" />
-  </div>
+                <div className="search-wrapper-add">
+                  <input
+                    className="search-to"
+                    type="search"
+                    placeholder="Search Address"
+                    aria-label="Search"
+                    value={input}
+                    onChange={(e) => handleChange(e.target.value)}
+                  />
+                  {results.length > 0 && (
+                    <SearchResultList results={results} onSelect={handleSelectAddress} />
+                  )}
+                  <img src="/Icon.svg" alt="icon" className="search-icon" />
 
-  {addresses.length > 0 ? (
-          addresses.map((address) => (
+                 
+                </div>
+
+                {addresses1.length > 0 ? (
+          addresses1.map((address) => (
             <li key={address.id} className="list-group-item d-flex justify-content-between align-items-center">
-              <div className="d-flex align-items-center p-3 gap-3">
+              <div className="setaddress d-flex align-items-center gap-3 ">
                 <i
                   className={`bi ${address.is_bookmarked ? 'bi-bookmark-fill' : 'bi-bookmark'} clickable-icon`}
                   style={{ cursor: 'pointer', color: address.is_bookmarked ? 'blue' : 'grey' }}
                   onClick={() => handleBookmarkClick(address.id)}
                 ></i>
-                <span className="ml-2">{address.fullAddress}</span>
+                <span className="ml-2">{address.displayAddress}</span>
               </div>
             </li>
           ))
         ) : (
           <p>No addresses found.</p>
         )}
-</div>
-            
+
+              </div>
+              {/* <div className="datatable-box ">
+                <table className="table table-hover">
+                  <thead>
+                    <tr className='datatable'>
+                      <th scope="col">Conversation ID</th>
+                      <th scope="col">Phone Number</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Responses</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentRecords.map((row, index) => (
+                      <tr
+                        key={index}
+                        className={`center-align ${selectedRowId === row.ownerid ? 'selected-row' : ''}`}
+                        onClick={() => handleRowClick(row.ownerid)}
+                      >
+                        <td>{row.ownerid}</td>
+                        <td>{row.PhoneNumber}</td>
+                        <td>{row.Status}</td>
+                        <td className={row.Responses === 'Interested' ? 'interested' : row.Responses === 'Stop' ? 'stop' : ''}>
+                          {row.Responses}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+
+              </div>
+              <div className="pagination-container">
+                <ul className="pagination">
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <button
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      &lt;
+                    </button>
+                  </li>
+                  {[...Array(totalPages)].map((_, i) => (
+                    <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                      <button
+                        className="page-link"
+                        onClick={() => handlePageChange(i + 1)}
+                      >
+                        {i + 1}
+                      </button>
+                    </li>
+                  ))}
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                    <button
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      &gt;
+                    </button>
+                  </li>
+                </ul>
+              </div> */}
             </div>
 
 
@@ -788,15 +862,28 @@ const Dashboard = () => {
                   value={input}
                   onChange={(e) => handleChange(e.target.value)}
                 />
-                {/* {results.length > 0 && (
+                {results.length > 0 && (
                   <SearchResultList results={results} onSelect={handleSelectAddress} />
-                )} */}
+                )}
               </div>
 
 
 
               <div className="input-msg">
-               
+                {/* <div className="chat-heading">
+                  <div className="chat-heading-msg">
+                    <div className="msg-id">Message ID</div>
+                    <div className="msg-auction">011045</div>
+                  </div>
+                  <div className="chat-heading-msg">
+                    <div className="msg-id">Message Status</div>
+                    <div className="msg-auction">Delivered</div>
+                  </div>
+                  <div className="chat-heading-msg">
+                    <div className="msg-id">Type</div>
+                    <div className="msg-auction">Auction</div>
+                  </div>
+                </div> */}
                 <div className="screenshot-msg">
                   <div className="inbox-chat">
                     {apiResponseBody.length > 0
@@ -870,8 +957,8 @@ const Dashboard = () => {
 
         </div>
 
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 
