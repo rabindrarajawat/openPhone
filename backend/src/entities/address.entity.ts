@@ -18,6 +18,9 @@ export class AddressEntity extends CommonEntity {
   @Column()
   address: string;
 
+  @Column({nullable:true})
+  is_bookmarked:boolean;
+
   @CreateDateColumn({ nullable: true })
   date: Date;
   @OneToMany(() => OpenPhoneEventEntity, (event) => event.address)
