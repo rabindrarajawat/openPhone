@@ -13,6 +13,7 @@ import { SearchResultList } from "../SearchResultList/SearchResultList";
 
 interface Address {
   fullAddress: string;
+  
 }
 
 interface Message {
@@ -73,7 +74,6 @@ const Dashboard = () => {
   const [messageResponse, setMessageResponse] = useState<number>(0);
   const [call, setCall] = useState<number>(0);
   const [callResponse, setCallResponse] = useState<number>(0);
-  const [bookmarkedAddresses, setBookmarkedAddresses] = useState(new Array(addresses.length).fill(false));
   const [input, setInput] = useState<string>('');
   const [results, setResultsState] = useState<Address[]>([]);
   const [allSelected, setAllSelected] = useState(false);
@@ -297,20 +297,9 @@ const Dashboard = () => {
   //   setBookmarkedAddresses(newBookmarkedAddresses);
   // };
 
-  const handleSelectAll = () => {
-    const newSelectionState = !allSelected;
-    setAllSelected(newSelectionState);
-    const newBookmarkedAddresses = addresses.map(() => newSelectionState);
-    setBookmarkedAddresses(newBookmarkedAddresses);
-  };
 
-  const handleBookmarkClick = (index: any) => {
-    const newBookmarkedAddresses = [...bookmarkedAddresses];
-    newBookmarkedAddresses[index] = !newBookmarkedAddresses[index];
-    setBookmarkedAddresses(newBookmarkedAddresses);
-    // Optionally update the allSelected state if all individual bookmarks are selected/deselected
-    setAllSelected(newBookmarkedAddresses.every((isBookmarked) => isBookmarked));
-  };
+
+
 
   const handleChange = (value: string) => {
     setInput(value);
@@ -734,17 +723,14 @@ const Dashboard = () => {
                   )}
                   <img src="/Icon.svg" alt="icon" className="search-icon" />
 
-                  {/* <div className="select-all-wrapper" onClick={handleSelectAll}>
-                    <i className={`bookmark bi ${allSelected ? 'bi-bookmark-fill' : 'bi-bookmark'}`}></i>
-                    <span>Select All</span>
-                  </div> */}
+                 
                 </div>
 
                 {addresses.map((address, index) => (
                   <div key={index} className="address-item align-items-center mb-2">
                     <i
-                      className={`bookmark bi ${bookmarkedAddresses[index] ? 'bi-bookmark-fill' : 'bi-bookmark'}`}
-                      onClick={() => handleBookmarkClick(index)}
+                      className={``}
+                     
                     ></i>
                     {address}
                   </div>
