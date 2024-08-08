@@ -2,15 +2,15 @@
 <g filter="url(#filter0_d_1500_450)">
 <rect x="5" y="3" width="50" height="50" rx="25" fill="#3361FF"/>
 </g>
-<circle cx="23.1429" cy="27.2857" r="5.14286" fill="white"/>
-<circle cx="38.1428" cy="17.4286" r="3.85714" fill="white"/>
-<circle cx="38.1428" cy="33.7143" r="3.85714" fill="white"/>
-<circle cx="22.7144" cy="40.5715" r="3" fill="white"/>
-<circle cx="22.7144" cy="14" r="3" fill="white"/>
-<path d="M22.7144 16.5715L22.7144 23" stroke="white" stroke-width="0.857143"/>
-<line x1="27.1825" y1="25.2204" x2="35.7539" y2="19.2204" stroke="white" stroke-width="0.857143"/>
-<path d="M27.6558 28.6366L35.1429 32.4286" stroke="white" stroke-width="0.857143"/>
-<line x1="22.7142" y1="31.5715" x2="22.7142" y2="39.2858" stroke="white" stroke-width="0.857143"/>
+<circle cx="24.5" cy="28.25" r="4.5" fill="white"/>
+<circle cx="37.625" cy="19.6251" r="3.375" fill="white"/>
+<circle cx="37.625" cy="33.875" r="3.375" fill="white"/>
+<circle cx="24.125" cy="39.8751" r="2.625" fill="white"/>
+<circle cx="24.125" cy="16.625" r="2.625" fill="white"/>
+<path d="M24.125 18.8751L24.125 24.5001" stroke="white" stroke-width="0.857143"/>
+<line x1="28.0037" y1="26.399" x2="35.5037" y2="21.149" stroke="white" stroke-width="0.857143"/>
+<path d="M28.4488 29.432L35 32.75" stroke="white" stroke-width="0.857143"/>
+<line x1="24.1786" y1="32.0001" x2="24.1786" y2="38.7501" stroke="white" stroke-width="0.857143"/>
 <defs>
 <filter id="filter0_d_1500_450" x="0" y="0" width="60" height="60" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>

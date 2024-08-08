@@ -3,12 +3,17 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  OneToMany,
+  ManyToOne,
 } from "typeorm";
 import { CommonEntity } from "./common-columns.entity";
+import { NotificationEntity } from "./notification.entity";
+import { BookmarkEntity } from "./bookmark.entity";
+import { AddressEntity } from "./address.entity";
 
 @Entity("open_phone_event")
 // export class OpenPhoneEventEntity extends CommonEntity {
-  export class OpenPhoneEventEntity{
+export class OpenPhoneEventEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -27,8 +32,8 @@ import { CommonEntity } from "./common-columns.entity";
   @Column()
   to: string;
 
-  @Column("text")
-  body: string;
+  @Column("text", { nullable: true })
+  body: string | null;
 
   @Column()
   url: string;
@@ -39,7 +44,7 @@ import { CommonEntity } from "./common-columns.entity";
   @Column()
   conversation_id: string;
 
-  @Column({nullable:true})
+  @Column({ nullable: true })
   created_by: string;
 
   @Column()
@@ -49,11 +54,11 @@ import { CommonEntity } from "./common-columns.entity";
   dead: string;
 
 
-  @Column({nullable:true})
+  @Column({ nullable: true })
   created_at: string;
 
 
-  @Column({nullable:true})
+  @Column({ nullable: true })
   received_at: string;
 
 
@@ -69,4 +74,11 @@ import { CommonEntity } from "./common-columns.entity";
 
   @Column({ nullable: true })
   user_id: string;
+
+
+  @ManyToOne(() => AddressEntity, address => address.events)
+  address: AddressEntity;
+
+  @OneToMany(() => NotificationEntity, notification => notification.event)
+  notifications: NotificationEntity[];
 }

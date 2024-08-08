@@ -24,6 +24,10 @@ import { usersModule } from "./module/users.module";
 import { RoleModule } from "./module/role.module";
 import { conversationmapping } from "./entities/conversation-mapping.entity";
 import { ConversationMappingModule } from "./module/conversation-mapping.modules";
+import { BookmarkEntity } from "./entities/bookmark.entity";
+import { NotificationEntity } from "./entities/notification.entity";
+import { BookmarkModule } from "./module/bookmark.module";
+import { NotificationModule } from "./module/notification.module";
 
 @Module({
   imports: [
@@ -45,7 +49,7 @@ import { ConversationMappingModule } from "./module/conversation-mapping.modules
           OpenPhoneEventDirectionEntity,
           CaseEventEntity,
           TaxDeadEntity,
-          MessageMasterEntity, MessageMasterEntity, AddressMappingEntity, UserEntity, RoleEntity, conversationmapping
+          MessageMasterEntity, MessageMasterEntity, AddressMappingEntity, UserEntity, RoleEntity, conversationmapping,BookmarkEntity,NotificationEntity
         ],
         synchronize: true,
         migrations: [__dirname + "/migrations/**/*{.ts,.js}"],
@@ -58,7 +62,7 @@ import { ConversationMappingModule } from "./module/conversation-mapping.modules
     OpenPhoneEventDirectionModule,
     OpenPhoneEventTypeModule,
     CaseEventModule,
-    AuctionEventModule, TaxDeadModule, MessageMasterModule, RoleModule, usersModule, ConversationMappingModule
+    AuctionEventModule, TaxDeadModule, MessageMasterModule, RoleModule, usersModule, ConversationMappingModule,BookmarkModule,NotificationModule
   ],
 })
 export class AppModule { }

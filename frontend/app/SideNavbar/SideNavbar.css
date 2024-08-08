@@ -3,10 +3,11 @@
 
 .sidebar {
     position: absolute;
-    background: #ECF0FF;
-    width: 153px;
-    height: 835px;
+    background: #D7F5DC;
+    width: 90px;
+    height: 755px;
     top: 76px;
+    z-index: 2;
 }
 
 .nav {
@@ -20,7 +21,7 @@
 }
 
 .logo2 {
-    margin-left: -10px;
+    margin-left: -16px;
     cursor: pointer;
 }
 
@@ -32,20 +33,20 @@
     text-align: left;
     color: #7D8FB3;
     cursor: pointer;
-    margin-top: 445%;
+    margin-top: 900%;
+    margin-left: -5px;
 
 }
 
 .dash {
     color: #7D8FB3;
     font-family: 'Inter', sans-serif;
-    font-size: 15px;
+    font-size: 9px;
     font-weight: 400;
-    line-height: 22.52px;
-    /* text-align: left; */
-    width: 134px;
+    line-height: 14.52px;
+    width: 62px;
     height: 15px;
-    margin-left: -11px;
+    margin-left: -15px;
     cursor: pointer;
 
 

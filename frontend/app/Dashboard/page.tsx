@@ -7,6 +7,9 @@ import Image from "next/image";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./dashboard.css";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+import { SearchResultList } from "../SearchResultList/SearchResultList";
+
 
 interface Address {
   fullAddress: string;
@@ -70,8 +73,23 @@ const Dashboard = () => {
   const [messageResponse, setMessageResponse] = useState<number>(0);
   const [call, setCall] = useState<number>(0);
   const [callResponse, setCallResponse] = useState<number>(0);
+  const [bookmarkedAddresses, setBookmarkedAddresses] = useState(new Array(addresses.length).fill(false));
+  const [input, setInput] = useState<string>('');
+  const [results, setResultsState] = useState<Address[]>([]);
+  const [allSelected, setAllSelected] = useState(false);
+
+
+
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 6;
+
+  const router = useRouter();
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      router.push("/");
+    }
+  }, [router]);
 
   useEffect(() => {
     axios
@@ -220,8 +238,19 @@ const Dashboard = () => {
 
   const handleAddressSelect = (address: string) => {
     setSelectedAddress(address);
+    setSelectedAddress1(address); // You can set it as needed
+
     setEventData([]); // Clear existing event data to ensure new data is shown
     setBox1DropdownOpen(false); // Close the dropdown after selection
+  };
+  const handleCheckboxClick = (addressId: any) => {
+    axios.post(`http://localhost:8000/bookmarks/${addressId}`)
+      .then(response => {
+        console.log('Bookmark added successfully:', response.data);
+      })
+      .catch(error => {
+        console.error('Error adding bookmark:', error);
+      });
   };
   const handleAddressSelect1 = (address: Address) => {
     setSelectedAddress(address.fullAddress);
@@ -238,6 +267,21 @@ const Dashboard = () => {
     }
   }, [tableData, selectedRowId]);
 
+  const fetchData = async (value: string) => {
+    try {
+      const response = await axios.get(`http://localhost:8000/address/search?address=${encodeURIComponent(value)}`);
+      const results = response.data.results.filter((address: Address) =>
+        address.fullAddress.toLowerCase().includes(value.toLowerCase())
+      );
+      setResultsState(results);
+      // if (setResults) {
+      //   setResults(results);
+      // }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   // const handleRowClick = (ownerId: number) => {
   //     setSelectedRowId(ownerId);
   //     console.log('Selected owner ID:', ownerId);
@@ -247,142 +291,185 @@ const Dashboard = () => {
     setIsSidebarVisible((prevState) => !prevState);
   };
 
+  // const handleBookmarkClick = (index: any) => {
+  //   const newBookmarkedAddresses = [...bookmarkedAddresses];
+  //   newBookmarkedAddresses[index] = !newBookmarkedAddresses[index];
+  //   setBookmarkedAddresses(newBookmarkedAddresses);
+  // };
+
+  const handleSelectAll = () => {
+    const newSelectionState = !allSelected;
+    setAllSelected(newSelectionState);
+    const newBookmarkedAddresses = addresses.map(() => newSelectionState);
+    setBookmarkedAddresses(newBookmarkedAddresses);
+  };
+
+  const handleBookmarkClick = (index: any) => {
+    const newBookmarkedAddresses = [...bookmarkedAddresses];
+    newBookmarkedAddresses[index] = !newBookmarkedAddresses[index];
+    setBookmarkedAddresses(newBookmarkedAddresses);
+    // Optionally update the allSelected state if all individual bookmarks are selected/deselected
+    setAllSelected(newBookmarkedAddresses.every((isBookmarked) => isBookmarked));
+  };
+
+  const handleChange = (value: string) => {
+    setInput(value);
+    fetchData(value);
+  };
+
+  const handleSelectAddress = (address: Address) => {
+    setInput(address.fullAddress);
+    setResultsState([]);
+    // if (onSelectAddress) {
+    //   onSelectAddress(address);
+    // }
+  };
+
+
   return (
     <div>
       {/* <Navbar onSelectAddress={handleAddressSelect1} /> */}
-      <Navbar onSelectAddress={handleAddressSelect1} />
+      <Navbar
+        toggleSidebar={toggleSidebar}
+        onSelectAddress={handleAddressSelect1}
+      />
       {isSidebarVisible && <SideBar />}
       {/* <SideBar /> */}
+
       <div className={`box ${isSidebarVisible ? "sidebar-visible" : ""}`}>
-        <div className="mg-1">
-          <div className="msg">Message and Calls</div>
-          <div className={`dropdown ${dropdownOpen ? "show" : ""}`}>
-            <button
-              className="dropdown  dropdown-toggle"
-              type="button"
-              onClick={toggleDropdown}
-            >
-              Status
-            </button>
-            <div className={`dropdown-menu ${dropdownOpen ? "show" : ""}`}>
-              <div className="form-check custom-dropdown-item">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="checkbox-delivered"
-                  checked={selectedOptions.includes("delivered")}
-                  onChange={() => handleOptionToggle("delivered")}
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor="checkbox-delivered"
-                >
-                  Delivered
-                </label>
-              </div>
+        <div className="mg-2">
+          <div className="mg-1">
+            <div className="open">OpenPhone</div>
 
-              <div className="form-check custom-dropdown-item">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="checkbox-not-delivered"
-                  checked={selectedOptions.includes("received")}
-                  onChange={() => handleOptionToggle("received")}
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor="checkbox-not-delivered"
-                >
-                  Received
-                </label>
+            <div className="msg">Message and Calls</div>
+            <div className={`msg dropdown ${dropdownOpen ? "show" : ""}`}>
+              <button
+                className="dropdown  dropdown-toggle"
+                type="button"
+                onClick={toggleDropdown}
+              >
+                Status
+              </button>
+              <div className={`dropdown-menu ${dropdownOpen ? "show" : ""}`}>
+                <div className="form-check custom-dropdown-item">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="checkbox-delivered"
+                    checked={selectedOptions.includes("delivered")}
+                    onChange={() => handleOptionToggle("delivered")}
+                  />
+                  <label
+                    className="form-check-label"
+                    htmlFor="checkbox-delivered"
+                  >
+                    Delivered
+                  </label>
+                </div>
+
+                <div className="form-check custom-dropdown-item">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="checkbox-not-delivered"
+                    checked={selectedOptions.includes("received")}
+                    onChange={() => handleOptionToggle("received")}
+                  />
+                  <label
+                    className="form-check-label"
+                    htmlFor="checkbox-not-delivered"
+                  >
+                    Received
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
-          <div className={`dropdown ${statusDropdownOpen ? "show" : ""}`}>
-            <button
-              className="dropdown status  dropdown-toggle"
-              type="button"
-              onClick={toggleStatusDropdown}
-            >
-              Type
-            </button>
-            <div
-              className={`dropdown-menu ${statusDropdownOpen ? "show" : ""}`}
-            >
-              <div className="form-check custom-dropdown-item">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="checkbox-case"
-                  checked={selectedOptions.includes("case")}
-                  onChange={() => handleOptionToggle("case")}
-                />
-                <label className="form-check-label" htmlFor="checkbox-case">
-                  Case
-                </label>
-              </div>
+            <div className={`dropdown ${statusDropdownOpen ? "show" : ""}`}>
+              <button
+                className="dropdown status  dropdown-toggle"
+                type="button"
+                onClick={toggleStatusDropdown}
+              >
+                Type
+              </button>
+              <div
+                className={`dropdown-menu ${statusDropdownOpen ? "show" : ""}`}
+              >
+                <div className="form-check custom-dropdown-item">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="checkbox-case"
+                    checked={selectedOptions.includes("case")}
+                    onChange={() => handleOptionToggle("case")}
+                  />
+                  <label className="form-check-label" htmlFor="checkbox-case">
+                    Case
+                  </label>
+                </div>
 
-              <div className="form-check custom-dropdown-item">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="checkbox-auction"
-                  checked={selectedOptions.includes("auction")}
-                  onChange={() => handleOptionToggle("auction")}
-                />
-                <label className="form-check-label" htmlFor="checkbox-auction">
-                  Auction
-                </label>
-              </div>
-              <div className="form-check custom-dropdown-item">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="checkbox-tax-deed"
-                  checked={selectedOptions.includes("tax-deed")}
-                  onChange={() => handleOptionToggle("tax-deed")}
-                />
-                <label className="form-check-label" htmlFor="checkbox-tax-deed">
-                  Tax deed
-                </label>
+                <div className="form-check custom-dropdown-item">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="checkbox-auction"
+                    checked={selectedOptions.includes("auction")}
+                    onChange={() => handleOptionToggle("auction")}
+                  />
+                  <label className="form-check-label" htmlFor="checkbox-auction">
+                    Auction
+                  </label>
+                </div>
+                <div className="form-check custom-dropdown-item">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="checkbox-tax-deed"
+                    checked={selectedOptions.includes("tax-deed")}
+                    onChange={() => handleOptionToggle("tax-deed")}
+                  />
+                  <label className="form-check-label" htmlFor="checkbox-tax-deed">
+                    Tax deed
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
-          <div className={`dropdown ${dateDropdownOpen ? "show" : ""}`}>
-            <button
-              className="dropdown date  dropdown-toggle"
-              type="button"
-              onClick={toggleDateDropdown}
-            >
-              Date
-            </button>
-            <div className={`dropdown-menu ${dateDropdownOpen ? "show" : ""}`}>
-              <div className="form-check custom-dropdown-item">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="checkbox-weekly"
-                  checked={selectedOptions.includes("Weekly")}
-                  onChange={() => handleOptionToggle("Weekly")}
-                />
-                <label className="form-check-label" htmlFor="checkbox-weekly">
-                  Weekly
-                </label>
-              </div>
+            <div className={`dropdown ${dateDropdownOpen ? "show" : ""}`}>
+              <button
+                className="dropdown date  dropdown-toggle"
+                type="button"
+                onClick={toggleDateDropdown}
+              >
+                Date
+              </button>
+              <div className={`dropdown-menu ${dateDropdownOpen ? "show" : ""}`}>
+                <div className="form-check custom-dropdown-item">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="checkbox-weekly"
+                    checked={selectedOptions.includes("Weekly")}
+                    onChange={() => handleOptionToggle("Weekly")}
+                  />
+                  <label className="form-check-label" htmlFor="checkbox-weekly">
+                    Weekly
+                  </label>
+                </div>
 
-              <div className="form-check custom-dropdown-item">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="checkbox-monthly"
-                  checked={selectedOptions.includes("Monthly")}
-                  onChange={() => handleOptionToggle("Monthly")}
-                />
-                <label className="form-check-label" htmlFor="checkbox-monthly">
-                  Monthly
-                </label>
-              </div>
-              {/* <div className="form-check custom-dropdown-item">
+                <div className="form-check custom-dropdown-item">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="checkbox-monthly"
+                    checked={selectedOptions.includes("Monthly")}
+                    onChange={() => handleOptionToggle("Monthly")}
+                  />
+                  <label className="form-check-label" htmlFor="checkbox-monthly">
+                    Monthly
+                  </label>
+                </div>
+
+                {/* <div className="form-check custom-dropdown-item">
                             <input
                                 className="form-check-input"
                                 type="checkbox"
@@ -394,8 +481,8 @@ const Dashboard = () => {
                                 Custom
                             </label>
                         </div> */}
-            </div>
-            {/* <div className="form-check call custom-dropdown-item">
+              </div>
+              {/* <div className="form-check call custom-dropdown-item">
                         <input
                             className="form-check-input"
                             type="checkbox"
@@ -407,229 +494,267 @@ const Dashboard = () => {
                             Calls
                         </label>
                     </div> */}
+            </div>
           </div>
+        </div>
 
-          <div className="box1">
-            <div
-              className={`dropdown search-address-dropdown custom-dropdown ${
-                box1DropdownOpen ? "show" : ""
-              }`}
+        <div className="box1 d-none d-sm-block">
+          {/* <div
+            className={`dropdown search-address-dropdown custom-dropdown ${box1DropdownOpen ? "show" : ""}`}
+          >
+            <button
+              className="btn btn-secondary dropdown-toggle custom-dropdown-button"
+              type="button"
+              onClick={toggleBox1Dropdown}
             >
-              <button
-                className="btn btn-secondary dropdown-toggle custom-dropdown-button"
-                type="button"
-                onClick={toggleBox1Dropdown}
-              >
-                {selectedAddress1}
-                {selectedAddress}
+              {selectedAddress1}
+              {selectedAddress}
 
-                <Image
-                  src="/dropdownicon.svg"
-                  alt="Dropdown Icon"
-                  className={`dropdown-icon ${box1DropdownOpen ? "open" : ""}`}
-                  width={50}
-                  height={50}
-                />
-              </button>
-              <div
-                className={`dropdown-menu custom-dropdown-menu ${
-                  box1DropdownOpen ? "show" : ""
-                }`}
-              >
-                {addresses.map((address, index) => (
+              <Image
+                src="/dropdownicon.svg"
+                alt="Dropdown Icon"
+                className={`dropdown-icon ${box1DropdownOpen ? "open" : ""}`}
+                width={50}
+                height={50}
+              />
+            </button>
+            <div
+              className={`dropdown-menu custom-dropdown-menu ${box1DropdownOpen ? "show" : ""}`}
+            >
+              {addresses.map((address, index) => (
+                <div key={index} className="dropdown-item custom-dropdown-item d-flex align-items-center">
+                  <input
+                    type="checkbox"
+                    className="form-check-input me-2"
+                  />
                   <button
-                    key={index}
-                    className="dropdown-item custom-dropdown-item"
+                    className="btn btn-link p-0 text-decoration-none"
                     onClick={() => handleAddressSelect(address)}
                   >
                     {address}
                   </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="logos-row">
-              <div className="nav1">
-                <Image
-                  src="/follow.svg"
-                  alt="Follow-up Logo"
-                  className={`logo3 ${
-                    isFollowUpClicked ? "follow-up-heading" : ""
-                  }`}
-                  width={50}
-                  height={50}
-                />
-                <label
-                  className={`Activity ${
-                    isFollowUpClicked ? "follow-up-heading" : ""
-                  }`}
-                  htmlFor=""
-                  onClick={handleFollowUpClick}
-                >
-                  Follow-up
-                </label>
-              </div>
-              <div className="nav1">
-                <Image
-                  src="/id.svg"
-                  alt="ID Logo"
-                  className="logo3"
-                  width={50}
-                  height={50}
-                />
-                <label className="Activity" htmlFor="">
-                  ID
-                </label>
-              </div>
-              <div className="nav1">
-                <Image
-                  src="/call.svg"
-                  alt="Call Logo"
-                  className="logo3"
-                  width={50}
-                  height={50}
-                />
-                <label className="Activity" htmlFor="">
-                  Call
-                </label>
-              </div>
-              <div className="nav1">
-                <Image
-                  src="/activity.svg"
-                  alt="Activity Logo"
-                  className="logo3"
-                  width={50}
-                  height={50}
-                />
-                <label className="Activity" htmlFor="">
-                  Activity
-                </label>
-              </div>
-            </div>
-
-            <div className="line"></div>
-            <div className="heading">Comprehensive view of Address</div>
-            <div className="logos-row-msg">
-              <div className="nav-msg">
-                <div className="message">Message Delivered</div>
-                <input
-                  type="text"
-                  className="round-input"
-                  value={messageDelivered}
-                  readOnly
-                />
-              </div>
-              <div className="nav-msg">
-                <div className="message response ">Message Response</div>
-                <input
-                  type="text"
-                  className="round-input"
-                  value={messageResponse}
-                  readOnly
-                />
-              </div>
-              <div className="nav-msg">
-                <div className="message call-">Call </div>
-                <input
-                  type="text"
-                  className="round-input"
-                  value={call}
-                  readOnly
-                />
-              </div>
-              <div className="nav-msg">
-                <div className="message call-response">Call Response</div>
-                <input
-                  type="text"
-                  className="round-input"
-                  value={callResponse}
-                  readOnly
-                />
-              </div>
-            </div>
-            <div className="tracking-container">
-              <div className="call-tracking">
-                <Image
-                  src="/Vector.svg"
-                  alt="Activity Logo"
-                  className="vector"
-                  width={50}
-                  height={50}
-                />
-                <div className="text">Call tracking of search address </div>
-              </div>
-              <div className="follow-up">
-                <div>
-                  <Image
-                    src="/redo.svg"
-                    alt="redo Logo"
-                    className={`vector redo ${
-                      isFollowUpClicked ? "follow-up-heading" : ""
-                    }`}
-                    width={50}
-                    height={50}
-                  />
-                  <div
-                    className={`text-follow ${
-                      isFollowUpClicked ? "follow-up-heading" : ""
-                    }`}
-                  >
-                    Follow-up tracking of search address{" "}
-                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-            <div className="tracking-container-box">
-              <div className="check-status">
-                <div className="time  ">Times</div>
-                <div className="vertical-line"></div>
-                <div className="time">Duration</div>
-                <div className="vertical-line"></div>
-                <div className="time">Status</div>
-                <div className="vertical-line"></div>
-                <div className="time">Action</div>
-              </div>
-              <div
-                className={`follow-status ${
-                  isFollowUpClicked ? "follow-up-heading" : ""
-                }`}
+          </div> */}
+
+
+          {/* <div className="logos-row">
+            <div className="nav1">
+              <Image
+                src="/follow.svg"
+                alt="Follow-up Logo"
+                className={`logo3 ${isFollowUpClicked ? "follow-up-heading" : ""
+                  }`}
+                width={50}
+                height={50}
+              />
+              <label
+                className={`Activity ${isFollowUpClicked ? "follow-up-heading" : ""
+                  }`}
+                htmlFor=""
+                onClick={handleFollowUpClick}
               >
-                <div className="time  ">Owner ID</div>
-                <div className="vertical-line"></div>
-                <div className="time">Status</div>
-                <div className="vertical-line"></div>
-                <div className="time">Last Follow-up</div>
-              </div>
+                Follow-up
+              </label>
             </div>
-            <div className="tracking-container">
-              <div className="call-tracking">
+            <div className="nav1">
+              <Image
+                src="/id.svg"
+                alt="ID Logo"
+                className="logo3"
+                width={50}
+                height={50}
+              />
+              <label className="Activity" htmlFor="">
+                ID
+              </label>
+            </div>
+            <div className="nav1">
+              <Image
+                src="/call.svg"
+                alt="Call Logo"
+                className="logo3"
+                width={50}
+                height={50}
+              />
+              <label className="Activity" htmlFor="">
+                Call
+              </label>
+            </div>
+            <div className="nav1">
+              <Image
+                src="/activity.svg"
+                alt="Activity Logo"
+                className="logo3"
+                width={50}
+                height={50}
+              />
+              <label className="Activity" htmlFor="">
+                Activity
+              </label>
+            </div>
+          </div> */}
+
+          {/* <div className="line"></div> */}
+          <div className="heading">
+            <img src="done.svg" alt="" /> Comprehensive view of Address</div>
+          <div className="logos-row-msg">
+            <div className="nav-msg">
+              <div className="message">Message Delivered</div>
+              <input
+                type="text"
+                className="round-input"
+                value={messageDelivered}
+                readOnly
+              />
+            </div>
+            <div className="nav-msg">
+              <div className="message response ">Message Response</div>
+              <input
+                type="text"
+                className="round-input"
+                value={messageResponse}
+                readOnly
+              />
+            </div>
+            <div className="nav-msg">
+              <div className="message call-">Call </div>
+              <input
+                type="text"
+                className="round-input"
+                value={call}
+                readOnly
+              />
+            </div>
+            <div className="nav-msg">
+              <div className="message call-response">Call Response</div>
+              <input
+                type="text"
+                className="round-input"
+                value={callResponse}
+                readOnly
+              />
+            </div>
+          </div>
+          {/* <div className="tracking-container">
+            <div className="call-tracking">
+              <Image
+                src="/Vector.svg"
+                alt="Activity Logo"
+                className="vector"
+                width={50}
+                height={50}
+              />
+              <div className="text">Call tracking of search address </div>
+            </div>
+            <div className="follow-up">
+              <div>
                 <Image
-                  src="/converstation.svg"
-                  alt="converstation Logo"
-                  className="vector"
+                  src="/redo.svg"
+                  alt="redo Logo"
+                  className={`vector redo ${isFollowUpClicked ? "follow-up-heading" : ""
+                    }`}
                   width={50}
                   height={50}
                 />
-                <div className="text"> Conversation From {fromNumber}</div>
-              </div>
-              <div className="">
-                <div>
-                  <Image
-                    src="/msg.svg"
-                    alt="msg Logo"
-                    className="vector redo"
-                    width={50}
-                    height={50}
-                  />
-                  <div className="text-follow ">Message Detail </div>
+                <div
+                  className={`text-follow ${isFollowUpClicked ? "follow-up-heading" : ""
+                    }`}
+                >
+                  Follow-up tracking of search address{" "}
                 </div>
               </div>
             </div>
-            <div className="tracking-container-box">
-              <div className="datatable-box ">
+          </div>
+          <div className="tracking-container-box">
+            <div className="check-status">
+              <div className="time  ">Times</div>
+              <div className="vertical-line"></div>
+              <div className="time">Duration</div>
+              <div className="vertical-line"></div>
+              <div className="time">Status</div>
+              <div className="vertical-line"></div>
+              <div className="time">Action</div>
+            </div>
+            <div
+              className={`follow-status ${isFollowUpClicked ? "follow-up-heading" : ""
+                }`}
+            >
+              <div className="time  ">Owner ID</div>
+              <div className="vertical-line"></div>
+              <div className="time">Status</div>
+              <div className="vertical-line"></div>
+              <div className="time">Last Follow-up</div>
+            </div>
+          </div>
+          <div className="tracking-container">
+            <div className="call-tracking">
+              <Image
+                src="/converstation.svg"
+                alt="converstation Logo"
+                className="vector"
+                width={50}
+                height={50}
+              />
+              <div className="text"> Conversation From {fromNumber}</div>
+            </div>
+            <div className="">
+              <div>
+                <Image
+                  src="/msg.svg"
+                  alt="msg Logo"
+                  className="vector redo message-logo"
+                  width={50}
+                  height={50}
+                />
+                <div className="text-follow msg-follow">Message Detail </div>
+              </div>
+            </div>
+          </div> */}
+          <div className="line"></div>
+
+          <div className="tracking-container-box">
+
+            <div >
+
+              <div className="address"> <img src="User.svg" alt="" /> Address</div>
+              <div className='address-list'>
+                <div className="search-wrapper-add">
+                  <input
+                    className="search-to"
+                    type="search"
+                    placeholder="Search Address"
+                    aria-label="Search"
+                    value={input}
+                    onChange={(e) => handleChange(e.target.value)}
+                  />
+                  {results.length > 0 && (
+                    <SearchResultList results={results} onSelect={handleSelectAddress} />
+                  )}
+                  <img src="/Icon.svg" alt="icon" className="search-icon" />
+
+                  {/* <div className="select-all-wrapper" onClick={handleSelectAll}>
+                    <i className={`bookmark bi ${allSelected ? 'bi-bookmark-fill' : 'bi-bookmark'}`}></i>
+                    <span>Select All</span>
+                  </div> */}
+                </div>
+
+                {addresses.map((address, index) => (
+                  <div key={index} className="address-item align-items-center mb-2">
+                    <i
+                      className={`bookmark bi ${bookmarkedAddresses[index] ? 'bi-bookmark-fill' : 'bi-bookmark'}`}
+                      onClick={() => handleBookmarkClick(index)}
+                    ></i>
+                    {address}
+                  </div>
+                ))}
+
+              </div>
+              {/* <div className="datatable-box ">
                 <table className="table table-hover">
                   <thead>
-                    <tr className="datatable">
+                    <tr className='datatable'>
                       <th scope="col">Conversation ID</th>
                       <th scope="col">Phone Number</th>
                       <th scope="col">Status</th>
@@ -640,33 +765,78 @@ const Dashboard = () => {
                     {currentRecords.map((row, index) => (
                       <tr
                         key={index}
-                        className={`center-align ${
-                          selectedRowId === row.ownerid ? "selected-row" : ""
-                        }`}
+                        className={`center-align ${selectedRowId === row.ownerid ? 'selected-row' : ''}`}
                         onClick={() => handleRowClick(row.ownerid)}
                       >
                         <td>{row.ownerid}</td>
                         <td>{row.PhoneNumber}</td>
                         <td>{row.Status}</td>
-                        <td
-                          className={
-                            row.Responses === "Interested"
-                              ? "interested"
-                              : row.Responses === "Stop"
-                              ? "stop"
-                              : ""
-                          }
-                        >
+                        <td className={row.Responses === 'Interested' ? 'interested' : row.Responses === 'Stop' ? 'stop' : ''}>
                           {row.Responses}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+
+
+              </div>
+              <div className="pagination-container">
+                <ul className="pagination">
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <button
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      &lt;
+                    </button>
+                  </li>
+                  {[...Array(totalPages)].map((_, i) => (
+                    <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                      <button
+                        className="page-link"
+                        onClick={() => handlePageChange(i + 1)}
+                      >
+                        {i + 1}
+                      </button>
+                    </li>
+                  ))}
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                    <button
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      &gt;
+                    </button>
+                  </li>
+                </ul>
+              </div> */}
+            </div>
+
+
+            <div className="conversation"> <img src="converstation.svg" alt="" /> Conversation From {fromNumber}
+
+              <div className="search-wrapper search-new">
+                {/* <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} /> */}
+                <input
+                  className="search"
+                  type="search"
+                  placeholder="Search To"
+                  aria-label="Search"
+                  value={input}
+                  onChange={(e) => handleChange(e.target.value)}
+                />
+                {results.length > 0 && (
+                  <SearchResultList results={results} onSelect={handleSelectAddress} />
+                )}
               </div>
 
+
+
               <div className="input-msg">
-                <div className="chat-heading">
+                {/* <div className="chat-heading">
                   <div className="chat-heading-msg">
                     <div className="msg-id">Message ID</div>
                     <div className="msg-auction">011045</div>
@@ -679,63 +849,58 @@ const Dashboard = () => {
                     <div className="msg-id">Type</div>
                     <div className="msg-auction">Auction</div>
                   </div>
-                </div>
+                </div> */}
                 <div className="screenshot-msg">
                   <div className="inbox-chat">
                     {apiResponseBody.length > 0
                       ? apiResponseBody.map((message, index) => (
-                          <div
-                            key={index}
-                            className={
-                              message.event_type_id === 1
-                                ? "chat-message-right"
-                                : "chat-message-left"
-                            }
-                          >
-                            {expandedMessages.has(index) ? (
-                              <div>
-                                {message.body}
-                                <button
-                                  onClick={() => toggleMessageExpansion(index)}
-                                  className={`read-more-btn ${
-                                    message.event_type_id === 1
-                                      ? "read-more-btn-right"
-                                      : "read-more-btn-left"
+                        <div
+                          key={index}
+                          className={
+                            message.event_type_id === 1
+                              ? "chat-message-right"
+                              : "chat-message-left"
+                          }
+                        >
+                          {expandedMessages.has(index) ? (
+                            <div>
+                              {message.body}
+                              <button
+                                onClick={() => toggleMessageExpansion(index)}
+                                className={`read-more-btn ${message.event_type_id === 1
+                                  ? "read-more-btn-right"
+                                  : "read-more-btn-left"
                                   }`}
-                                >
-                                  Read Less
-                                </button>
-                              </div>
-                            ) : (
-                              <div>
-                                {message.body.length > 100 ? (
-                                  <>
-                                    {message.body.substring(0, 100)}...
-                                    <button
-                                      onClick={() =>
-                                        toggleMessageExpansion(index)
-                                      }
-                                      className={`read-more-btn ${
-                                        message.event_type_id === 2
-                                          ? "read-more-btn-right"
-                                          : "read-more-btn-left"
+                              >
+                                Read Less
+                              </button>
+                            </div>
+                          ) : (
+                            <div>
+                              {message.body && message.body.length > 100 ? (
+                                <>
+                                  {message.body.substring(0, 100)}...
+                                  <button
+                                    onClick={() => toggleMessageExpansion(index)}
+                                    className={`read-more-btn ${message.event_type_id === 2 ? "read-more-btn-right" : "read-more-btn-left"
                                       }`}
-                                    >
-                                      Read More
-                                    </button>
-                                  </>
-                                ) : (
-                                  message.body
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        ))
+                                  >
+                                    Read More
+                                  </button>
+                                </>
+                              ) : (
+                                message.body || "No message body"
+                              )}
+                            </div>
+
+                          )}
+                        </div>
+                      ))
                       : "Loading..."}
                   </div>
                 </div>
 
-                <div className="chat-heading-follow">
+                {/* <div className="chat-heading-follow">
                   <div className="chat-heading-msg">
                     <div className="follow-id">Follow Up</div>
                     <div className="msg-auction">03 Times</div>
@@ -751,56 +916,15 @@ const Dashboard = () => {
                   <button type="button" className="btn-call">
                     Call Now
                   </button>
-                </div>
+                </div> */}
               </div>
             </div>
-            <div className="pagination-container">
-              <ul className="pagination">
-                <li
-                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
-                >
-                  <button
-                    className="page-link"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  >
-                    &lt;
-                  </button>
-                </li>
-                {[...Array(totalPages)].map((_, i) => (
-                  <li
-                    key={i}
-                    className={`page-item ${
-                      currentPage === i + 1 ? "active" : ""
-                    }`}
-                  >
-                    <button
-                      className="page-link"
-                      onClick={() => handlePageChange(i + 1)}
-                    >
-                      {i + 1}
-                    </button>
-                  </li>
-                ))}
-                <li
-                  className={`page-item ${
-                    currentPage === totalPages ? "disabled" : ""
-                  }`}
-                >
-                  <button
-                    className="page-link"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                  >
-                    &gt;
-                  </button>
-                </li>
-              </ul>
-            </div>
           </div>
+
         </div>
-      </div>
-    </div>
+
+      </div >
+    </div >
   );
 };
 

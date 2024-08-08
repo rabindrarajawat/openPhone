@@ -167,7 +167,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { OpenPhoneEventEntity } from "../entities/open-phone-event.entity";
 import { AddressService } from "./address.service";
 import { AddressDto } from "../dto/address.dto";
@@ -176,6 +176,7 @@ import { AuctionEventService } from "./auction-event.service";
 import { AuctionEventDto } from "src/dto/auction-event.dto";
 import { validate } from "class-validator";
 import { OpenPhoneEventDto } from "../dto/open-phone-event.dto";
+import { NotificationService } from "./notification.service";
 @Injectable()
 export class OpenPhoneEventService {
   constructor(
@@ -184,7 +185,8 @@ export class OpenPhoneEventService {
     @InjectRepository(AddressEntity)
     private addressRepository: Repository<AddressEntity>,
     private addressService: AddressService,
-    private auctionService: AuctionEventService
+    private auctionService: AuctionEventService,
+    private notificationService: NotificationService
   ) { }
 
   // async create(payload: any) {
@@ -504,16 +506,12 @@ export class OpenPhoneEventService {
       // Validate the payload
       const errors = await validate(payload);
       if (errors.length > 0) {
-        const errorMessages = errors
-          .map((error) => Object.values(error.constraints))
-          .flat();
-        throw new BadRequestException(
-          `Invalid payload: ${errorMessages.join(", ")}`
-        );
+        const errorMessages = errors.map((error) => Object.values(error.constraints)).flat();
+        throw new BadRequestException(`Invalid payload: ${errorMessages.join(", ")}`);
       }
 
       const messageData = payload.data.object;
-      const body = messageData.body;
+      const body = messageData.body || null; // Handle the case where body might be null
 
       // Check event type
       const eventTypeId = this.getEventTypeId(payload.type);
@@ -524,47 +522,40 @@ export class OpenPhoneEventService {
       let addressId = null;
       let addressCreated = false;
 
-      // Extract address from body and save it
-      if (!body) {
-        throw new BadRequestException("Body is null or empty");
-      }
-
-      const extractedInfo = this.extractInformation(body);
-      if (!extractedInfo.address && payload.data.object.status === "outgoing") {
-        throw new BadRequestException("Extracted address is null or empty");
-      }
-
-      // Check if the address already exists
-      const existingAddress = await this.addressRepository.findOne({
-        where: { address: extractedInfo.address },
-      });
-
-      if (!existingAddress) {
-        const addressDto: AddressDto = {
-          address: extractedInfo.address,
-          date: extractedInfo.date || new Date(),
-          created_by: "Ram",
-          is_active: true,
-        };
-
-        // Validate the addressDto
-        const addressErrors = await validate(addressDto);
-        if (addressErrors.length > 0) {
-          const errorMessages = addressErrors
-            .map((error) => Object.values(error.constraints))
-            .flat();
-          throw new BadRequestException(
-            `Invalid address data: ${errorMessages.join(", ")}`
-          );
+      // Extract address from body if body is not null and save it
+      if (body) {
+        const extractedInfo = this.extractInformation(body);
+        if (!extractedInfo.address && payload.data.object.status === "outgoing") {
+          throw new BadRequestException("Extracted address is null or empty");
         }
 
-        // Save the address
-        const savedAddress =
-          await this.addressService.createAddress(addressDto);
-        addressId = savedAddress.id;
-        addressCreated = true;
-      } else {
-        addressId = existingAddress.id;
+        // Check if the address already exists
+        const existingAddress = await this.addressRepository.findOne({
+          where: { address: extractedInfo.address },
+        });
+
+        if (!existingAddress) {
+          const addressDto: AddressDto = {
+            address: extractedInfo.address,
+            date: extractedInfo.date || new Date(),
+            created_by: "Ram",
+            is_active: true,
+          };
+
+          // Validate the addressDto
+          const addressErrors = await validate(addressDto);
+          if (addressErrors.length > 0) {
+            const errorMessages = addressErrors.map((error) => Object.values(error.constraints)).flat();
+            throw new BadRequestException(`Invalid address data: ${errorMessages.join(", ")}`);
+          }
+
+          // Save the address
+          const savedAddress = await this.addressService.createAddress(addressDto);
+          addressId = savedAddress.id;
+          addressCreated = true;
+        } else {
+          addressId = existingAddress.id;
+        }
       }
 
       const existingEvent = await this.openPhoneEventRepository.findOne({
@@ -573,10 +564,8 @@ export class OpenPhoneEventService {
 
       const openPhoneEvent = new OpenPhoneEventEntity();
       openPhoneEvent.event_type_id = eventTypeId;
-      openPhoneEvent.address_id =
-        messageData.status === "delivered"
-          ? existingEvent?.address_id
-          : addressId;
+      openPhoneEvent.address_id = messageData.status === "delivered" ? existingEvent?.address_id : addressId;
+
       if (existingEvent !== null) {
         if (
           existingEvent.conversation_id === messageData.conversationId &&
@@ -586,20 +575,13 @@ export class OpenPhoneEventService {
           openPhoneEvent.address_id = null;
         }
       }
-      openPhoneEvent.event_direction_id = this.getEventDirectionId(
-        messageData.direction
-      );
+
+      openPhoneEvent.event_direction_id = this.getEventDirectionId(messageData.direction);
       openPhoneEvent.from = messageData.from;
       openPhoneEvent.to = messageData.to;
       openPhoneEvent.body = body;
-      openPhoneEvent.url =
-        messageData.media && messageData.media.length > 0
-          ? messageData.media[0].url
-          : "url";
-      openPhoneEvent.url_type =
-        messageData.media && messageData.media.length > 0
-          ? messageData.media[0].type
-          : "image";
+      openPhoneEvent.url = messageData.media && messageData.media.length > 0 ? messageData.media[0].url : "url";
+      openPhoneEvent.url_type = messageData.media && messageData.media.length > 0 ? messageData.media[0].type : "image";
       openPhoneEvent.conversation_id = messageData.conversationId;
       openPhoneEvent.created_at = messageData.createdAt;
       openPhoneEvent.received_at = payload.createdAt;
@@ -614,17 +596,13 @@ export class OpenPhoneEventService {
       // Validate the openPhoneEvent
       const eventErrors = await validate(openPhoneEvent);
       if (eventErrors.length > 0) {
-        const errorMessages = eventErrors
-          .map((error) => Object.values(error.constraints))
-          .flat();
-        throw new BadRequestException(
-          `Invalid open phone event data: ${errorMessages.join(", ")}`
-        );
+        const errorMessages = eventErrors.map((error) => Object.values(error.constraints)).flat();
+        throw new BadRequestException(`Invalid open phone event data: ${errorMessages.join(", ")}`);
       }
 
       const savedOpenPhoneEvent =
         await this.openPhoneEventRepository.save(openPhoneEvent);
-
+        await this.notificationService.createNotification(savedOpenPhoneEvent.id);
       const auctionEventDto: AuctionEventDto = {
         event_id: savedOpenPhoneEvent.id,
         created_by: "Ram",
@@ -633,12 +611,8 @@ export class OpenPhoneEventService {
       // Validate the auctionEventDto
       const auctionErrors = await validate(auctionEventDto);
       if (auctionErrors.length > 0) {
-        const errorMessages = auctionErrors
-          .map((error) => Object.values(error.constraints))
-          .flat();
-        throw new BadRequestException(
-          `Invalid auction event data: ${errorMessages.join(", ")}`
-        );
+        const errorMessages = auctionErrors.map((error) => Object.values(error.constraints)).flat();
+        throw new BadRequestException(`Invalid auction event data: ${errorMessages.join(", ")}`);
       }
 
       const saveEventId = await this.auctionService.create(auctionEventDto);
@@ -654,9 +628,7 @@ export class OpenPhoneEventService {
         if (error.message.includes("violates not-null constraint")) {
           throw new BadRequestException(`Invalid data: ${error.message}`);
         }
-        throw new InternalServerErrorException(
-          `Error saving open phone event: ${error.message}`
-        );
+        throw new InternalServerErrorException(`Error saving open phone event: ${error.message}`);
       }
       throw new InternalServerErrorException("An unknown error occurred");
     }
@@ -711,9 +683,48 @@ export class OpenPhoneEventService {
     };
   }
 
+  // async findOpenPhoneEventsByAddress(
+  //   address: string
+  // ): Promise<Partial<OpenPhoneEventEntity>[]> {
+  //   // Fetch address data based on the provided address
+  //   const addressData = await this.addressRepository.findOne({
+  //     where: { address: address },
+  //   });
+
+  //   // If address is not found, throw an exception
+  //   if (!addressData) {
+  //     throw new NotFoundException(`Address not found: ${address}`);
+  //   }
+
+  //   // Fetch OpenPhone events using the address_id from the found address
+  //   const openPhoneEvents = await this.openPhoneEventRepository.find({
+  //     where: { address_id: addressData.id },
+  //   });
+
+  //   // If no events are found, throw an exception
+  //   if (openPhoneEvents.length === 0) {
+  //     throw new NotFoundException(`No OpenPhoneEvents found for address: ${address}`);
+  //   }
+
+  //   // Map through the events and remove the body field from each event
+  //   const eventsWithoutBody = openPhoneEvents.map((event) => {
+  //     const { body, ...eventWithoutBody } = event;
+  //     return eventWithoutBody;
+  //   });
+
+  //   // Return the events without their body field
+  //   return eventsWithoutBody;
+  // }
+
   async findOpenPhoneEventsByAddress(
     address: string
-  ): Promise<Partial<OpenPhoneEventEntity>[]> {
+  ): Promise<{
+    events: Partial<OpenPhoneEventEntity>[],
+    messageDelivered: number,
+    messageResponse: number,
+    call: number,
+    callResponse: number
+  }> {
     // Fetch address data based on the provided address
     const addressData = await this.addressRepository.findOne({
       where: { address: address },
@@ -725,24 +736,54 @@ export class OpenPhoneEventService {
     }
 
     // Fetch OpenPhone events using the address_id from the found address
-    const openPhoneEvents = await this.openPhoneEventRepository.find({
+    const initialEvents = await this.openPhoneEventRepository.find({
       where: { address_id: addressData.id },
+      order: { id: 'ASC' }
     });
 
+    // Collect all conversation IDs from the initial events
+    const conversationIds = initialEvents.map(event => event.conversation_id);
+
+    // Fetch additional events based on collected conversation IDs
+    const additionalEvents = await this.openPhoneEventRepository.find({
+      where: { conversation_id: In(conversationIds) },
+      order: { id: 'ASC' }
+    });
+
+    // Combine initial and additional events, ensuring no duplicates
+    const allEvents = [...initialEvents, ...additionalEvents.filter(event => !initialEvents.some(e => e.id === event.id))];
+
+    // Sort the combined events by id in ascending order
+    allEvents.sort((a, b) => a.id - b.id);
+
     // If no events are found, throw an exception
-    if (openPhoneEvents.length === 0) {
+    if (allEvents.length === 0) {
       throw new NotFoundException(`No OpenPhoneEvents found for address: ${address}`);
     }
 
     // Map through the events and remove the body field from each event
-    const eventsWithoutBody = openPhoneEvents.map((event) => {
+    const eventsWithoutBody = allEvents.map((event) => {
       const { body, ...eventWithoutBody } = event;
       return eventWithoutBody;
     });
 
-    // Return the events without their body field
-    return eventsWithoutBody;
+    // Calculate counts for each event_type_id
+    const messageDelivered = allEvents.filter(event => event.event_type_id === 2).length;
+    const messageResponse = allEvents.filter(event => event.event_type_id === 1).length;
+    const call = allEvents.filter(event => event.event_type_id === 3).length;
+    const callResponse = allEvents.filter(event => event.event_type_id === 4).length;
+
+    // Return the events without their body field and the counts
+    return {
+      events: eventsWithoutBody,
+      messageDelivered,
+      messageResponse,
+      call,
+      callResponse
+    };
   }
+
+
 
 
   async findEventBodiesByConversationId(conversationId: string): Promise<{ event_type_id: number, body: string }[]> {
