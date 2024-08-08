@@ -136,7 +136,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
   const newNotificationCount = notifications.length;
 
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary">
+    <nav className="navbar ">
       <div className="container-fluid">
         <Image
           src="/line.svg"
@@ -146,61 +146,43 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
           height={50}
           onClick={toggleSidebar}
         />
-        <div className="navbar-brand1">
-          OpenPhone <br />
-          <p className="dashboard">Dashboard</p>
-        </div>
+        {/* <div className="navbar-brand1">
+          OpenPhone
+        </div> */}
 
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <form className="d-flex" role="search" onSubmit={(e) => e.preventDefault()}>
-            <div className="search-wrapper">
-              <input
-                className="search"
-                type="search"
-                placeholder="Search Address"
-                aria-label="Search"
-                value={input}
-                onChange={(e) => handleChange(e.target.value)}
-              />
-              {results.length > 0 && (
-                <SearchResultList results={results} onSelect={handleSelectAddress} />
-              )}
+        <div className='nav-list'>
+          <div className='profileicon'>
+            <Image src="/account_circle.svg" alt="Profile" className='profile' width={50} height={50} />
+          </div>
+
+          <a className='name'>
+            {userName || 'User'}
+          </a>
+
+          <div className='bellicon' onClick={handleBellClick}>
+            <Image src="/bell.svg" alt="Notifications" className='bell' width={50} height={50} />
+            {newNotificationCount > 0 && (
+              <span className="new-notification-dot">{newNotificationCount}</span>
+            )}
+          </div>
+
+          {showDropdown && (
+            <div className="notification-dropdown">
+              <div>{newNotificationCount} new messages</div>
+              <ul>
+                {notifications.map(notification => (
+                  <li key={notification.event_id} className={!notification.is_read ? 'new-notification' : ''}>
+                    <strong onClick={() => handleMarkAsRead(notification.event_id)}>
+                      From: {notification.event.from}
+                    </strong><br />
+                    {/* Other notification content can go here */}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ToastContainer />
-          </form>
-        </div>
-
-        <div className='profileicon'>
-          <Image src="/account_circle.svg" alt="Profile" className='profile' width={50} height={50} />
-        </div>
-
-        <a className='name'>
-          {userName || 'User'}
-        </a>
-
-        <div className='bellicon' onClick={handleBellClick}>
-          <Image src="/bell.svg" alt="Notifications" className='bell' width={50} height={50} />
-          {newNotificationCount > 0 && (
-            <span className="new-notification-dot">{newNotificationCount}</span>
           )}
+
         </div>
-
-        {showDropdown && (
-  <div className="notification-dropdown">
-    <div>{newNotificationCount} new messages</div>
-    <ul>
-      {notifications.map(notification => (
-        <li key={notification.event_id} className={!notification.is_read ? 'new-notification' : ''}>
-          <strong onClick={() => handleMarkAsRead(notification.event_id)}>
-            From: {notification.event.from}
-          </strong><br />
-          {/* Other notification content can go here */}
-        </li>
-      ))}
-    </ul>
-  </div>
-)}
-
       </div>
     </nav>
   );
