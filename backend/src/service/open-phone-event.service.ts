@@ -837,6 +837,4 @@ export class OpenPhoneEventService {
       body: event.event_body,
     }));
   }
-
-
 }
