@@ -11,6 +11,9 @@
     /* background: linear-gradient(179.99deg, #E4FFEC 0.01%, #E9F0FF 102.39%); */
     z-index: 1;
 }
+.setaddress{
+    margin-left: -114px;
+    padding-top: 24px;}
 
 .box.sidebar-visible {
     margin-left: 90px;
