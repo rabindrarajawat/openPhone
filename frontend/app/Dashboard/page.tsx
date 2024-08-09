@@ -751,9 +751,6 @@ const Dashboard = () => {
               <div className="address"> <img src="User.svg" alt="" /> Address</div>
               <div className='address-list'>
                 <div className="search-wrapper-add">
-                  <div className="select-all-wrapper" onClick={handleSelectAll}>
-                    <i className={`bookmark-select bi ${allSelected ? 'bi-bookmark-fill' : 'bi-bookmark'}`}></i>
-                  </div>
                   <input
                     className="search-to"
                     type="search"
