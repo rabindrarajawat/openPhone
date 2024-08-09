@@ -13,6 +13,14 @@ import { SearchResultList } from "../SearchResultList/SearchResultList";
 
 interface Address {
   fullAddress: string;
+ 
+
+  
+}
+interface Address1{
+  is_bookmarked:boolean;
+  displayAddress:string;
+  id:number;
 }
 
 interface Message {
@@ -73,10 +81,10 @@ const Dashboard = () => {
   const [messageResponse, setMessageResponse] = useState<number>(0);
   const [call, setCall] = useState<number>(0);
   const [callResponse, setCallResponse] = useState<number>(0);
-  const [bookmarkedAddresses, setBookmarkedAddresses] = useState(new Array(addresses.length).fill(false));
   const [input, setInput] = useState<string>('');
   const [results, setResultsState] = useState<Address[]>([]);
   const [allSelected, setAllSelected] = useState(false);
+  const [addresses1, setAddresses1] = useState<Address1[]>([]);
 
 
 
@@ -95,6 +103,13 @@ const Dashboard = () => {
     axios
       .get("http://localhost:8000/address/getalladdress")
       .then((response) => {
+        console.log('API Response:',response.data);
+        const formattedAddresses = response.data.map((item:any) =>({
+          id: item.id,
+          displayAddress: item.address, 
+          is_bookmarked: item.is_bookmarked, 
+        }));
+        setAddresses1(formattedAddresses)
         const addressData = response.data.map(
           (address: any) => address.address
         );
@@ -107,6 +122,32 @@ const Dashboard = () => {
         console.error("Error fetching addresses:", error);
       });
   }, []);
+  const handleBookmarkClick = (addressId: number) => {
+    const address = addresses1.find(a => a.id === addressId);
+    if (!address) return;
+
+    const newIsBookmarked = !address.is_bookmarked;
+
+    console.log(`Toggling bookmark status for address ID ${addressId} to ${newIsBookmarked}`);
+
+    axios.post(`http://localhost:8000/bookmarks/${addressId}`, {
+      is_bookmarked: newIsBookmarked
+    })
+      .then(response => {
+        console.log(`API Response for bookmarking:`, response.data);
+        // Update the state only if the API call was successful
+        setAddresses1(prevAddresses =>
+          prevAddresses.map(a =>
+            a.id === addressId
+              ? { ...a, is_bookmarked: newIsBookmarked }
+              : a
+          )
+        );
+      })
+      .catch(error => {
+        console.error('Error updating bookmark status:', error);
+      });
+  };
 
   useEffect(() => {
     if (selectedAddress && selectedAddress !== "Search Address") {
@@ -297,20 +338,9 @@ const Dashboard = () => {
   //   setBookmarkedAddresses(newBookmarkedAddresses);
   // };
 
-  const handleSelectAll = () => {
-    const newSelectionState = !allSelected;
-    setAllSelected(newSelectionState);
-    const newBookmarkedAddresses = addresses.map(() => newSelectionState);
-    setBookmarkedAddresses(newBookmarkedAddresses);
-  };
 
-  const handleBookmarkClick = (index: any) => {
-    const newBookmarkedAddresses = [...bookmarkedAddresses];
-    newBookmarkedAddresses[index] = !newBookmarkedAddresses[index];
-    setBookmarkedAddresses(newBookmarkedAddresses);
-    // Optionally update the allSelected state if all individual bookmarks are selected/deselected
-    setAllSelected(newBookmarkedAddresses.every((isBookmarked) => isBookmarked));
-  };
+
+
 
   const handleChange = (value: string) => {
     setInput(value);
@@ -737,18 +767,25 @@ const Dashboard = () => {
                   )}
                   <img src="/Icon.svg" alt="icon" className="search-icon" />
 
-
+                 
                 </div>
 
-                {addresses.map((address, index) => (
-                  <div key={index} className="address-item align-items-center mb-2">
-                    <i
-                      className={`bookmark bi ${bookmarkedAddresses[index] ? 'bi-bookmark-fill' : 'bi-bookmark'}`}
-                      onClick={() => handleBookmarkClick(index)}
-                    ></i>
-                    {address}
-                  </div>
-                ))}
+                {addresses1.length > 0 ? (
+          addresses1.map((address) => (
+            <li key={address.id} className="list-group-item d-flex justify-content-between align-items-center">
+              <div className="setaddress d-flex align-items-center gap-3 ">
+                <i
+                  className={`bi ${address.is_bookmarked ? 'bi-bookmark-fill' : 'bi-bookmark'} clickable-icon`}
+                  style={{ cursor: 'pointer', color: address.is_bookmarked ? 'blue' : 'grey' }}
+                  onClick={() => handleBookmarkClick(address.id)}
+                ></i>
+                <span className="ml-2">{address.displayAddress}</span>
+              </div>
+            </li>
+          ))
+        ) : (
+          <p>No addresses found.</p>
+        )}
 
               </div>
               {/* <div className="datatable-box ">
