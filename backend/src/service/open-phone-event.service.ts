@@ -540,7 +540,7 @@ export class OpenPhoneEventService {
             date: extractedInfo.date || new Date(),
             created_by: "Ram",
             is_active: true,
-            is_bookmarked:false,
+            is_bookmarked: false,
           };
 
           // Validate the addressDto
@@ -603,7 +603,7 @@ export class OpenPhoneEventService {
 
       const savedOpenPhoneEvent =
         await this.openPhoneEventRepository.save(openPhoneEvent);
-        await this.notificationService.createNotification(savedOpenPhoneEvent.id);
+      await this.notificationService.createNotification(savedOpenPhoneEvent.id);
       const auctionEventDto: AuctionEventDto = {
         event_id: savedOpenPhoneEvent.id,
         created_by: "Ram",
@@ -787,29 +787,66 @@ export class OpenPhoneEventService {
 
 
 
-  async findEventBodiesByConversationId(conversationId: string): Promise<{ event_type_id: number, body: string }[]> {
-    try {
-      // Fetch events by conversation_id and order by id in ascending order
-      const events = await this.openPhoneEventRepository.find({
-        where: { conversation_id: conversationId },
-        order: { id: 'ASC' }, // Sort by id in ascending order
-      });
+  // async findEventBodiesByConversationId(conversationId: string): Promise<{ event_type_id: number, body: string }[]> {
+  //   try {
+  //     // Fetch events by conversation_id and order by id in ascending order
+  //     const events = await this.openPhoneEventRepository.find({
+  //       where: { conversation_id: conversationId },
+  //       order: { id: 'ASC' }, // Sort by id in ascending order
+  //     });
 
-      // Check if events are found
-      if (events.length === 0) {
-        throw new NotFoundException(`No events found for conversation_id: ${conversationId}`);
-      }
+  //     // Check if events are found
+  //     if (events.length === 0) {
+  //       throw new NotFoundException(`No events found for conversation_id: ${conversationId}`);
+  //     }
 
-      // Extract the 'event_type_id' and 'body' value from each event
-      return events.map(event => ({
-        event_type_id: event.event_type_id,
-        body: event.body,
-      }));
-    } catch (error) {
-      console.error('Error fetching events:', error);
-      throw error;
+  //     // Extract the 'event_type_id' and 'body' value from each event
+  //     return events.map(event => ({
+  //       event_type_id: event.event_type_id,
+  //       body: event.body,
+  //     }));
+  //   } catch (error) {
+  //     console.error('Error fetching events:', error);
+  //     throw error;
+  //   }
+  // }
+
+  async findEventBodiesByAddressAndFromNumber(addressId: number, fromNumber?: string) {
+    // Step 1: Find events that match the provided address_id and from_number
+    const initialEvents = await this.openPhoneEventRepository.find({
+      where: { address_id: addressId, from: fromNumber },
+      order: { id: 'ASC' },
+    });
+
+    if (initialEvents.length === 0) {
+      throw new NotFoundException(`No events found for address_id: ${addressId} and from: ${fromNumber}`);
     }
+
+    // Step 2: Extract the conversation_id from the found events
+    const conversationIds = initialEvents.map(event => event.conversation_id);
+
+    // Step 3: Find all events that share the same conversation_id(s)
+    const relatedEvents = await this.openPhoneEventRepository.find({
+      where: { conversation_id: In(conversationIds) },
+      order: { id: 'ASC' },
+    });
+
+    // Step 4: Combine initial and related events, and remove duplicates
+    const allEvents = [...initialEvents, ...relatedEvents];
+    const uniqueEvents = Array.from(new Map(allEvents.map(event => [event.id, event])).values());
+
+    // Step 5: Return unique events with only the needed fields
+    return uniqueEvents.map(event => ({
+      event_type_id: event.event_type_id,
+      body: event.body,
+      to: event.to,
+      created_at: event.created_at,
+      conversation_id: event.conversation_id,
+    }));
   }
+
+
+
 
   async findConversationsWithoutAddress(): Promise<any[]> {
     const subQuery = this.openPhoneEventRepository

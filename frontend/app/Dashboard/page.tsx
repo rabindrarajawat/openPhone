@@ -13,14 +13,14 @@ import { SearchResultList } from "../SearchResultList/SearchResultList";
 
 interface Address {
   fullAddress: string;
- 
 
-  
+
+
 }
-interface Address1{
-  is_bookmarked:boolean;
-  displayAddress:string;
-  id:number;
+interface Address1 {
+  is_bookmarked: boolean;
+  displayAddress: string;
+  id: number;
 }
 
 interface Message {
@@ -31,6 +31,14 @@ interface Message {
 interface ApiResponse {
   message: string;
   data: Message[];
+}
+
+interface Event {
+  event_type_id: number;
+  body: string;
+  to: string;
+  created_at: string;
+  conversation_id: string;
 }
 
 interface EventItem {
@@ -53,6 +61,8 @@ interface EventItem {
   dead: string;
   keep_an_eye: string;
   is_stop: string;
+  body: string;
+
 }
 
 const Dashboard = () => {
@@ -71,9 +81,9 @@ const Dashboard = () => {
   const [apiResponseBody, setApiResponseBody] = useState<Message[]>([]);
   const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
   const [isMessageExpanded, setIsMessageExpanded] = useState(false);
-  const [expandedMessages, setExpandedMessages] = useState<Set<number>>(
-    new Set()
-  );
+  // const [expandedMessages, setExpandedMessages] = useState<Set<number>>(
+  //   new Set()
+  // );
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
@@ -85,6 +95,18 @@ const Dashboard = () => {
   const [results, setResultsState] = useState<Address[]>([]);
   const [allSelected, setAllSelected] = useState(false);
   const [addresses1, setAddresses1] = useState<Address1[]>([]);
+
+  const [uniqueFromNumbers, setUniqueFromNumbers] = useState<string[]>([]);
+
+  // const [selectedAddress, setSelectedAddress] = useState(''); // For the display address
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
+  // const [fromNumber, setFromNumber] = useState('');
+
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [expandedMessages, setExpandedMessages] = useState(new Map());
+
+
+
 
 
 
@@ -103,25 +125,26 @@ const Dashboard = () => {
     axios
       .get("http://localhost:8000/address/getalladdress")
       .then((response) => {
-        console.log('API Response:',response.data);
-        const formattedAddresses = response.data.map((item:any) =>({
+        console.log('API Response:', response.data);
+        const formattedAddresses = response.data.map((item: any) => ({
           id: item.id,
-          displayAddress: item.address, 
-          is_bookmarked: item.is_bookmarked, 
+          displayAddress: item.address,
+          is_bookmarked: item.is_bookmarked,
         }));
-        setAddresses1(formattedAddresses)
-        const addressData = response.data.map(
-          (address: any) => address.address
-        );
-        setAddresses(addressData);
-        if (addressData.length > 0) {
-          setSelectedAddress(addressData[0]); // Set the first address as the default selected address
+        setAddresses1(formattedAddresses);
+
+        if (formattedAddresses.length > 0) {
+          setSelectedAddress(formattedAddresses[0].displayAddress); // Set the first address as the default selected address
+          setSelectedAddressId(formattedAddresses[0].id); // Set the first address ID as the default selected address ID
         }
       })
       .catch((error) => {
         console.error("Error fetching addresses:", error);
       });
   }, []);
+
+
+
   const handleBookmarkClick = (addressId: number) => {
     const address = addresses1.find(a => a.id === addressId);
     if (!address) return;
@@ -149,6 +172,39 @@ const Dashboard = () => {
       });
   };
 
+  // useEffect(() => {
+  //   if (selectedAddress && selectedAddress !== "Search Address") {
+  //     axios
+  //       .get(
+  //         `http://localhost:8000/openPhoneEventData/events?address=${encodeURIComponent(
+  //           selectedAddress
+  //         )}`
+  //       )
+  //       .then((response) => {
+  //         const data = response.data.data;
+  //         if (data && Array.isArray(data.events)) {
+  //           setEventData(data.events);
+  //           if (data.events.length > 0) {
+  //             setPhoneNumber(data.events[0].to);
+  //             setFromNumber(data.events[0].from);
+  //           } else {
+  //             setPhoneNumber("");
+  //             setFromNumber("");
+  //           }
+  //           setMessageDelivered(data.messageDelivered || 0);
+  //           setMessageResponse(data.messageResponse || 0);
+  //           setCall(data.call || 0);
+  //           setCallResponse(data.callResponse || 0);
+  //         } else {
+  //           console.error("Events data is not an array or is missing");
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error fetching event data:", error);
+  //       });
+  //   }
+  // }, [selectedAddress]);
+
   useEffect(() => {
     if (selectedAddress && selectedAddress !== "Search Address") {
       axios
@@ -161,9 +217,17 @@ const Dashboard = () => {
           const data = response.data.data;
           if (data && Array.isArray(data.events)) {
             setEventData(data.events);
-            if (data.events.length > 0) {
-              setPhoneNumber(data.events[0].to);
-              setFromNumber(data.events[0].from);
+
+            // Filter events to only include those with an address_id
+            const eventsWithAddressId = data.events.filter((event: any) => event.address_id);
+
+            // Extract unique 'fromNumber' values from filtered events
+            const uniqueNumbers = Array.from(new Set<string>(eventsWithAddressId.map((event: any) => event.from)));
+            setUniqueFromNumbers(uniqueNumbers);
+
+            if (eventsWithAddressId.length > 0) {
+              setPhoneNumber(eventsWithAddressId[0].to);
+              setFromNumber(eventsWithAddressId[0].from);
             } else {
               setPhoneNumber("");
               setFromNumber("");
@@ -182,32 +246,33 @@ const Dashboard = () => {
     }
   }, [selectedAddress]);
 
-  const handleRowClick = (ownerId: number) => {
-    if (selectedRowId !== ownerId) {
-      setSelectedRowId(ownerId);
-      console.log("Selected owner ID:", ownerId);
 
-      axios
-        .get<ApiResponse>(
-          `http://localhost:8000/openPhoneEventData/events-by-conversation?conversation_id=${ownerId}`
-        )
-        .then((response) => {
-          console.log("API response for selected owner ID:", response.data);
-          setApiResponseBody(response.data.data); // Store the data array in state
-        })
-        .catch((error) => {
-          console.error("Error fetching data for selected owner ID:", error);
-        });
-    }
-  };
+  // const handleRowClick = (ownerId: number) => {
+  //   if (selectedRowId !== ownerId) {
+  //     setSelectedRowId(ownerId);
+  //     console.log("Selected owner ID:", ownerId);
 
-  const toggleMessageExpansion = (index: number) => {
+  //     axios
+  //       .get<ApiResponse>(
+  //         `http://localhost:8000/openPhoneEventData/events-by-conversation?conversation_id=${ownerId}`
+  //       )
+  //       .then((response) => {
+  //         console.log("API response for selected owner ID:", response.data);
+  //         setApiResponseBody(response.data.data); // Store the data array in state
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error fetching data for selected owner ID:", error);
+  //       });
+  //   }
+  // };
+
+  const toggleMessageExpansion = (index: any) => {
     setExpandedMessages((prev) => {
-      const newExpandedMessages = new Set(prev);
+      const newExpandedMessages = new Map(prev);
       if (newExpandedMessages.has(index)) {
         newExpandedMessages.delete(index);
       } else {
-        newExpandedMessages.add(index);
+        newExpandedMessages.set(index, true);
       }
       return newExpandedMessages;
     });
@@ -277,13 +342,14 @@ const Dashboard = () => {
     });
   };
 
-  const handleAddressSelect = (address: string) => {
+  const handleAddressSelect = (address: string, addressId: number) => {
     setSelectedAddress(address);
-    setSelectedAddress1(address); // You can set it as needed
+    setSelectedAddressId(addressId); // Update the selected address ID
 
     setEventData([]); // Clear existing event data to ensure new data is shown
-    setBox1DropdownOpen(false); // Close the dropdown after selection
   };
+
+
   const handleCheckboxClick = (addressId: any) => {
     axios.post(`http://localhost:8000/bookmarks/${addressId}`)
       .then(response => {
@@ -297,16 +363,16 @@ const Dashboard = () => {
     setSelectedAddress(address.fullAddress);
   };
 
-  useEffect(() => {
-    if (tableData.length > 0) {
-      // Set default selectedRowId only if it is not already set
-      if (selectedRowId === null && tableData.length > 0) {
-        const firstRowId = tableData[0].ownerid;
-        setSelectedRowId(firstRowId);
-        handleRowClick(firstRowId);
-      }
-    }
-  }, [tableData, selectedRowId]);
+  // useEffect(() => {
+  //   if (tableData.length > 0) {
+  //     // Set default selectedRowId only if it is not already set
+  //     if (selectedRowId === null && tableData.length > 0) {
+  //       const firstRowId = tableData[0].ownerid;
+  //       setSelectedRowId(firstRowId);
+  //       handleRowClick(firstRowId);
+  //     }
+  //   }
+  // }, [tableData, selectedRowId]);
 
   const fetchData = async (value: string) => {
     try {
@@ -354,6 +420,37 @@ const Dashboard = () => {
     //   onSelectAddress(address);
     // }
   };
+
+  // function setEvents(data: any) {
+  //   throw new Error("Function not implemented.");
+  // }
+
+  useEffect(() => {
+    async function fetchEvents() {
+      try {
+        const response = await axios.get('http://localhost:8000/openPhoneEventData/events-by-address-and-from', {
+          params: { address_id: selectedAddressId, from_number: fromNumber }
+        });
+        setEvents(response.data.data);
+      } catch (error) {
+        // setError('Error fetching event bodies');
+      } finally {
+        // setLoading(false);
+      }
+    }
+
+    fetchEvents();
+  }, [selectedAddress1, fromNumber]);
+
+  // Group messages by conversation_id
+  const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>((acc, message) => {
+    if (!acc[message.conversation_id]) {
+      acc[message.conversation_id] = [];
+    }
+    acc[message.conversation_id].push(message);
+    return acc;
+  }, {});
+
 
 
   return (
@@ -763,26 +860,27 @@ const Dashboard = () => {
                     <SearchResultList results={results} onSelect={handleSelectAddress} />
                   )}
                   <img src="/Icon.svg" alt="icon" className="search-icon" />
-
-                 
                 </div>
 
                 {addresses1.length > 0 ? (
-          addresses1.map((address) => (
-            <li key={address.id} className="list-group-item d-flex justify-content-between align-items-center">
-              <div className="setaddress d-flex align-items-center gap-3 ">
-                <i
-                  className={`bi ${address.is_bookmarked ? 'bi-bookmark-fill' : 'bi-bookmark'} clickable-icon`}
-                  style={{ cursor: 'pointer', color: address.is_bookmarked ? 'blue' : 'grey' }}
-                  onClick={() => handleBookmarkClick(address.id)}
-                ></i>
-                <span className="ml-2">{address.displayAddress}</span>
-              </div>
-            </li>
-          ))
-        ) : (
-          <p>No addresses found.</p>
-        )}
+                  addresses1.map((address) => (
+                    <li key={address.id}
+                      className="list-group-item d-flex justify-content-between align-items-center"
+                      onClick={() => handleAddressSelect(address.displayAddress, address.id)} // Pass the address ID on click
+                    >
+                      <div className="setaddress d-flex align-items-center gap-3 ">
+                        <i
+                          className={`bi ${address.is_bookmarked ? 'bi-bookmark-fill' : 'bi-bookmark'} clickable-icon`}
+                          style={{ cursor: 'pointer', color: address.is_bookmarked ? 'blue' : 'grey' }}
+                          onClick={() => handleBookmarkClick(address.id)}
+                        ></i>
+                        <span className="ml-2">{address.displayAddress}</span>
+                      </div>
+                    </li>
+                  ))
+                ) : (
+                  <p>No addresses found.</p>
+                )}
 
               </div>
               {/* <div className="datatable-box ">
@@ -850,7 +948,26 @@ const Dashboard = () => {
             </div>
 
 
-            <div className="conversation"> <img src="converstation.svg" alt="" /> Conversation From {fromNumber}
+            <div className="conversation">
+
+              {/* <img src="converstation.svg" alt="" /> Conversation From {fromNumber} */}
+
+              {selectedAddress && (
+                <div className="conversation">
+                  <img src="converstation.svg" alt="" /> Conversation From { }
+                  {uniqueFromNumbers.length > 0 && (
+                    <select
+                      value={fromNumber}
+                      onChange={(e) => setFromNumber(e.target.value)}  // Update fromNumber on selection
+                    >
+                      {uniqueFromNumbers.map((number, index) => (
+                        <option key={index} value={number}>{number}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              )}
+
 
               <div className="search-wrapper search-new">
                 {/* <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} /> */}
@@ -870,87 +987,67 @@ const Dashboard = () => {
 
 
               <div className="input-msg">
-                {/* <div className="chat-heading">
-                  <div className="chat-heading-msg">
-                    <div className="msg-id">Message ID</div>
-                    <div className="msg-auction">011045</div>
-                  </div>
-                  <div className="chat-heading-msg">
-                    <div className="msg-id">Message Status</div>
-                    <div className="msg-auction">Delivered</div>
-                  </div>
-                  <div className="chat-heading-msg">
-                    <div className="msg-id">Type</div>
-                    <div className="msg-auction">Auction</div>
-                  </div>
-                </div> */}
                 <div className="screenshot-msg">
                   <div className="inbox-chat">
-                    {apiResponseBody.length > 0
-                      ? apiResponseBody.map((message, index) => (
-                        <div
-                          key={index}
-                          className={
-                            message.event_type_id === 1
-                              ? "chat-message-right"
-                              : "chat-message-left"
-                          }
-                        >
-                          {expandedMessages.has(index) ? (
-                            <div>
-                              {message.body}
-                              <button
-                                onClick={() => toggleMessageExpansion(index)}
-                                className={`read-more-btn ${message.event_type_id === 1
-                                  ? "read-more-btn-right"
-                                  : "read-more-btn-left"
-                                  }`}
-                              >
-                                Read Less
-                              </button>
-                            </div>
-                          ) : (
-                            <div>
-                              {message.body && message.body.length > 100 ? (
-                                <>
-                                  {message.body.substring(0, 100)}...
+                    {events.length > 0 ? (
+                      Object.keys(groupedMessages).map((conversationId) => (
+                        <div key={conversationId}>
+                          <div className="to-line">.</div>
+                          <div className="to-value">
+                            <strong>To - </strong>{groupedMessages[conversationId][0].to}
+                          </div>
+
+                          {groupedMessages[conversationId].map((message, index) => (
+                            <div
+                              key={index}
+                              className={
+                                message.event_type_id === 1
+                                  ? "chat-message-right"
+                                  : "chat-message-left"
+                              }
+                            >
+                              {expandedMessages.has(index) ? (
+                                <div>
+                                  {message.body}
                                   <button
                                     onClick={() => toggleMessageExpansion(index)}
-                                    className={`read-more-btn ${message.event_type_id === 2 ? "read-more-btn-right" : "read-more-btn-left"
+                                    className={`read-less-btn ${message.event_type_id === 1
+                                      ? "read-less-btn-right"
+                                      : "read-less-btn-left"
                                       }`}
                                   >
-                                    Read More
+                                    Read Less
                                   </button>
-                                </>
+                                </div>
                               ) : (
-                                message.body || "No message body"
+                                <div>
+                                  {message.body && message.body.length > 100 ? (
+                                    <>
+                                      {message.body.substring(0, 100)}...
+                                      <button
+                                        onClick={() => toggleMessageExpansion(index)}
+                                        className={`read-more-btn ${message.event_type_id === 2
+                                          ? "read-more-btn-right"
+                                          : "read-more-btn-left"
+                                          }`}
+                                      >
+                                        Read More
+                                      </button>
+                                    </>
+                                  ) : (
+                                    message.body || "No message body"
+                                  )}
+                                </div>
                               )}
                             </div>
-
-                          )}
+                          ))}
                         </div>
                       ))
-                      : "Loading..."}
+                    ) : (
+                      "Loading..."
+                    )}
                   </div>
                 </div>
-
-                {/* <div className="chat-heading-follow">
-                  <div className="chat-heading-msg">
-                    <div className="follow-id">Follow Up</div>
-                    <div className="msg-auction">03 Times</div>
-                  </div>
-                  <div className="chat-heading-msg">
-                    <div className="follow-id">Lead Status</div>
-                    <div className="stop ">Dead</div>
-                  </div>
-                  <div className="chat-heading-msg">
-                    <div className="follow-id">Response</div>
-                    <div className=" stop">Stop</div>
-                  </div>
-                  <button type="button" className="btn-call">
-                    Call Now
-                  </button>
-                </div> */}
               </div>
             </div>
           </div>
@@ -963,3 +1060,20 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+
+
+
+
+
+// function setError(arg0: string) {
+//   throw new Error("Function not implemented.");
+// }
+
+// function setLoading(arg0: boolean) {
+//   throw new Error("Function not implemented.");
+// }
+///////////////////////////////////////////////////////////////workcode//////////////////////////////////////////////
+//////////////////////////////////////////////
+/////////////////////////////////////
+//////////////////////////////////

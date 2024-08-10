@@ -11,12 +11,110 @@
     /* background: linear-gradient(179.99deg, #E4FFEC 0.01%, #E9F0FF 102.39%); */
     z-index: 1;
 }
-.setaddress{
+
+.setaddress {
     margin-left: -114px;
-    padding-top: 24px;}
+    padding-top: 24px;
+}
 
 .box.sidebar-visible {
     margin-left: 90px;
+}
+
+.ml-2 {
+    cursor: pointer;
+}
+
+.to-value {
+    font-weight: bold;
+    font-size: 16px;
+    margin-left: 40% !important;
+    margin-bottom: 15px;
+    color: #333;
+    /* Change this to your desired color */
+}
+
+.to-line {
+    border-top: 1px solid gray;
+    width: 60%;
+    margin-left: 20%;
+    margin-top: 2%;
+}
+
+
+.chat-message-right {
+    text-align: right;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 10px;
+    margin-left: auto;
+    background: #D0D9FA73;
+    color: #4E4E4E;
+
+    font-family: 'Roboto', sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 20.46px;
+    text-align: left;
+
+    max-width: 60%;
+
+
+}
+
+.chat-message-left {
+    background-color: #0d6efd;
+    text-align: left;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 10px;
+    max-width: 60%;
+    margin-right: auto;
+    font-family: 'Roboto', sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 20.46px;
+}
+
+.read-more-btn,
+.read-less-btn {
+    border: none;
+    background: none;
+    /* color: #007bff; */
+    /* Customize button color */
+    cursor: pointer;
+    font-size: 13px;
+    display: block;
+    /* Ensure the button appears on a new line */
+    margin-top: 5px;
+}
+
+.read-more-btn-left {
+    color: #4E4E4E;
+}
+
+.read-more-btn-right {
+    color: white;
+}
+
+.read-less-btn-right {
+    color: #4E4E4E;
+}
+
+.read-less-btn-left {
+    color: white;
+}
+
+.chat-message-right .read-more-btn,
+.chat-message-left .read-more-btn {
+    float: right;
+    /* Align to the right side of the message box */
+}
+
+.chat-message-right .read-less-btn,
+.chat-message-left .read-less-btn {
+    float: right;
+    /* Align to the right side of the message box */
 }
 
 .dropdown,
@@ -693,13 +791,13 @@
     margin-top: 195px;
 }
 
-.chat-message {
+/* .chat-message {
     margin: 5px 0;
     padding: 10px;
     border-radius: 10px;
     max-width: 70%;
     word-break: break-word;
-}
+} */
 
 /* .selected-row {
     border: 2px solid gray;
@@ -710,40 +808,23 @@
 .inbox-chat {
     display: flex;
     flex-direction: column;
+
 }
 
-.chat-message-right {
-    align-self: flex-end;
-    background-color: #EEEBEB;
-    color: #4E4E4E;
-    padding: 10px;
-    margin: 5px;
-    border-radius: 10px;
-    max-width: 60%;
-}
 
-.read-more-btn-left {
+/* .read-more-btn-left {
     color: #4E4E4E !important;
-}
+} */
 
-.chat-message-left {
-    align-self: flex-start;
-    background-color: #3361FF;
-    color: white;
-    padding: 10px;
-    margin: 5px;
-    border-radius: 10px;
-    max-width: 60%;
 
-}
 
-.read-more-btn {
+/* .read-more-btn {
     background: none;
     border: none;
     color: blue;
     cursor: pointer;
     font-size: 14px;
-}
+} */
 
 
 
@@ -846,21 +927,11 @@
     margin-right: 10px;
 }
 
-.read-more-btn {
-    background: none;
-    border: none;
-    color: #FFFFFF;
-    cursor: pointer;
-    padding-left: 5px;
-    font-family: 'Roboto', sans-serif;
-    font-size: 8px;
-    font-weight: 400;
-    /* text-decoration: underline; */
-}
 
-.read-more-btn:hover {
+
+/* .read-more-btn:hover {
     text-decoration: none;
-}
+} */
 
 .reply {
     color: #4E4E4E;
