@@ -114,15 +114,21 @@ export class OpenPhoneEventController {
     };
   }
 
-  @Get("events-by-conversation")
-  async getEventBodiesByConversationId(@Query("conversation_id") conversationId: string) {
-    // Fetch the event bodies using the service
-    const eventBodies = await this.openPhoneEventService.findEventBodiesByConversationId(conversationId);
+  @Get("events-by-address-and-from")
+  async getEventBodiesByAddressAndFromNumber(
+    @Query("address_id") addressId: number,
+    @Query("from_number") fromNumber?: string
+  ) {
+    const eventBodies = await this.openPhoneEventService.findEventBodiesByAddressAndFromNumber(addressId, fromNumber);
     return {
-      message: `Event bodies fetched successfully for conversation_id: ${conversationId}`,
+      message: `Event bodies fetched successfully for address_id: ${addressId} and from: ${fromNumber || 'all numbers'}`,
       data: eventBodies,
     };
   }
+
+
+
+
 
   @Get('getConversationsWithoutAddress')
   async getConversationsWithoutAddress() {
