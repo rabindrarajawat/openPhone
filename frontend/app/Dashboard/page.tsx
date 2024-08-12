@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Navbar from "../Navbar/Navbar";
 import SideBar from "../SideNavbar/sideNavbar";
 import Image from "next/image";
@@ -10,17 +10,13 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { SearchResultList } from "../SearchResultList/SearchResultList";
 
-
 interface Address {
   fullAddress: string;
- 
-
-  
 }
-interface Address1{
-  is_bookmarked:boolean;
-  displayAddress:string;
-  id:number;
+interface Address1 {
+  is_bookmarked: boolean;
+  displayAddress: string;
+  id: number;
 }
 
 interface Message {
@@ -53,6 +49,8 @@ interface EventItem {
   dead: string;
   keep_an_eye: string;
   is_stop: string;
+  body: string;
+
 }
 
 const Dashboard = () => {
@@ -81,14 +79,67 @@ const Dashboard = () => {
   const [messageResponse, setMessageResponse] = useState<number>(0);
   const [call, setCall] = useState<number>(0);
   const [callResponse, setCallResponse] = useState<number>(0);
-  const [input, setInput] = useState<string>('');
+  const [input, setInput] = useState<string>("");
   const [results, setResultsState] = useState<Address[]>([]);
   const [allSelected, setAllSelected] = useState(false);
   const [addresses1, setAddresses1] = useState<Address1[]>([]);
 
-
-
+  const [isOpen, setIsOpen] = useState(true);
+  const [isType, setIsType] = useState(false);
+  const dropdownToggleRef = useRef(null);
+  const [isDate, setIsDate] = useState(true);
+  const [isCustomDateOpen, setIsCustomDateOpen] = useState(true);
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+    
+
+
+
+
+
+  const handleToggle = () => {
+    setIsOpen((prevIsOpen) => !prevIsOpen);
+  };
+  const handleToggle1 = () => {
+    setIsType((prevIsOpen) => !prevIsOpen);
+  };
+  const handleDate = () => {
+    setIsDate(!isDate);
+  };
+
+  const handleCustomDateToggle = () => {
+    setIsCustomDateOpen(!isCustomDateOpen);
+  };
+
+  const handleDone = () => {
+    // Add your logic for when the "Done" button is clicked
+    setIsCustomDateOpen(false); // Close the custom date dropdown
+  };
+  useEffect(() => {
+    async function fetchEvents() {
+      try {
+        const response = await axios.get('http://localhost:8000/openPhoneEventData/events-by-address-and-from', {
+          params: { address_id: selectedAddressId, from_number: fromNumber }
+        });
+        setEvents(response.data.data);
+      } catch (error) {
+        // setError('Error fetching event bodies');
+      } finally {
+        // setLoading(false);
+      }
+    }
+
+    fetchEvents();
+  }, [selectedAddress1, fromNumber]);
+  const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>((acc, message) => {
+    if (!acc[message.conversation_id]) {
+      acc[message.conversation_id] = [];
+    }
+    acc[message.conversation_id].push(message);
+    return acc;
+  }, {});
+
   const recordsPerPage = 6;
 
   const router = useRouter();
@@ -103,13 +154,13 @@ const Dashboard = () => {
     axios
       .get("http://localhost:8000/address/getalladdress")
       .then((response) => {
-        console.log('API Response:',response.data);
-        const formattedAddresses = response.data.map((item:any) =>({
+        console.log("API Response:", response.data);
+        const formattedAddresses = response.data.map((item: any) => ({
           id: item.id,
-          displayAddress: item.address, 
-          is_bookmarked: item.is_bookmarked, 
+          displayAddress: item.address,
+          is_bookmarked: item.is_bookmarked,
         }));
-        setAddresses1(formattedAddresses)
+        setAddresses1(formattedAddresses);
         const addressData = response.data.map(
           (address: any) => address.address
         );
@@ -123,29 +174,30 @@ const Dashboard = () => {
       });
   }, []);
   const handleBookmarkClick = (addressId: number) => {
-    const address = addresses1.find(a => a.id === addressId);
+    const address = addresses1.find((a) => a.id === addressId);
     if (!address) return;
 
     const newIsBookmarked = !address.is_bookmarked;
 
-    console.log(`Toggling bookmark status for address ID ${addressId} to ${newIsBookmarked}`);
+    console.log(
+      `Toggling bookmark status for address ID ${addressId} to ${newIsBookmarked}`
+    );
 
-    axios.post(`http://localhost:8000/bookmarks/${addressId}`, {
-      is_bookmarked: newIsBookmarked
-    })
-      .then(response => {
+    axios
+      .post(`http://localhost:8000/bookmarks/${addressId}`, {
+        is_bookmarked: newIsBookmarked,
+      })
+      .then((response) => {
         console.log(`API Response for bookmarking:`, response.data);
         // Update the state only if the API call was successful
-        setAddresses1(prevAddresses =>
-          prevAddresses.map(a =>
-            a.id === addressId
-              ? { ...a, is_bookmarked: newIsBookmarked }
-              : a
+        setAddresses1((prevAddresses) =>
+          prevAddresses.map((a) =>
+            a.id === addressId ? { ...a, is_bookmarked: newIsBookmarked } : a
           )
         );
       })
-      .catch(error => {
-        console.error('Error updating bookmark status:', error);
+      .catch((error) => {
+        console.error("Error updating bookmark status:", error);
       });
   };
 
@@ -277,20 +329,21 @@ const Dashboard = () => {
     });
   };
 
-  const handleAddressSelect = (address: string) => {
+  const handleAddressSelect = (address: string, addressId: number) => {
     setSelectedAddress(address);
-    setSelectedAddress1(address); // You can set it as needed
+    setSelectedAddressId(addressId); // Update the selected address ID
 
     setEventData([]); // Clear existing event data to ensure new data is shown
-    setBox1DropdownOpen(false); // Close the dropdown after selection
   };
+
   const handleCheckboxClick = (addressId: any) => {
-    axios.post(`http://localhost:8000/bookmarks/${addressId}`)
-      .then(response => {
-        console.log('Bookmark added successfully:', response.data);
+    axios
+      .post(`http://localhost:8000/bookmarks/${addressId}`)
+      .then((response) => {
+        console.log("Bookmark added successfully:", response.data);
       })
-      .catch(error => {
-        console.error('Error adding bookmark:', error);
+      .catch((error) => {
+        console.error("Error adding bookmark:", error);
       });
   };
   const handleAddressSelect1 = (address: Address) => {
@@ -310,7 +363,11 @@ const Dashboard = () => {
 
   const fetchData = async (value: string) => {
     try {
-      const response = await axios.get(`http://localhost:8000/address/search?address=${encodeURIComponent(value)}`);
+      const response = await axios.get(
+        `http://localhost:8000/address/search?address=${encodeURIComponent(
+          value
+        )}`
+      );
       const results = response.data.results.filter((address: Address) =>
         address.fullAddress.toLowerCase().includes(value.toLowerCase())
       );
@@ -338,10 +395,6 @@ const Dashboard = () => {
   //   setBookmarkedAddresses(newBookmarkedAddresses);
   // };
 
-
-
-
-
   const handleChange = (value: string) => {
     setInput(value);
     fetchData(value);
@@ -355,7 +408,6 @@ const Dashboard = () => {
     // }
   };
 
-
   return (
     <div>
       {/* <Navbar onSelectAddress={handleAddressSelect1} /> */}
@@ -364,9 +416,351 @@ const Dashboard = () => {
         onSelectAddress={handleAddressSelect1}
       />
       {isSidebarVisible && <SideBar />}
-      {/* <SideBar /> */}
+      <div className="main-container">
+        <div className="content-with-border-right">
+          <div className="openphone">
+            <span className="border-bottom pb-3">OpenPhone</span>
+          </div>
+          <div className="">
+            <div className="information">Message and Calls</div>
+            <div className="main-dropdown">
+              <div className="status">
+                Status
+                <span className="ms-2 mb-2 ">
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={handleToggle}
+                    aria-expanded={isOpen}
+                  >
+                    <img
+                      src="/dropdownicon.svg"
+                      alt="Dropdown Icon"
+                      className="logo"
+                    />
+                  </button>
 
-      <div className={`box ${isSidebarVisible ? "sidebar-visible" : ""}`}>
+                  <ul className={`dropdown-menu ${isOpen ? "show" : ""}`}>
+                    <li className="dropdown-item">
+                      <input type="checkbox" />
+                      <label className="ms-2">Delivered</label>
+                    </li>
+                    <li className="dropdown-item pt-2">
+                      <input type="checkbox" />
+                      <label className="ms-2" >
+                        Not Delivered
+                      </label>
+                    </li>
+                    <li className="dropdown-item pt-2">
+                      <input type="checkbox" id="pending" />
+                      <label className="ms-2" htmlFor="pending">
+                        Pending
+                      </label>
+                    </li>
+                  </ul>
+                </span> 
+              </div>
+            </div>
+            <div className="type">
+              Type
+              <span className="ms-2 mb-2 ">
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={handleToggle1}
+                  aria-expanded={isType}
+                >
+                  <img src="/dropdownicon.svg" alt="Dropdown Icon" />
+                </button>
+
+                <ul className={`dropdown-type ${isType ? "show" : ""}`}>
+                  <li className="dropdown-item">
+                    <input type="checkbox" />
+                    <label className="ms-2">Case</label>
+                  </li>
+                  <li className="dropdown-item pt-2">
+                    <input type="checkbox" id="notDelivered" />
+                    <label className="ms-2" htmlFor="notDelivered">
+                      Auction
+                    </label>
+                  </li>
+                  <li className="dropdown-item pt-2">
+                    <input type="checkbox" id="pending" />
+                    <label className="ms-2" htmlFor="pending">
+                      Tax deed
+                    </label>
+                  </li>
+                </ul>
+              </span>
+            </div>
+            <div className="Date">
+              Date
+              <span className="ms-2 mb-2">
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={handleToggle1}
+                  aria-expanded={isType}
+                >
+                  <img src="/dropdownicon.svg" alt="Dropdown Icon" />
+                </button>
+
+                <ul className={`dropdown-Date ${isType ? "show" : ""}`}>
+                  <li className="dropdown-item">
+                    <input type="checkbox" />
+                    <label className="ms-2">weekly</label>
+                  </li>
+                  <li className="dropdown-item pt-2">
+                    <input type="checkbox" id="notDelivered" />
+                    <label className="ms-2" htmlFor="notDelivered">
+                      monthly{" "}
+                    </label>
+                  </li>
+                  <div className="custom">
+                    <li className="dropdown-item pt-2">
+                      <label className="custom" htmlFor="pending">
+                        custom
+                        <button
+                          className="btn ms-2"
+                          type="button"
+                          onClick={handleCustomDateToggle}
+                          aria-expanded={isCustomDateOpen}
+                        >
+                          <img src="/dropdownicon.svg" alt="Dropdown Icon" />
+                        </button>
+                      </label>
+
+                      {isCustomDateOpen && (
+                        <div className="custom-date-dropdown borderless">
+                          <div className="d-flex align-items-center">
+                            <label htmlFor="fromDate" className="me-2">
+                              From:
+                            </label>
+                            <input
+                              type="text"
+                              id="fromDate"
+                              className="set-date  me-2"
+                              placeholder="08/08/24"
+                            />
+                          </div>
+                          <div className="d-flex align-items-center mt-2">
+                            <label htmlFor="toDate" className="me-2">
+                              To:
+                            </label>
+                            <input
+                              type="text"
+                              id="toDate"
+                              className="set-date me-2 ms-3"
+                              placeholder="09/09/23"
+                            />
+                          </div>
+                          <button
+                            className="btn btn-primary mt-2"
+                            type="button"
+                            onClick={handleDone}
+                          >
+                            Done
+                          </button>
+                        </div>
+                      )}
+                    </li>
+                  </div>
+                </ul>
+              </span>
+            </div>
+          </div>
+          
+        </div>
+        <div>
+          <div className="heading">
+<img src="/Done.svg" alt="" /> Comprehensive view of Address
+          </div>
+          <div className="logos-row-msg1">
+            <div className="nav-msg1">
+              <div className="message1">Message Delivered</div>
+              <input
+                type="text"
+                className="round-input1"
+                value={messageDelivered}
+                readOnly
+              />
+            </div>
+            <div className="nav-msg1">
+              <div className="message1 response ">Message Response</div>
+              <input
+                type="text"
+                className="round-input1"
+                value={messageResponse}
+                readOnly
+              />
+            </div>
+            <div className="nav-msg1">
+              <div className="message1 call-">Call </div>
+              <input
+                type="text"
+                className="round-input1"
+                value={call}
+                readOnly
+              />
+            </div>
+            <div className="nav-msg1">
+              <div className="message1 call-response">Call Response</div>
+              <input
+                type="text"
+                className="round-input1"
+                value={callResponse}
+                readOnly
+              />
+            </div>
+          </div>
+        </div>
+        <div className="main-Address ">
+          <span className="">
+            {" "}
+            <img src="/User.svg" alt="users" className="person-icon ms-4" />
+          </span>
+          <div className="Address ms-4">Address</div>
+          <div className="main-search">
+            <div className="search-box ">
+              <span className="icon">
+                <img src="/Icon.svg" alt="icon" />
+              </span>
+              <input type="text" placeholder="Search Address"></input>
+            </div>
+
+            <div className="icon-labels d-flex">
+              <div className="bookmark-container text-center">
+                <i className="bi bi-bookmark ms-3"></i>
+                <div>Select all</div>
+              </div>
+              <div className="redo-container text-center">
+                <img src="/redo.svg" alt="redo" className="ms-3" />
+                <div>Default</div>
+              </div>
+            </div>
+            <div>
+            <div className='address-list'>
+                <div className="search-wrapper-add">
+                  
+                  {results.length > 0 && (
+                    <SearchResultList results={results} onSelect={handleSelectAddress} />
+                  )}
+                </div>
+
+                {addresses1.length > 0 ? (
+                  addresses1.map((address) => (
+                    <li key={address.id}
+                      className="list-group-item d-flex justify-content-between align-items-center"
+                      onClick={() => handleAddressSelect(address.displayAddress, address.id)} // Pass the address ID on click
+                    >
+                      <div className="setaddress d-flex align-items-center gap-3 ">
+                        <i
+                          className={`bi ${address.is_bookmarked ? 'bi-bookmark-fill' : 'bi-bookmark'} clickable-icon`}
+                          style={{ cursor: 'pointer', color: address.is_bookmarked ? 'blue' : 'grey' }}
+                          onClick={() => handleBookmarkClick(address.id)}
+                        ></i>
+                        <span className="ml-2">{address.displayAddress}</span>
+                      </div>
+                    </li>
+                  ))
+                ) : (
+                  <p>No addresses found.</p>
+                )}
+
+              </div>
+              <div className="pagination-container">
+                <ul className="pagination">
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <button
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      &lt;
+                    </button>
+                  </li>
+                  {[...Array(totalPages)].map((_, i) => (
+                    <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                      <button
+                        className="page-link"
+                        onClick={() => handlePageChange(i + 1)}
+                      >
+                        {i + 1}
+                      </button>
+                    </li>
+                  ))}
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                    <button
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      &gt;
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+         
+        <div>
+          <div className="Analyticdata ">
+            <span>
+              <i className="bi bi-bar-chart-line-fill"></i>
+            </span>
+            <span className="ms-4">Analytic Data of Selected Address</span>
+          </div>
+          <div className="d-flex main-message">
+          <div className="logos-row-msg">
+            <div className="nav-msg">
+              <div className="message Delivered">Message Delivered</div>
+              <input
+                type="text"
+                className="round-input"
+                value={messageDelivered}
+                readOnly
+              />
+            </div>
+            <div className="nav-msg">
+              <div className="message response1 ">Message Response</div>
+              <input
+                type="text"
+                className="round-input"
+                value={messageResponse}
+                readOnly
+              />
+            </div>
+            <div className="nav-msg">
+              <div className="message call-1">Call </div>
+              <input
+                type="text"
+                className="round-input"
+                value={call}
+                readOnly
+              />
+            </div>
+            <div className="nav-msg">
+              <div className="message call-response-1">Call Response</div>
+              <input
+                type="text"
+                className="round-input"
+                value={callResponse}
+                readOnly
+              />
+            </div>
+          </div>
+
+         
+          </div>
+        </div>
+        
+      </div>
+    
+     
+
+      {/* <div className={`box ${isSidebarVisible ? "sidebar-visible" : ""}`}>
         <div className="mg-2">
           <div className="mg-1">
             <div className="open">OpenPhone</div>
@@ -396,6 +790,21 @@ const Dashboard = () => {
                     Delivered
                   </label>
                 </div>
+                <div className="form-check custom-dropdown-item">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="checkbox-delivered"
+                    checked={selectedOptions.includes("delivered")}
+                    onChange={() => handleOptionToggle("delivered")}
+                  />
+                  <label
+                    className="form-check-label"
+                    htmlFor="checkbox-delivered"
+                  >
+                    Not Delivered
+                  </label>
+                </div>
 
                 <div className="form-check custom-dropdown-item">
                   <input
@@ -414,7 +823,7 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-            <div className={`dropdown ${statusDropdownOpen ? "show" : ""}`}>
+            <div className={`dropdown dropdown-type  ${statusDropdownOpen ? "show" : ""}`}>
               <button
                 className="dropdown status  dropdown-toggle"
                 type="button"
@@ -423,9 +832,9 @@ const Dashboard = () => {
                 Type
               </button>
               <div
-                className={`dropdown-menu ${statusDropdownOpen ? "show" : ""}`}
+                className={`dropdown-menu  dropdown-type ${statusDropdownOpen ? "show" : ""}`}
               >
-                <div className="form-check custom-dropdown-item">
+                <div className="form-check type  custom-dropdown-item">
                   <input
                     className="form-check-input"
                     type="checkbox"
@@ -464,7 +873,7 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-            <div className={`dropdown ${dateDropdownOpen ? "show" : ""}`}>
+            <div className={`dropdown dropdown-date ${dateDropdownOpen ? "show" : ""}`}>
               <button
                 className="dropdown date  dropdown-toggle"
                 type="button"
@@ -499,136 +908,17 @@ const Dashboard = () => {
                   </label>
                 </div>
 
-                {/* <div className="form-check custom-dropdown-item">
-                            <input
-                                className="form-check-input"
-                                type="checkbox"
-                                id="checkbox-custom"
-                                checked={selectedOptions.includes('Custom')}
-                                onChange={() => handleOptionToggle('Custom')}
-                            />
-                            <label className="form-check-label" htmlFor="checkbox-custom">
-                                Custom
-                            </label>
-                        </div> */}
+             
               </div>
-              {/* <div className="form-check call custom-dropdown-item">
-                        <input
-                            className="form-check-input"
-                            type="checkbox"
-                            id="checkbox-call"
-                            checked={selectedOptions.includes('call')}
-                            onChange={() => handleOptionToggle('call')}
-                        />
-                        <label className="form-check-label" htmlFor="checkbox-call">
-                            Calls
-                        </label>
-                    </div> */}
+          
             </div>
           </div>
         </div>
 
         <div className="box1 d-none d-sm-block">
-          {/* <div
-            className={`dropdown search-address-dropdown custom-dropdown ${box1DropdownOpen ? "show" : ""}`}
-          >
-            <button
-              className="btn btn-secondary dropdown-toggle custom-dropdown-button"
-              type="button"
-              onClick={toggleBox1Dropdown}
-            >
-              {selectedAddress1}
-              {selectedAddress}
-
-              <Image
-                src="/dropdownicon.svg"
-                alt="Dropdown Icon"
-                className={`dropdown-icon ${box1DropdownOpen ? "open" : ""}`}
-                width={50}
-                height={50}
-              />
-            </button>
-            <div
-              className={`dropdown-menu custom-dropdown-menu ${box1DropdownOpen ? "show" : ""}`}
-            >
-              {addresses.map((address, index) => (
-                <div key={index} className="dropdown-item custom-dropdown-item d-flex align-items-center">
-                  <input
-                    type="checkbox"
-                    className="form-check-input me-2"
-                  />
-                  <button
-                    className="btn btn-link p-0 text-decoration-none"
-                    onClick={() => handleAddressSelect(address)}
-                  >
-                    {address}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div> */}
-
-
-          {/* <div className="logos-row">
-            <div className="nav1">
-              <Image
-                src="/follow.svg"
-                alt="Follow-up Logo"
-                className={`logo3 ${isFollowUpClicked ? "follow-up-heading" : ""
-                  }`}
-                width={50}
-                height={50}
-              />
-              <label
-                className={`Activity ${isFollowUpClicked ? "follow-up-heading" : ""
-                  }`}
-                htmlFor=""
-                onClick={handleFollowUpClick}
-              >
-                Follow-up
-              </label>
-            </div>
-            <div className="nav1">
-              <Image
-                src="/id.svg"
-                alt="ID Logo"
-                className="logo3"
-                width={50}
-                height={50}
-              />
-              <label className="Activity" htmlFor="">
-                ID
-              </label>
-            </div>
-            <div className="nav1">
-              <Image
-                src="/call.svg"
-                alt="Call Logo"
-                className="logo3"
-                width={50}
-                height={50}
-              />
-              <label className="Activity" htmlFor="">
-                Call
-              </label>
-            </div>
-            <div className="nav1">
-              <Image
-                src="/activity.svg"
-                alt="Activity Logo"
-                className="logo3"
-                width={50}
-                height={50}
-              />
-              <label className="Activity" htmlFor="">
-                Activity
-              </label>
-            </div>
-          </div> */}
-
-          {/* <div className="line"></div> */}
+         
           <div className="heading">
-            <img src="done.svg" alt="" /> Comprehensive view of Address</div>
+            <img src="Vector 310.svg" alt=""  height='' width='' /> Analytic Data of Selected Address</div>
           <div className="logos-row-msg">
             <div className="nav-msg">
               <div className="message">Message Delivered</div>
@@ -667,81 +957,7 @@ const Dashboard = () => {
               />
             </div>
           </div>
-          {/* <div className="tracking-container">
-            <div className="call-tracking">
-              <Image
-                src="/Vector.svg"
-                alt="Activity Logo"
-                className="vector"
-                width={50}
-                height={50}
-              />
-              <div className="text">Call tracking of search address </div>
-            </div>
-            <div className="follow-up">
-              <div>
-                <Image
-                  src="/redo.svg"
-                  alt="redo Logo"
-                  className={`vector redo ${isFollowUpClicked ? "follow-up-heading" : ""
-                    }`}
-                  width={50}
-                  height={50}
-                />
-                <div
-                  className={`text-follow ${isFollowUpClicked ? "follow-up-heading" : ""
-                    }`}
-                >
-                  Follow-up tracking of search address{" "}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="tracking-container-box">
-            <div className="check-status">
-              <div className="time  ">Times</div>
-              <div className="vertical-line"></div>
-              <div className="time">Duration</div>
-              <div className="vertical-line"></div>
-              <div className="time">Status</div>
-              <div className="vertical-line"></div>
-              <div className="time">Action</div>
-            </div>
-            <div
-              className={`follow-status ${isFollowUpClicked ? "follow-up-heading" : ""
-                }`}
-            >
-              <div className="time  ">Owner ID</div>
-              <div className="vertical-line"></div>
-              <div className="time">Status</div>
-              <div className="vertical-line"></div>
-              <div className="time">Last Follow-up</div>
-            </div>
-          </div>
-          <div className="tracking-container">
-            <div className="call-tracking">
-              <Image
-                src="/converstation.svg"
-                alt="converstation Logo"
-                className="vector"
-                width={50}
-                height={50}
-              />
-              <div className="text"> Conversation From {fromNumber}</div>
-            </div>
-            <div className="">
-              <div>
-                <Image
-                  src="/msg.svg"
-                  alt="msg Logo"
-                  className="vector redo message-logo"
-                  width={50}
-                  height={50}
-                />
-                <div className="text-follow msg-follow">Message Detail </div>
-              </div>
-            </div>
-          </div> */}
+        
           <div className="line"></div>
 
           <div className="tracking-container-box">
@@ -785,75 +1001,13 @@ const Dashboard = () => {
         )}
 
               </div>
-              {/* <div className="datatable-box ">
-                <table className="table table-hover">
-                  <thead>
-                    <tr className='datatable'>
-                      <th scope="col">Conversation ID</th>
-                      <th scope="col">Phone Number</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Responses</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentRecords.map((row, index) => (
-                      <tr
-                        key={index}
-                        className={`center-align ${selectedRowId === row.ownerid ? 'selected-row' : ''}`}
-                        onClick={() => handleRowClick(row.ownerid)}
-                      >
-                        <td>{row.ownerid}</td>
-                        <td>{row.PhoneNumber}</td>
-                        <td>{row.Status}</td>
-                        <td className={row.Responses === 'Interested' ? 'interested' : row.Responses === 'Stop' ? 'stop' : ''}>
-                          {row.Responses}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-
-              </div>
-              <div className="pagination-container">
-                <ul className="pagination">
-                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                    <button
-                      className="page-link"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      &lt;
-                    </button>
-                  </li>
-                  {[...Array(totalPages)].map((_, i) => (
-                    <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
-                      <button
-                        className="page-link"
-                        onClick={() => handlePageChange(i + 1)}
-                      >
-                        {i + 1}
-                      </button>
-                    </li>
-                  ))}
-                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                    <button
-                      className="page-link"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      &gt;
-                    </button>
-                  </li>
-                </ul>
-              </div> */}
+         
             </div>
 
 
             <div className="conversation"> <img src="converstation.svg" alt="" /> Conversation From {fromNumber}
 
               <div className="search-wrapper search-new">
-                {/* <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} /> */}
                 <input
                   className="search"
                   type="search"
@@ -870,20 +1024,7 @@ const Dashboard = () => {
 
 
               <div className="input-msg">
-                {/* <div className="chat-heading">
-                  <div className="chat-heading-msg">
-                    <div className="msg-id">Message ID</div>
-                    <div className="msg-auction">011045</div>
-                  </div>
-                  <div className="chat-heading-msg">
-                    <div className="msg-id">Message Status</div>
-                    <div className="msg-auction">Delivered</div>
-                  </div>
-                  <div className="chat-heading-msg">
-                    <div className="msg-id">Type</div>
-                    <div className="msg-auction">Auction</div>
-                  </div>
-                </div> */}
+             
                 <div className="screenshot-msg">
                   <div className="inbox-chat">
                     {apiResponseBody.length > 0
@@ -934,31 +1075,15 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {/* <div className="chat-heading-follow">
-                  <div className="chat-heading-msg">
-                    <div className="follow-id">Follow Up</div>
-                    <div className="msg-auction">03 Times</div>
-                  </div>
-                  <div className="chat-heading-msg">
-                    <div className="follow-id">Lead Status</div>
-                    <div className="stop ">Dead</div>
-                  </div>
-                  <div className="chat-heading-msg">
-                    <div className="follow-id">Response</div>
-                    <div className=" stop">Stop</div>
-                  </div>
-                  <button type="button" className="btn-call">
-                    Call Now
-                  </button>
-                </div> */}
+         
               </div>
             </div>
           </div>
 
         </div>
 
-      </div >
-    </div >
+      </div > */}
+    </div>
   );
 };
 
