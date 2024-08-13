@@ -106,12 +106,17 @@ const Dashboard = () => {
 
   const [uniqueFromNumbers, setUniqueFromNumbers] = useState<string[]>([]);
 
-  // const [selectedAddress, setSelectedAddress] = useState(''); // For the display address
-  // const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
-  // const [fromNumber, setFromNumber] = useState('');
-
-  // const [events, setEvents] = useState<EventItem[]>([]);
   const [expandedMessages, setExpandedMessages] = useState(new Map());
+
+  const [counts, setCounts] = useState({
+    messageDelivered: 0,
+    messageResponse: 0,
+    call: 0,
+    callResponse: 0,
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
 
 
@@ -193,6 +198,24 @@ const Dashboard = () => {
       });
   }, []);
 
+
+  useEffect(() => {
+    const fetchEventCounts = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/openPhoneEventData/all');
+        if (!response.ok) {
+          throw new Error('Failed to fetch event counts');
+        }
+        const data = await response.json();
+        setCounts(data);
+      } catch (err) {
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEventCounts();
+  }, []); // Empty dependency array means this effect runs once on mount
 
   const handleBookmarkClick = (addressId: number) => {
     const address = addresses1.find((a) => a.id === addressId);
@@ -474,7 +497,7 @@ const Dashboard = () => {
     async function fetchEvents() {
       try {
         const response = await axios.get('http://localhost:8000/openPhoneEventData/events-by-address-and-from', {
-          params: { address_id: selectedAddressId, from_number: fromNumber }
+          params: { address_id: selectedAddressId, from_number: fromNumber } // Pass fromNumber directly
         });
         setEvents(response.data.data);
       } catch (error) {
@@ -485,7 +508,10 @@ const Dashboard = () => {
     }
 
     fetchEvents();
-  }, [selectedAddress1, fromNumber]);
+  }, [selectedAddressId, fromNumber]);
+
+
+
 
   // Group messages by conversation_id
   const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>((acc, message) => {
@@ -495,6 +521,8 @@ const Dashboard = () => {
     acc[message.conversation_id].push(message);
     return acc;
   }, {});
+
+
 
   return (
     <div>
@@ -659,6 +687,7 @@ const Dashboard = () => {
           </div>
 
         </div>
+
         <div>
           <div className="heading">
             <img src="/Done.svg" alt="" /> Comprehensive view of Address
@@ -669,7 +698,7 @@ const Dashboard = () => {
               <input
                 type="text"
                 className="round-input1"
-                value={messageDelivered}
+                value={counts.messageDelivered}
                 readOnly
               />
             </div>
@@ -678,7 +707,7 @@ const Dashboard = () => {
               <input
                 type="text"
                 className="round-input1"
-                value={messageResponse}
+                value={counts.messageResponse}
                 readOnly
               />
             </div>
@@ -687,7 +716,7 @@ const Dashboard = () => {
               <input
                 type="text"
                 className="round-input1"
-                value={call}
+                value={counts.call}
                 readOnly
               />
             </div>
@@ -696,12 +725,13 @@ const Dashboard = () => {
               <input
                 type="text"
                 className="round-input1"
-                value={callResponse}
+                value={counts.callResponse}
                 readOnly
               />
             </div>
           </div>
         </div>
+
         <div className="main-Address ">
           <span className="">
             {" "}
@@ -867,7 +897,7 @@ const Dashboard = () => {
           )}
 
 
-          <div className="search-wrapper search-new">
+          <div className="search-wrapper ">
             {/* <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} /> */}
             <input
               className="search"
@@ -877,9 +907,6 @@ const Dashboard = () => {
               value={input}
               onChange={(e) => handleChange(e.target.value)}
             />
-            {results.length > 0 && (
-              <SearchResultList results={results} onSelect={handleSelectAddress} />
-            )}
           </div>
 
 
