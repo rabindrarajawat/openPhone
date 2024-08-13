@@ -56,8 +56,8 @@
 .type {
   margin-left: 133px;
 
-  margin-top: 133px;
-}
+  margin-top: 19px;
+} 
 
 .dropdown-type {
   min-width: 148px;
@@ -219,8 +219,8 @@
 .main-search {
   margin-top: 201px;
   margin-left: -120px;
-  padding-left: 1px;
-  padding-right: 10px;
+  padding-left: 14px;
+  padding-right: 30px;
   border: 3px solid #D7F5DC;
   border-radius: 6px;
 }
@@ -331,7 +331,7 @@
 }
 
 .message {
-  width: 187px;
+  width: 210px;
   height: 39px;
   border: 2px solid grey;
   border-radius: 3.27px;
@@ -365,11 +365,11 @@
 }
 
 .input-msg {
-  width: 295%;
-  height: 125%;
+  width: 287%;
+  height: 160%;
   margin-top: 8%;
   margin-top: -300px;
-  margin-left: -452px;
+  margin-left: -499px;
   border-radius: 5px 0px 0px 0px;
   /* background: linear-gradient(171.76deg, #CBE3FF 4.95%, #D2FFCC 92.28%); */
   border: 3px solid #D7F5DC;
@@ -563,7 +563,7 @@
   width: 350px;
   height: 310px;
   margin-top: 130px;
-  margin-left: -452px;
+  margin-left: -498px;
 }
 
 .message-date-right {

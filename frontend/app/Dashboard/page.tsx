@@ -540,42 +540,33 @@ const Dashboard = () => {
           <div className="">
             <div className="information">Message and Calls</div>
             <div className="main-dropdown">
-              <div className="status">
-                Status
-                <span className="ms-2 mb-2 ">
-                  <button
-                    className="btn"
-                    type="button"
-                    onClick={handleToggle}
-                    aria-expanded={isOpen}
-                  >
-                    <img
-                      src="/dropdownicon.svg"
-                      alt="Dropdown Icon"
-                      className="logo"
-                    />
-                  </button>
+            <div className="status">
+              Status
+              <span className="ms-2 mb-2 ">
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={handleToggle}
+                  aria-expanded={isType}
+                >
+                  <img src="/dropdownicon.svg" alt="Dropdown Icon" />
+                </button>
 
-                  <ul className={`dropdown-menu ${isOpen ? "show" : ""}`}>
-                    <li className="dropdown-item">
-                      <input type="checkbox" />
-                      <label className="ms-2">Delivered</label>
-                    </li>
-                    <li className="dropdown-item pt-2">
-                      <input type="checkbox" />
-                      <label className="ms-2" >
-                        Not Delivered
-                      </label>
-                    </li>
-                    <li className="dropdown-item pt-2">
-                      <input type="checkbox" id="pending" />
-                      <label className="ms-2" htmlFor="pending">
-                        Pending
-                      </label>
-                    </li>
-                  </ul>
-                </span>
-              </div>
+                <ul className={`dropdown-type ${isType ? "show" : ""}`}>
+                  <li className="dropdown-item">
+                    <input type="checkbox" />
+                    <label className="ms-2">Delivered</label>
+                  </li>
+                  <li className="dropdown-item pt-2">
+                    <input type="checkbox" id="notDelivered" />
+                    <label className="ms-2" htmlFor="notDelivered">
+                      received
+                    </label>
+                  </li>
+                 
+                </ul>
+              </span>
+            </div>
             </div>
             <div className="type">
               Type
