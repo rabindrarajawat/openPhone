@@ -14,23 +14,27 @@
   font-weight: 700;
   font-size: 23px;
 }
+
 .content-with-border-right {
   border-right: 2px solid #e8e8e8;
   padding-right: 4px;
-  height:85vh
+  height: 85vh
 }
+
 .information {
   margin-top: 53px;
   margin-left: 124px;
   color: #5a657b;
   font-weight: 600;
 }
+
 .status {
   margin-left: 133px;
   margin-top: 8px;
-  
+
 
 }
+
 .dropdown-menu {
   min-width: 160px;
 }
@@ -40,23 +44,27 @@
 }
 
 .btn.p-0 {
-  padding: 0; /* Remove padding */
+  padding: 0;
+  /* Remove padding */
 }
 
 .logo {
   width: 14.01px;
   height: 9px;
 }
+
 .type {
   margin-left: 133px;
 
   margin-top: 133px;
 }
+
 .dropdown-type {
   min-width: 148px;
   margin-left: -19px;
   margin-top: 11px;
 }
+
 .Date {
   margin-left: 134px;
   margin-top: 26px;
@@ -66,6 +74,7 @@
   margin-left: -16px;
   margin-top: 6px;
 }
+
 .custom-date-dropdown {
   width: 251px;
   margin-top: -3px;
@@ -75,7 +84,8 @@
 }
 
 .custom-date-dropdown input[type="date"] {
-  width: calc(100% - 60px); /* Adjust for label width */
+  width: calc(100% - 60px);
+  /* Adjust for label width */
 }
 
 .custom-date-dropdown .btn {
@@ -86,27 +96,32 @@
   border-radius: 12px;
   padding: 1px;
 }
+
 .todate {
   margin-left: 18px;
 }
+
 .set-date {
   width: 95px;
   height: 24px;
   padding: 10px 2px 11px 18px;
   border-radius: 18px;
   background: linear-gradient(#fff, #fff) padding-box,
-    /* Inner background */ linear-gradient(90deg, #bce6c3 0%, #88a0f3 100%)
-      border-box;
+    /* Inner background */
+    linear-gradient(90deg, #bce6c3 0%, #88a0f3 100%) border-box;
   border: 2px solid transparent;
   font-size: 10px;
 }
+
 .custom {
   margin-left: -7px;
 }
+
 .main-Address {
   display: flex;
   margin-left: -1389px;
 }
+
 .heading {
   width: 92%;
   height: 20px;
@@ -119,6 +134,7 @@
   text-align: left;
   color: #4d5e80;
 }
+
 .logos-row-msg1 {
   display: flex;
   justify-content: left;
@@ -127,6 +143,7 @@
   margin-top: 15px;
   gap: 63px;
 }
+
 .round-input1 {
   border-radius: 50%;
   padding: 10px;
@@ -137,12 +154,14 @@
   margin-left: -45px;
   margin-top: 8px;
 }
+
 .nav-msg1 {
   /* text-align: center; */
   display: flex;
   /* flex-direction: column; */
   align-items: center;
 }
+
 .message1 {
   width: 300px;
   height: 60px;
@@ -161,6 +180,7 @@
   line-height: 20px;
   text-align: left;
 }
+
 .response {
   background: linear-gradient(90deg, #ffffff 0%, #d7f1fd 100%);
   border-left: 2px solid #33bfff;
@@ -175,11 +195,13 @@
   background: linear-gradient(90deg, #ffffff 0%, #cbffd0 100%);
   border-left: 2px solid #29cc39;
 }
+
 .Address {
   font-weight: 600;
   font-size: 20px;
   margin-top: 161px;
 }
+
 .Analyticdata {
   margin-top: 161px;
   margin-left: 52px;
@@ -187,10 +209,12 @@
   font-size: 20px;
   font-family: "Roboto", sans-serif;
 }
+
 .person-icon {
   font-size: x-large;
   margin-top: 161px;
 }
+
 .main-search {
   margin-top: 201px;
   margin-left: -120px;
@@ -199,6 +223,7 @@
   border: 3px solid #D7F5DC;
   border-radius: 6px;
 }
+
 .search-box {
   display: inline-table;
   margin-left: 16px;
@@ -222,6 +247,7 @@
   left: 10px;
   transform: translateY(-50%);
 }
+
 .icon-labels {
   align-items: center;
   margin-left: 195px;
@@ -249,11 +275,14 @@
   width: 11px;
   height: 11px;
 }
+
 .bookmark-container i {
   width: 8.17px;
   height: 11.67px;
-  font-size: 11.67px; /* Ensure the icon scales correctly */
+  font-size: 11.67px;
+  /* Ensure the icon scales correctly */
 }
+
 .main-message {
   margin-left: 36px;
   margin-top: 9px;
@@ -261,15 +290,18 @@
   font-weight: 900;
   font-size: 10.71px;
 }
+
 .message-box {
   width: 185px;
   height: 37px;
 }
+
 .gradient-border {
   border: 2px solid transparent;
   border-radius: 3px;
   border-color: #bf9eec;
 }
+
 .round-input {
   border-radius: 50%;
   padding: 8px;
@@ -280,6 +312,7 @@
   margin-left: -35px;
   margin-top: 3px;
 }
+
 .logos-row-msg {
   display: flex;
   justify-content: left;
@@ -295,6 +328,7 @@
   /* flex-direction: column; */
   align-items: center;
 }
+
 .message {
   width: 187px;
   height: 39px;
@@ -312,23 +346,29 @@
   line-height: 20px;
   text-align: left;
 }
+
 .Delivered {
   border-color: #c4a6ee;
 }
+
 .response1 {
   border-color: #9dcde3;
 }
+
 .call-1 {
   border-color: #f1e1b1;
 }
+
 .call-response-1 {
   border-color: #a8dead;
 }
+
 .input-msg {
   width: 295%;
   height: 125%;
   margin-top: 8%;
-  /* margin-left: -65px; */
+  margin-top: -300px;
+  margin-left: -452px;
   border-radius: 5px 0px 0px 0px;
   /* background: linear-gradient(171.76deg, #CBE3FF 4.95%, #D2FFCC 92.28%); */
   border: 3px solid #D7F5DC;
@@ -383,14 +423,16 @@
   margin-left: 10px;
   margin-right: 10px;
 }
+
 .address-list {
   margin-top: 10%;
   margin-left: -415px;
 }
+
 .pagination-container .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 260px;
+  margin-top: 350px;
 
 }
 
@@ -426,4 +468,114 @@
   padding: 5px 10px;
   font-size: 12px;
 
+}
+
+.ml-2 {
+  cursor: pointer;
+}
+
+.to-value {
+  font-weight: bold;
+  font-size: 16px;
+  margin-left: 40% !important;
+  margin-bottom: 15px;
+  color: #333;
+  /* Change this to your desired color */
+}
+
+.to-line {
+  border-top: 2px solid #A2A2A23D;
+  width: 60%;
+  margin-left: 20%;
+  margin-top: 2%;
+
+  /* border: 0.1px solid #A2A2A23D */
+}
+
+.chat-message-right,
+.chat-message-left {
+  text-align: left;
+  /* Text alignment should be consistent */
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 10px;
+  max-width: 60%;
+  font-family: 'Roboto', sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 20.46px;
+  position: relative;
+  word-wrap: break-word;
+}
+
+.chat-message-right {
+  margin-left: auto;
+  background: #D0D9FA73;
+  color: #4E4E4E;
+}
+
+.chat-message-left {
+  background-color: #0d6efd;
+  color: white;
+  margin-right: auto;
+}
+
+/* Ensuring the button appears right after the message */
+.read-more-btn,
+.read-less-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 13.5px;
+  display: inline-block;
+  margin-left: 5px;
+  color: inherit;
+  /* Inherits the text color from the parent */
+}
+
+.read-more-btn-right,
+.read-less-btn-right {
+  color: #4E4E4E;
+}
+
+.read-more-btn-left,
+.read-less-btn-left {
+  color: white;
+}
+
+/* Removing float and ensuring the button stays inline with the text */
+.chat-message-right .read-more-btn,
+.chat-message-left .read-more-btn,
+.chat-message-right .read-less-btn,
+.chat-message-left .read-less-btn {
+  display: inline;
+  /* margin-left: 5px; */
+  position: relative;
+}
+
+
+.conversation {
+  width: 350px;
+  height: 310px;
+  margin-top: 130px;
+  margin-left: -452px;
+}
+
+.message-date-right {
+  text-align: right;
+  color: #4E4E4E;
+  font-family: 'Roboto', sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 20.46px;
+}
+
+.message-date-left {
+  text-align: left;
+  color: #4E4E4E;
+  font-family: 'Roboto', sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 20.46px;
+  margin-left: 6px;
 }

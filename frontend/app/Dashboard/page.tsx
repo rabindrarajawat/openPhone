@@ -29,6 +29,14 @@ interface ApiResponse {
   data: Message[];
 }
 
+interface Event {
+  event_type_id: number;
+  body: string;
+  to: string;
+  created_at: string;
+  conversation_id: string;
+}
+
 interface EventItem {
   created_at: string;
   modified_at: string | null;
@@ -69,9 +77,9 @@ const Dashboard = () => {
   const [apiResponseBody, setApiResponseBody] = useState<Message[]>([]);
   const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
   const [isMessageExpanded, setIsMessageExpanded] = useState(false);
-  const [expandedMessages, setExpandedMessages] = useState<Set<number>>(
-    new Set()
-  );
+  // const [expandedMessages, setExpandedMessages] = useState<Set<number>>(
+  //   new Set()
+  // );
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
@@ -92,7 +100,17 @@ const Dashboard = () => {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-    
+
+  const [uniqueFromNumbers, setUniqueFromNumbers] = useState<string[]>([]);
+
+  // const [selectedAddress, setSelectedAddress] = useState(''); // For the display address
+  // const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
+  // const [fromNumber, setFromNumber] = useState('');
+
+  // const [events, setEvents] = useState<EventItem[]>([]);
+  const [expandedMessages, setExpandedMessages] = useState(new Map());
+
+
 
 
 
@@ -116,29 +134,29 @@ const Dashboard = () => {
     // Add your logic for when the "Done" button is clicked
     setIsCustomDateOpen(false); // Close the custom date dropdown
   };
-  useEffect(() => {
-    async function fetchEvents() {
-      try {
-        const response = await axios.get('http://localhost:8000/openPhoneEventData/events-by-address-and-from', {
-          params: { address_id: selectedAddressId, from_number: fromNumber }
-        });
-        setEvents(response.data.data);
-      } catch (error) {
-        // setError('Error fetching event bodies');
-      } finally {
-        // setLoading(false);
-      }
-    }
+  // useEffect(() => {
+  //   async function fetchEvents() {
+  //     try {
+  //       const response = await axios.get('http://localhost:8000/openPhoneEventData/events-by-address-and-from', {
+  //         params: { address_id: selectedAddressId, from_number: fromNumber }
+  //       });
+  //       setEvents(response.data.data);
+  //     } catch (error) {
+  //       // setError('Error fetching event bodies');
+  //     } finally {
+  //       // setLoading(false);
+  //     }
+  //   }
 
-    fetchEvents();
-  }, [selectedAddress1, fromNumber]);
-  const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>((acc, message) => {
-    if (!acc[message.conversation_id]) {
-      acc[message.conversation_id] = [];
-    }
-    acc[message.conversation_id].push(message);
-    return acc;
-  }, {});
+  //   fetchEvents();
+  // }, [selectedAddress1, fromNumber]);
+  // const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>((acc, message) => {
+  //   if (!acc[message.conversation_id]) {
+  //     acc[message.conversation_id] = [];
+  //   }
+  //   acc[message.conversation_id].push(message);
+  //   return acc;
+  // }, {});
 
   const recordsPerPage = 6;
 
@@ -154,25 +172,25 @@ const Dashboard = () => {
     axios
       .get("http://localhost:8000/address/getalladdress")
       .then((response) => {
-        console.log("API Response:", response.data);
+        console.log('API Response:', response.data);
         const formattedAddresses = response.data.map((item: any) => ({
           id: item.id,
           displayAddress: item.address,
           is_bookmarked: item.is_bookmarked,
         }));
         setAddresses1(formattedAddresses);
-        const addressData = response.data.map(
-          (address: any) => address.address
-        );
-        setAddresses(addressData);
-        if (addressData.length > 0) {
-          setSelectedAddress(addressData[0]); // Set the first address as the default selected address
+
+        if (formattedAddresses.length > 0) {
+          setSelectedAddress(formattedAddresses[0].displayAddress); // Set the first address as the default selected address
+          setSelectedAddressId(formattedAddresses[0].id); // Set the first address ID as the default selected address ID
         }
       })
       .catch((error) => {
         console.error("Error fetching addresses:", error);
       });
   }, []);
+
+
   const handleBookmarkClick = (addressId: number) => {
     const address = addresses1.find((a) => a.id === addressId);
     if (!address) return;
@@ -213,9 +231,17 @@ const Dashboard = () => {
           const data = response.data.data;
           if (data && Array.isArray(data.events)) {
             setEventData(data.events);
-            if (data.events.length > 0) {
-              setPhoneNumber(data.events[0].to);
-              setFromNumber(data.events[0].from);
+
+            // Filter events to only include those with an address_id
+            const eventsWithAddressId = data.events.filter((event: any) => event.address_id);
+
+            // Extract unique 'fromNumber' values from filtered events
+            const uniqueNumbers = Array.from(new Set<string>(eventsWithAddressId.map((event: any) => event.from)));
+            setUniqueFromNumbers(uniqueNumbers);
+
+            if (eventsWithAddressId.length > 0) {
+              setPhoneNumber(eventsWithAddressId[0].to);
+              setFromNumber(eventsWithAddressId[0].from);
             } else {
               setPhoneNumber("");
               setFromNumber("");
@@ -234,32 +260,32 @@ const Dashboard = () => {
     }
   }, [selectedAddress]);
 
-  const handleRowClick = (ownerId: number) => {
-    if (selectedRowId !== ownerId) {
-      setSelectedRowId(ownerId);
-      console.log("Selected owner ID:", ownerId);
+  // const handleRowClick = (ownerId: number) => {
+  //   if (selectedRowId !== ownerId) {
+  //     setSelectedRowId(ownerId);
+  //     console.log("Selected owner ID:", ownerId);
 
-      axios
-        .get<ApiResponse>(
-          `http://localhost:8000/openPhoneEventData/events-by-conversation?conversation_id=${ownerId}`
-        )
-        .then((response) => {
-          console.log("API response for selected owner ID:", response.data);
-          setApiResponseBody(response.data.data); // Store the data array in state
-        })
-        .catch((error) => {
-          console.error("Error fetching data for selected owner ID:", error);
-        });
-    }
-  };
+  //     axios
+  //       .get<ApiResponse>(
+  //         `http://localhost:8000/openPhoneEventData/events-by-conversation?conversation_id=${ownerId}`
+  //       )
+  //       .then((response) => {
+  //         console.log("API response for selected owner ID:", response.data);
+  //         setApiResponseBody(response.data.data); // Store the data array in state
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error fetching data for selected owner ID:", error);
+  //       });
+  //   }
+  // };
 
-  const toggleMessageExpansion = (index: number) => {
+  const toggleMessageExpansion = (index: any) => {
     setExpandedMessages((prev) => {
-      const newExpandedMessages = new Set(prev);
+      const newExpandedMessages = new Map(prev);
       if (newExpandedMessages.has(index)) {
         newExpandedMessages.delete(index);
       } else {
-        newExpandedMessages.add(index);
+        newExpandedMessages.set(index, true);
       }
       return newExpandedMessages;
     });
@@ -350,16 +376,16 @@ const Dashboard = () => {
     setSelectedAddress(address.fullAddress);
   };
 
-  useEffect(() => {
-    if (tableData.length > 0) {
-      // Set default selectedRowId only if it is not already set
-      if (selectedRowId === null && tableData.length > 0) {
-        const firstRowId = tableData[0].ownerid;
-        setSelectedRowId(firstRowId);
-        handleRowClick(firstRowId);
-      }
-    }
-  }, [tableData, selectedRowId]);
+  // useEffect(() => {
+  //   if (tableData.length > 0) {
+  //     // Set default selectedRowId only if it is not already set
+  //     if (selectedRowId === null && tableData.length > 0) {
+  //       const firstRowId = tableData[0].ownerid;
+  //       setSelectedRowId(firstRowId);
+  //       handleRowClick(firstRowId);
+  //     }
+  //   }
+  // }, [tableData, selectedRowId]);
 
   const fetchData = async (value: string) => {
     try {
@@ -407,6 +433,32 @@ const Dashboard = () => {
     //   onSelectAddress(address);
     // }
   };
+
+  useEffect(() => {
+    async function fetchEvents() {
+      try {
+        const response = await axios.get('http://localhost:8000/openPhoneEventData/events-by-address-and-from', {
+          params: { address_id: selectedAddressId, from_number: fromNumber }
+        });
+        setEvents(response.data.data);
+      } catch (error) {
+        // setError('Error fetching event bodies');
+      } finally {
+        // setLoading(false);
+      }
+    }
+
+    fetchEvents();
+  }, [selectedAddress1, fromNumber]);
+
+  // Group messages by conversation_id
+  const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>((acc, message) => {
+    if (!acc[message.conversation_id]) {
+      acc[message.conversation_id] = [];
+    }
+    acc[message.conversation_id].push(message);
+    return acc;
+  }, {});
 
   return (
     <div>
@@ -458,7 +510,7 @@ const Dashboard = () => {
                       </label>
                     </li>
                   </ul>
-                </span> 
+                </span>
               </div>
             </div>
             <div className="type">
@@ -569,11 +621,11 @@ const Dashboard = () => {
               </span>
             </div>
           </div>
-          
+
         </div>
         <div>
           <div className="heading">
-<img src="/Done.svg" alt="" /> Comprehensive view of Address
+            <img src="/Done.svg" alt="" /> Comprehensive view of Address
           </div>
           <div className="logos-row-msg1">
             <div className="nav-msg1">
@@ -639,9 +691,9 @@ const Dashboard = () => {
               </div>
             </div>
             <div>
-            <div className='address-list'>
+              <div className='address-list'>
                 <div className="search-wrapper-add">
-                  
+
                   {results.length > 0 && (
                     <SearchResultList results={results} onSelect={handleSelectAddress} />
                   )}
@@ -702,9 +754,9 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          
+
         </div>
-         
+
         <div>
           <div className="Analyticdata ">
             <span>
@@ -713,52 +765,173 @@ const Dashboard = () => {
             <span className="ms-4">Analytic Data of Selected Address</span>
           </div>
           <div className="d-flex main-message">
-          <div className="logos-row-msg">
-            <div className="nav-msg">
-              <div className="message Delivered">Message Delivered</div>
-              <input
-                type="text"
-                className="round-input"
-                value={messageDelivered}
-                readOnly
-              />
+            <div className="logos-row-msg">
+              <div className="nav-msg">
+                <div className="message Delivered">Message Delivered</div>
+                <input
+                  type="text"
+                  className="round-input"
+                  value={messageDelivered}
+                  readOnly
+                />
+              </div>
+              <div className="nav-msg">
+                <div className="message response1 ">Message Response</div>
+                <input
+                  type="text"
+                  className="round-input"
+                  value={messageResponse}
+                  readOnly
+                />
+              </div>
+              <div className="nav-msg">
+                <div className="message call-1">Call </div>
+                <input
+                  type="text"
+                  className="round-input"
+                  value={call}
+                  readOnly
+                />
+              </div>
+              <div className="nav-msg">
+                <div className="message call-response-1">Call Response</div>
+                <input
+                  type="text"
+                  className="round-input"
+                  value={callResponse}
+                  readOnly
+                />
+              </div>
             </div>
-            <div className="nav-msg">
-              <div className="message response1 ">Message Response</div>
-              <input
-                type="text"
-                className="round-input"
-                value={messageResponse}
-                readOnly
-              />
+
+
+          </div>
+
+
+        </div>
+
+        <div className="conversation">
+
+          {/* <img src="converstation.svg" alt="" /> Conversation From {fromNumber} */}
+
+          {selectedAddress && (
+            <div className="conversation">
+              <img src="converstation.svg" alt="" /> Conversation From { }
+              {uniqueFromNumbers.length > 0 && (
+                <select
+                  value={fromNumber}
+                  onChange={(e) => setFromNumber(e.target.value)}  // Update fromNumber on selection
+                >
+                  {uniqueFromNumbers.map((number, index) => (
+                    <option key={index} value={number}>{number}</option>
+                  ))}
+                </select>
+              )}
             </div>
-            <div className="nav-msg">
-              <div className="message call-1">Call </div>
-              <input
-                type="text"
-                className="round-input"
-                value={call}
-                readOnly
-              />
-            </div>
-            <div className="nav-msg">
-              <div className="message call-response-1">Call Response</div>
-              <input
-                type="text"
-                className="round-input"
-                value={callResponse}
-                readOnly
-              />
+          )}
+
+
+          <div className="search-wrapper search-new">
+            {/* <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} /> */}
+            <input
+              className="search"
+              type="search"
+              placeholder="Search To"
+              aria-label="Search"
+              value={input}
+              onChange={(e) => handleChange(e.target.value)}
+            />
+            {results.length > 0 && (
+              <SearchResultList results={results} onSelect={handleSelectAddress} />
+            )}
+          </div>
+
+
+
+          <div className="input-msg">
+            <div className="screenshot-msg">
+              <div className="inbox-chat">
+                {events.length > 0 ? (
+                  Object.keys(groupedMessages).map((conversationId) => (
+                    <div key={conversationId}>
+                      <div className="to-line">.</div>
+                      <div className="to-value">
+                        <strong>To - </strong>{groupedMessages[conversationId][0].to}
+                      </div>
+
+                      {groupedMessages[conversationId].map((message, index) => (
+                        <div>
+                          <div
+                            key={index}
+                            className={
+                              message.event_type_id === 1
+                                ? "chat-message-right"
+                                : "chat-message-left"
+                            }
+                          >
+                            <div className="message-body">
+                              {expandedMessages.has(index) ? (
+                                <div>
+                                  {message.body}
+                                  <button
+                                    onClick={() => toggleMessageExpansion(index)}
+                                    className={`read-less-btn ${message.event_type_id === 1
+                                      ? "read-less-btn-right"
+                                      : "read-less-btn-left"
+                                      }`}
+                                  >
+                                    Read Less
+                                  </button>
+                                </div>
+                              ) : (
+                                <div>
+                                  {message.body && message.body.length > 100 ? (
+                                    <>
+                                      {message.body.substring(0, 100)}...
+                                      <button
+                                        onClick={() => toggleMessageExpansion(index)}
+                                        className={`read-more-btn ${message.event_type_id === 1
+                                          ? "read-more-btn-right"
+                                          : "read-more-btn-left"
+                                          }`}
+                                      >
+                                        Read More
+                                      </button>
+                                    </>
+                                  ) : (
+                                    message.body || "No message body"
+                                  )}
+                                </div>
+                              )}
+                            </div>
+
+                          </div>
+                          <div
+                            className={
+                              message.event_type_id === 1
+                                ? "message-date message-date-right"
+                                : "message-date message-date-left"
+                            }
+                          >
+                            {new Date(message.created_at).toLocaleDateString()}
+                          </div>
+                        </div>
+
+                      ))}
+                    </div>
+                  ))
+                ) : (
+                  "Loading..."
+                )}
+              </div>
             </div>
           </div>
 
-         
-          </div>
         </div>
-        
+
       </div>
-    
-     
+
+
 
       {/* <div className={`box ${isSidebarVisible ? "sidebar-visible" : ""}`}>
         <div className="mg-2">
