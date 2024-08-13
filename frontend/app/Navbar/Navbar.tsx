@@ -168,14 +168,20 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
 
           {showDropdown && (
             <div className="notification-dropdown">
-              <div>{newNotificationCount} new messages</div>
+              <div className='main-notification'>
+
+              <span className=''><i className="bi bi-telephone-inbound-fill  call-icon"></i>
+              Calls</span>
+              <span className=''> <i className="bi bi-chat-right-text icon-message"></i>
+              message </span>
+              </div>
+              <div>{newNotificationCount} new messages</div>  
               <ul>
                 {notifications.map(notification => (
                   <li key={notification.event_id} className={!notification.is_read ? 'new-notification' : ''}>
                     <strong onClick={() => handleMarkAsRead(notification.event_id)}>
                       From: {notification.event.from}
                     </strong><br />
-                    {/* Other notification content can go here */}
                   </li>
                 ))}
               </ul>
