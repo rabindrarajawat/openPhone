@@ -172,22 +172,45 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
 
               <span className=''><i className="bi bi-telephone-inbound-fill  call-icon"></i>
               Calls</span>
-              <span className=''> <i className="bi bi-chat-right-text icon-message"></i>
-              message </span>
+              <span className='text-danger'> <i className="bi bi-chat-right-text icon-message"></i>
+              Message </span>
               </div>
-              <div>{newNotificationCount} new messages</div>  
+              <div className='border-bottom mt-2'></div>
+
+              {/* <div>{newNotificationCount}</div>   */}
               <ul>
-                {notifications.map(notification => (
-                  <li key={notification.event_id} className={!notification.is_read ? 'new-notification' : ''}>
-                    <strong onClick={() => handleMarkAsRead(notification.event_id)}>
-                      From: {notification.event.from}
-                    </strong><br />
-                  </li>
-                ))}
-              </ul>
+  {notifications.map(notification => (
+    <li key={notification.event_id} className={!notification.is_read ? 'new-notification' : ''}>
+      <strong>
+        <span>
+          <i className="bi bi-chat-right-text icon-message icon-missed"></i>
+        </span>
+        You have a missed call from: {notification.event.from}
+        {!notification.is_read && (
+          <button
+            onClick={() => handleMarkAsRead(notification.event_id)}
+            style={{
+              backgroundColor: 'white',
+
+              color: 'green',
+              border: '2px solid green',
+              borderRadius: '20px',
+              padding: '0px 6px',
+              marginLeft: '10px',
+              cursor: 'pointer',
+              borderColor: 'green'
+            }}
+          >
+            Mark as Read
+          </button>
+        )}
+      </strong>
+    </li>
+  ))}
+</ul>
+
             </div>
           )}
-
         </div>
       </div>
     </nav>
