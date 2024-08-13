@@ -119,6 +119,8 @@ export class OpenPhoneEventController {
     @Query("address_id") addressId: number,
     @Query("from_number") fromNumber?: string
   ) {
+    // console.log('Received from_number:', fromNumber); // Check if the fromNumber is correctly decoded
+
     const eventBodies = await this.openPhoneEventService.findEventBodiesByAddressAndFromNumber(addressId, fromNumber);
     return {
       message: `Event bodies fetched successfully for address_id: ${addressId} and from: ${fromNumber || 'all numbers'}`,
@@ -126,6 +128,13 @@ export class OpenPhoneEventController {
     };
   }
 
+
+
+
+  @Get('all')
+  async getAllOpenPhoneEvent() {
+    return this.openPhoneEventService.findAllOpenPhoneEvents();
+  }
 
 
 
