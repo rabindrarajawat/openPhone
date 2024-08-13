@@ -172,8 +172,8 @@
     position: absolute;
     top: 0;
     right: 0;
-    width: 19px;
-    height: 18px;
+    width: 15px;
+    height: 15px;
     background-color: #3361ff;
     border-radius: 50%;
     padding-left: 18%;
@@ -204,13 +204,12 @@
   
   .notification-dropdown li {
     padding: 10px;
-    border-bottom: 1px solid #ccc;
   }
   
   .notification-dropdown li.new-notification {
-    background-color: #f9f9f9;
-    font-weight: bold;
-    font-weight: bold;
+    color: #5A657B;
+    font-weight: 400;
+    font-size: 15px;
 }
 .main-notification{
     margin-left: 132px;
@@ -223,5 +222,7 @@
 .icon-message{
     margin-right: 2px;
     margin-left :4px;
+    color: #EA0000;
+
 
 }
