@@ -12,6 +12,9 @@ import { SearchResultList } from "../SearchResultList/SearchResultList";
 
 interface Address {
   fullAddress: string;
+
+
+
 }
 interface Address1 {
   is_bookmarked: boolean;
@@ -103,12 +106,17 @@ const Dashboard = () => {
 
   const [uniqueFromNumbers, setUniqueFromNumbers] = useState<string[]>([]);
 
-  // const [selectedAddress, setSelectedAddress] = useState(''); // For the display address
-  // const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
-  // const [fromNumber, setFromNumber] = useState('');
-
-  // const [events, setEvents] = useState<EventItem[]>([]);
   const [expandedMessages, setExpandedMessages] = useState(new Map());
+
+  const [counts, setCounts] = useState({
+    messageDelivered: 0,
+    messageResponse: 0,
+    call: 0,
+    callResponse: 0,
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
 
 
@@ -191,6 +199,24 @@ const Dashboard = () => {
   }, []);
 
 
+  useEffect(() => {
+    const fetchEventCounts = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/openPhoneEventData/all');
+        if (!response.ok) {
+          throw new Error('Failed to fetch event counts');
+        }
+        const data = await response.json();
+        setCounts(data);
+      } catch (err) {
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEventCounts();
+  }, []); // Empty dependency array means this effect runs once on mount
+
   const handleBookmarkClick = (addressId: number) => {
     const address = addresses1.find((a) => a.id === addressId);
     if (!address) return;
@@ -218,6 +244,39 @@ const Dashboard = () => {
         console.error("Error updating bookmark status:", error);
       });
   };
+
+  // useEffect(() => {
+  //   if (selectedAddress && selectedAddress !== "Search Address") {
+  //     axios
+  //       .get(
+  //         `http://localhost:8000/openPhoneEventData/events?address=${encodeURIComponent(
+  //           selectedAddress
+  //         )}`
+  //       )
+  //       .then((response) => {
+  //         const data = response.data.data;
+  //         if (data && Array.isArray(data.events)) {
+  //           setEventData(data.events);
+  //           if (data.events.length > 0) {
+  //             setPhoneNumber(data.events[0].to);
+  //             setFromNumber(data.events[0].from);
+  //           } else {
+  //             setPhoneNumber("");
+  //             setFromNumber("");
+  //           }
+  //           setMessageDelivered(data.messageDelivered || 0);
+  //           setMessageResponse(data.messageResponse || 0);
+  //           setCall(data.call || 0);
+  //           setCallResponse(data.callResponse || 0);
+  //         } else {
+  //           console.error("Events data is not an array or is missing");
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error fetching event data:", error);
+  //       });
+  //   }
+  // }, [selectedAddress]);
 
   useEffect(() => {
     if (selectedAddress && selectedAddress !== "Search Address") {
@@ -438,7 +497,7 @@ const Dashboard = () => {
     async function fetchEvents() {
       try {
         const response = await axios.get('http://localhost:8000/openPhoneEventData/events-by-address-and-from', {
-          params: { address_id: selectedAddressId, from_number: fromNumber }
+          params: { address_id: selectedAddressId, from_number: fromNumber } // Pass fromNumber directly
         });
         setEvents(response.data.data);
       } catch (error) {
@@ -449,7 +508,10 @@ const Dashboard = () => {
     }
 
     fetchEvents();
-  }, [selectedAddress1, fromNumber]);
+  }, [selectedAddressId, fromNumber]);
+
+
+
 
   // Group messages by conversation_id
   const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>((acc, message) => {
@@ -459,6 +521,8 @@ const Dashboard = () => {
     acc[message.conversation_id].push(message);
     return acc;
   }, {});
+
+
 
   return (
     <div>
@@ -623,6 +687,7 @@ const Dashboard = () => {
           </div>
 
         </div>
+
         <div>
           <div className="heading">
             <img src="/Done.svg" alt="" /> Comprehensive view of Address
@@ -633,7 +698,7 @@ const Dashboard = () => {
               <input
                 type="text"
                 className="round-input1"
-                value={messageDelivered}
+                value={counts.messageDelivered}
                 readOnly
               />
             </div>
@@ -642,7 +707,7 @@ const Dashboard = () => {
               <input
                 type="text"
                 className="round-input1"
-                value={messageResponse}
+                value={counts.messageResponse}
                 readOnly
               />
             </div>
@@ -651,7 +716,7 @@ const Dashboard = () => {
               <input
                 type="text"
                 className="round-input1"
-                value={call}
+                value={counts.call}
                 readOnly
               />
             </div>
@@ -660,12 +725,13 @@ const Dashboard = () => {
               <input
                 type="text"
                 className="round-input1"
-                value={callResponse}
+                value={counts.callResponse}
                 readOnly
               />
             </div>
           </div>
         </div>
+
         <div className="main-Address ">
           <span className="">
             {" "}
@@ -831,7 +897,7 @@ const Dashboard = () => {
           )}
 
 
-          <div className="search-wrapper search-new">
+          <div className="search-wrapper ">
             {/* <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} /> */}
             <input
               className="search"
@@ -841,9 +907,6 @@ const Dashboard = () => {
               value={input}
               onChange={(e) => handleChange(e.target.value)}
             />
-            {results.length > 0 && (
-              <SearchResultList results={results} onSelect={handleSelectAddress} />
-            )}
           </div>
 
 
@@ -1152,30 +1215,32 @@ const Dashboard = () => {
                     <SearchResultList results={results} onSelect={handleSelectAddress} />
                   )}
                   <img src="/Icon.svg" alt="icon" className="search-icon" />
-
-                 
                 </div>
 
                 {addresses1.length > 0 ? (
-          addresses1.map((address) => (
-            <li key={address.id} className="list-group-item d-flex justify-content-between align-items-center">
-              <div className="setaddress d-flex align-items-center gap-3 ">
-                <i
-                  className={`bi ${address.is_bookmarked ? 'bi-bookmark-fill' : 'bi-bookmark'} clickable-icon`}
-                  style={{ cursor: 'pointer', color: address.is_bookmarked ? 'blue' : 'grey' }}
-                  onClick={() => handleBookmarkClick(address.id)}
-                ></i>
-                <span className="ml-2">{address.displayAddress}</span>
-              </div>
-            </li>
-          ))
-        ) : (
-          <p>No addresses found.</p>
-        )}
+                  addresses1.map((address) => (
+                    <li key={address.id}
+                      className="list-group-item d-flex justify-content-between align-items-center"
+                      onClick={() => handleAddressSelect(address.displayAddress, address.id)} // Pass the address ID on click
+                    >
+                      <div className="setaddress d-flex align-items-center gap-3 ">
+                        <i
+                          className={`bi ${address.is_bookmarked ? 'bi-bookmark-fill' : 'bi-bookmark'} clickable-icon`}
+                          style={{ cursor: 'pointer', color: address.is_bookmarked ? 'blue' : 'grey' }}
+                          onClick={() => handleBookmarkClick(address.id)}
+                        ></i>
+                        <span className="ml-2">{address.displayAddress}</span>
+                      </div>
+                    </li>
+                  ))
+                ) : (
+                  <p>No addresses found.</p>
+                )}
 
               </div>
          
             </div>
+          )}
 
 
             <div className="conversation"> <img src="converstation.svg" alt="" /> Conversation From {fromNumber}
@@ -1253,7 +1318,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-        </div>
+        </div >
 
       </div > */}
     </div>
@@ -1261,3 +1326,20 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+
+
+
+
+
+// function setError(arg0: string) {
+//   throw new Error("Function not implemented.");
+// }
+
+// function setLoading(arg0: boolean) {
+//   throw new Error("Function not implemented.");
+// }
+///////////////////////////////////////////////////////////////workcode//////////////////////////////////////////////
+//////////////////////////////////////////////
+/////////////////////////////////////
+//////////////////////////////////

@@ -101,6 +101,7 @@
   margin-left: 18px;
 }
 
+
 .set-date {
   width: 95px;
   height: 24px;
@@ -531,6 +532,10 @@
   margin-left: 5px;
   color: inherit;
   /* Inherits the text color from the parent */
+}
+
+.bookmark-select {
+  margin-left: -14px;
 }
 
 .read-more-btn-right,

@@ -787,6 +787,8 @@ export class OpenPhoneEventService {
 
 
 
+
+
   // async findEventBodiesByConversationId(conversationId: string): Promise<{ event_type_id: number, body: string }[]> {
   //   try {
   //     // Fetch events by conversation_id and order by id in ascending order
@@ -844,6 +846,40 @@ export class OpenPhoneEventService {
       conversation_id: event.conversation_id,
     }));
   }
+
+  async findAllOpenPhoneEvents(): Promise<{
+    messageDelivered: number,
+    messageResponse: number,
+    call: number,
+    callResponse: number
+  }> {
+    // Fetch all OpenPhone events
+    const allEvents = await this.openPhoneEventRepository.find({
+      order: { id: 'ASC' }
+    });
+
+    // If no events are found, throw an exception
+    if (allEvents.length === 0) {
+      throw new NotFoundException(`No OpenPhoneEvents found`);
+    }
+
+    // Calculate counts for each event_type_id
+    const messageDelivered = allEvents.filter(event => event.event_type_id === 2).length;
+    const messageResponse = allEvents.filter(event => event.event_type_id === 1).length;
+    const call = allEvents.filter(event => event.event_type_id === 3).length;
+    const callResponse = allEvents.filter(event => event.event_type_id === 4).length;
+
+    // Return only the counts
+    return {
+      messageDelivered,
+      messageResponse,
+      call,
+      callResponse
+    };
+  }
+
+
+
 
   async findConversationsWithoutAddress(): Promise<any[]> {
     const subQuery = this.openPhoneEventRepository
