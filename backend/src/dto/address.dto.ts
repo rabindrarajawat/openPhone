@@ -6,7 +6,10 @@ export class AddressDto {
   @IsString()
   address: string;
 
-    is_bookmarked:boolean;
+  is_bookmarked: boolean;
+
+  @IsNotEmpty()
+  auction_type_id: number;
 
   @IsNotEmpty()
   @IsDateString()

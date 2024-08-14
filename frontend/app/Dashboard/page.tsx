@@ -547,32 +547,23 @@ const Dashboard = () => {
                     className="btn"
                     type="button"
                     onClick={handleToggle}
-                    aria-expanded={isOpen}
+                    aria-expanded={isType}
                   >
-                    <img
-                      src="/dropdownicon.svg"
-                      alt="Dropdown Icon"
-                      className="logo"
-                    />
+                    <img src="/dropdownicon.svg" alt="Dropdown Icon" />
                   </button>
 
-                  <ul className={`dropdown-menu ${isOpen ? "show" : ""}`}>
+                  <ul className={`dropdown-type ${isType ? "show" : ""}`}>
                     <li className="dropdown-item">
                       <input type="checkbox" />
                       <label className="ms-2">Delivered</label>
                     </li>
                     <li className="dropdown-item pt-2">
-                      <input type="checkbox" />
-                      <label className="ms-2" >
-                        Not Delivered
+                      <input type="checkbox" id="notDelivered" />
+                      <label className="ms-2" htmlFor="notDelivered">
+                        received
                       </label>
                     </li>
-                    <li className="dropdown-item pt-2">
-                      <input type="checkbox" id="pending" />
-                      <label className="ms-2" htmlFor="pending">
-                        Pending
-                      </label>
-                    </li>
+
                   </ul>
                 </span>
               </div>
@@ -899,6 +890,7 @@ const Dashboard = () => {
 
 
           <div className="search-wrapper ">
+            <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} />
             <input
               className="search"
               type="search"

@@ -56,7 +56,7 @@
 .type {
   margin-left: 133px;
 
-  margin-top: 133px;
+  margin-top: 19px;
 }
 
 .dropdown-type {
@@ -219,8 +219,8 @@
 .main-search {
   margin-top: 201px;
   margin-left: -120px;
-  padding-left: 1px;
-  padding-right: 10px;
+  padding-left: 14px;
+  padding-right: 30px;
   border: 3px solid #D7F5DC;
   border-radius: 6px;
 }
@@ -247,6 +247,14 @@
   top: 50%;
   left: 10px;
   transform: translateY(-50%);
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 2px;
+  pointer-events: none;
+
 }
 
 .icon-labels {
@@ -331,7 +339,7 @@
 }
 
 .message {
-  width: 187px;
+  width: 210px;
   height: 39px;
   border: 2px solid grey;
   border-radius: 3.27px;
@@ -383,6 +391,7 @@
 
 .screenshot-msg {
   width: 97%;
+  width: 97%;
   height: 90%;
   /* top: 594px;
   left: 1029px; */
@@ -395,6 +404,8 @@
   z-index: 2;
   box-shadow: 0px 2px 5px 0px #26334D08;
   display: flex;
+  border-radius: 5px;
+  margin-left: 3px;
   border-radius: 5px;
   margin-left: 3px;
 
@@ -607,6 +618,36 @@
   font-weight: 400;
   line-height: 20.46px;
   margin-left: 6px;
+}
+
+.conversation-chat select {
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  cursor: pointer;
+}
+
+.ms-3 {
+  cursor: pointer;
+}
+
+.selected-address {
+  background-color: #e6f7ff;
+  /* Light blue background for the selected address */
+  color: #007bff;
+  /* Text color for the selected address */
+  border-radius: 5px;
+  /* Optiona
+  l: Add rounded corners */
+}
+
+.selected-address .setaddress {
+  color: #007bff;
+  /* Ensure that the text inside .setaddress also changes color */
 }
 
 .conversation-chat select {
