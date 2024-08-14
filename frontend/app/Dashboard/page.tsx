@@ -759,7 +759,6 @@ const Dashboard = () => {
             <div>
               <div className='address-list'>
                 <div className="search-wrapper-add">
-
                   {results.length > 0 && (
                     <SearchResultList results={results} onSelect={handleSelectAddress} />
                   )}
@@ -767,8 +766,10 @@ const Dashboard = () => {
 
                 {addresses1.length > 0 ? (
                   addresses1.map((address) => (
-                    <li key={address.id}
-                      className="list-group-item d-flex justify-content-between align-items-center"
+                    <li
+                      key={address.id}
+                      className={`list-group-item d-flex justify-content-between align-items-center ${selectedAddressId === address.id ? 'selected-address' : ''
+                        }`}
                       onClick={() => handleAddressSelect(address.displayAddress, address.id)} // Pass the address ID on click
                     >
                       <div className="setaddress d-flex align-items-center gap-3 ">
@@ -784,8 +785,8 @@ const Dashboard = () => {
                 ) : (
                   <p>No addresses found.</p>
                 )}
-
               </div>
+
               <div className="pagination-container">
                 <ul className="pagination">
                   <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
@@ -881,7 +882,7 @@ const Dashboard = () => {
           {/* <img src="converstation.svg" alt="" /> Conversation From {fromNumber} */}
 
           {selectedAddress && (
-            <div className="conversation">
+            <div className="conversation-chat">
               <img src="converstation.svg" alt="" /> Conversation From { }
               {uniqueFromNumbers.length > 0 && (
                 <select
@@ -898,7 +899,6 @@ const Dashboard = () => {
 
 
           <div className="search-wrapper ">
-            {/* <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} /> */}
             <input
               className="search"
               type="search"
@@ -908,6 +908,13 @@ const Dashboard = () => {
               onChange={(e) => handleChange(e.target.value)}
             />
           </div>
+
+          {/* <div className="search-box-to ">
+            <span className="icon">
+              <img src="/Icon.svg" alt="icon" />
+            </span>
+            <input type="text" placeholder="Search Address"></input>
+          </div> */}
 
 
 
@@ -920,6 +927,9 @@ const Dashboard = () => {
                       <div className="to-line">.</div>
                       <div className="to-value">
                         <strong>To - </strong>{groupedMessages[conversationId][0].to}
+
+                        <i className="bi bi-bookmark ms-3"></i>
+
                       </div>
 
                       {groupedMessages[conversationId].map((message, index) => (
@@ -1321,7 +1331,7 @@ const Dashboard = () => {
         </div >
 
       </div > */}
-    </div>
+    </div >
   );
 };
 
