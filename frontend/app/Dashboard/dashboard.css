@@ -373,11 +373,11 @@
 }
 
 .input-msg {
-  width: 295%;
+  width: 280%;
   height: 140%;
   margin-top: 8%;
   margin-top: -255px;
-  margin-left: -452px;
+  margin-left: -541px;
   border-radius: 5px 0px 0px 0px;
   /* background: linear-gradient(171.76deg, #CBE3FF 4.95%, #D2FFCC 92.28%); */
   border: 3px solid #D7F5DC;
@@ -415,7 +415,7 @@
   margin-top: -316px;
   position: absolute;
   z-index: 2;
-  margin-left: 24%;
+  margin-left: 16%;
   border-radius: 30px;
   /* padding: 10px; */
   height: 35px;
@@ -596,7 +596,7 @@
 .conversation-chat {
   /* display: flex; */
   margin-top: 230px;
-  margin-left: -452px;
+  margin-left: -541px;
   width: 350px;
   height: 310px;
 }
@@ -665,17 +665,6 @@
   cursor: pointer;
 }
 
-.selected-address {
-  background-color: #e6f7ff;
-  /* Light blue background for the selected address */
-  color: #007bff;
-  /* Text color for the selected address */
-  border-radius: 5px;
-  /* Optiona
-  l: Add rounded corners */
-}
-
 .selected-address .setaddress {
   color: #007bff;
-  /* Ensure that the text inside .setaddress also changes color */
 }
