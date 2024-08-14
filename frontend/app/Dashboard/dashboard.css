@@ -366,9 +366,9 @@
 
 .input-msg {
   width: 295%;
-  height: 125%;
+  height: 140%;
   margin-top: 8%;
-  margin-top: -300px;
+  margin-top: -255px;
   margin-left: -452px;
   border-radius: 5px 0px 0px 0px;
   /* background: linear-gradient(171.76deg, #CBE3FF 4.95%, #D2FFCC 92.28%); */
@@ -382,7 +382,7 @@
 }
 
 .screenshot-msg {
-  width: 90%;
+  width: 97%;
   height: 90%;
   /* top: 594px;
   left: 1029px; */
@@ -395,9 +395,25 @@
   z-index: 2;
   box-shadow: 0px 2px 5px 0px #26334D08;
   display: flex;
-  border-radius: 2%;
+  border-radius: 5px;
+  margin-left: 3px;
 
 }
+
+.search-wrapper {
+  margin-top: -316px;
+  position: absolute;
+  z-index: 2;
+  margin-left: 24%;
+  border-radius: 30px;
+  /* padding: 10px; */
+  height: 35px;
+  width: 164px;
+  background: linear-gradient(white, white) padding-box,
+    linear-gradient(102.59deg, #D7F5DC -59.65%, #DEEFFF 71.41%) border-box;
+  border: 2px solid transparent;
+}
+
 
 .inbox-chat {
   font-family: 'Roboto', sans-serif;
@@ -554,7 +570,6 @@
 .chat-message-right .read-less-btn,
 .chat-message-left .read-less-btn {
   display: inline;
-  /* margin-left: 5px; */
   position: relative;
 }
 
@@ -562,8 +577,17 @@
 .conversation {
   width: 350px;
   height: 310px;
-  margin-top: 130px;
+  margin-top: 30px;
   margin-left: -452px;
+  display: flexs;
+}
+
+.conversation-chat {
+  /* display: flex; */
+  margin-top: 230px;
+  margin-left: -452px;
+  width: 350px;
+  height: 310px;
 }
 
 .message-date-right {
@@ -583,4 +607,34 @@
   font-weight: 400;
   line-height: 20.46px;
   margin-left: 6px;
+}
+
+.conversation-chat select {
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  cursor: pointer;
+}
+
+.ms-3 {
+  cursor: pointer;
+}
+
+.selected-address {
+  background-color: #e6f7ff;
+  /* Light blue background for the selected address */
+  color: #007bff;
+  /* Text color for the selected address */
+  border-radius: 5px;
+  /* Optiona
+  l: Add rounded corners */
+}
+
+.selected-address .setaddress {
+  color: #007bff;
+  /* Ensure that the text inside .setaddress also changes color */
 }
