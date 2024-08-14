@@ -187,7 +187,7 @@ export class OpenPhoneEventService {
     private addressService: AddressService,
     private auctionService: AuctionEventService,
     private notificationService: NotificationService
-  ) {}
+  ) { }
 
   async create(payload: OpenPhoneEventDto) {
     try {
@@ -226,7 +226,7 @@ export class OpenPhoneEventService {
         }
 
         // var auctionTypeId = this.auctionTypeId(extractedInfo.auction_type);
-      
+
 
         // Check if the address already exists
         const existingAddress = await this.addressRepository.findOne({
@@ -261,7 +261,9 @@ export class OpenPhoneEventService {
           addressCreated = true;
         } else {
           addressId = existingAddress.id;
-         }
+          auctionTypeId = existingAddress.auction_type_id; // Use the existing auction_type_id
+
+        }
       }
 
       const existingEvent = await this.openPhoneEventRepository.findOne({
@@ -274,7 +276,7 @@ export class OpenPhoneEventService {
         messageData.status === "delivered"
           ? existingEvent?.address_id
           : addressId;
-      openPhoneEvent.auction_type_id = auctionTypeId;
+      // openPhoneEvent.auction_type_id = auctionTypeId;
       if (existingEvent !== null) {
         if (
           existingEvent.conversation_id === messageData.conversationId &&
