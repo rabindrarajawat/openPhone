@@ -28,7 +28,6 @@ export class UsersService {
   async getAllUsers(): Promise<UserEntity[]> {
     return await this.usersRepository.find({ relations: ['role'] });
   }
-
   async createUser(createUserDto: CreateUsersDto): Promise<{
     id: string;
     name: string;
@@ -37,7 +36,16 @@ export class UsersService {
     roleName: string;
   }> {
     try {
+      console.log('Received DTO:', createUserDto); // Debugging line
+  
       const { roleid, password, ...rest } = createUserDto;
+      
+      console.log('Extracted password:', password); // Debugging line
+  
+      if (!password) {
+        throw new HttpException('Password is required', HttpStatus.BAD_REQUEST);
+      }
+  
       const role = await this.roleRepository.findOne({ where: { id: roleid } });
   
       if (!role) {
@@ -45,6 +53,8 @@ export class UsersService {
       }
   
       const hashedPassword = await bcrypt.hash(password, 10); // Hash the password with a salt
+  
+      console.log('Hashed password:', hashedPassword); // Debugging line
   
       const newUser = this.usersRepository.create({
         ...rest,
@@ -61,9 +71,13 @@ export class UsersService {
         roleName: role.name,
       };
     } catch (error) {
+      console.error('Error during user creation:', error.message); // Debugging line
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
+  
+  
+  
   
 
   async validateUserByEmail(email: string, password: string): Promise<{ token: string }> {
