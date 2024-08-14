@@ -10,6 +10,8 @@ import { CaseEventEntity } from "../entities/case-event.entity"
 import { MessageMasterEntity } from "../entities/message-template.entity"
 import { AddressMappingEntity } from "../entities/address-mapping.entity"
 import * as dotenv from 'dotenv';
+import { BookmarkEntity } from '../entities/bookmark.entity';
+import { NotificationEntity } from '../entities/notification.entity';
 
 dotenv.config();
 
@@ -30,7 +32,9 @@ export const AppDataSource = new DataSource({
     RoleEntity,
     CaseEventEntity,
     MessageMasterEntity,
-    AddressMappingEntity
+    AddressMappingEntity,
+    BookmarkEntity,
+    NotificationEntity
   ],
   migrations: ['src/migrations/**/*.ts'],
   synchronize: process.env.DB_SYNC === 'true',
