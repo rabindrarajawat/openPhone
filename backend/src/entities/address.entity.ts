@@ -18,10 +18,13 @@ export class AddressEntity extends CommonEntity {
   @Column()
   address: string;
 
-  @Column({nullable:true})
-  is_bookmarked:boolean;
+  @Column({ nullable: true })
+  is_bookmarked: boolean;
 
- 
+  @Column({ nullable: true })
+  auction_type_id: number;
+
+
   @CreateDateColumn({ nullable: true })
   date: Date;
   @OneToMany(() => OpenPhoneEventEntity, (event) => event.address)

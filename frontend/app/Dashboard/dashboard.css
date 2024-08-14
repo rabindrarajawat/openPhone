@@ -222,8 +222,11 @@
   padding-left: 14px;
   padding-right: 30px;
   border: 3px solid #D7F5DC;
+
   border-radius: 6px;
+  height: 550px;
 }
+
 
 .search-box {
   display: inline-table;
@@ -269,6 +272,7 @@
   flex-direction: column;
   align-items: center;
   margin-left: -13px;
+  z-index: 2;
 }
 
 .bookmark-container div,
@@ -452,15 +456,17 @@
   margin-right: 10px;
 }
 
-.address-list {
+
+
+.list-group-item {
+  margin-left: -145px;
   margin-top: 10%;
-  margin-left: -415px;
 }
 
 .pagination-container .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 350px;
+  margin-top: 235px;
 
 }
 
@@ -635,36 +641,25 @@
   cursor: pointer;
 }
 
-.selected-address {
-  background-color: #e6f7ff;
-  /* Light blue background for the selected address */
-  color: #007bff;
-  /* Text color for the selected address */
-  border-radius: 5px;
-  /* Optiona
-  l: Add rounded corners */
-}
-
-.selected-address .setaddress {
-  color: #007bff;
-  /* Ensure that the text inside .setaddress also changes color */
-}
-
-.conversation-chat select {
-  border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
-  background-color: #f9f9f9;
-  font-size: 14px;
-  color: #333;
-  outline: none;
-  cursor: pointer;
-}
-
-.ms-3 {
+.ms-4 {
   cursor: pointer;
 }
 
 .selected-address .setaddress {
   color: #007bff;
+}
+
+.checkbox {
+  cursor: pointer;
+}
+
+.text-primary {
+  color: blue;
+  /* Adjust the color as needed */
+}
+
+.active-filter {
+  font-weight: bold;
+  color: blue;
+  /* Optional: to visually indicate the active filter */
 }
