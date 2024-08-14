@@ -82,7 +82,7 @@ export class OpenPhoneEventController {
   constructor(
     private readonly openPhoneEventService: OpenPhoneEventService,
     private readonly addressService: AddressService
-  ) { }
+  ) {}
   @Post()
   async createOpenPhoneEvent(@Body() payload: any) {
     const { openPhoneEvent, addressCreated } =
@@ -121,27 +121,26 @@ export class OpenPhoneEventController {
   ) {
     // console.log('Received from_number:', fromNumber); // Check if the fromNumber is correctly decoded
 
-    const eventBodies = await this.openPhoneEventService.findEventBodiesByAddressAndFromNumber(addressId, fromNumber);
+    const eventBodies =
+      await this.openPhoneEventService.findEventBodiesByAddressAndFromNumber(
+        addressId,
+        fromNumber
+      );
     return {
-      message: `Event bodies fetched successfully for address_id: ${addressId} and from: ${fromNumber || 'all numbers'}`,
+      message: `Event bodies fetched successfully for address_id: ${addressId} and from: ${fromNumber || "all numbers"}`,
       data: eventBodies,
     };
   }
 
-
-
-
-  @Get('all')
+  @Get("all")
   async getAllOpenPhoneEvent() {
     return this.openPhoneEventService.findAllOpenPhoneEvents();
   }
 
-
-
-
-  @Get('getConversationsWithoutAddress')
+  @Get("getConversationsWithoutAddress")
   async getConversationsWithoutAddress() {
-    const conversationIds = await this.openPhoneEventService.findConversationsWithoutAddress();
+    const conversationIds =
+      await this.openPhoneEventService.findConversationsWithoutAddress();
     return {
       message: "Conversations without address IDs fetched successfully.",
       data: conversationIds,

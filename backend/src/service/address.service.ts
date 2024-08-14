@@ -30,13 +30,14 @@ export class AddressService {
 
 
 
-  async createAddress(addressDto: { address: string; date: Date }) {
+  async createAddress(addressDto: { address: string; date: Date,auction_event_id:number }) {
     try {
       const address = this.addressRepository.create({
         address: addressDto.address,
         date: addressDto.date,
         created_by: 'Ram', // assuming 'Ram' is the user creating this entry
         is_active: true,
+        auction_event_id:addressDto.auction_event_id
       });
 
       return await this.addressRepository.save(address);
