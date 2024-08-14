@@ -8,8 +8,7 @@ export class AddressDto {
 
   is_bookmarked: boolean;
 
-  @IsNotEmpty()
-  auction_type_id: number;
+  auction_event_id: number;
 
   @IsNotEmpty()
   @IsDateString()
