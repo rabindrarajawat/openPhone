@@ -27,7 +27,7 @@ export class OpenPhoneEventEntity {
   event_direction_id: number;
 
   @Column({ nullable: true })
-  auction_type_id: number;
+  auction_event_id: number;
 
   @Column()
   from: string;
