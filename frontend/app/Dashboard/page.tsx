@@ -890,6 +890,7 @@ const Dashboard = () => {
 
 
           <div className="search-wrapper ">
+          <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} />
             <input
               className="search"
               type="search"
