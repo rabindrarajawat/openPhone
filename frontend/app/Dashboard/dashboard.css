@@ -248,6 +248,13 @@
   left: 10px;
   transform: translateY(-50%);
 }
+.search-icon{
+  position: absolute;
+  left: 12px;
+  top: 2px;
+  pointer-events: none;
+
+}
 
 .icon-labels {
   align-items: center;
@@ -365,11 +372,11 @@
 }
 
 .input-msg {
-  width: 287%;
-  height: 160%;
-  margin-top: 8%;
-  margin-top: -300px;
-  margin-left: -499px;
+  width: 288%;
+  height: 173%;
+  margin-top: -270px;
+  margin-left: -546px;
+  margin-left: -542px;
   border-radius: 5px 0px 0px 0px;
   /* background: linear-gradient(171.76deg, #CBE3FF 4.95%, #D2FFCC 92.28%); */
   border: 3px solid #D7F5DC;
@@ -404,7 +411,7 @@
   margin-top: -316px;
   position: absolute;
   z-index: 2;
-  margin-left: 24%;
+  margin-left: 16%;
   border-radius: 30px;
   /* padding: 10px; */
   height: 35px;
@@ -577,9 +584,20 @@
 .conversation {
   width: 350px;
   height: 310px;
-  margin-top: 130px;
-  margin-left: -498px;
+  margin-top: 30px;
+  margin-left: -452px;
 }
+
+.conversation-chat {
+  margin-top: 248px;
+  margin-bottom: 17px;
+  margin-left: -540px;
+  width: 350px;
+  height: 310px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
 
 .message-date-right {
   text-align: right;
