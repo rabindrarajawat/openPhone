@@ -20,7 +20,7 @@ interface Address1 {
   is_bookmarked: boolean;
   displayAddress: string;
   id: number;
-  auction_type_id: number;
+  auction_event_id: number;
   created_at: string;
 }
 
@@ -188,7 +188,7 @@ const Dashboard = () => {
 
   const filteredAddresses = addresses1.filter((address) => {
     // Apply auction type filter
-    const matchesAuctionType = selectedAuctionTypes.length === 0 || selectedAuctionTypes.includes(address.auction_type_id);
+    const matchesAuctionType = selectedAuctionTypes.length === 0 || selectedAuctionTypes.includes(address.auction_event_id);
 
     // Apply bookmark filter
     const matchesBookmark = filterOption === 'all' ||
@@ -284,7 +284,7 @@ const Dashboard = () => {
           id: item.id,
           displayAddress: item.address,
           is_bookmarked: item.is_bookmarked,
-          auction_type_id: item.auction_type_id,
+          auction_event_id: item.auction_event_id,
           created_at: item.created_at,
 
         }));
