@@ -445,24 +445,6 @@ export class OpenPhoneEventService {
     }));
   }
 
-
-  // async findAllFiltered(filter?: 'delivered' | 'received') {
-  //   const query = this.openPhoneEventRepository.createQueryBuilder('event');
-
-  //   if (filter === 'delivered') {
-  //     query.where('event.event_type_id = :id', { id: 2 });
-  //   } else if (filter === 'received') {
-  //     query.where('event.event_type_id = :id', { id: 1 });
-  //   }
-
-  //   return query.getMany();
-  // }
-
-
-
-
-
-
   async findAllFiltered(filter?: 'delivered' | 'received') {
     const query = this.openPhoneEventRepository
       .createQueryBuilder('event')
@@ -508,26 +490,41 @@ export class OpenPhoneEventService {
     }
   }
 
-
-
-
-  async toggleNumberPin(id: number): Promise<{ message: string }> {
-    const event = await this.openPhoneEventRepository.findOne({ where: { id } });
+  async toggleNumberPin(conversation_id: string): Promise<{ message: string }> {
+    const event = await this.openPhoneEventRepository.findOne({ where: { conversation_id } });
     if (!event) {
-      throw new NotFoundException(`Event with ID ${id} not found`);
+      throw new NotFoundException(`Event with ID ${conversation_id} not found`);
     }
     event.is_number_pinned = !event.is_number_pinned;
     const updatedData = await this.openPhoneEventRepository.save(event);
     if (updatedData.is_number_pinned) {
       return {
-        message: `Number pinned  for event_id ${id}`,
+        message: `Number pinned  for conversation_id ${conversation_id}`,
       };
     } else {
       return {
-        message: `Number unpinnrd for event_id ${id}`,
+        message: `Number unpinnrd for conversation_id ${conversation_id}`,
       };;
     }
   }
+
+
+  async getAllPinnedMessages(): Promise<OpenPhoneEventEntity[]> {
+    return this.openPhoneEventRepository.find({
+      where: { is_message_pinned: true },
+    });
+  }
+  
+  async getAllPinnedNumbers(): Promise<OpenPhoneEventEntity[]> {
+    return this.openPhoneEventRepository.find({
+      where: { is_number_pinned: true },
+    });
+  }
+
+
+
+
+
 }
 
 
