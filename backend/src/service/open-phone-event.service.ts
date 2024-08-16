@@ -485,6 +485,49 @@ export class OpenPhoneEventService {
       address: event.address_id ? addressMap.get(event.address_id) : null,
     }));
   }
+
+
+  async toggleMessagePin(id: number): Promise<{ message: string }> {
+    const event = await this.openPhoneEventRepository.findOne({ where: { id } });
+    if (!event) {
+      throw new NotFoundException(`Event with ID ${id} not found`);
+    }
+    event.is_message_pinned = !event.is_message_pinned;
+
+
+    const updatedData = await this.openPhoneEventRepository.save(event);
+
+    if (updatedData.is_message_pinned) {
+      return {
+        message: `Message pinned  for event_id ${id}`,
+      };
+    } else {
+      return {
+        message: `Message unpinned for event_id ${id}`,
+      };;
+    }
+  }
+
+
+
+
+  async toggleNumberPin(id: number): Promise<{ message: string }> {
+    const event = await this.openPhoneEventRepository.findOne({ where: { id } });
+    if (!event) {
+      throw new NotFoundException(`Event with ID ${id} not found`);
+    }
+    event.is_number_pinned = !event.is_number_pinned;
+    const updatedData = await this.openPhoneEventRepository.save(event);
+    if (updatedData.is_number_pinned) {
+      return {
+        message: `Number pinned  for event_id ${id}`,
+      };
+    } else {
+      return {
+        message: `Number unpinnrd for event_id ${id}`,
+      };;
+    }
+  }
 }
 
 
