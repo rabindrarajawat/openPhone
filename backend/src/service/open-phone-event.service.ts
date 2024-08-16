@@ -24,7 +24,8 @@ export class OpenPhoneEventService {
     private addressRepository: Repository<AddressEntity>,
     private addressService: AddressService,
     private auctionService: AuctionEventService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+
   ) { }
 
   async create(payload: OpenPhoneEventDto) {
@@ -443,4 +444,91 @@ export class OpenPhoneEventService {
       body: event.event_body,
     }));
   }
+
+
+  // async findAllFiltered(filter?: 'delivered' | 'received') {
+  //   const query = this.openPhoneEventRepository.createQueryBuilder('event');
+
+  //   if (filter === 'delivered') {
+  //     query.where('event.event_type_id = :id', { id: 2 });
+  //   } else if (filter === 'received') {
+  //     query.where('event.event_type_id = :id', { id: 1 });
+  //   }
+
+  //   return query.getMany();
+  // }
+
+
+
+
+
+
+  async findAllFiltered(filter?: 'delivered' | 'received') {
+    const query = this.openPhoneEventRepository
+      .createQueryBuilder('event')
+      .leftJoinAndSelect('event.address', 'address');
+
+    if (filter === 'delivered') {
+      query.where('event.event_type_id = :id', { id: 2 });
+    } else if (filter === 'received') {
+      query.where('event.event_type_id = :id', { id: 1 });
+    }
+
+    const events = await query.getMany();
+
+    const addressIds = events.map(event => event.address_id).filter(id => id != null);
+    const addresses = await this.addressRepository.findByIds(addressIds);
+    const addressMap = new Map(addresses.map(addr => [addr.id, addr.address]));
+
+    return events.map(event => ({
+      ...event,
+      address: event.address_id ? addressMap.get(event.address_id) : null,
+    }));
+  }
+
+
+  async toggleMessagePin(id: number): Promise<{ message: string }> {
+    const event = await this.openPhoneEventRepository.findOne({ where: { id } });
+    if (!event) {
+      throw new NotFoundException(`Event with ID ${id} not found`);
+    }
+    event.is_message_pinned = !event.is_message_pinned;
+
+
+    const updatedData = await this.openPhoneEventRepository.save(event);
+
+    if (updatedData.is_message_pinned) {
+      return {
+        message: `Message pinned  for event_id ${id}`,
+      };
+    } else {
+      return {
+        message: `Message unpinned for event_id ${id}`,
+      };;
+    }
+  }
+
+
+
+
+  async toggleNumberPin(id: number): Promise<{ message: string }> {
+    const event = await this.openPhoneEventRepository.findOne({ where: { id } });
+    if (!event) {
+      throw new NotFoundException(`Event with ID ${id} not found`);
+    }
+    event.is_number_pinned = !event.is_number_pinned;
+    const updatedData = await this.openPhoneEventRepository.save(event);
+    if (updatedData.is_number_pinned) {
+      return {
+        message: `Number pinned  for event_id ${id}`,
+      };
+    } else {
+      return {
+        message: `Number unpinnrd for event_id ${id}`,
+      };;
+    }
+  }
 }
+
+
+
