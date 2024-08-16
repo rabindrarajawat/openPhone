@@ -56,15 +56,11 @@ export class OpenPhoneEventEntity {
   @Column()
   dead: string;
 
-
   @Column({ nullable: true })
   created_at: string;
 
-
   @Column({ nullable: true })
   received_at: string;
-
-
 
   @Column()
   keep_an_eye: string;
@@ -77,6 +73,12 @@ export class OpenPhoneEventEntity {
 
   @Column({ nullable: true })
   user_id: string;
+
+  @Column({ type: "boolean", default: false })
+  is_message_pinned: boolean;
+
+  @Column({ type: "boolean", default: false })
+  is_number_pinned: boolean;
 
 
   @ManyToOne(() => AddressEntity, address => address.events)
