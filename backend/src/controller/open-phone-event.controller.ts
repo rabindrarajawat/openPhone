@@ -1,6 +1,6 @@
 
 
-import { Controller, Post, Get, Body, Query } from "@nestjs/common";
+import { Controller, Post, Get, Body, Query, Param } from "@nestjs/common";
 import { OpenPhoneEventService } from "../service/open-phone-event.service";
 import { AddressService } from "src/service/address.service";
 
@@ -75,10 +75,6 @@ export class OpenPhoneEventController {
   }
 
   
-
-
-
-
   @Get()
   async getAllOpenPhoneEvents(@Query('filter') filter?: 'delivered' | 'received') {
     const events = await this.openPhoneEventService.findAllFiltered(filter);
@@ -87,4 +83,18 @@ export class OpenPhoneEventController {
       data: events,
     };
   }
+
+  @Post('toggle-message-pin/:id')
+  async toggleMessagePin(@Param('id') id: number) {
+    const updatedEvent = await this.openPhoneEventService.toggleMessagePin(id);
+    return updatedEvent
+  }
+
+  @Post('toggle-number-pin/:id')
+  async toggleNumberPin(@Param('id') id: number) {
+    const updatedEvent = await this.openPhoneEventService.toggleNumberPin(id);
+    return updatedEvent
+  }
+
+
 }
