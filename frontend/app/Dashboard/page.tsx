@@ -874,7 +874,7 @@ const Dashboard = () => {
 
           {selectedAddress && (
             <div className="conversation-chat">
-              <img src="converstation.svg" alt="" className="converstation-icon"/> Conversation From { }
+              <img src="converstation.svg" alt="" /> Conversation From { }
               {uniqueFromNumbers.length > 0 && (
                 <select
                   value={fromNumber}
