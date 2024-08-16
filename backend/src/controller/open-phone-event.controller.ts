@@ -91,10 +91,18 @@ export class OpenPhoneEventController {
   }
 
   @Post('toggle-number-pin/:id')
-  async toggleNumberPin(@Param('id') id: number) {
-    const updatedEvent = await this.openPhoneEventService.toggleNumberPin(id);
+  async toggleNumberPin(@Param('id') conversation_id: string) {
+    const updatedEvent = await this.openPhoneEventService.toggleNumberPin(conversation_id);
     return updatedEvent
   }
 
-
+  @Get('pinned-messages')
+  async getPinnedMessages() {
+    return this.openPhoneEventService.getAllPinnedMessages();
+  }
+  
+  @Get('pinned-numbers')
+  async getPinnedNumbers() {
+    return this.openPhoneEventService.getAllPinnedNumbers();
+  }
 }
