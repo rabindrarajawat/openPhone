@@ -515,15 +515,24 @@ export class OpenPhoneEventService {
     });
   }
   
-  async getAllPinnedNumbers(): Promise<OpenPhoneEventEntity[]> {
+  // async getAllPinnedNumbers(): Promise<OpenPhoneEventEntity[]> {
+  //   return this.openPhoneEventRepository.find({
+  //     where: { is_number_pinned: true },
+  //   });
+  // }
+
+
+  async getAllPinnedNumbers(conversationId: string): Promise<OpenPhoneEventEntity[]> {
     return this.openPhoneEventRepository.find({
-      where: { is_number_pinned: true },
+      where: { 
+        // is_number_pinned: true,
+        conversation_id: conversationId
+      },
     });
   }
-
-
-
-
+  
+   
+ 
 
 }
 
