@@ -133,12 +133,11 @@ const Dashboard = () => {
   const [showAllAddresses, setShowAllAddresses] = useState<boolean>(true);
   const [selectedDateFilter, setSelectedDateFilter] = useState<'all' | 'weekly' | 'monthly'>('all');
 
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  // const [isCustomDateOpen, setIsCustomDateOpen] = useState(false);
 
 
-
-  const handleSelectAllClick = () => {
-    setFilterOption('bookmarked');
-  };
 
   const handleDefaultClick = () => {
     setFilterOption('all');
@@ -201,8 +200,13 @@ const Dashboard = () => {
       (selectedDateFilter === 'weekly' && isWithinLastWeek(address.created_at)) ||
       (selectedDateFilter === 'monthly' && isWithinLastMonth(address.created_at));
 
-    return matchesAuctionType && matchesBookmark && matchesDateFilter;
+    // Apply custom date filter
+    const matchesCustomDateFilter = (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
+      (!toDate || new Date(address.created_at) <= new Date(toDate));
+
+    return matchesAuctionType && matchesBookmark && matchesDateFilter && matchesCustomDateFilter;
   });
+
 
   // Show all addresses if no filters match
   const addressesToShow = filteredAddresses.length > 0 ? filteredAddresses : addresses1;
@@ -239,7 +243,13 @@ const Dashboard = () => {
 
   const handleDone = () => {
     // Add your logic for when the "Done" button is clicked
-    setIsCustomDateOpen(false); // Close the custom date dropdown
+    setIsCustomDateOpen(true); // Close the custom date dropdown
+  };
+
+  const handleReset = () => {
+    setFromDate('');
+    setToDate('');
+    setIsCustomDateOpen(true);
   };
   // useEffect(() => {
   //   async function fetchEvents() {
@@ -756,10 +766,12 @@ const Dashboard = () => {
                               From:
                             </label>
                             <input
-                              type="text"
+                              type="date"
                               id="fromDate"
                               className="set-date  me-2"
-                              placeholder="08/08/24"
+                              // placeholder="08/08/24"
+                              value={fromDate}
+                              onChange={(e) => setFromDate(e.target.value)}
                             />
                           </div>
                           <div className="d-flex align-items-center mt-2">
@@ -767,19 +779,21 @@ const Dashboard = () => {
                               To:
                             </label>
                             <input
-                              type="text"
+                              type="date"
                               id="toDate"
-                              className="set-date me-2 ms-3"
-                              placeholder="09/09/23"
+                              className="set-date me-2 todate"
+                              value={toDate}
+                              onChange={(e) => setToDate(e.target.value)}
                             />
                           </div>
-                          <button
-                            className="btn btn-primary mt-2"
-                            type="button"
-                            onClick={handleDone}
-                          >
-                            Done
-                          </button>
+                          <div className="d-flex align-items-center mt-2 gap-2">
+                            {/* <button className="btn btn-primary done-button" type="button" onClick={handleDone}>
+                              Done
+                            </button> */}
+                            <button className="btn btn-primary btn btn-primary reset-button" type="button" onClick={handleReset} >
+                              Reset
+                            </button>
+                          </div>
                         </div>
                       )}
                     </li>
