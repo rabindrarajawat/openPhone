@@ -208,8 +208,9 @@
   }
   
   .notification-dropdown li.new-notification {
-  
-    margin-top: 31px;
+    color: #5A657B;
+    font-weight: 400;
+    font-size: 15px;
 }
 .main-notification{
     margin-left: 192px;
