@@ -57,7 +57,7 @@
   margin-left: 133px;
 
   margin-top: 19px;
-} 
+}
 
 .dropdown-type {
   min-width: 148px;
@@ -222,8 +222,11 @@
   padding-left: 14px;
   padding-right: 30px;
   border: 3px solid #D7F5DC;
+
   border-radius: 6px;
+  height: 550px;
 }
+
 
 .search-box {
   display: inline-table;
@@ -248,7 +251,8 @@
   left: 10px;
   transform: translateY(-50%);
 }
-.search-icon{
+
+.search-icon {
   position: absolute;
   left: 12px;
   top: 2px;
@@ -268,6 +272,7 @@
   flex-direction: column;
   align-items: center;
   margin-left: -13px;
+  z-index: 2;
 }
 
 .bookmark-container div,
@@ -372,11 +377,11 @@
 }
 
 .input-msg {
-  width: 288%;
-  height: 173%;
-  margin-top: -270px;
-  margin-left: -546px;
-  margin-left: -542px;
+  width: 280%;
+  height: 140%;
+  margin-top: 8%;
+  margin-top: -255px;
+  margin-left: -541px;
   border-radius: 5px 0px 0px 0px;
   /* background: linear-gradient(171.76deg, #CBE3FF 4.95%, #D2FFCC 92.28%); */
   border: 3px solid #D7F5DC;
@@ -390,6 +395,7 @@
 
 .screenshot-msg {
   width: 97%;
+  width: 97%;
   height: 90%;
   /* top: 594px;
   left: 1029px; */
@@ -402,6 +408,8 @@
   z-index: 2;
   box-shadow: 0px 2px 5px 0px #26334D08;
   display: flex;
+  border-radius: 5px;
+  margin-left: 3px;
   border-radius: 5px;
   margin-left: 3px;
 
@@ -448,15 +456,17 @@
   margin-right: 10px;
 }
 
-.address-list {
+
+
+.list-group-item {
+  margin-left: -145px;
   margin-top: 10%;
-  margin-left: -415px;
 }
 
 .pagination-container .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 350px;
+  margin-top: 235px;
 
 }
 
@@ -586,18 +596,16 @@
   height: 310px;
   margin-top: 30px;
   margin-left: -452px;
+  display: flexs;
 }
 
 .conversation-chat {
-  margin-top: 248px;
-  margin-bottom: 17px;
-  margin-left: -540px;
+  /* display: flex; */
+  margin-top: 230px;
+  margin-left: -541px;
   width: 350px;
   height: 310px;
-  font-size: 20px;
-  font-weight: 600;
 }
-
 
 .message-date-right {
   text-align: right;
@@ -633,17 +641,25 @@
   cursor: pointer;
 }
 
-.selected-address {
-  background-color: #e6f7ff;
-  /* Light blue background for the selected address */
-  color: #007bff;
-  /* Text color for the selected address */
-  border-radius: 5px;
-  /* Optiona
-  l: Add rounded corners */
+.ms-4 {
+  cursor: pointer;
 }
 
 .selected-address .setaddress {
   color: #007bff;
-  /* Ensure that the text inside .setaddress also changes color */
+}
+
+.checkbox {
+  cursor: pointer;
+}
+
+.text-primary {
+  color: blue;
+  /* Adjust the color as needed */
+}
+
+.active-filter {
+  font-weight: bold;
+  color: blue;
+  /* Optional: to visually indicate the active filter */
 }

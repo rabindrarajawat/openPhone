@@ -20,6 +20,8 @@ interface Address1 {
   is_bookmarked: boolean;
   displayAddress: string;
   id: number;
+  auction_event_id: number;
+  created_at: string;
 }
 
 interface Message {
@@ -116,7 +118,104 @@ const Dashboard = () => {
   });
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+  // const [selectedAuctionTypes, setSelectedAuctionTypes] = useState<number[]>([]);
+  // const [filterOption, setFilterOption] = useState<'all' | 'bookmarked' | 'default'>('default');
+
+  // const [selectedAuctionTypes, setSelectedAuctionTypes] = useState<number[]>([]);
+  // const [filterOption, setFilterOption] = useState<'all' | 'bookmarked' | 'default'>('default');
+  // const [timeFilter, setTimeFilter] = useState<'all' | 'weekly' | 'monthly'>('all');
+
+
+  const [selectedAuctionTypes, setSelectedAuctionTypes] = useState<number[]>([]);
+  const [filterOption, setFilterOption] = useState<'all' | 'bookmarked' | 'default'>('default');
+  const [timeFilter, setTimeFilter] = useState<'all' | 'weekly' | 'monthly'>('all');
+  const [showAllAddresses, setShowAllAddresses] = useState<boolean>(true);
+  const [selectedDateFilter, setSelectedDateFilter] = useState<'all' | 'weekly' | 'monthly'>('all');
+
+
+
+
+  const handleSelectAllClick = () => {
+    setFilterOption('bookmarked');
+  };
+
+  const handleDefaultClick = () => {
+    setFilterOption('all');
+  };
+
+  const handleTimeFilterChange = (filter: 'weekly' | 'monthly') => {
+    if (timeFilter === filter) {
+      // If the same filter is clicked again, remove the filter
+      setTimeFilter('all');
+      setShowAllAddresses(true); // Show all addresses if no filters are selected
+    } else {
+      setTimeFilter(filter);
+      setShowAllAddresses(false); // Hide all addresses until a filter is applied
+    }
+  };
+
+
+  const handleCheckboxChange = (typeId: number) => {
+    setSelectedAuctionTypes(prevSelected => {
+      if (prevSelected.includes(typeId)) {
+        // Remove the filter if already selected
+        return prevSelected.filter(id => id !== typeId);
+      } else {
+        return [...prevSelected, typeId];
+      }
+    });
+  };
+
+  // Helper function to check if a date is within the last week
+  const isWithinLastWeek = (dateString: string | number | Date) => {
+    const date = new Date(dateString);
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    return date >= oneWeekAgo;
+  };
+
+  // Helper function to check if a date is within the last month
+  const isWithinLastMonth = (dateString: string | number | Date) => {
+    const date = new Date(dateString);
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    return date >= oneMonthAgo;
+  };
+
+
+  const filteredAddresses = addresses1.filter((address) => {
+    // Apply auction type filter
+    const matchesAuctionType = selectedAuctionTypes.length === 0 || selectedAuctionTypes.includes(address.auction_event_id);
+
+    // Apply bookmark filter
+    const matchesBookmark = filterOption === 'all' ||
+      (filterOption === 'bookmarked' && address.is_bookmarked) ||
+      (filterOption === 'default'); // 'default' shows all addresses
+
+    // Apply date filter
+    const matchesDateFilter =
+      selectedDateFilter === 'all' ||
+      (selectedDateFilter === 'weekly' && isWithinLastWeek(address.created_at)) ||
+      (selectedDateFilter === 'monthly' && isWithinLastMonth(address.created_at));
+
+    return matchesAuctionType && matchesBookmark && matchesDateFilter;
+  });
+
+  // Show all addresses if no filters match
+  const addressesToShow = filteredAddresses.length > 0 ? filteredAddresses : addresses1;
+
+
+
+
+
+
+
+
+  console.log('Filtered Addresses:', filteredAddresses);
+  console.log('All Addresses:', addresses1);
 
 
 
@@ -185,6 +284,9 @@ const Dashboard = () => {
           id: item.id,
           displayAddress: item.address,
           is_bookmarked: item.is_bookmarked,
+          auction_event_id: item.auction_event_id,
+          created_at: item.created_at,
+
         }));
         setAddresses1(formattedAddresses);
 
@@ -522,6 +624,11 @@ const Dashboard = () => {
     return acc;
   }, {});
 
+  const handleFilterChange = (type: 'all' | 'bookmarked' | 'default') => {
+    setFilterOption(type);
+  };
+
+
 
 
   return (
@@ -540,33 +647,33 @@ const Dashboard = () => {
           <div className="">
             <div className="information">Message and Calls</div>
             <div className="main-dropdown">
-            <div className="status">
-              Status
-              <span className="ms-2 mb-2 ">
-                <button
-                  className="btn"
-                  type="button"
-                  onClick={handleToggle}
-                  aria-expanded={isType}
-                >
-                  <img src="/dropdownicon.svg" alt="Dropdown Icon" />
-                </button>
+              <div className="status">
+                Status
+                <span className="ms-2 mb-2 ">
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={handleToggle}
+                    aria-expanded={isType}
+                  >
+                    <img src="/dropdownicon.svg" alt="Dropdown Icon" />
+                  </button>
 
-                <ul className={`dropdown-type ${isType ? "show" : ""}`}>
-                  <li className="dropdown-item">
-                    <input type="checkbox" />
-                    <label className="ms-2">Delivered</label>
-                  </li>
-                  <li className="dropdown-item pt-2">
-                    <input type="checkbox" id="notDelivered" />
-                    <label className="ms-2" htmlFor="notDelivered">
-                      received
-                    </label>
-                  </li>
-                 
-                </ul>
-              </span>
-            </div>
+                  <ul className={`dropdown-type ${isType ? "show" : ""}`}>
+                    <li className="dropdown-item">
+                      <input type="checkbox" />
+                      <label className="ms-2">Delivered</label>
+                    </li>
+                    <li className="dropdown-item pt-2">
+                      <input type="checkbox" id="notDelivered" />
+                      <label className="ms-2" htmlFor="notDelivered">
+                        received
+                      </label>
+                    </li>
+
+                  </ul>
+                </span>
+              </div>
             </div>
             <div className="type">
               Type
@@ -582,18 +689,18 @@ const Dashboard = () => {
 
                 <ul className={`dropdown-type ${isType ? "show" : ""}`}>
                   <li className="dropdown-item">
-                    <input type="checkbox" />
+                    <input type="checkbox" className="checkbox" id="case" onChange={() => handleCheckboxChange(3)} />
                     <label className="ms-2">Case</label>
                   </li>
                   <li className="dropdown-item pt-2">
-                    <input type="checkbox" id="notDelivered" />
-                    <label className="ms-2" htmlFor="notDelivered">
+                    <input type="checkbox" className="checkbox" id="auction" onChange={() => handleCheckboxChange(1)} />
+                    <label className="ms-2" htmlFor="auction">
                       Auction
                     </label>
                   </li>
                   <li className="dropdown-item pt-2">
-                    <input type="checkbox" id="pending" />
-                    <label className="ms-2" htmlFor="pending">
+                    <input type="checkbox" className="checkbox" id="taxDeed" onChange={() => handleCheckboxChange(2)} />
+                    <label className="ms-2" htmlFor="taxDeed">
                       Tax deed
                     </label>
                   </li>
@@ -614,13 +721,18 @@ const Dashboard = () => {
 
                 <ul className={`dropdown-Date ${isType ? "show" : ""}`}>
                   <li className="dropdown-item">
-                    <input type="checkbox" />
-                    <label className="ms-2">weekly</label>
+                    <input type="checkbox" id="weekly" className="checkbox"
+                      onChange={() => setSelectedDateFilter(selectedDateFilter === 'weekly' ? 'all' : 'weekly')} />
+                    <label className="ms-2" htmlFor="weekly">
+                      Weekly {" "}</label>
                   </li>
                   <li className="dropdown-item pt-2">
-                    <input type="checkbox" id="notDelivered" />
-                    <label className="ms-2" htmlFor="notDelivered">
-                      monthly{" "}
+                    <input type="checkbox" id="monthly"
+                      className="checkbox"
+                      onChange={() => setSelectedDateFilter(selectedDateFilter === 'monthly' ? 'all' : 'monthly')}
+                    />
+                    <label className="ms-2" htmlFor="monthly">
+                      Monthly{" "}
                     </label>
                   </li>
                   <div className="custom">
@@ -738,30 +850,33 @@ const Dashboard = () => {
             </div>
 
             <div className="icon-labels d-flex">
-              <div className="bookmark-container text-center">
-                <i className="bi bi-bookmark ms-3"></i>
-                <div>Select all</div>
+              <div
+                className={`bookmark-container text-center ${filterOption === 'bookmarked' ? 'active-filter' : ''}`}
+                onClick={() => handleFilterChange('bookmarked')}
+              >
+                <i className="bi bi-bookmark ms-4"></i>
+                <div className="ms-4">Select all</div>
               </div>
-              <div className="redo-container text-center">
+              <div className="redo-container text-center" onClick={handleDefaultClick}>
                 <img src="/redo.svg" alt="redo" className="ms-3" />
                 <div>Default</div>
               </div>
             </div>
             <div>
-              <div className='address-list'>
+
+              <div className="address-list">
                 <div className="search-wrapper-add">
                   {results.length > 0 && (
                     <SearchResultList results={results} onSelect={handleSelectAddress} />
                   )}
                 </div>
 
-                {addresses1.length > 0 ? (
-                  addresses1.map((address) => (
+                {addressesToShow.length > 0 ? (
+                  addressesToShow.map((address) => (
                     <li
                       key={address.id}
-                      className={`list-group-item d-flex justify-content-between align-items-center ${selectedAddressId === address.id ? 'selected-address' : ''
-                        }`}
-                      onClick={() => handleAddressSelect(address.displayAddress, address.id)} // Pass the address ID on click
+                      className={`list-group-item justify-content-between ${selectedAddressId === address.id ? 'selected-address' : ''}`}
+                      onClick={() => handleAddressSelect(address.displayAddress, address.id)}
                     >
                       <div className="setaddress d-flex align-items-center gap-3 ">
                         <i
@@ -777,6 +892,10 @@ const Dashboard = () => {
                   <p>No addresses found.</p>
                 )}
               </div>
+
+
+
+
 
               <div className="pagination-container">
                 <ul className="pagination">
@@ -890,7 +1009,7 @@ const Dashboard = () => {
 
 
           <div className="search-wrapper ">
-          <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} />
+            <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} />
             <input
               className="search"
               type="search"
@@ -1334,6 +1453,10 @@ export default Dashboard;
 
 
 
+
+function setFilterType(type: string) {
+  throw new Error("Function not implemented.");
+}
 // function setError(arg0: string) {
 //   throw new Error("Function not implemented.");
 // }
