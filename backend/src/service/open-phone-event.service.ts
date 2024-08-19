@@ -452,7 +452,7 @@ export class OpenPhoneEventService {
 
     if (filter === 'delivered') {
       query.where('event.event_type_id = :id', { id: 2 });
-    } else if (filter === 'received') {
+    } else if (filter === 'received') {   
       query.where('event.event_type_id = :id', { id: 1 });
     }
 
