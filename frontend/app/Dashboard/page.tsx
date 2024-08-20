@@ -27,20 +27,28 @@ interface Address1 {
 interface Message {
   event_type_id: number;
   body: string;
-}
-
-interface ApiResponse {
-  message: string;
-  data: Message[];
-}
-
-interface Event {
-  event_type_id: number;
-  body: string;
   to: string;
   created_at: string;
   conversation_id: string;
 }
+
+
+// interface GroupedMessages {
+//   [conversationId: string]: Message[];
+// }
+
+// interface YourComponentProps {
+//   events: Message[];
+//   groupedMessages: GroupedMessages;
+// }
+
+// interface Event {
+//   event_type_id: number;
+//   body: string;
+//   to: string;
+//   created_at: string;
+//   conversation_id: string;
+// }
 
 interface EventItem {
   created_at: string;
@@ -133,12 +141,15 @@ const Dashboard = () => {
   const [showAllAddresses, setShowAllAddresses] = useState<boolean>(true);
   const [selectedDateFilter, setSelectedDateFilter] = useState<'all' | 'weekly' | 'monthly'>('all');
 
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  // const [pinnedConversations, setPinnedConversations] = useState<{ [key: string]: boolean }>({});
+  const [updateTrigger, setUpdateTrigger] = useState(false); // State to force re-render
+  const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(new Set());
 
 
 
-  const handleSelectAllClick = () => {
-    setFilterOption('bookmarked');
-  };
+
 
   const handleDefaultClick = () => {
     setFilterOption('all');
@@ -201,8 +212,13 @@ const Dashboard = () => {
       (selectedDateFilter === 'weekly' && isWithinLastWeek(address.created_at)) ||
       (selectedDateFilter === 'monthly' && isWithinLastMonth(address.created_at));
 
-    return matchesAuctionType && matchesBookmark && matchesDateFilter;
+    // Apply custom date filter
+    const matchesCustomDateFilter = (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
+      (!toDate || new Date(address.created_at) <= new Date(toDate));
+
+    return matchesAuctionType && matchesBookmark && matchesDateFilter && matchesCustomDateFilter;
   });
+
 
   // Show all addresses if no filters match
   const addressesToShow = filteredAddresses.length > 0 ? filteredAddresses : addresses1;
@@ -239,7 +255,13 @@ const Dashboard = () => {
 
   const handleDone = () => {
     // Add your logic for when the "Done" button is clicked
-    setIsCustomDateOpen(false); // Close the custom date dropdown
+    setIsCustomDateOpen(true); // Close the custom date dropdown
+  };
+
+  const handleReset = () => {
+    setFromDate('');
+    setToDate('');
+    setIsCustomDateOpen(true);
   };
   // useEffect(() => {
   //   async function fetchEvents() {
@@ -346,6 +368,46 @@ const Dashboard = () => {
         console.error("Error updating bookmark status:", error);
       });
   };
+
+
+  const handlePinNumber = async (conversationId: string, to: string) => {
+    try {
+      // Check if the conversationId is already pinned
+      const isPinned = pinnedConversations.has(conversationId);
+      console.log(`Before API Call - Is Pinned: ${isPinned}`);
+
+      // API call to toggle pin/unpin
+      const response = await axios.post(
+        `http://localhost:8000/openPhoneEventData/toggle-number-pin/${conversationId}`
+      );
+
+      if (response.status === 200) {
+        // Update the pinned state
+        setPinnedConversations((prevState) => {
+          const newSet = new Set(prevState);
+          if (isPinned) {
+            newSet.delete(conversationId); // Unpin if already pinned
+          } else {
+            newSet.add(conversationId); // Pin if not pinned
+          }
+          console.log(`New State After Toggle:`, Array.from(newSet));
+          return newSet;
+        });
+
+        console.log(`After State Update - Is Pinned: ${!isPinned}`);
+      } else {
+        console.error('API response not OK:', response);
+      }
+    } catch (error) {
+      console.error("Error toggling the pin:", error);
+    }
+  };
+
+  useEffect(() => {
+    console.log("Pinned Conversations Updated:", pinnedConversations);
+  }, [pinnedConversations]);
+
+
 
   // useEffect(() => {
   //   if (selectedAddress && selectedAddress !== "Search Address") {
@@ -756,10 +818,12 @@ const Dashboard = () => {
                               From:
                             </label>
                             <input
-                              type="text"
+                              type="date"
                               id="fromDate"
                               className="set-date  me-2"
-                              placeholder="08/08/24"
+                              // placeholder="08/08/24"
+                              value={fromDate}
+                              onChange={(e) => setFromDate(e.target.value)}
                             />
                           </div>
                           <div className="d-flex align-items-center mt-2">
@@ -767,19 +831,21 @@ const Dashboard = () => {
                               To:
                             </label>
                             <input
-                              type="text"
+                              type="date"
                               id="toDate"
-                              className="set-date me-2 ms-3"
-                              placeholder="09/09/23"
+                              className="set-date me-2 todate"
+                              value={toDate}
+                              onChange={(e) => setToDate(e.target.value)}
                             />
                           </div>
-                          <button
-                            className="btn btn-primary mt-2"
-                            type="button"
-                            onClick={handleDone}
-                          >
-                            Done
-                          </button>
+                          <div className="d-flex align-items-center mt-2 gap-2">
+                            {/* <button className="btn btn-primary done-button" type="button" onClick={handleDone}>
+                              Done
+                            </button> */}
+                            <button className="btn btn-primary btn btn-primary reset-button" type="button" onClick={handleReset} >
+                              Reset
+                            </button>
+                          </div>
                         </div>
                       )}
                     </li>
@@ -1009,7 +1075,7 @@ const Dashboard = () => {
 
 
           <div className="search-wrapper ">
-            <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} />
+            {/* <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} /> */}
             <input
               className="search"
               type="search"
@@ -1033,20 +1099,23 @@ const Dashboard = () => {
             <div className="screenshot-msg">
               <div className="inbox-chat">
                 {events.length > 0 ? (
-                  Object.keys(groupedMessages).map((conversationId) => (
+                  Object.keys(groupedMessages).map((conversationId: string) => (
                     <div key={conversationId}>
                       <div className="to-line">.</div>
                       <div className="to-value">
-                        <strong>To - </strong>{groupedMessages[conversationId][0].to}
+                        <strong>To  </strong>
+                        {groupedMessages[conversationId][0].to}
 
-                        <i className="bi bi-bookmark ms-3"></i>
-
+                        {/* Pin/Unpin Icon */}
+                        <i
+                          className={`bi bi-pin ms-3 ${pinnedConversations.has(conversationId) ? "text-primary" : ""}`}
+                          onClick={() => handlePinNumber(conversationId, groupedMessages[conversationId][0].to)}
+                        ></i>
                       </div>
 
                       {groupedMessages[conversationId].map((message, index) => (
-                        <div>
+                        <div key={index}>
                           <div
-                            key={index}
                             className={
                               message.event_type_id === 1
                                 ? "chat-message-right"
@@ -1100,7 +1169,6 @@ const Dashboard = () => {
                             {new Date(message.created_at).toLocaleDateString()}
                           </div>
                         </div>
-
                       ))}
                     </div>
                   ))
