@@ -383,6 +383,7 @@ export class OpenPhoneEventService {
       to: event.to,
       created_at: event.created_at,
       conversation_id: event.conversation_id,
+      id: event.id,
     }));
   }
 
@@ -452,7 +453,7 @@ export class OpenPhoneEventService {
 
     if (filter === 'delivered') {
       query.where('event.event_type_id = :id', { id: 2 });
-    } else if (filter === 'received') {   
+    } else if (filter === 'received') {
       query.where('event.event_type_id = :id', { id: 1 });
     }
 
@@ -514,7 +515,7 @@ export class OpenPhoneEventService {
       where: { is_message_pinned: true },
     });
   }
-  
+
   // async getAllPinnedNumbers(): Promise<OpenPhoneEventEntity[]> {
   //   return this.openPhoneEventRepository.find({
   //     where: { is_number_pinned: true },
@@ -524,15 +525,15 @@ export class OpenPhoneEventService {
 
   async getAllPinnedNumbers(conversationId: string): Promise<OpenPhoneEventEntity[]> {
     return this.openPhoneEventRepository.find({
-      where: { 
+      where: {
         // is_number_pinned: true,
         conversation_id: conversationId
       },
     });
   }
-  
-   
- 
+
+
+
 
 }
 
