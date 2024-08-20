@@ -383,6 +383,7 @@ export class OpenPhoneEventService {
       to: event.to,
       created_at: event.created_at,
       conversation_id: event.conversation_id,
+      id: event.id,
     }));
   }
 
@@ -514,7 +515,7 @@ export class OpenPhoneEventService {
       where: { is_message_pinned: true },
     });
   }
-  
+
   async getAllPinnedNumbers(): Promise<OpenPhoneEventEntity[]> {
     return this.openPhoneEventRepository.find({
       where: { is_number_pinned: true },
