@@ -33,22 +33,22 @@ interface Message {
 }
 
 
-interface GroupedMessages {
-  [conversationId: string]: Message[];
-}
+// interface GroupedMessages {
+//   [conversationId: string]: Message[];
+// }
 
-interface YourComponentProps {
-  events: Message[];
-  groupedMessages: GroupedMessages;
-}
+// interface YourComponentProps {
+//   events: Message[];
+//   groupedMessages: GroupedMessages;
+// }
 
-interface Event {
-  event_type_id: number;
-  body: string;
-  to: string;
-  created_at: string;
-  conversation_id: string;
-}
+// interface Event {
+//   event_type_id: number;
+//   body: string;
+//   to: string;
+//   created_at: string;
+//   conversation_id: string;
+// }
 
 interface EventItem {
   created_at: string;
@@ -1075,7 +1075,7 @@ const Dashboard = () => {
 
 
           <div className="search-wrapper ">
-            <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} />
+            {/* <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} /> */}
             <input
               className="search"
               type="search"
@@ -1103,7 +1103,7 @@ const Dashboard = () => {
                     <div key={conversationId}>
                       <div className="to-line">.</div>
                       <div className="to-value">
-                        <strong>To - </strong>
+                        <strong>To  </strong>
                         {groupedMessages[conversationId][0].to}
 
                         {/* Pin/Unpin Icon */}
