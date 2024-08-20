@@ -27,11 +27,19 @@ interface Address1 {
 interface Message {
   event_type_id: number;
   body: string;
+  to: string;
+  created_at: string;
+  conversation_id: string;
 }
 
-interface ApiResponse {
-  message: string;
-  data: Message[];
+
+interface GroupedMessages {
+  [conversationId: string]: Message[];
+}
+
+interface YourComponentProps {
+  events: Message[];
+  groupedMessages: GroupedMessages;
 }
 
 interface Event {
@@ -135,7 +143,11 @@ const Dashboard = () => {
 
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
-  // const [isCustomDateOpen, setIsCustomDateOpen] = useState(false);
+  // const [pinnedConversations, setPinnedConversations] = useState<{ [key: string]: boolean }>({});
+  const [updateTrigger, setUpdateTrigger] = useState(false); // State to force re-render
+  const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(new Set());
+
+
 
 
 
@@ -356,6 +368,46 @@ const Dashboard = () => {
         console.error("Error updating bookmark status:", error);
       });
   };
+
+
+  const handlePinNumber = async (conversationId: string, to: string) => {
+    try {
+      // Check if the conversationId is already pinned
+      const isPinned = pinnedConversations.has(conversationId);
+      console.log(`Before API Call - Is Pinned: ${isPinned}`);
+
+      // API call to toggle pin/unpin
+      const response = await axios.post(
+        `http://localhost:8000/openPhoneEventData/toggle-number-pin/${conversationId}`
+      );
+
+      if (response.status === 200) {
+        // Update the pinned state
+        setPinnedConversations((prevState) => {
+          const newSet = new Set(prevState);
+          if (isPinned) {
+            newSet.delete(conversationId); // Unpin if already pinned
+          } else {
+            newSet.add(conversationId); // Pin if not pinned
+          }
+          console.log(`New State After Toggle:`, Array.from(newSet));
+          return newSet;
+        });
+
+        console.log(`After State Update - Is Pinned: ${!isPinned}`);
+      } else {
+        console.error('API response not OK:', response);
+      }
+    } catch (error) {
+      console.error("Error toggling the pin:", error);
+    }
+  };
+
+  useEffect(() => {
+    console.log("Pinned Conversations Updated:", pinnedConversations);
+  }, [pinnedConversations]);
+
+
 
   // useEffect(() => {
   //   if (selectedAddress && selectedAddress !== "Search Address") {
@@ -1047,20 +1099,23 @@ const Dashboard = () => {
             <div className="screenshot-msg">
               <div className="inbox-chat">
                 {events.length > 0 ? (
-                  Object.keys(groupedMessages).map((conversationId) => (
+                  Object.keys(groupedMessages).map((conversationId: string) => (
                     <div key={conversationId}>
                       <div className="to-line">.</div>
                       <div className="to-value">
-                        <strong>To - </strong>{groupedMessages[conversationId][0].to}
+                        <strong>To - </strong>
+                        {groupedMessages[conversationId][0].to}
 
-                        <i className="bi bi-bookmark ms-3"></i>
-
+                        {/* Pin/Unpin Icon */}
+                        <i
+                          className={`bi bi-pin ms-3 ${pinnedConversations.has(conversationId) ? "text-primary" : ""}`}
+                          onClick={() => handlePinNumber(conversationId, groupedMessages[conversationId][0].to)}
+                        ></i>
                       </div>
 
                       {groupedMessages[conversationId].map((message, index) => (
-                        <div>
+                        <div key={index}>
                           <div
-                            key={index}
                             className={
                               message.event_type_id === 1
                                 ? "chat-message-right"
@@ -1114,7 +1169,6 @@ const Dashboard = () => {
                             {new Date(message.created_at).toLocaleDateString()}
                           </div>
                         </div>
-
                       ))}
                     </div>
                   ))
