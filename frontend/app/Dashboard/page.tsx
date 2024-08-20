@@ -126,15 +126,6 @@ const Dashboard = () => {
   });
 
   const [loading, setLoading] = useState(true);
-
-  // const [selectedAuctionTypes, setSelectedAuctionTypes] = useState<number[]>([]);
-  // const [filterOption, setFilterOption] = useState<'all' | 'bookmarked' | 'default'>('default');
-
-  // const [selectedAuctionTypes, setSelectedAuctionTypes] = useState<number[]>([]);
-  // const [filterOption, setFilterOption] = useState<'all' | 'bookmarked' | 'default'>('default');
-  // const [timeFilter, setTimeFilter] = useState<'all' | 'weekly' | 'monthly'>('all');
-
-
   const [selectedAuctionTypes, setSelectedAuctionTypes] = useState<number[]>([]);
   const [filterOption, setFilterOption] = useState<'all' | 'bookmarked' | 'default'>('default');
   const [timeFilter, setTimeFilter] = useState<'all' | 'weekly' | 'monthly'>('all');
@@ -143,9 +134,13 @@ const Dashboard = () => {
 
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
-  // const [pinnedConversations, setPinnedConversations] = useState<{ [key: string]: boolean }>({});
   const [updateTrigger, setUpdateTrigger] = useState(false); // State to force re-render
-  const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(new Set());
+  // const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(new Set());
+
+  const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(() => {
+    const storedPins = localStorage.getItem("pinnedConversations");
+    return storedPins ? new Set<string>(JSON.parse(storedPins)) : new Set<string>();
+  });
 
 
 
@@ -370,9 +365,9 @@ const Dashboard = () => {
   };
 
 
-  const handlePinNumber = async (conversationId: string, to: string) => {
+  const handlePinNumber = async (conversationId: string) => {
     try {
-      // Check if the conversationId is already pinned
+      console.log(`Pin button clicked for conversation ID: ${conversationId}`);
       const isPinned = pinnedConversations.has(conversationId);
       console.log(`Before API Call - Is Pinned: ${isPinned}`);
 
@@ -381,22 +376,29 @@ const Dashboard = () => {
         `http://localhost:8000/openPhoneEventData/toggle-number-pin/${conversationId}`
       );
 
-      if (response.status === 200) {
+      // Check for both 200 and 201 status codes
+      if (response.status === 200 || response.status === 201) {
         // Update the pinned state
         setPinnedConversations((prevState) => {
-          const newSet = new Set(prevState);
+          // Create a new Set from the previous state
+          const newSet = new Set<string>(prevState);
+
           if (isPinned) {
             newSet.delete(conversationId); // Unpin if already pinned
           } else {
             newSet.add(conversationId); // Pin if not pinned
           }
+
+          // Persist the updated pin state to localStorage
+          localStorage.setItem("pinnedConversations", JSON.stringify([...newSet]));
+
           console.log(`New State After Toggle:`, Array.from(newSet));
           return newSet;
         });
 
         console.log(`After State Update - Is Pinned: ${!isPinned}`);
       } else {
-        console.error('API response not OK:', response);
+        console.error('API response not OK:', response.status, response.data);
       }
     } catch (error) {
       console.error("Error toggling the pin:", error);
@@ -1107,10 +1109,19 @@ const Dashboard = () => {
                         {groupedMessages[conversationId][0].to}
 
                         {/* Pin/Unpin Icon */}
-                        <i
+                        {/* <i
                           className={`bi bi-pin ms-3 ${pinnedConversations.has(conversationId) ? "text-primary" : ""}`}
                           onClick={() => handlePinNumber(conversationId, groupedMessages[conversationId][0].to)}
+                        ></i> */}
+
+                        <i
+                          className={`bi pinnumber ${pinnedConversations.has(conversationId) ? "bi-pin-fill text-primary" : "bi-pin"}`}
+                          onClick={() => handlePinNumber(conversationId)}
                         ></i>
+
+
+                        {/* <i className="bi bi-pin-fill"></i> */}
+
                       </div>
 
                       {groupedMessages[conversationId].map((message, index) => (
