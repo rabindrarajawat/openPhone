@@ -103,7 +103,7 @@
 
 
 .set-date {
-  width: 95px;
+  width: 100px !important;
   height: 24px;
   padding: 10px 2px 11px 18px;
   border-radius: 18px;
@@ -643,6 +643,19 @@
 
 .ms-4 {
   cursor: pointer;
+}
+
+.todate {
+  margin-left: 19px !important;
+}
+
+.done-button {
+  margin-left: -30px !important;
+}
+
+.reset-button {
+  margin-left: 75px !important;
+  width: 80px !important;
 }
 
 .selected-address .setaddress {
