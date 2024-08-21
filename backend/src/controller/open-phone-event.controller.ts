@@ -101,8 +101,9 @@ export class OpenPhoneEventController {
     return this.openPhoneEventService.getAllPinnedMessages();
   }
   
-  @Get('pinned-numbers')
-  async getPinnedNumbers() {
-    return this.openPhoneEventService.getAllPinnedNumbers();
+  @Get('pinned-numbers/:conversationId')
+  async getPinnedNumbers(@Param('conversationId') conversationId: string) {
+    return this.openPhoneEventService.getAllPinnedNumbers(conversationId);
   }
+
 }

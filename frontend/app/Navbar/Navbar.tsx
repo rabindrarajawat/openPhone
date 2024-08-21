@@ -6,6 +6,7 @@ import './Navbar.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { SearchResultList } from "../SearchResultList/SearchResultList";
+import NotificationItem from '../notificationiItem'; // Adjust the import path as needed
 
 interface Address {
   fullAddress: string;
@@ -106,9 +107,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
   const handleSelectAddress = (address: Address) => {
     setInput(address.fullAddress);
     setResultsState([]);
-    if (onSelectAddress) {
-      onSelectAddress(address);
-    }
+    onSelectAddress(address);
   };
 
   const handleBellClick = () => {
@@ -136,7 +135,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
   const newNotificationCount = notifications.length;
 
   return (
-    <nav className="navbar ">
+    <nav className="navbar">
       <div className="container-fluid">
         <Image
           src="/line.svg"
@@ -146,10 +145,6 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
           height={50}
           onClick={toggleSidebar}
         />
-        {/* <div className="navbar-brand1">
-          OpenPhone
-        </div> */}
-
         <div className='nav-list'>
           <div className='profileicon'>
             <Image src="/account_circle.svg" alt="Profile" className='profile' width={50} height={50} />
@@ -169,45 +164,21 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
           {showDropdown && (
             <div className="notification-dropdown">
               <div className='main-notification'>
-
-              <span className=''><i className="bi bi-telephone-inbound-fill  call-icon"></i>
-              Calls</span>
-              <span className='text-danger'> <i className="bi bi-chat-right-text icon-message"></i>
-              Message </span>
+                <span><i className="bi bi-telephone-inbound-fill call-icon"></i> Calls</span>
+                <span className='text-danger'> <i className="bi bi-chat-right-text icon-message"></i> Message </span>
               </div>
               <div className='border-bottom mt-2'></div>
 
-              {/* <div>{newNotificationCount}</div>   */}
               <ul>
-  {notifications.map(notification => (
-    <li key={notification.event_id} className={!notification.is_read ? 'new-notification' : ''}>
-      <strong>
-        <span>
-          <i className="bi bi-chat-right-text icon-message icon-missed"></i>
-        </span>
-        You have a missed call from: {notification.event.from}
-        {!notification.is_read && (
-          <button
-            onClick={() => handleMarkAsRead(notification.event_id)}
-            style={{
-              backgroundColor: 'white',
-
-              color: 'green',
-              border: '2px solid green',
-              borderRadius: '20px',
-              padding: '0px 6px',
-              marginLeft: '10px',
-              cursor: 'pointer',
-              borderColor: 'green'
-            }}
-          >
-            Mark as Read
-          </button>
-        )}
-      </strong>
-    </li>
-  ))}
-</ul>
+                {notifications.map(notification => (
+                  <NotificationItem
+                    key={notification.event_id}
+                    event={notification.event}
+                    is_read={notification.is_read}
+                    event_id={notification.event_id}
+                    handleMarkAsRead={handleMarkAsRead} id={0} address_id={null} created_at={''}                  />
+                ))}
+              </ul>
 
             </div>
           )}
