@@ -186,15 +186,16 @@
     right: 10px;
     background-color: white;
     border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 300px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 9px;
+    width: 434px;
+    /* height: 351px; */
     z-index: 1000;
+    
   }
   
   .notification-dropdown ul {
     list-style-type: none;
-    padding: 0;
+    padding: 3px 7px 7px 5px;
     margin: 0;
   }
 
@@ -212,17 +213,62 @@
     font-size: 15px;
 }
 .main-notification{
-    margin-left: 132px;
+    margin-left: 192px;
     margin-top: 13px;
 
 }
+.notification-info{
+    background-color: white;
+    color: green;
+    border: 2px solid green;
+    border-radius: 20px;
+    padding: 0px 6px;
+    margin-bottom: 0px;
+    /* margin-top: -67px; */
+    cursor: pointer;
+    margin-left: 241px;
+    font-size: 12px;
+    border-color: green;
+}
+
 .call-icon{
     margin-right: 5px;
 }
 .icon-message{
-    margin-right: 2px;
-    margin-left :4px;
+    margin-right: 14px;
+    margin-left: 4px;
     color: #EA0000;
+    margin-top: 17px;
+    /* padding: 8px 2px; */
+    padding-top: 12px;
+    padding-bottom: 8px;
+    padding-right: 11px;
+    padding-left: 11px;
+    border-radius: 22px;
 
 
 }
+.calls-text {
+    margin-right: 1%; /* Adjust this value to control the distance */
+  }
+  
+  .message-text {
+    margin-left: 20px; /* Optional, depending on how you want to space things */
+  }
+  .event-from{
+    margin-left: 49px;
+    color: #5A657B;
+    font-size:18px ;
+    font-weight: 500;
+
+  }
+  .missed-message{
+    color: #5A657B;
+    font-size:19px ;
+    font-weight: 400;
+
+  }
+ 
+
+
+  
