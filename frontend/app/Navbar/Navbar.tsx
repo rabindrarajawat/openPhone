@@ -73,7 +73,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
     const fetchNotifications = async () => {
       try {
         const response = await axios.get('http://localhost:8000/notifications');
-        console.log("Notifications:", response.data);
+        // console.log("Notifications:", response.data);
         setNotifications(response.data.filter((notification: Notification) => !notification.is_read));
       } catch (error) {
         console.error("Error fetching notifications:", error);
