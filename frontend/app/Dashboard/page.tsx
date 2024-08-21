@@ -12,9 +12,6 @@ import { SearchResultList } from "../SearchResultList/SearchResultList";
 
 interface Address {
   fullAddress: string;
-
-
-
 }
 interface Address1 {
   is_bookmarked: boolean;
@@ -31,7 +28,6 @@ interface Message {
   created_at: string;
   conversation_id: string;
 }
-
 
 // interface GroupedMessages {
 //   [conversationId: string]: Message[];
@@ -71,7 +67,7 @@ interface EventItem {
   keep_an_eye: string;
   is_stop: string;
   body: string;
-
+  is_message_pinned: boolean;
 }
 
 const Dashboard = () => {
@@ -111,7 +107,9 @@ const Dashboard = () => {
   const [isDate, setIsDate] = useState(true);
   const [isCustomDateOpen, setIsCustomDateOpen] = useState(true);
   const [events, setEvents] = useState<EventItem[]>([]);
-  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
+    null
+  );
   const [currentPage, setCurrentPage] = useState(1);
 
   const [uniqueFromNumbers, setUniqueFromNumbers] = useState<string[]>([]);
@@ -126,14 +124,22 @@ const Dashboard = () => {
   });
 
   const [loading, setLoading] = useState(true);
-  const [selectedAuctionTypes, setSelectedAuctionTypes] = useState<number[]>([]);
-  const [filterOption, setFilterOption] = useState<'all' | 'bookmarked' | 'default'>('default');
-  const [timeFilter, setTimeFilter] = useState<'all' | 'weekly' | 'monthly'>('all');
+  const [selectedAuctionTypes, setSelectedAuctionTypes] = useState<number[]>(
+    []
+  );
+  const [filterOption, setFilterOption] = useState<
+    "all" | "bookmarked" | "default"
+  >("default");
+  const [timeFilter, setTimeFilter] = useState<"all" | "weekly" | "monthly">(
+    "all"
+  );
   const [showAllAddresses, setShowAllAddresses] = useState<boolean>(true);
-  const [selectedDateFilter, setSelectedDateFilter] = useState<'all' | 'weekly' | 'monthly'>('all');
+  const [selectedDateFilter, setSelectedDateFilter] = useState<
+    "all" | "weekly" | "monthly"
+  >("all");
 
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const [updateTrigger, setUpdateTrigger] = useState(false); // State to force re-render
   const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(new Set<string>());
   const [searchQuery, setSearchQuery] = useState('');
@@ -146,18 +152,21 @@ const Dashboard = () => {
     }
   }, []);
 
+  // const [groupedMessage, setGroupedMessages] = useState<
+  //   Record<string, EventItem[]>
+  // >({});
 
-
-
+  const [pinnedMessages, setPinnedMessages] = useState<Set<number>>(new Set());
+  const [messages, setMessages] = useState<EventItem[]>([]);
 
   const handleDefaultClick = () => {
-    setFilterOption('all');
+    setFilterOption("all");
   };
 
-  const handleTimeFilterChange = (filter: 'weekly' | 'monthly') => {
+  const handleTimeFilterChange = (filter: "weekly" | "monthly") => {
     if (timeFilter === filter) {
       // If the same filter is clicked again, remove the filter
-      setTimeFilter('all');
+      setTimeFilter("all");
       setShowAllAddresses(true); // Show all addresses if no filters are selected
     } else {
       setTimeFilter(filter);
@@ -165,12 +174,11 @@ const Dashboard = () => {
     }
   };
 
-
   const handleCheckboxChange = (typeId: number) => {
-    setSelectedAuctionTypes(prevSelected => {
+    setSelectedAuctionTypes((prevSelected) => {
       if (prevSelected.includes(typeId)) {
         // Remove the filter if already selected
-        return prevSelected.filter(id => id !== typeId);
+        return prevSelected.filter((id) => id !== typeId);
       } else {
         return [...prevSelected, typeId];
       }
@@ -194,7 +202,6 @@ const Dashboard = () => {
 
     return date >= oneMonthAgo;
   };
-
 
   const filteredAddresses = addresses1.filter((address) => {
     const matchesAuctionType = selectedAuctionTypes.length === 0 || selectedAuctionTypes.includes(address.auction_event_id);
@@ -231,8 +238,8 @@ const Dashboard = () => {
   };
 
   const handleReset = () => {
-    setFromDate('');
-    setToDate('');
+    setFromDate("");
+    setToDate("");
     setIsCustomDateOpen(true);
   };
 
@@ -261,7 +268,6 @@ const Dashboard = () => {
           is_bookmarked: item.is_bookmarked,
           auction_event_id: item.auction_event_id,
           created_at: item.created_at,
-
         }));
         setAddresses1(formattedAddresses);
 
@@ -275,13 +281,14 @@ const Dashboard = () => {
       });
   }, []);
 
-
   useEffect(() => {
     const fetchEventCounts = async () => {
       try {
-        const response = await fetch('http://localhost:8000/openPhoneEventData/all');
+        const response = await fetch(
+          "http://localhost:8000/openPhoneEventData/all"
+        );
         if (!response.ok) {
-          throw new Error('Failed to fetch event counts');
+          throw new Error("Failed to fetch event counts");
         }
         const data = await response.json();
         setCounts(data);
@@ -309,7 +316,6 @@ const Dashboard = () => {
         is_bookmarked: newIsBookmarked,
       })
       .then((response) => {
-        console.log(`API Response for bookmarking:`, response.data);
         // Update the state only if the API call was successful
         setAddresses1((prevAddresses) =>
           prevAddresses.map((a) =>
@@ -322,12 +328,9 @@ const Dashboard = () => {
       });
   };
 
-
   const handlePinNumber = async (conversationId: string) => {
     try {
-      console.log(`Pin button clicked for conversation ID: ${conversationId}`);
       const isPinned = pinnedConversations.has(conversationId);
-      console.log(`Before API Call - Is Pinned: ${isPinned}`);
 
       // API call to toggle pin/unpin
       const response = await axios.post(
@@ -348,26 +351,23 @@ const Dashboard = () => {
           }
 
           // Persist the updated pin state to localStorage
-          localStorage.setItem("pinnedConversations", JSON.stringify([...newSet]));
+          localStorage.setItem(
+            "pinnedConversations",
+            JSON.stringify([...newSet])
+          );
 
-          console.log(`New State After Toggle:`, Array.from(newSet));
           return newSet;
         });
-
-        console.log(`After State Update - Is Pinned: ${!isPinned}`);
       } else {
-        console.error('API response not OK:', response.status, response.data);
+        console.error("API response not OK:", response.status, response.data);
       }
     } catch (error) {
       console.error("Error toggling the pin:", error);
     }
   };
 
-  useEffect(() => {
-    console.log("Pinned Conversations Updated:", pinnedConversations);
-  }, [pinnedConversations]);
-
-
+  // useEffect(() => {
+  //  }, [pinnedConversations]);
 
   // useEffect(() => {
   //   if (selectedAddress && selectedAddress !== "Search Address") {
@@ -416,10 +416,16 @@ const Dashboard = () => {
             setEventData(data.events);
 
             // Filter events to only include those with an address_id
-            const eventsWithAddressId = data.events.filter((event: any) => event.address_id);
+            const eventsWithAddressId = data.events.filter(
+              (event: any) => event.address_id
+            );
 
             // Extract unique 'fromNumber' values from filtered events
-            const uniqueNumbers = Array.from(new Set<string>(eventsWithAddressId.map((event: any) => event.from)));
+            const uniqueNumbers = Array.from(
+              new Set<string>(
+                eventsWithAddressId.map((event: any) => event.from)
+              )
+            );
             setUniqueFromNumbers(uniqueNumbers);
 
             if (eventsWithAddressId.length > 0) {
@@ -644,21 +650,131 @@ const Dashboard = () => {
 
 
   // Group messages by conversation_id
-  const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>((acc, message) => {
-    if (!acc[message.conversation_id]) {
-      acc[message.conversation_id] = [];
-    }
-    acc[message.conversation_id].push(message);
-    return acc;
-  }, {});
+  const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>(
+    (acc, message) => {
+      if (!acc[message.conversation_id]) {
+        acc[message.conversation_id] = [];
+      }
+      acc[message.conversation_id].push(message);
+      return acc;
+    },
+    {}
+  );
 
-  const handleFilterChange = (type: 'all' | 'bookmarked' | 'default') => {
+  const handleFilterChange = (type: "all" | "bookmarked" | "default") => {
     setFilterOption(type);
   };
 
+  // const toggleMessagePin = async (messageId: number) => {
+  //   console.log("🚀 ~ toggleMessagePin ~ messageId:", messageId);
+  //   try {
+  //     const response = await axios.post(
+  //       `http://localhost:8000/openPhoneEventData/toggle-message-pin/${messageId}`
+  //     );
+  //     console.log("API Response:", response.data);
 
+  //     if (response.data && response.data.message) {
+  //       // Update the local pinned messages state
+  //       setPinnedMessages((prevPinnedMessages) => {
+  //         const newPinnedMessages = new Set(prevPinnedMessages);
+  //         if (newPinnedMessages.has(messageId)) {
+  //           newPinnedMessages.delete(messageId);
+  //         } else {
+  //           newPinnedMessages.add(messageId);
 
+  //         }
+  //         return newPinnedMessages;
+  //       });
 
+  //       console.log("Pin status updated successfully");
+  //     } else {
+  //       console.error("Unexpected response format:", response.data);
+  //     }
+  //   } catch (error: any) {
+  //     console.error("Error toggling message pin:", error);
+  //     if (error.response) {
+  //       console.error("Error response:", error.response.data);
+  //     }
+  //   }
+  // };
+
+  // const toggleMessagePin = async (messageId: number, message: any) => {
+  //   console.log("🚀 ~ Dashboard ~ groupedMessages:", groupedMessages)
+
+  //   console.log("🚀 ~ toggleMessagePin ~ message:", messageId, message);
+  //   try {
+  //     const response = await axios.post(
+  //       `http://localhost:8000/openPhoneEventData/toggle-message-pin/${messageId}`
+  //     );
+
+  //     if (response.data && response.data.message) {
+  //       // Update the specific message's is_message_pinned property first
+  //       setMessages((prevMessages) =>
+  //         prevMessages.map((msg) =>
+  //           msg.id === messageId
+  //             ? { ...msg, is_message_pinned: !msg.is_message_pinned }
+  //             : msg
+  //         )
+  //       );
+
+  //       // Then update the local pinned messages state
+  //       setPinnedMessages((prevPinnedMessages) => {
+  //         const newPinnedMessages = new Set(prevPinnedMessages);
+  //         if (newPinnedMessages.has(messageId)) {
+  //           newPinnedMessages.delete(messageId);
+  //         } else {
+  //           newPinnedMessages.add(messageId);
+  //         }
+  //         return newPinnedMessages;
+  //       });
+  //     } else {
+  //       console.error("Unexpected response format:", response.data);
+  //     }
+  //   } catch (error: any) {
+  //     console.error("Error toggling message pin:", error);
+  //     if (error.response) {
+  //       console.error("Error response:", error.response.data);
+  //     }
+  //   }
+  // };
+
+  const [updatedMessages, setUpdatedMessages] = useState(groupedMessages);
+  console.log("🚀 ~ Dashboard ~ updatedMessages:", updatedMessages);
+
+  useEffect(() => {
+    // Update state whenever events change
+    setUpdatedMessages(groupedMessages);
+  }, [events]);
+
+  const toggleMessagePin = async (
+    messageId: number,
+    conversationId: string
+  ) => {
+    try {
+      await axios.post(
+        `http://localhost:8000/openPhoneEventData/toggle-message-pin/${messageId}`
+      );
+
+      setUpdatedMessages((prevMessages) => {
+        const updatedMessages = { ...prevMessages };
+        const conversationMessages = updatedMessages[conversationId].map(
+          (msg) => {
+            if (msg.id === messageId) {
+              return {
+                ...msg,
+                is_message_pinned: !msg.is_message_pinned,
+              };
+            }
+            return msg;
+          }
+        );
+        updatedMessages[conversationId] = conversationMessages;
+        return updatedMessages;
+      });
+    } catch (error) {
+      console.error("Failed to toggle pin state:", error);
+    }
+  };
   return (
     <div>
       {/* <Navbar onSelectAddress={handleAddressSelect1} /> */}
@@ -698,7 +814,6 @@ const Dashboard = () => {
                         received
                       </label>
                     </li>
-
                   </ul>
                 </span>
               </div>
@@ -717,17 +832,32 @@ const Dashboard = () => {
 
                 <ul className={`dropdown-type ${isType ? "show" : ""}`}>
                   <li className="dropdown-item">
-                    <input type="checkbox" className="checkbox" id="case" onChange={() => handleCheckboxChange(3)} />
+                    <input
+                      type="checkbox"
+                      className="checkbox"
+                      id="case"
+                      onChange={() => handleCheckboxChange(3)}
+                    />
                     <label className="ms-2">Case</label>
                   </li>
                   <li className="dropdown-item pt-2">
-                    <input type="checkbox" className="checkbox" id="auction" onChange={() => handleCheckboxChange(1)} />
+                    <input
+                      type="checkbox"
+                      className="checkbox"
+                      id="auction"
+                      onChange={() => handleCheckboxChange(1)}
+                    />
                     <label className="ms-2" htmlFor="auction">
                       Auction
                     </label>
                   </li>
                   <li className="dropdown-item pt-2">
-                    <input type="checkbox" className="checkbox" id="taxDeed" onChange={() => handleCheckboxChange(2)} />
+                    <input
+                      type="checkbox"
+                      className="checkbox"
+                      id="taxDeed"
+                      onChange={() => handleCheckboxChange(2)}
+                    />
                     <label className="ms-2" htmlFor="taxDeed">
                       Tax deed
                     </label>
@@ -749,15 +879,30 @@ const Dashboard = () => {
 
                 <ul className={`dropdown-Date ${isType ? "show" : ""}`}>
                   <li className="dropdown-item">
-                    <input type="checkbox" id="weekly" className="checkbox"
-                      onChange={() => setSelectedDateFilter(selectedDateFilter === 'weekly' ? 'all' : 'weekly')} />
+                    <input
+                      type="checkbox"
+                      id="weekly"
+                      className="checkbox"
+                      onChange={() =>
+                        setSelectedDateFilter(
+                          selectedDateFilter === "weekly" ? "all" : "weekly"
+                        )
+                      }
+                    />
                     <label className="ms-2" htmlFor="weekly">
-                      Weekly {" "}</label>
+                      Weekly{" "}
+                    </label>
                   </li>
                   <li className="dropdown-item pt-2">
-                    <input type="checkbox" id="monthly"
+                    <input
+                      type="checkbox"
+                      id="monthly"
                       className="checkbox"
-                      onChange={() => setSelectedDateFilter(selectedDateFilter === 'monthly' ? 'all' : 'monthly')}
+                      onChange={() =>
+                        setSelectedDateFilter(
+                          selectedDateFilter === "monthly" ? "all" : "monthly"
+                        )
+                      }
                     />
                     <label className="ms-2" htmlFor="monthly">
                       Monthly{" "}
@@ -808,7 +953,11 @@ const Dashboard = () => {
                             {/* <button className="btn btn-primary done-button" type="button" onClick={handleDone}>
                               Done
                             </button> */}
-                            <button className="btn btn-primary btn btn-primary reset-button" type="button" onClick={handleReset} >
+                            <button
+                              className="btn btn-primary btn btn-primary reset-button"
+                              type="button"
+                              onClick={handleReset}
+                            >
                               Reset
                             </button>
                           </div>
@@ -820,7 +969,6 @@ const Dashboard = () => {
               </span>
             </div>
           </div>
-
         </div>
 
         <div>
@@ -884,23 +1032,29 @@ const Dashboard = () => {
 
             <div className="icon-labels">
               <div
-                className={`bookmark-container text-center ${filterOption === 'bookmarked' ? 'active-filter' : ''}`}
-                onClick={() => handleFilterChange('bookmarked')}
+                className={`bookmark-container text-center ${filterOption === "bookmarked" ? "active-filter" : ""
+                  }`}
+                onClick={() => handleFilterChange("bookmarked")}
               >
                 <i className="bi bi-bookmark ms-4"></i>
                 <div className="ms-4">Select all</div>
               </div>
-              <div className="redo-container text-center" onClick={handleDefaultClick}>
+              <div
+                className="redo-container text-center"
+                onClick={handleDefaultClick}
+              >
                 <img src="/redo.svg" alt="redo" className="ms-3" />
                 <div>Default</div>
               </div>
             </div>
             <div>
-
               <div className="address-list">
                 <div className="search-wrapper-add">
                   {results.length > 0 && (
-                    <SearchResultList results={results} onSelect={handleSelectAddress} />
+                    <SearchResultList
+                      results={results}
+                      onSelect={handleSelectAddress}
+                    />
                   )}
                 </div>
 
@@ -908,13 +1062,24 @@ const Dashboard = () => {
                   addressesToShow.map((address) => (
                     <li
                       key={address.id}
-                      className={`list-group-item justify-content-between ${selectedAddressId === address.id ? 'selected-address' : ''}`}
-                      onClick={() => handleAddressSelect(address.displayAddress, address.id)}
+                      className={`list-group-item justify-content-between ${selectedAddressId === address.id
+                        ? "selected-address"
+                        : ""
+                        }`}
+                      onClick={() =>
+                        handleAddressSelect(address.displayAddress, address.id)
+                      }
                     >
                       <div className="setaddress d-flex align-items-center gap-3 ">
                         <i
-                          className={`bi ${address.is_bookmarked ? 'bi-bookmark-fill' : 'bi-bookmark'} clickable-icon`}
-                          style={{ cursor: 'pointer', color: address.is_bookmarked ? 'blue' : 'grey' }}
+                          className={`bi ${address.is_bookmarked
+                            ? "bi-bookmark-fill"
+                            : "bi-bookmark"
+                            } clickable-icon`}
+                          style={{
+                            cursor: "pointer",
+                            color: address.is_bookmarked ? "blue" : "grey",
+                          }}
                           onClick={() => handleBookmarkClick(address.id)}
                         ></i>
                         <span className="ml-2">{address.displayAddress}</span>
@@ -926,13 +1091,12 @@ const Dashboard = () => {
                 )}
               </div>
 
-
-
-
-
               <div className="pagination-container">
                 <ul className="pagination">
-                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                  <li
+                    className={`page-item ${currentPage === 1 ? "disabled" : ""
+                      }`}
+                  >
                     <button
                       className="page-link"
                       onClick={() => handlePageChange(currentPage - 1)}
@@ -942,7 +1106,11 @@ const Dashboard = () => {
                     </button>
                   </li>
                   {[...Array(totalPages)].map((_, i) => (
-                    <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                    <li
+                      key={i}
+                      className={`page-item ${currentPage === i + 1 ? "active" : ""
+                        }`}
+                    >
                       <button
                         className="page-link"
                         onClick={() => handlePageChange(i + 1)}
@@ -951,7 +1119,10 @@ const Dashboard = () => {
                       </button>
                     </li>
                   ))}
-                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                  <li
+                    className={`page-item ${currentPage === totalPages ? "disabled" : ""
+                      }`}
+                  >
                     <button
                       className="page-link"
                       onClick={() => handlePageChange(currentPage + 1)}
@@ -964,7 +1135,6 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-
         </div>
 
         <div>
@@ -1023,16 +1193,17 @@ const Dashboard = () => {
               {uniqueFromNumbers.length > 0 && (
                 <select
                   value={fromNumber}
-                  onChange={(e) => setFromNumber(e.target.value)}  // Update fromNumber on selection
+                  onChange={(e) => setFromNumber(e.target.value)} // Update fromNumber on selection
                 >
                   {uniqueFromNumbers.map((number, index) => (
-                    <option key={index} value={number}>{number}</option>
+                    <option key={index} value={number}>
+                      {number}
+                    </option>
                   ))}
                 </select>
               )}
             </div>
           )}
-
 
           <div className="search-wrapper ">
             <input
@@ -1044,104 +1215,136 @@ const Dashboard = () => {
           <div className="input-msg">
             <div className="screenshot-msg">
               <div className="inbox-chat">
-                {events.length > 0 ? (
-                  Object.keys(groupedMessages).map((conversationId: string) => {
-                    const isStop = groupedMessages[conversationId].some(
+                {events.length > 0
+                  ? Object.keys(updatedMessages).map((conversationId) => {
+                    const isStop = updatedMessages[conversationId].some(
                       (message) => message.is_stop
-
                     );
-                    console.log(isStop)
+                    console.log(
+                      "🚀 ~ Dashboard ~ isStop:",
+                      updatedMessages,
+                      isStop
+                    );
+
                     return (
                       <div key={conversationId}>
                         <div className="to-line">.</div>
                         <div className="to-value">
                           <strong>To </strong>
-                          <span
-                            style={{ color: isStop ? 'red' : 'inherit' }}
-                          >
-                            {groupedMessages[conversationId][0].to}
+                          <span style={{ color: isStop ? "red" : "inherit" }}>
+                            {updatedMessages[conversationId][0].to}
                           </span>
+
                           <i
                             className={`bi pinnumber ${pinnedConversations.has(conversationId)
-                              ? 'bi-pin-fill text-primary'
-                              : 'bi-pin'
+                              ? "bi-pin-fill text-primary"
+                              : "bi-pin"
                               }`}
                             onClick={() => handlePinNumber(conversationId)}
                           ></i>
                         </div>
 
-                        {groupedMessages[conversationId].map((message, index) => (
-                          <div key={index}>
-                            <div
-                              className={
-                                message.event_type_id === 1
-                                  ? 'chat-message-right'
-                                  : 'chat-message-left'
-                              }
-                            >
-                              <div className="message-body-1">
-                                {expandedMessages.has(index) ? (
-                                  <div>
-                                    {message.body}
-                                    <button
-                                      onClick={() => toggleMessageExpansion(index)}
-                                      className={`read-less-btn ${message.event_type_id === 1
-                                        ? 'read-less-btn-right'
-                                        : 'read-less-btn-left'
-                                        }`}
-                                    >
-                                      Read Less
-                                    </button>
-                                  </div>
-                                ) : (
-                                  <div>
-                                    {message.body && message.body.length > 100 ? (
-                                      <>
-                                        {message.body.substring(0, 100)}...
-                                        <button
-                                          onClick={() => toggleMessageExpansion(index)}
-                                          className={`read-more-btn ${message.event_type_id === 1
-                                            ? 'read-more-btn-right'
-                                            : 'read-more-btn-left'
-                                            }`}
-                                        >
-                                          Read More
-                                        </button>
-                                      </>
-                                    ) : (
-                                      message.body || 'No message body'
-                                    )}
-                                  </div>
-                                )}
+                        {updatedMessages[conversationId].map(
+                          (message, index) => (
+                            <div key={index}>
+                              <div
+                                className={
+                                  message.event_type_id === 1
+                                    ? "chat-message-right"
+                                    : "chat-message-left"
+                                }
+                              >
+                                <div className="message-body-1">
+                                  {expandedMessages.has(index) ? (
+                                    <div>
+                                      {message.body}
+                                      <button
+                                        onClick={() =>
+                                          toggleMessageExpansion(index)
+                                        }
+                                        className={`read-less-btn ${message.event_type_id === 1
+                                          ? "read-less-btn-right"
+                                          : "read-less-btn-left"
+                                          }`}
+                                      >
+                                        Read Less
+                                      </button>
+
+                                      <i
+                                        className={`bi ${message.is_message_pinned
+                                          ? "bi-star-fill text-warning"
+                                          : "bi-star"
+                                          } star-icon`}
+                                        onClick={() =>
+                                          toggleMessagePin(
+                                            message.id,
+                                            conversationId
+                                          )
+                                        }
+                                      ></i>
+                                    </div>
+                                  ) : (
+                                    <div>
+                                      {message.body &&
+                                        message.body.length > 100 ? (
+                                        <>
+                                          {message.body.substring(0, 100)}
+                                          ...
+                                          <button
+                                            onClick={() =>
+                                              toggleMessageExpansion(index)
+                                            }
+                                            className={`read-more-btn ${message.event_type_id === 1
+                                              ? "read-more-btn-right"
+                                              : "read-more-btn-left"
+                                              }`}
+                                          >
+                                            Read More
+                                          </button>
+                                          <i
+                                            style={{ cursor: "pointer" }}
+                                            className={`bi ${message.is_message_pinned
+                                              ? "bi-star-fill text-warning"
+                                              : "bi-star"
+                                              } star-icon cursor-pointer`}
+                                            onClick={() =>
+                                              toggleMessagePin(
+                                                message.id,
+                                                conversationId
+                                              )
+                                            }
+                                          ></i>
+                                        </>
+                                      ) : (
+                                        message.body || "No message body"
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                              <div
+                                className={
+                                  message.event_type_id === 1
+                                    ? "message-date message-date-right"
+                                    : "message-date message-date-left"
+                                }
+                              >
+                                {new Date(
+                                  message.created_at
+                                ).toLocaleDateString()}
                               </div>
                             </div>
-                            <div
-                              className={
-                                message.event_type_id === 1
-                                  ? 'message-date message-date-right'
-                                  : 'message-date message-date-left'
-                              }
-                            >
-                              {new Date(message.created_at).toLocaleDateString()}
-                            </div>
-                          </div>
-                        ))}
+                          )
+                        )}
                       </div>
                     );
                   })
-                ) : (
-                  'Loading...'
-                )}
+                  : "Loading..."}
               </div>
             </div>
           </div>
-
-
         </div>
-
       </div>
-
-
 
       {/* <div className={`box ${isSidebarVisible ? "sidebar-visible" : ""}`}>
         <div className="mg-2">
@@ -1468,7 +1671,7 @@ const Dashboard = () => {
         </div >
 
       </div > */}
-    </div >
+    </div>
   );
 };
 
