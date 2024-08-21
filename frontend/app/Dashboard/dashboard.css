@@ -459,7 +459,7 @@
 
 .list-group-item {
   margin-left: -145px;
-  margin-top: 10%;
+  margin-top: 12%;
 }
 
 .pagination-container .pagination {
@@ -646,16 +646,16 @@
 
 .selected-address .setaddress {
   color: #007bff;
-  margin-left: 0%;
-  padding: 13px;
-  padding-top: 32px;
+  padding-top:15px
+  
+
 }
   
 
 
 .setaddress{
-  margin-left: 1%;
-  padding: 13px;
+  margin-left: -77%;
+
 
 }
 

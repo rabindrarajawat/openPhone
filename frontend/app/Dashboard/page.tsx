@@ -168,6 +168,8 @@ const Dashboard = () => {
   const [timeFilter, setTimeFilter] = useState<'all' | 'weekly' | 'monthly'>('all');
   const [showAllAddresses, setShowAllAddresses] = useState<boolean>(true);
   const [selectedDateFilter, setSelectedDateFilter] = useState<'all' | 'weekly' | 'monthly'>('all');
+  const [statusFilter, setStatus] = useState<'delivered' | 'received' | null>(null);
+
 
 
 
@@ -314,7 +316,7 @@ const Dashboard = () => {
 
 
   useEffect(() => {
-    const fetchData1 = async () => {
+    const fetchData = async () => {
       try {
         // Fetch addresses
         const addressResponse = await axios.get('http://localhost:8000/address/getalladdress');
@@ -324,25 +326,44 @@ const Dashboard = () => {
           is_bookmarked: item.is_bookmarked,
           auction_event_id: item.auction_event_id,
           created_at: item.created_at,
-          notificationCount: 0, // Initialize notification count
+          notificationCount: 0,
         }));
 
         // Fetch notifications
         const notificationResponse = await axios.get('http://localhost:8000/notifications');
-        const unreadNotifications = notificationResponse.data.filter((notification: Notification) => !notification.is_read);
+        const unreadNotifications = notificationResponse.data.filter(
+          (notification: Notification) => !notification.is_read
+        );
+        setNotifications(unreadNotifications);
 
         // Calculate notification counts
         const addressNotificationCounts = formattedAddresses.map((address: { id: any; }) => {
-          const count = unreadNotifications.filter((notification: { address_id: any; }) => notification.address_id === address.id).length;
+          const count = unreadNotifications.filter(
+            (notification: { address_id: any; }) => notification.address_id === address.id
+          ).length;
           return { ...address, notificationCount: count };
         });
 
+        // Filter addresses based on the status filter
+        let filteredAddresses = addressNotificationCounts;
+        if (statusFilter) {
+          const statusResponse = await axios.get(
+            `http://localhost:8000/openPhoneEventData?filter=${statusFilter}`
+          );
+          const statusAddressIds = statusResponse.data.map((item: any) => item.address_id);
+          filteredAddresses = addressNotificationCounts.filter((address: { id: any; }) =>
+            statusAddressIds.includes(address.id)
+          );
+        }
+
         // Sort addresses so that those with new notifications appear at the top
-        const sortedAddresses = addressNotificationCounts.sort((a: { notificationCount: number; }, b: { notificationCount: number; }) => {
-          if (a.notificationCount > 0 && b.notificationCount === 0) return -1;
-          if (a.notificationCount === 0 && b.notificationCount > 0) return 1;
-          return 0;
-        });
+        const sortedAddresses = filteredAddresses.sort(
+          (a: { notificationCount: number; }, b: { notificationCount: number; }) => {
+            if (a.notificationCount > 0 && b.notificationCount === 0) return -1;
+            if (a.notificationCount === 0 && b.notificationCount > 0) return 1;
+            return 0;
+          }
+        );
 
         setAddresses1(sortedAddresses);
 
@@ -355,8 +376,16 @@ const Dashboard = () => {
       }
     };
 
-    fetchData1();
-  }, []);
+    fetchData();
+  }, [statusFilter]);//Dependency on filter Added filter dependency
+
+  const handleCheckboxChange1 = (status: 'delivered' | 'received') => {
+    if (statusFilter === status) {
+      setStatus(null); // Clear filter if same checkbox is clicked again
+    } else {
+      setStatus(status); // Set filter
+    }
+  };
  
 
   useEffect(() => {
@@ -705,33 +734,27 @@ const Dashboard = () => {
           <div className="">
             <div className="information">Message and Calls</div>
             <div className="main-dropdown">
-              <div className="status">
-                Status
-                <span className="ms-2 mb-2 ">
-                  <button
-                    className="btn"
-                    type="button"
-                    onClick={handleToggle}
-                    aria-expanded={isType}
-                  >
-                    <img src="/dropdownicon.svg" alt="Dropdown Icon" />
-                  </button>
+           
+            <div className="status">
+        Status
+        <span className="ms-2 mb-2">
+          <input
+            type="checkbox"
+            id="delivered"
+            checked={statusFilter === 'delivered'}
+            onChange={() => handleCheckboxChange1('delivered')}
+          />
+          <label htmlFor="delivered" className="ms-2">Delivered</label>
 
-                  <ul className={`dropdown-type ${isType ? "show" : ""}`}>
-                    <li className="dropdown-item">
-                      <input type="checkbox" />
-                      <label className="ms-2">Delivered</label>
-                    </li>
-                    <li className="dropdown-item pt-2">
-                      <input type="checkbox" id="notDelivered" />
-                      <label className="ms-2" htmlFor="notDelivered">
-                        received
-                      </label>
-                    </li>
-
-                  </ul>
-                </span>
-              </div>
+          <input
+            type="checkbox"
+            id="received"
+            checked={statusFilter === 'received'}
+            onChange={() => handleCheckboxChange1('received')}
+          />
+          <label htmlFor="received" className="ms-2">Received</label>
+        </span>
+      </div>
             </div>
             <div className="type">
               Type
@@ -921,7 +944,6 @@ const Dashboard = () => {
               </div>
             </div>
             <div>
-
             <div className="address-list">
       <div className="search-wrapper-add">
         {results.length > 0 && (
@@ -930,14 +952,14 @@ const Dashboard = () => {
       </div>
 
       {addresses1.length > 0 ? (
-        <ul className="list-group">
+        <ul className="borderless-list">
           {addresses1.map((address) => (
-            <div
+            <li
               key={address.id}
-              className={`justify-content-between ${selectedAddressId === address.id ? 'selected-address' : ''}`}
+              className={`list-group-item borderless-item setaddress ${selectedAddressId === address.id ? 'selected-address' : ''}`}
               onClick={() => handleAddressSelect(address.displayAddress, address.id)}
             >
-              <div className="setaddress d-flex align-items-center gap-3 ">
+              <div className="d-flex align-items-center gap-3">
                 <i
                   className={`bi ${address.is_bookmarked ? 'bi-bookmark-fill' : 'bi-bookmark'} clickable-icon`}
                   style={{ cursor: 'pointer', color: address.is_bookmarked ? 'blue' : 'grey' }}
@@ -946,7 +968,7 @@ const Dashboard = () => {
                     handleBookmarkClick(address.id);
                   }}
                 ></i>
-                <span className="ml-2 setAddress">
+                <span className="ml-2">
                   {address.displayAddress}
                   {address.notificationCount > 0 && (
                     <span className="notification-count ml-2">
@@ -955,13 +977,15 @@ const Dashboard = () => {
                   )}
                 </span>
               </div>
-            </div>
+            </li>
           ))}
         </ul>
       ) : (
         <p>No addresses found.</p>
       )}
     </div>
+
+   
 
 
 
@@ -1480,7 +1504,7 @@ const Dashboard = () => {
         </div >
 
       </div > */}
-    </div >
+    </div>
   );
 };
 
