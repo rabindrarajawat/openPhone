@@ -149,7 +149,7 @@ export class OpenPhoneEventService {
       openPhoneEvent.contact_established = "NA";
       openPhoneEvent.dead = "No";
       openPhoneEvent.keep_an_eye = "Yes";
-      openPhoneEvent.is_stop = messageData.body === "Stop"?true: false;
+      openPhoneEvent.is_stop = messageData.body === "Stop" ? true : false;
       openPhoneEvent.created_by = "Ram";
       openPhoneEvent.phone_number_id = messageData.phoneNumberId;
       openPhoneEvent.user_id = messageData.userId;
@@ -384,7 +384,8 @@ export class OpenPhoneEventService {
       created_at: event.created_at,
       conversation_id: event.conversation_id,
       id: event.id,
-      is_message_pinned:event.is_message_pinned
+      is_message_pinned: event.is_message_pinned,
+      is_stop: event.is_stop,
     }));
   }
 

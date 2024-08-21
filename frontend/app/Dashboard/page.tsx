@@ -141,9 +141,9 @@ const Dashboard = () => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [updateTrigger, setUpdateTrigger] = useState(false); // State to force re-render
-  const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(
-    new Set<string>()
-  );
+  const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(new Set<string>());
+  const [searchQuery, setSearchQuery] = useState('');
+
 
   useEffect(() => {
     const storedPins = localStorage.getItem("pinnedConversations");
@@ -204,44 +204,20 @@ const Dashboard = () => {
   };
 
   const filteredAddresses = addresses1.filter((address) => {
-    // Apply auction type filter
-    const matchesAuctionType =
-      selectedAuctionTypes.length === 0 ||
-      selectedAuctionTypes.includes(address.auction_event_id);
-
-    // Apply bookmark filter
-    const matchesBookmark =
-      filterOption === "all" ||
-      (filterOption === "bookmarked" && address.is_bookmarked) ||
-      filterOption === "default"; // 'default' shows all addresses
-
-    // Apply date filter
-    const matchesDateFilter =
-      selectedDateFilter === "all" ||
-      (selectedDateFilter === "weekly" &&
-        isWithinLastWeek(address.created_at)) ||
-      (selectedDateFilter === "monthly" &&
-        isWithinLastMonth(address.created_at));
-
-    // Apply custom date filter
-    const matchesCustomDateFilter =
-      (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
+    const matchesAuctionType = selectedAuctionTypes.length === 0 || selectedAuctionTypes.includes(address.auction_event_id);
+    const matchesBookmark = filterOption === 'all' || (filterOption === 'bookmarked' && address.is_bookmarked) || (filterOption === 'default');
+    const matchesDateFilter = selectedDateFilter === 'all' ||
+      (selectedDateFilter === 'weekly' && isWithinLastWeek(address.created_at)) ||
+      (selectedDateFilter === 'monthly' && isWithinLastMonth(address.created_at));
+    const matchesCustomDateFilter = (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
       (!toDate || new Date(address.created_at) <= new Date(toDate));
 
-    return (
-      matchesAuctionType &&
-      matchesBookmark &&
-      matchesDateFilter &&
-      matchesCustomDateFilter
-    );
+    // Apply the search filter
+    const matchesSearch = address.displayAddress.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchesAuctionType && matchesBookmark && matchesDateFilter && matchesCustomDateFilter && matchesSearch;
   });
-
-  // Show all addresses if no filters match
-  const addressesToShow =
-    filteredAddresses.length > 0 ? filteredAddresses : addresses1;
-
-  // console.log("Filtered Addresses:", filteredAddresses);
-  // console.log("All Addresses:", addresses1);
+  const addressesToShow = filteredAddresses.length > 0 ? filteredAddresses : addresses1;
 
   const handleToggle = () => {
     setIsOpen((prevIsOpen) => !prevIsOpen);
@@ -258,8 +234,7 @@ const Dashboard = () => {
   };
 
   const handleDone = () => {
-    // Add your logic for when the "Done" button is clicked
-    setIsCustomDateOpen(true); // Close the custom date dropdown
+    setIsCustomDateOpen(true);
   };
 
   const handleReset = () => {
@@ -267,29 +242,10 @@ const Dashboard = () => {
     setToDate("");
     setIsCustomDateOpen(true);
   };
-  // useEffect(() => {
-  //   async function fetchEvents() {
-  //     try {
-  //       const response = await axios.get('http://localhost:8000/openPhoneEventData/events-by-address-and-from', {
-  //         params: { address_id: selectedAddressId, from_number: fromNumber }
-  //       });
-  //       setEvents(response.data.data);
-  //     } catch (error) {
-  //       // setError('Error fetching event bodies');
-  //     } finally {
-  //       // setLoading(false);
-  //     }
-  //   }
 
-  //   fetchEvents();
-  // }, [selectedAddress1, fromNumber]);
-  // const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>((acc, message) => {
-  //   if (!acc[message.conversation_id]) {
-  //     acc[message.conversation_id] = [];
-  //   }
-  //   acc[message.conversation_id].push(message);
-  //   return acc;
-  // }, {});
+  const handleSearchChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
+    setSearchQuery(e.target.value);
+  };
 
   const recordsPerPage = 6;
 
@@ -305,6 +261,7 @@ const Dashboard = () => {
     axios
       .get("http://localhost:8000/address/getalladdress")
       .then((response) => {
+        // console.log('API Response:', response.data);
         const formattedAddresses = response.data.map((item: any) => ({
           id: item.id,
           displayAddress: item.address,
@@ -315,8 +272,8 @@ const Dashboard = () => {
         setAddresses1(formattedAddresses);
 
         if (formattedAddresses.length > 0) {
-          setSelectedAddress(formattedAddresses[0].displayAddress); // Set the first address as the default selected address
-          setSelectedAddressId(formattedAddresses[0].id); // Set the first address ID as the default selected address ID
+          setSelectedAddress(formattedAddresses[0].displayAddress);
+          setSelectedAddressId(formattedAddresses[0].id);
         }
       })
       .catch((error) => {
@@ -667,24 +624,30 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    async function fetchEvents() {
-      try {
-        const response = await axios.get(
-          "http://localhost:8000/openPhoneEventData/events-by-address-and-from",
-          {
-            params: { address_id: selectedAddressId, from_number: fromNumber }, // Pass fromNumber directly
-          }
-        );
-        setEvents(response.data.data);
-      } catch (error) {
-        // setError('Error fetching event bodies');
-      } finally {
-        // setLoading(false);
+    const timer = setTimeout(async () => {
+      async function fetchEvents() {
+        try {
+          const response = await axios.get('http://localhost:8000/openPhoneEventData/events-by-address-and-from', {
+            params: { address_id: selectedAddressId, from_number: fromNumber } // Pass fromNumber directly
+          });
+          setEvents(response.data.data);
+        } catch (error) {
+          // setError('Error fetching event bodies');
+        } finally {
+          // setLoading(false);
+        }
       }
-    }
 
-    fetchEvents();
+      fetchEvents();
+    }, 700); // 0.5 second delay
+
+    // Cleanup function to clear the timeout if the dependencies change or the component unmounts
+    return () => clearTimeout(timer);
   }, [selectedAddressId, fromNumber]);
+
+
+
+
 
   // Group messages by conversation_id
   const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>(
@@ -697,7 +660,7 @@ const Dashboard = () => {
     },
     {}
   );
- 
+
   const handleFilterChange = (type: "all" | "bookmarked" | "default") => {
     setFilterOption(type);
   };
@@ -776,7 +739,7 @@ const Dashboard = () => {
   // };
 
   const [updatedMessages, setUpdatedMessages] = useState(groupedMessages);
-  console.log("🚀 ~ Dashboard ~ updatedMessages:", updatedMessages)
+  console.log("🚀 ~ Dashboard ~ updatedMessages:", updatedMessages);
 
   useEffect(() => {
     // Update state whenever events change
@@ -1063,14 +1026,14 @@ const Dashboard = () => {
               <span className="icon">
                 <img src="/Icon.svg" alt="icon" />
               </span>
-              <input type="text" placeholder="Search Address"></input>
+              <input type="text" placeholder="Search Address" value={searchQuery}
+                onChange={handleSearchChange}></input>
             </div>
 
-            <div className="icon-labels d-flex">
+            <div className="icon-labels">
               <div
-                className={`bookmark-container text-center ${
-                  filterOption === "bookmarked" ? "active-filter" : ""
-                }`}
+                className={`bookmark-container text-center ${filterOption === "bookmarked" ? "active-filter" : ""
+                  }`}
                 onClick={() => handleFilterChange("bookmarked")}
               >
                 <i className="bi bi-bookmark ms-4"></i>
@@ -1099,22 +1062,20 @@ const Dashboard = () => {
                   addressesToShow.map((address) => (
                     <li
                       key={address.id}
-                      className={`list-group-item justify-content-between ${
-                        selectedAddressId === address.id
-                          ? "selected-address"
-                          : ""
-                      }`}
+                      className={`list-group-item justify-content-between ${selectedAddressId === address.id
+                        ? "selected-address"
+                        : ""
+                        }`}
                       onClick={() =>
                         handleAddressSelect(address.displayAddress, address.id)
                       }
                     >
                       <div className="setaddress d-flex align-items-center gap-3 ">
                         <i
-                          className={`bi ${
-                            address.is_bookmarked
-                              ? "bi-bookmark-fill"
-                              : "bi-bookmark"
-                          } clickable-icon`}
+                          className={`bi ${address.is_bookmarked
+                            ? "bi-bookmark-fill"
+                            : "bi-bookmark"
+                            } clickable-icon`}
                           style={{
                             cursor: "pointer",
                             color: address.is_bookmarked ? "blue" : "grey",
@@ -1133,9 +1094,8 @@ const Dashboard = () => {
               <div className="pagination-container">
                 <ul className="pagination">
                   <li
-                    className={`page-item ${
-                      currentPage === 1 ? "disabled" : ""
-                    }`}
+                    className={`page-item ${currentPage === 1 ? "disabled" : ""
+                      }`}
                   >
                     <button
                       className="page-link"
@@ -1148,9 +1108,8 @@ const Dashboard = () => {
                   {[...Array(totalPages)].map((_, i) => (
                     <li
                       key={i}
-                      className={`page-item ${
-                        currentPage === i + 1 ? "active" : ""
-                      }`}
+                      className={`page-item ${currentPage === i + 1 ? "active" : ""
+                        }`}
                     >
                       <button
                         className="page-link"
@@ -1161,9 +1120,8 @@ const Dashboard = () => {
                     </li>
                   ))}
                   <li
-                    className={`page-item ${
-                      currentPage === totalPages ? "disabled" : ""
-                    }`}
+                    className={`page-item ${currentPage === totalPages ? "disabled" : ""
+                      }`}
                   >
                     <button
                       className="page-link"
@@ -1186,7 +1144,7 @@ const Dashboard = () => {
             </span>
             <span className="ms-4">Analytic Data of Selected Address</span>
           </div>
-          <div className="d-flex main-message">
+          <div className=" main-message">
             <div className="logos-row-msg">
               <div className="nav-msg">
                 <div className="message Delivered">Message Delivered</div>
@@ -1229,11 +1187,9 @@ const Dashboard = () => {
         </div>
 
         <div className="conversation">
-          {/* <img src="converstation.svg" alt="" /> Conversation From {fromNumber} */}
-
           {selectedAddress && (
             <div className="conversation-chat">
-              <img src="converstation.svg" alt="" /> Conversation From {}
+              <img src="converstation.svg" alt="" /> Conversation From { }
               {uniqueFromNumbers.length > 0 && (
                 <select
                   value={fromNumber}
@@ -1250,155 +1206,139 @@ const Dashboard = () => {
           )}
 
           <div className="search-wrapper ">
-            {/* <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} /> */}
             <input
               className="search"
               type="search"
               placeholder="Search To"
-              aria-label="Search"
-              value={input}
-              onChange={(e) => handleChange(e.target.value)}
             />
           </div>
-
-          {/* <div className="search-box-to ">
-            <span className="icon">
-              <img src="/Icon.svg" alt="icon" />
-            </span>
-            <input type="text" placeholder="Search Address"></input>
-          </div> */}
-
           <div className="input-msg">
             <div className="screenshot-msg">
               <div className="inbox-chat">
                 {events.length > 0
                   ? Object.keys(updatedMessages).map((conversationId) => {
-                      const isStop = updatedMessages[conversationId].some(
-                        (message) => message.is_stop
-                      );
-                      console.log("🚀 ~ Dashboard ~ isStop:",updatedMessages, isStop)
+                    const isStop = updatedMessages[conversationId].some(
+                      (message) => message.is_stop
+                    );
+                    console.log(
+                      "🚀 ~ Dashboard ~ isStop:",
+                      updatedMessages,
+                      isStop
+                    );
 
-                      return (
-                        <div key={conversationId}>
-                          <div className="to-line">.</div>
-                          <div className="to-value">
-                            <strong>To </strong>
-                            <span style={{ color: isStop ? "red" : "inherit" }}>
-                              {updatedMessages[conversationId][0].to}
-                            </span>
+                    return (
+                      <div key={conversationId}>
+                        <div className="to-line">.</div>
+                        <div className="to-value">
+                          <strong>To </strong>
+                          <span style={{ color: isStop ? "red" : "inherit" }}>
+                            {updatedMessages[conversationId][0].to}
+                          </span>
 
-                            <i
-                              className={`bi pinnumber ${
-                                pinnedConversations.has(conversationId)
-                                  ? "bi-pin-fill text-primary"
-                                  : "bi-pin"
+                          <i
+                            className={`bi pinnumber ${pinnedConversations.has(conversationId)
+                              ? "bi-pin-fill text-primary"
+                              : "bi-pin"
                               }`}
-                              onClick={() => handlePinNumber(conversationId)}
-                            ></i>
-                          </div>
+                            onClick={() => handlePinNumber(conversationId)}
+                          ></i>
+                        </div>
 
-                          {updatedMessages[conversationId].map(
-                            (message, index) => (
-                              <div key={index}>
-                                <div
-                                  className={
-                                    message.event_type_id === 1
-                                      ? "chat-message-right"
-                                      : "chat-message-left"
-                                  }
-                                >
-                                  <div className="message-body">
-                                    {expandedMessages.has(index) ? (
-                                      <div>
-                                        {message.body}
-                                        <button
-                                          onClick={() =>
-                                            toggleMessageExpansion(index)
-                                          }
-                                          className={`read-less-btn ${
-                                            message.event_type_id === 1
-                                              ? "read-less-btn-right"
-                                              : "read-less-btn-left"
+                        {updatedMessages[conversationId].map(
+                          (message, index) => (
+                            <div key={index}>
+                              <div
+                                className={
+                                  message.event_type_id === 1
+                                    ? "chat-message-right"
+                                    : "chat-message-left"
+                                }
+                              >
+                                <div className="message-body-1">
+                                  {expandedMessages.has(index) ? (
+                                    <div>
+                                      {message.body}
+                                      <button
+                                        onClick={() =>
+                                          toggleMessageExpansion(index)
+                                        }
+                                        className={`read-less-btn ${message.event_type_id === 1
+                                          ? "read-less-btn-right"
+                                          : "read-less-btn-left"
                                           }`}
-                                        >
-                                          Read Less
-                                        </button>
+                                      >
+                                        Read Less
+                                      </button>
 
-                                        <i
-                                    className={`bi ${
-                                      message.is_message_pinned
-                                        ? "bi-star-fill text-warning"
-                                        : "bi-star"
-                                    } star-icon`}
-                                    onClick={() =>
-                                      toggleMessagePin(
-                                        message.id,
-                                        conversationId
-                                      )
-                                    }
-                                  ></i>
-
-                                      </div>
-                                    ) : (
-                                      <div>
-                                        {message.body &&
+                                      <i
+                                        className={`bi ${message.is_message_pinned
+                                          ? "bi-star-fill text-warning"
+                                          : "bi-star"
+                                          } star-icon`}
+                                        onClick={() =>
+                                          toggleMessagePin(
+                                            message.id,
+                                            conversationId
+                                          )
+                                        }
+                                      ></i>
+                                    </div>
+                                  ) : (
+                                    <div>
+                                      {message.body &&
                                         message.body.length > 100 ? (
-                                          <>
-                                            {message.body.substring(0, 100)}
-                                            ...
-                                            <button
-                                              onClick={() =>
-                                                toggleMessageExpansion(index)
-                                              }
-                                              className={`read-more-btn ${
-                                                message.event_type_id === 1
-                                                  ? "read-more-btn-right"
-                                                  : "read-more-btn-left"
+                                        <>
+                                          {message.body.substring(0, 100)}
+                                          ...
+                                          <button
+                                            onClick={() =>
+                                              toggleMessageExpansion(index)
+                                            }
+                                            className={`read-more-btn ${message.event_type_id === 1
+                                              ? "read-more-btn-right"
+                                              : "read-more-btn-left"
                                               }`}
-                                            >
-                                              Read More
-                                            </button>
-
-                                            <i
-                                    className={`bi ${
-                                      message.is_message_pinned
-                                        ? "bi-star-fill text-warning"
-                                        : "bi-star"
-                                    } star-icon`}
-                                    onClick={() =>
-                                      toggleMessagePin(
-                                        message.id,
-                                        conversationId
-                                      )
-                                    }
-                                  ></i>
-
-                                          </>
-                                        ) : (
-                                          message.body || "No message body"
-                                        )}
-                                      </div>
-                                    )}
-                                  </div>
-                                 
-                                </div>
-                                <div
-                                  className={
-                                    message.event_type_id === 1
-                                      ? "message-date message-date-right"
-                                      : "message-date message-date-left"
-                                  }
-                                >
-                                  {new Date(
-                                    message.created_at
-                                  ).toLocaleDateString()}
+                                          >
+                                            Read More
+                                          </button>
+                                          <i
+                                            style={{ cursor: "pointer" }}
+                                            className={`bi ${message.is_message_pinned
+                                              ? "bi-star-fill text-warning"
+                                              : "bi-star"
+                                              } star-icon cursor-pointer`}
+                                            onClick={() =>
+                                              toggleMessagePin(
+                                                message.id,
+                                                conversationId
+                                              )
+                                            }
+                                          ></i>
+                                        </>
+                                      ) : (
+                                        message.body || "No message body"
+                                      )}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
-                            )
-                          )}
-                        </div>
-                      );
-                    })
+                              <div
+                                className={
+                                  message.event_type_id === 1
+                                    ? "message-date message-date-right"
+                                    : "message-date message-date-left"
+                                }
+                              >
+                                {new Date(
+                                  message.created_at
+                                ).toLocaleDateString()}
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    );
+                  })
                   : "Loading..."}
               </div>
             </div>
@@ -1737,13 +1677,3 @@ const Dashboard = () => {
 
 export default Dashboard;
 
-function setFilterType(type: string) {
-  throw new Error("Function not implemented.");
-}
-// function setError(arg0: string) {
-//   throw new Error("Function not implemented.");
-// }
-
-// function setLoading(arg0: boolean) {
-//   throw new Error("Function not implemented.");
-// }
