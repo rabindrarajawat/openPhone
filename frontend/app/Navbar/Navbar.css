@@ -189,34 +189,36 @@
     width: 434px;
     /* height: 351px; */
     z-index: 1000;
-    
-  }
-  
-  .notification-dropdown ul {
+
+}
+
+.notification-dropdown ul {
     list-style-type: none;
     padding: 3px 7px 7px 5px;
     margin: 0;
-  }
+}
 
-  .notification-dropdown .notification-label {
-    margin-left: 10px; 
-  }
-  
-  .notification-dropdown li {
+.notification-dropdown .notification-label {
+    margin-left: 10px;
+}
+
+.notification-dropdown li {
     padding: 10px;
-  }
-  
-  .notification-dropdown li.new-notification {
+}
+
+.notification-dropdown li.new-notification {
     color: #5A657B;
     font-weight: 400;
     font-size: 15px;
 }
-.main-notification{
+
+.main-notification {
     margin-left: 192px;
     margin-top: 13px;
 
 }
-.notification-info{
+
+.notification-info {
     background-color: white;
     color: green;
     border: 2px solid green;
@@ -225,17 +227,18 @@
     margin-bottom: 0px;
     /* margin-top: -67px; */
     cursor: pointer;
-    margin-left: 203px;
+    margin-left: 205px;
     font-size: 12px;
     border-color: green;
 }
 
-.call-icon{
+.call-icon {
     margin-right: 5px;
 }
-.icon-message{
-    margin-right: -3px;
-    margin-left: 1px;
+
+.icon-message {
+    margin-right: 14px;
+    margin-left: 4px;
     color: #EA0000;
     margin-top: 17px;
     /* padding: 8px 2px; */
@@ -247,29 +250,32 @@
 
 
 }
+
 .calls-text {
-    margin-right: 1%; /* Adjust this value to control the distance */
-  }
-  
-  .message-text {
-    margin-left: 20px; /* Optional, depending on how you want to space things */
-  }
-  .event-from{
+    margin-right: 1%;
+    /* Adjust this value to control the distance */
+}
+
+.message-text {
+    margin-left: 20px;
+    /* Optional, depending on how you want to space things */
+}
+
+.event-from {
     margin-left: 49px;
     color: #5A657B;
-    font-size:18px ;
+    font-size: 18px;
     font-weight: 500;
 
-  }
-  .missed-message{
+}
+
+.missed-message {
     color: #5A657B;
-    font-size:19px ;
+    font-size: 19px;
     font-weight: 400;
 
-  }
+}
 
-
-  .message-body{
-    margin-left: 54px;
-
-  }
+.message-body {
+    margin-left: 56px;
+}
