@@ -19,6 +19,8 @@ interface Address1 {
   id: number;
   auction_event_id: number;
   created_at: string;
+  notificationCount: number; // Add this field
+
 }
 
 interface Message {
@@ -45,6 +47,35 @@ interface Message {
 //   created_at: string;
 //   conversation_id: string;
 // }
+
+interface Notification {
+  id: number;
+  address_id: number | null;
+  event_id: number;
+  is_read: boolean;
+  created_at: string;
+  event: {
+    id: number;
+    event_type_id: number;
+    address_id: number | null;
+    event_direction_id: number;
+    from: string;
+    to: string;
+    body: string;
+    url: string;
+    url_type: string;
+    conversation_id: string;
+    created_by: string;
+    contact_established: string;
+    dead: string;
+    created_at: string;
+    received_at: string;
+    keep_an_eye: string;
+    is_stop: boolean;
+    phone_number_id: string;
+    user_id: string;
+  }
+};
 
 interface EventItem {
   created_at: string;
@@ -111,6 +142,7 @@ const Dashboard = () => {
     null
   );
   const [currentPage, setCurrentPage] = useState(1);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const [uniqueFromNumbers, setUniqueFromNumbers] = useState<string[]>([]);
 
@@ -257,28 +289,69 @@ const Dashboard = () => {
     }
   }, [router]);
 
+  // useEffect(() => {
+  //   axios
+  //     .get("http://localhost:8000/address/getalladdress")
+  //     .then((response) => {
+  //       // console.log('API Response:', response.data);
+  //       const formattedAddresses = response.data.map((item: any) => ({
+  //         id: item.id,
+  //         displayAddress: item.address,
+  //         is_bookmarked: item.is_bookmarked,
+  //         auction_event_id: item.auction_event_id,
+  //         created_at: item.created_at,
+  //       }));
+  //       setAddresses1(formattedAddresses);
+
+  //       if (formattedAddresses.length > 0) {
+  //         setSelectedAddress(formattedAddresses[0].displayAddress);
+  //         setSelectedAddressId(formattedAddresses[0].id);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching addresses:", error);
+  //     });
+  // }, []);
+
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/address/getalladdress")
-      .then((response) => {
-        // console.log('API Response:', response.data);
-        const formattedAddresses = response.data.map((item: any) => ({
+    const fetchData = async () => {
+      try {
+        // Fetch all addresses
+        const addressResponse = await axios.get('http://localhost:8000/address/getalladdress');
+        const formattedAddresses = addressResponse.data.map((item: any) => ({
           id: item.id,
           displayAddress: item.address,
           is_bookmarked: item.is_bookmarked,
           auction_event_id: item.auction_event_id,
           created_at: item.created_at,
+          notificationCount: 0,
+          address: item.address
         }));
-        setAddresses1(formattedAddresses);
 
-        if (formattedAddresses.length > 0) {
-          setSelectedAddress(formattedAddresses[0].displayAddress);
-          setSelectedAddressId(formattedAddresses[0].id);
+        // Fetch unread notifications
+        const notificationResponse = await axios.get('http://localhost:8000/notifications');
+        const unreadNotifications = notificationResponse.data.filter((notification: any) => !notification.is_read);
+        setNotifications(unreadNotifications);
+
+        // Calculate notification counts
+        const addressNotificationCounts = formattedAddresses.map((address: any) => {
+          const count = unreadNotifications.filter((notification: any) => notification.address_id === address.id).length;
+          return { ...address, notificationCount: count };
+        });
+
+        setAddresses1(addressNotificationCounts);
+
+        // Set default selected address
+        if (addressNotificationCounts.length > 0) {
+          setSelectedAddress(addressNotificationCounts[0].displayAddress);
+          setSelectedAddressId(addressNotificationCounts[0].id);
         }
-      })
-      .catch((error) => {
-        console.error("Error fetching addresses:", error);
-      });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -811,7 +884,7 @@ const Dashboard = () => {
                     <li className="dropdown-item pt-2">
                       <input type="checkbox" id="notDelivered" />
                       <label className="ms-2" htmlFor="notDelivered">
-                        received
+                        Received
                       </label>
                     </li>
                   </ul>
@@ -1082,7 +1155,15 @@ const Dashboard = () => {
                           }}
                           onClick={() => handleBookmarkClick(address.id)}
                         ></i>
-                        <span className="ml-2">{address.displayAddress}</span>
+                        {/* <span className="ml-2">{address.displayAddress}</span> */}
+                        <span className="ml-2">
+                          {address.displayAddress}
+                          {address.notificationCount > 0 && (
+                            <span className="notification-count ml-2">
+                              ({address.notificationCount} new)
+                            </span>
+                          )}
+                        </span>
                       </div>
                     </li>
                   ))
@@ -1090,7 +1171,7 @@ const Dashboard = () => {
                   <p>No addresses found.</p>
                 )}
               </div>
-
+              {/* 
               <div className="pagination-container">
                 <ul className="pagination">
                   <li
@@ -1132,7 +1213,7 @@ const Dashboard = () => {
                     </button>
                   </li>
                 </ul>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
