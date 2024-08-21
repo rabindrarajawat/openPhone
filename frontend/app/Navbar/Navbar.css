@@ -226,7 +226,7 @@
     margin-bottom: 0px;
     /* margin-top: -67px; */
     cursor: pointer;
-    margin-left: 241px;
+    margin-left: 203px;
     font-size: 12px;
     border-color: green;
 }
@@ -235,8 +235,8 @@
     margin-right: 5px;
 }
 .icon-message{
-    margin-right: 14px;
-    margin-left: 4px;
+    margin-right: -3px;
+    margin-left: 1px;
     color: #EA0000;
     margin-top: 17px;
     /* padding: 8px 2px; */
@@ -270,4 +270,7 @@
   }
 
 
-  
+  .message-body{
+    margin-left: 54px;
+
+  }

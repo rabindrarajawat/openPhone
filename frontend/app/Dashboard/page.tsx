@@ -16,13 +16,44 @@ interface Address {
 
 
 }
+
 interface Address1 {
-  is_bookmarked: boolean;
-  displayAddress: string;
   id: number;
+  displayAddress: string;
+  is_bookmarked: boolean;
   auction_event_id: number;
   created_at: string;
+  notificationCount: number; // Add this field
+
 }
+
+interface Notification {
+  id: number;
+  address_id: number | null;
+  event_id: number;
+  is_read: boolean;
+  created_at: string;
+  event: {
+    id: number;
+    event_type_id: number;
+    address_id: number | null;
+    event_direction_id: number;
+    from: string;
+    to: string;
+    body: string;
+    url: string;
+    url_type: string;
+    conversation_id: string;
+    created_by: string;
+    contact_established: string;
+    dead: string;
+    created_at: string;
+    received_at: string;
+    keep_an_eye: string;
+    is_stop: boolean;
+    phone_number_id: string;
+    user_id: string;
+  }};
 
 interface Message {
   event_type_id: number;
@@ -67,13 +98,20 @@ interface EventItem {
 }
 
 const Dashboard = () => {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState("Search Address");
+  const [addresses1, setAddresses1] = useState<Address1[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
+
+
+
+
   const [dropdownOpen, setDropdownOpen] = useState(true);
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(true);
   const [dateDropdownOpen, setDateDropdownOpen] = useState(true);
   const [box1DropdownOpen, setBox1DropdownOpen] = useState(false);
   const [isFollowUpClicked, setIsFollowUpClicked] = useState(false); // Add state for Follow-up button
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  const [selectedAddress, setSelectedAddress] = useState("Search Address");
   const [addresses, setAddresses] = useState<string[]>([]); // State to store addresses
   const [eventData, setEventData] = useState<EventItem[]>([]);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -95,7 +133,6 @@ const Dashboard = () => {
   const [input, setInput] = useState<string>("");
   const [results, setResultsState] = useState<Address[]>([]);
   const [allSelected, setAllSelected] = useState(false);
-  const [addresses1, setAddresses1] = useState<Address1[]>([]);
 
   const [isOpen, setIsOpen] = useState(true);
   const [isType, setIsType] = useState(false);
@@ -103,7 +140,6 @@ const Dashboard = () => {
   const [isDate, setIsDate] = useState(true);
   const [isCustomDateOpen, setIsCustomDateOpen] = useState(true);
   const [events, setEvents] = useState<EventItem[]>([]);
-  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
   const [uniqueFromNumbers, setUniqueFromNumbers] = useState<string[]>([]);
@@ -275,31 +311,53 @@ const Dashboard = () => {
     }
   }, [router]);
 
+
+
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/address/getalladdress")
-      .then((response) => {
-        console.log('API Response:', response.data);
-        const formattedAddresses = response.data.map((item: any) => ({
+    const fetchData1 = async () => {
+      try {
+        // Fetch addresses
+        const addressResponse = await axios.get('http://localhost:8000/address/getalladdress');
+        const formattedAddresses = addressResponse.data.map((item: any) => ({
           id: item.id,
           displayAddress: item.address,
           is_bookmarked: item.is_bookmarked,
           auction_event_id: item.auction_event_id,
           created_at: item.created_at,
-
+          notificationCount: 0, // Initialize notification count
         }));
-        setAddresses1(formattedAddresses);
 
-        if (formattedAddresses.length > 0) {
-          setSelectedAddress(formattedAddresses[0].displayAddress); // Set the first address as the default selected address
-          setSelectedAddressId(formattedAddresses[0].id); // Set the first address ID as the default selected address ID
+        // Fetch notifications
+        const notificationResponse = await axios.get('http://localhost:8000/notifications');
+        const unreadNotifications = notificationResponse.data.filter((notification: Notification) => !notification.is_read);
+
+        // Calculate notification counts
+        const addressNotificationCounts = formattedAddresses.map((address: { id: any; }) => {
+          const count = unreadNotifications.filter((notification: { address_id: any; }) => notification.address_id === address.id).length;
+          return { ...address, notificationCount: count };
+        });
+
+        // Sort addresses so that those with new notifications appear at the top
+        const sortedAddresses = addressNotificationCounts.sort((a: { notificationCount: number; }, b: { notificationCount: number; }) => {
+          if (a.notificationCount > 0 && b.notificationCount === 0) return -1;
+          if (a.notificationCount === 0 && b.notificationCount > 0) return 1;
+          return 0;
+        });
+
+        setAddresses1(sortedAddresses);
+
+        if (sortedAddresses.length > 0) {
+          setSelectedAddress(sortedAddresses[0].displayAddress); // Set the first address as the default selected address
+          setSelectedAddressId(sortedAddresses[0].id); // Set the first address ID as the default selected address ID
         }
-      })
-      .catch((error) => {
-        console.error("Error fetching addresses:", error);
-      });
-  }, []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
 
+    fetchData1();
+  }, []);
+ 
 
   useEffect(() => {
     const fetchEventCounts = async () => {
@@ -516,9 +574,9 @@ const Dashboard = () => {
     });
   };
 
-  const handleAddressSelect = (address: string, addressId: number) => {
+  const handleAddressSelect = (address: string, id: number) => {
     setSelectedAddress(address);
-    setSelectedAddressId(addressId); // Update the selected address ID
+    setSelectedAddressId(id); // Update the selected address ID
 
     setEventData([]); // Clear existing event data to ensure new data is shown
   };
@@ -864,71 +922,51 @@ const Dashboard = () => {
             </div>
             <div>
 
-              <div className="address-list">
-                <div className="search-wrapper-add">
-                  {results.length > 0 && (
-                    <SearchResultList results={results} onSelect={handleSelectAddress} />
+            <div className="address-list">
+      <div className="search-wrapper-add">
+        {results.length > 0 && (
+          <SearchResultList results={results} onSelect={handleSelectAddress} />
+        )}
+      </div>
+
+      {addresses1.length > 0 ? (
+        <ul className="list-group">
+          {addresses1.map((address) => (
+            <div
+              key={address.id}
+              className={`justify-content-between ${selectedAddressId === address.id ? 'selected-address' : ''}`}
+              onClick={() => handleAddressSelect(address.displayAddress, address.id)}
+            >
+              <div className="setaddress d-flex align-items-center gap-3 ">
+                <i
+                  className={`bi ${address.is_bookmarked ? 'bi-bookmark-fill' : 'bi-bookmark'} clickable-icon`}
+                  style={{ cursor: 'pointer', color: address.is_bookmarked ? 'blue' : 'grey' }}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent triggering the select address when clicking the bookmark icon
+                    handleBookmarkClick(address.id);
+                  }}
+                ></i>
+                <span className="ml-2 setAddress">
+                  {address.displayAddress}
+                  {address.notificationCount > 0 && (
+                    <span className="notification-count ml-2">
+                      ({address.notificationCount} new)
+                    </span>
                   )}
-                </div>
-
-                {addressesToShow.length > 0 ? (
-                  addressesToShow.map((address) => (
-                    <li
-                      key={address.id}
-                      className={`list-group-item justify-content-between ${selectedAddressId === address.id ? 'selected-address' : ''}`}
-                      onClick={() => handleAddressSelect(address.displayAddress, address.id)}
-                    >
-                      <div className="setaddress d-flex align-items-center gap-3 ">
-                        <i
-                          className={`bi ${address.is_bookmarked ? 'bi-bookmark-fill' : 'bi-bookmark'} clickable-icon`}
-                          style={{ cursor: 'pointer', color: address.is_bookmarked ? 'blue' : 'grey' }}
-                          onClick={() => handleBookmarkClick(address.id)}
-                        ></i>
-                        <span className="ml-2">{address.displayAddress}</span>
-                      </div>
-                    </li>
-                  ))
-                ) : (
-                  <p>No addresses found.</p>
-                )}
+                </span>
               </div>
+            </div>
+          ))}
+        </ul>
+      ) : (
+        <p>No addresses found.</p>
+      )}
+    </div>
 
 
 
 
-
-              <div className="pagination-container">
-                <ul className="pagination">
-                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                    <button
-                      className="page-link"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      &lt;
-                    </button>
-                  </li>
-                  {[...Array(totalPages)].map((_, i) => (
-                    <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
-                      <button
-                        className="page-link"
-                        onClick={() => handlePageChange(i + 1)}
-                      >
-                        {i + 1}
-                      </button>
-                    </li>
-                  ))}
-                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                    <button
-                      className="page-link"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      &gt;
-                    </button>
-                  </li>
-                </ul>
-              </div>
+             
             </div>
           </div>
 
@@ -1090,7 +1128,7 @@ const Dashboard = () => {
                             </div>
 
                           </div>
-                          <div
+                          <div  
                             className={
                               message.event_type_id === 1
                                 ? "message-date message-date-right"
