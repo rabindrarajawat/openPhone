@@ -170,14 +170,13 @@
 
 .new-notification-dot {
     position: absolute;
-    top: 0;
+    top: 5px;
     right: 0;
     width: 15px;
     height: 15px;
     background-color: #3361ff;
     border-radius: 50%;
-    padding-left: 18%;
-    padding-top: -88%;
+    padding-left: 30%;
 }
 
 .notification-dropdown {
@@ -226,7 +225,7 @@
     margin-bottom: 0px;
     /* margin-top: -67px; */
     cursor: pointer;
-    margin-left: 241px;
+    margin-left: 203px;
     font-size: 12px;
     border-color: green;
 }
@@ -235,8 +234,8 @@
     margin-right: 5px;
 }
 .icon-message{
-    margin-right: 14px;
-    margin-left: 4px;
+    margin-right: -3px;
+    margin-left: 1px;
     color: #EA0000;
     margin-top: 17px;
     /* padding: 8px 2px; */
@@ -268,7 +267,9 @@
     font-weight: 400;
 
   }
- 
 
 
-  
+  .message-body{
+    margin-left: 54px;
+
+  }
