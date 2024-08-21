@@ -12,14 +12,48 @@ import { SearchResultList } from "../SearchResultList/SearchResultList";
 
 interface Address {
   fullAddress: string;
+
+
+
 }
+
 interface Address1 {
-  is_bookmarked: boolean;
-  displayAddress: string;
   id: number;
+  displayAddress: string;
+  is_bookmarked: boolean;
   auction_event_id: number;
   created_at: string;
+  notificationCount: number; // Add this field
+
 }
+
+interface Notification {
+  id: number;
+  address_id: number | null;
+  event_id: number;
+  is_read: boolean;
+  created_at: string;
+  event: {
+    id: number;
+    event_type_id: number;
+    address_id: number | null;
+    event_direction_id: number;
+    from: string;
+    to: string;
+    body: string;
+    url: string;
+    url_type: string;
+    conversation_id: string;
+    created_by: string;
+    contact_established: string;
+    dead: string;
+    created_at: string;
+    received_at: string;
+    keep_an_eye: string;
+    is_stop: boolean;
+    phone_number_id: string;
+    user_id: string;
+  }};
 
 interface Message {
   event_type_id: number;
@@ -143,6 +177,8 @@ const Dashboard = () => {
   const [updateTrigger, setUpdateTrigger] = useState(false); // State to force re-render
   const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(new Set<string>());
   const [searchQuery, setSearchQuery] = useState('');
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
 
 
   useEffect(() => {
@@ -258,27 +294,44 @@ const Dashboard = () => {
   }, [router]);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/address/getalladdress")
-      .then((response) => {
-        // console.log('API Response:', response.data);
-        const formattedAddresses = response.data.map((item: any) => ({
+    const fetchData = async () => {
+      try {
+        // Fetch all addresses
+        const addressResponse = await axios.get('http://localhost:8000/address/getalladdress');
+        const formattedAddresses = addressResponse.data.map((item: any) => ({
           id: item.id,
           displayAddress: item.address,
           is_bookmarked: item.is_bookmarked,
           auction_event_id: item.auction_event_id,
           created_at: item.created_at,
+          notificationCount: 0,
+          address:item.address
         }));
-        setAddresses1(formattedAddresses);
 
-        if (formattedAddresses.length > 0) {
-          setSelectedAddress(formattedAddresses[0].displayAddress);
-          setSelectedAddressId(formattedAddresses[0].id);
+        // Fetch unread notifications
+        const notificationResponse = await axios.get('http://localhost:8000/notifications');
+        const unreadNotifications = notificationResponse.data.filter((notification: any) => !notification.is_read);
+        setNotifications(unreadNotifications);
+
+        // Calculate notification counts
+        const addressNotificationCounts = formattedAddresses.map((address: any) => {
+          const count = unreadNotifications.filter((notification: any) => notification.address_id === address.id).length;
+          return { ...address, notificationCount: count };
+        });
+
+        setAddresses1(addressNotificationCounts);
+
+        // Set default selected address
+        if (addressNotificationCounts.length > 0) {
+          setSelectedAddress(addressNotificationCounts[0].displayAddress);
+          setSelectedAddressId(addressNotificationCounts[0].id);
         }
-      })
-      .catch((error) => {
-        console.error("Error fetching addresses:", error);
-      });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -1048,48 +1101,46 @@ const Dashboard = () => {
               </div>
             </div>
             <div>
-              <div className="address-list">
-                <div className="search-wrapper-add">
-                  {results.length > 0 && (
-                    <SearchResultList
-                      results={results}
-                      onSelect={handleSelectAddress}
-                    />
-                  )}
-                </div>
+            <div className="address-list">
+        <div className="search-wrapper-add">
+          {results.length > 0 && (
+            <SearchResultList results={results} onSelect={handleSelectAddress} />
+          )}
+        </div>
 
-                {addressesToShow.length > 0 ? (
-                  addressesToShow.map((address) => (
-                    <li
-                      key={address.id}
-                      className={`list-group-item justify-content-between ${selectedAddressId === address.id
-                        ? "selected-address"
-                        : ""
-                        }`}
-                      onClick={() =>
-                        handleAddressSelect(address.displayAddress, address.id)
-                      }
-                    >
-                      <div className="setaddress d-flex align-items-center gap-3 ">
-                        <i
-                          className={`bi ${address.is_bookmarked
-                            ? "bi-bookmark-fill"
-                            : "bi-bookmark"
-                            } clickable-icon`}
-                          style={{
-                            cursor: "pointer",
-                            color: address.is_bookmarked ? "blue" : "grey",
-                          }}
-                          onClick={() => handleBookmarkClick(address.id)}
-                        ></i>
-                        <span className="ml-2">{address.displayAddress}</span>
-                      </div>
-                    </li>
-                  ))
-                ) : (
-                  <p>No addresses found.</p>
-                )}
-              </div>
+        {addresses1.length > 0 ? (
+          <ul className="borderless-list">
+            {addresses1.map((address) => (
+              <li
+                key={address.id}
+                className={`list-group-item borderless-item setaddress ${selectedAddressId === address.id ? 'selected-address' : ''}`}
+                onClick={() => handleAddressSelect(address.displayAddress, address.id)}
+              >
+                <div className="d-flex align-items-center gap-3">
+                  <i
+                    className={`bi ${address.is_bookmarked ? 'bi-bookmark-fill' : 'bi-bookmark'} clickable-icon`}
+                    style={{ cursor: 'pointer', color: address.is_bookmarked ? 'blue' : 'grey' }}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent triggering the select address when clicking the bookmark icon
+                      handleBookmarkClick(address.id);
+                    }}
+                  ></i>
+                  <span className="ml-2">
+                    {address.displayAddress}
+                    {address.notificationCount > 0 && (
+                      <span className="notification-count ml-2">
+                        ({address.notificationCount} new)
+                      </span>
+                    )}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No addresses found.</p>
+        )}
+      </div>
 
               <div className="pagination-container">
                 <ul className="pagination">
