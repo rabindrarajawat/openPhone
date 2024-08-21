@@ -21,19 +21,27 @@ export class NotificationService {
     const event = await this.eventRepository.findOne({
       where: { id: eventId },
     });
+
     if (!event) {
       throw new NotFoundException("Event not found");
     }
+
+    const openPhoneEvent = await this.eventRepository.findOne({
+      where: { conversation_id: event.conversation_id },
+      order: { created_at: "ASC" },
+    });
+
     const notification = this.notificationRepository.create({
       event_id: eventId,
-      address_id: event.address_id,
+      address_id: openPhoneEvent?.address_id,
     });
+
     const savedNotification =
       await this.notificationRepository.save(notification);
     this.notificationGateway.notifyNewEvent(savedNotification);
+
     return savedNotification;
   }
-
   async getUnreadNotifications(): Promise<NotificationEntity[]> {
     return this.notificationRepository.find({
       where: { is_read: false },
