@@ -1101,94 +1101,99 @@ const Dashboard = () => {
             <div className="screenshot-msg">
               <div className="inbox-chat">
                 {events.length > 0 ? (
-                  Object.keys(groupedMessages).map((conversationId: string) => (
-                    <div key={conversationId}>
-                      <div className="to-line">.</div>
-                      <div className="to-value">
-                        <strong>To  </strong>
-                        {groupedMessages[conversationId][0].to}
+                  Object.keys(groupedMessages).map((conversationId: string) => {
+                    // Check if any message in the conversation has is_stop set to true
+                    const isStop = groupedMessages[conversationId].some(
+                      (message) => message.is_stop
+                    );
 
-                        {/* Pin/Unpin Icon */}
-                        {/* <i
-                          className={`bi bi-pin ms-3 ${pinnedConversations.has(conversationId) ? "text-primary" : ""}`}
-                          onClick={() => handlePinNumber(conversationId, groupedMessages[conversationId][0].to)}
-                        ></i> */}
-
-                        <i
-                          className={`bi pinnumber ${pinnedConversations.has(conversationId) ? "bi-pin-fill text-primary" : "bi-pin"}`}
-                          onClick={() => handlePinNumber(conversationId)}
-                        ></i>
-
-
-                        {/* <i className="bi bi-pin-fill"></i> */}
-
-                      </div>
-
-                      {groupedMessages[conversationId].map((message, index) => (
-                        <div key={index}>
-                          <div
-                            className={
-                              message.event_type_id === 1
-                                ? "chat-message-right"
-                                : "chat-message-left"
-                            }
+                    return (
+                      <div key={conversationId}>
+                        <div className="to-line">.</div>
+                        <div className="to-value">
+                          <strong>To </strong>
+                          <span
+                            style={{ color: isStop ? 'red' : 'inherit' }}
                           >
-                            <div className="message-body">
-                              {expandedMessages.has(index) ? (
-                                <div>
-                                  {message.body}
-                                  <button
-                                    onClick={() => toggleMessageExpansion(index)}
-                                    className={`read-less-btn ${message.event_type_id === 1
-                                      ? "read-less-btn-right"
-                                      : "read-less-btn-left"
-                                      }`}
-                                  >
-                                    Read Less
-                                  </button>
-                                </div>
-                              ) : (
-                                <div>
-                                  {message.body && message.body.length > 100 ? (
-                                    <>
-                                      {message.body.substring(0, 100)}...
-                                      <button
-                                        onClick={() => toggleMessageExpansion(index)}
-                                        className={`read-more-btn ${message.event_type_id === 1
-                                          ? "read-more-btn-right"
-                                          : "read-more-btn-left"
-                                          }`}
-                                      >
-                                        Read More
-                                      </button>
-                                    </>
-                                  ) : (
-                                    message.body || "No message body"
-                                  )}
-                                </div>
-                              )}
-                            </div>
+                            {groupedMessages[conversationId][0].to}
+                          </span>
 
-                          </div>
-                          <div
-                            className={
-                              message.event_type_id === 1
-                                ? "message-date message-date-right"
-                                : "message-date message-date-left"
-                            }
-                          >
-                            {new Date(message.created_at).toLocaleDateString()}
-                          </div>
+                          {/* Pin/Unpin Icon */}
+                          <i
+                            className={`bi pinnumber ${pinnedConversations.has(conversationId)
+                              ? 'bi-pin-fill text-primary'
+                              : 'bi-pin'
+                              }`}
+                            onClick={() => handlePinNumber(conversationId)}
+                          ></i>
                         </div>
-                      ))}
-                    </div>
-                  ))
+
+                        {groupedMessages[conversationId].map((message, index) => (
+                          <div key={index}>
+                            <div
+                              className={
+                                message.event_type_id === 1
+                                  ? 'chat-message-right'
+                                  : 'chat-message-left'
+                              }
+                            >
+                              <div className="message-body">
+                                {expandedMessages.has(index) ? (
+                                  <div>
+                                    {message.body}
+                                    <button
+                                      onClick={() => toggleMessageExpansion(index)}
+                                      className={`read-less-btn ${message.event_type_id === 1
+                                        ? 'read-less-btn-right'
+                                        : 'read-less-btn-left'
+                                        }`}
+                                    >
+                                      Read Less
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div>
+                                    {message.body && message.body.length > 100 ? (
+                                      <>
+                                        {message.body.substring(0, 100)}...
+                                        <button
+                                          onClick={() => toggleMessageExpansion(index)}
+                                          className={`read-more-btn ${message.event_type_id === 1
+                                            ? 'read-more-btn-right'
+                                            : 'read-more-btn-left'
+                                            }`}
+                                        >
+                                          Read More
+                                        </button>
+                                      </>
+                                    ) : (
+                                      message.body || 'No message body'
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div
+                              className={
+                                message.event_type_id === 1
+                                  ? 'message-date message-date-right'
+                                  : 'message-date message-date-left'
+                              }
+                            >
+                              {new Date(message.created_at).toLocaleDateString()}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })
                 ) : (
-                  "Loading..."
+                  'Loading...'
                 )}
               </div>
             </div>
           </div>
+
 
         </div>
 
