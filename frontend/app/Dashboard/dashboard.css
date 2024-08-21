@@ -460,8 +460,8 @@
 
 
 .list-group-item {
-  margin-left: -145px;
-  margin-top: 10%;
+  margin-left: -188px;
+    margin-top: 10%;
 }
 
 .pagination-container .pagination {
@@ -680,4 +680,9 @@
 
 .pinnumber {
   cursor: pointer;
+}
+
+.notification-count {
+  font-weight: bold;
+  color: rgb(234, 113, 113); /* Adjust color as needed */
 }
