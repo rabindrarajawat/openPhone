@@ -384,6 +384,7 @@ export class OpenPhoneEventService {
       created_at: event.created_at,
       conversation_id: event.conversation_id,
       id: event.id,
+      is_stop: event.is_stop,
     }));
   }
 
