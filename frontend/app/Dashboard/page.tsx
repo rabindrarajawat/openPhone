@@ -135,12 +135,14 @@ const Dashboard = () => {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [updateTrigger, setUpdateTrigger] = useState(false); // State to force re-render
-  // const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(new Set());
+  const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(new Set<string>());
 
-  const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(() => {
+  useEffect(() => {
     const storedPins = localStorage.getItem("pinnedConversations");
-    return storedPins ? new Set<string>(JSON.parse(storedPins)) : new Set<string>();
-  });
+    if (storedPins) {
+      setPinnedConversations(new Set<string>(JSON.parse(storedPins)));
+    }
+  }, []);
 
 
 
