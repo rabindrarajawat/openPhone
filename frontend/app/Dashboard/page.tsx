@@ -697,7 +697,7 @@ const Dashboard = () => {
     },
     {}
   );
- 
+
   const handleFilterChange = (type: "all" | "bookmarked" | "default") => {
     setFilterOption(type);
   };
@@ -776,7 +776,7 @@ const Dashboard = () => {
   // };
 
   const [updatedMessages, setUpdatedMessages] = useState(groupedMessages);
-  console.log("🚀 ~ Dashboard ~ updatedMessages:", updatedMessages)
+  console.log("🚀 ~ Dashboard ~ updatedMessages:", updatedMessages);
 
   useEffect(() => {
     // Update state whenever events change
@@ -1276,7 +1276,11 @@ const Dashboard = () => {
                       const isStop = updatedMessages[conversationId].some(
                         (message) => message.is_stop
                       );
-                      console.log("🚀 ~ Dashboard ~ isStop:",updatedMessages, isStop)
+                      console.log(
+                        "🚀 ~ Dashboard ~ isStop:",
+                        updatedMessages,
+                        isStop
+                      );
 
                       return (
                         <div key={conversationId}>
@@ -1325,19 +1329,18 @@ const Dashboard = () => {
                                         </button>
 
                                         <i
-                                    className={`bi ${
-                                      message.is_message_pinned
-                                        ? "bi-star-fill text-warning"
-                                        : "bi-star"
-                                    } star-icon`}
-                                    onClick={() =>
-                                      toggleMessagePin(
-                                        message.id,
-                                        conversationId
-                                      )
-                                    }
-                                  ></i>
-
+                                          className={`bi ${
+                                            message.is_message_pinned
+                                              ? "bi-star-fill text-warning"
+                                              : "bi-star"
+                                          } star-icon`}
+                                          onClick={() =>
+                                            toggleMessagePin(
+                                              message.id,
+                                              conversationId
+                                            )
+                                          }
+                                        ></i>
                                       </div>
                                     ) : (
                                       <div>
@@ -1358,21 +1361,20 @@ const Dashboard = () => {
                                             >
                                               Read More
                                             </button>
-
                                             <i
-                                    className={`bi ${
-                                      message.is_message_pinned
-                                        ? "bi-star-fill text-warning"
-                                        : "bi-star"
-                                    } star-icon`}
-                                    onClick={() =>
-                                      toggleMessagePin(
-                                        message.id,
-                                        conversationId
-                                      )
-                                    }
-                                  ></i>
-
+                                              style={{ cursor: "pointer" }}
+                                              className={`bi ${
+                                                message.is_message_pinned
+                                                  ? "bi-star-fill text-warning"
+                                                  : "bi-star"
+                                              } star-icon cursor-pointer`}
+                                              onClick={() =>
+                                                toggleMessagePin(
+                                                  message.id,
+                                                  conversationId
+                                                )
+                                              }
+                                            ></i>
                                           </>
                                         ) : (
                                           message.body || "No message body"
@@ -1380,7 +1382,6 @@ const Dashboard = () => {
                                       </div>
                                     )}
                                   </div>
-                                 
                                 </div>
                                 <div
                                   className={
