@@ -136,6 +136,8 @@ const Dashboard = () => {
   const [toDate, setToDate] = useState('');
   const [updateTrigger, setUpdateTrigger] = useState(false); // State to force re-render
   const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(new Set<string>());
+  const [searchQuery, setSearchQuery] = useState('');
+
 
   useEffect(() => {
     const storedPins = localStorage.getItem("pinnedConversations");
@@ -195,46 +197,20 @@ const Dashboard = () => {
 
 
   const filteredAddresses = addresses1.filter((address) => {
-    // Apply auction type filter
     const matchesAuctionType = selectedAuctionTypes.length === 0 || selectedAuctionTypes.includes(address.auction_event_id);
-
-    // Apply bookmark filter
-    const matchesBookmark = filterOption === 'all' ||
-      (filterOption === 'bookmarked' && address.is_bookmarked) ||
-      (filterOption === 'default'); // 'default' shows all addresses
-
-    // Apply date filter
-    const matchesDateFilter =
-      selectedDateFilter === 'all' ||
+    const matchesBookmark = filterOption === 'all' || (filterOption === 'bookmarked' && address.is_bookmarked) || (filterOption === 'default');
+    const matchesDateFilter = selectedDateFilter === 'all' ||
       (selectedDateFilter === 'weekly' && isWithinLastWeek(address.created_at)) ||
       (selectedDateFilter === 'monthly' && isWithinLastMonth(address.created_at));
-
-    // Apply custom date filter
     const matchesCustomDateFilter = (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
       (!toDate || new Date(address.created_at) <= new Date(toDate));
 
-    return matchesAuctionType && matchesBookmark && matchesDateFilter && matchesCustomDateFilter;
+    // Apply the search filter
+    const matchesSearch = address.displayAddress.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchesAuctionType && matchesBookmark && matchesDateFilter && matchesCustomDateFilter && matchesSearch;
   });
-
-
-  // Show all addresses if no filters match
   const addressesToShow = filteredAddresses.length > 0 ? filteredAddresses : addresses1;
-
-
-
-
-
-
-
-
-  console.log('Filtered Addresses:', filteredAddresses);
-  console.log('All Addresses:', addresses1);
-
-
-
-
-
-
 
   const handleToggle = () => {
     setIsOpen((prevIsOpen) => !prevIsOpen);
@@ -251,8 +227,7 @@ const Dashboard = () => {
   };
 
   const handleDone = () => {
-    // Add your logic for when the "Done" button is clicked
-    setIsCustomDateOpen(true); // Close the custom date dropdown
+    setIsCustomDateOpen(true);
   };
 
   const handleReset = () => {
@@ -260,29 +235,10 @@ const Dashboard = () => {
     setToDate('');
     setIsCustomDateOpen(true);
   };
-  // useEffect(() => {
-  //   async function fetchEvents() {
-  //     try {
-  //       const response = await axios.get('http://localhost:8000/openPhoneEventData/events-by-address-and-from', {
-  //         params: { address_id: selectedAddressId, from_number: fromNumber }
-  //       });
-  //       setEvents(response.data.data);
-  //     } catch (error) {
-  //       // setError('Error fetching event bodies');
-  //     } finally {
-  //       // setLoading(false);
-  //     }
-  //   }
 
-  //   fetchEvents();
-  // }, [selectedAddress1, fromNumber]);
-  // const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>((acc, message) => {
-  //   if (!acc[message.conversation_id]) {
-  //     acc[message.conversation_id] = [];
-  //   }
-  //   acc[message.conversation_id].push(message);
-  //   return acc;
-  // }, {});
+  const handleSearchChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
+    setSearchQuery(e.target.value);
+  };
 
   const recordsPerPage = 6;
 
@@ -298,7 +254,7 @@ const Dashboard = () => {
     axios
       .get("http://localhost:8000/address/getalladdress")
       .then((response) => {
-        console.log('API Response:', response.data);
+        // console.log('API Response:', response.data);
         const formattedAddresses = response.data.map((item: any) => ({
           id: item.id,
           displayAddress: item.address,
@@ -310,8 +266,8 @@ const Dashboard = () => {
         setAddresses1(formattedAddresses);
 
         if (formattedAddresses.length > 0) {
-          setSelectedAddress(formattedAddresses[0].displayAddress); // Set the first address as the default selected address
-          setSelectedAddressId(formattedAddresses[0].id); // Set the first address ID as the default selected address ID
+          setSelectedAddress(formattedAddresses[0].displayAddress);
+          setSelectedAddressId(formattedAddresses[0].id);
         }
       })
       .catch((error) => {
@@ -662,21 +618,27 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    async function fetchEvents() {
-      try {
-        const response = await axios.get('http://localhost:8000/openPhoneEventData/events-by-address-and-from', {
-          params: { address_id: selectedAddressId, from_number: fromNumber } // Pass fromNumber directly
-        });
-        setEvents(response.data.data);
-      } catch (error) {
-        // setError('Error fetching event bodies');
-      } finally {
-        // setLoading(false);
+    const timer = setTimeout(async () => {
+      async function fetchEvents() {
+        try {
+          const response = await axios.get('http://localhost:8000/openPhoneEventData/events-by-address-and-from', {
+            params: { address_id: selectedAddressId, from_number: fromNumber } // Pass fromNumber directly
+          });
+          setEvents(response.data.data);
+        } catch (error) {
+          // setError('Error fetching event bodies');
+        } finally {
+          // setLoading(false);
+        }
       }
-    }
 
-    fetchEvents();
+      fetchEvents();
+    }, 700); // 0.5 second delay
+
+    // Cleanup function to clear the timeout if the dependencies change or the component unmounts
+    return () => clearTimeout(timer);
   }, [selectedAddressId, fromNumber]);
+
 
 
 
@@ -916,10 +878,11 @@ const Dashboard = () => {
               <span className="icon">
                 <img src="/Icon.svg" alt="icon" />
               </span>
-              <input type="text" placeholder="Search Address"></input>
+              <input type="text" placeholder="Search Address" value={searchQuery}
+                onChange={handleSearchChange}></input>
             </div>
 
-            <div className="icon-labels d-flex">
+            <div className="icon-labels">
               <div
                 className={`bookmark-container text-center ${filterOption === 'bookmarked' ? 'active-filter' : ''}`}
                 onClick={() => handleFilterChange('bookmarked')}
@@ -1011,7 +974,7 @@ const Dashboard = () => {
             </span>
             <span className="ms-4">Analytic Data of Selected Address</span>
           </div>
-          <div className="d-flex main-message">
+          <div className=" main-message">
             <div className="logos-row-msg">
               <div className="nav-msg">
                 <div className="message Delivered">Message Delivered</div>
@@ -1050,17 +1013,10 @@ const Dashboard = () => {
                 />
               </div>
             </div>
-
-
           </div>
-
-
         </div>
 
         <div className="conversation">
-
-          {/* <img src="converstation.svg" alt="" /> Conversation From {fromNumber} */}
-
           {selectedAddress && (
             <div className="conversation-chat">
               <img src="converstation.svg" alt="" /> Conversation From { }
@@ -1079,36 +1035,22 @@ const Dashboard = () => {
 
 
           <div className="search-wrapper ">
-            {/* <Image src="/Icon.svg" alt="icon" className='search-icon' width={30} height={30} /> */}
             <input
               className="search"
               type="search"
               placeholder="Search To"
-              aria-label="Search"
-              value={input}
-              onChange={(e) => handleChange(e.target.value)}
             />
           </div>
-
-          {/* <div className="search-box-to ">
-            <span className="icon">
-              <img src="/Icon.svg" alt="icon" />
-            </span>
-            <input type="text" placeholder="Search Address"></input>
-          </div> */}
-
-
-
           <div className="input-msg">
             <div className="screenshot-msg">
               <div className="inbox-chat">
                 {events.length > 0 ? (
                   Object.keys(groupedMessages).map((conversationId: string) => {
-                    // Check if any message in the conversation has is_stop set to true
                     const isStop = groupedMessages[conversationId].some(
                       (message) => message.is_stop
-                    );
 
+                    );
+                    console.log(isStop)
                     return (
                       <div key={conversationId}>
                         <div className="to-line">.</div>
@@ -1119,8 +1061,6 @@ const Dashboard = () => {
                           >
                             {groupedMessages[conversationId][0].to}
                           </span>
-
-                          {/* Pin/Unpin Icon */}
                           <i
                             className={`bi pinnumber ${pinnedConversations.has(conversationId)
                               ? 'bi-pin-fill text-primary'
@@ -1139,7 +1079,7 @@ const Dashboard = () => {
                                   : 'chat-message-left'
                               }
                             >
-                              <div className="message-body">
+                              <div className="message-body-1">
                                 {expandedMessages.has(index) ? (
                                   <div>
                                     {message.body}
@@ -1534,23 +1474,3 @@ const Dashboard = () => {
 
 export default Dashboard;
 
-
-
-
-
-
-
-function setFilterType(type: string) {
-  throw new Error("Function not implemented.");
-}
-// function setError(arg0: string) {
-//   throw new Error("Function not implemented.");
-// }
-
-// function setLoading(arg0: boolean) {
-//   throw new Error("Function not implemented.");
-// }
-///////////////////////////////////////////////////////////////workcode//////////////////////////////////////////////
-//////////////////////////////////////////////
-/////////////////////////////////////
-//////////////////////////////////
