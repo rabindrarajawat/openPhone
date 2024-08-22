@@ -1142,48 +1142,7 @@ const Dashboard = () => {
         )}
       </div>
 
-              <div className="pagination-container">
-                <ul className="pagination">
-                  <li
-                    className={`page-item ${currentPage === 1 ? "disabled" : ""
-                      }`}
-                  >
-                    <button
-                      className="page-link"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      &lt;
-                    </button>
-                  </li>
-                  {[...Array(totalPages)].map((_, i) => (
-                    <li
-                      key={i}
-                      className={`page-item ${currentPage === i + 1 ? "active" : ""
-                        }`}
-                    >
-                      <button
-                        className="page-link"
-                        onClick={() => handlePageChange(i + 1)}
-                      >
-                        {i + 1}
-                      </button>
-                    </li>
-                  ))}
-                  <li
-                    className={`page-item ${currentPage === totalPages ? "disabled" : ""
-                      }`}
-                  >
-                    <button
-                      className="page-link"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      &gt;
-                    </button>
-                  </li>
-                </ul>
-              </div>
+
             </div>
           </div>
         </div>
