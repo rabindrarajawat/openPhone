@@ -684,5 +684,6 @@
 
 .notification-count {
   font-weight: bold;
-  color: rgb(234, 113, 113); /* Adjust color as needed */
+  color: rgb(234, 113, 113);
+  /* Adjust color as needed */
 }
