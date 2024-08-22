@@ -224,7 +224,7 @@
   border: 3px solid #D7F5DC;
 
   border-radius: 6px;
-  height: 550px;
+  height: 675px;
 }
 
 
@@ -379,7 +379,7 @@
 
 .input-msg {
   width: 280%;
-  height: 140%;
+  height: 180%;
   margin-top: 8%;
   margin-top: -255px;
   margin-left: -541px;
@@ -661,6 +661,10 @@
 
 .selected-address .setaddress {
   color: #007bff;
+}
+.address-list{
+  margin-left: 45px;
+  margin-top: 49px;
 }
 
 .checkbox {

@@ -21,7 +21,7 @@ export class AddressEntity extends CommonEntity {
   @Column({ default: false })
   is_bookmarked: boolean;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   auction_event_id: number;
 
   @CreateDateColumn({ nullable: true })
