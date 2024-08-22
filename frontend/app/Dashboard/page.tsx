@@ -18,12 +18,14 @@ interface Address {
 }
 
 interface Address1 {
+  fullAddress: string;
   id: number;
   displayAddress: string;
   is_bookmarked: boolean;
   auction_event_id: number;
   created_at: string;
   notificationCount: number; // Add this field
+  address:string;
 
 }
 
@@ -179,7 +181,10 @@ const Dashboard = () => {
   const [updateTrigger, setUpdateTrigger] = useState(false); // State to force re-render
   const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(new Set<string>());
   const [searchQuery, setSearchQuery] = useState('');
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [deliveredChecked, setDeliveredChecked] = useState(false);
+  const [receivedChecked, setReceivedChecked] = useState(false);
+  const [addresses2, setAddresses2] = useState<Address1[]>([]);
+  const [filteredAddresses2, setFilteredAddresses2] = useState<Address1[]>([]);
 
 
 
@@ -242,6 +247,7 @@ const Dashboard = () => {
   };
 
   const filteredAddresses = addresses1.filter((address) => {
+
     const matchesAuctionType = selectedAuctionTypes.length === 0 || selectedAuctionTypes.includes(address.auction_event_id);
     const matchesBookmark = filterOption === 'all' || (filterOption === 'bookmarked' && address.is_bookmarked) || (filterOption === 'default');
     const matchesDateFilter = selectedDateFilter === 'all' ||
@@ -255,10 +261,17 @@ const Dashboard = () => {
 
     return matchesAuctionType && matchesBookmark && matchesDateFilter && matchesCustomDateFilter && matchesSearch;
   });
-  const addressesToShow = filteredAddresses.length > 0 ? filteredAddresses : addresses1;
+
+  
+  const addressesToShow = filteredAddresses.length > 0
+  ? filteredAddresses.filter((address) => filteredAddresses2.some((filteredAddress) => filteredAddress.address === address.address))
+  : filteredAddresses2.length > 0
+    ? filteredAddresses2
+    : addresses1;
+  console.log("addressesToShow",addressesToShow);
 
   const handleToggle = () => {
-    setIsOpen((prevIsOpen) => !prevIsOpen);
+    setIsType(!isType);
   };
   const handleToggle1 = () => {
     setIsType((prevIsOpen) => !prevIsOpen);
@@ -295,29 +308,7 @@ const Dashboard = () => {
     }
   }, [router]);
 
-  // useEffect(() => {
-  //   axios
-  //     .get("http://localhost:8000/address/getalladdress")
-  //     .then((response) => {
-  //       // console.log('API Response:', response.data);
-  //       const formattedAddresses = response.data.map((item: any) => ({
-  //         id: item.id,
-  //         displayAddress: item.address,
-  //         is_bookmarked: item.is_bookmarked,
-  //         auction_event_id: item.auction_event_id,
-  //         created_at: item.created_at,
-  //       }));
-  //       setAddresses1(formattedAddresses);
 
-  //       if (formattedAddresses.length > 0) {
-  //         setSelectedAddress(formattedAddresses[0].displayAddress);
-  //         setSelectedAddressId(formattedAddresses[0].id);
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching addresses:", error);
-  //     });
-  // }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -333,6 +324,11 @@ const Dashboard = () => {
           notificationCount: 0,
           address: item.address
         }));
+        setAddresses2(formattedAddresses);
+        setFilteredAddresses2(formattedAddresses);
+        console.log("formattedAddresses",formattedAddresses)
+
+
 
         // Fetch unread notifications
         const notificationResponse = await axios.get('http://localhost:8000/notifications');
@@ -361,6 +357,40 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
+    const fetchFilteredAddresses = async () => {
+      let deliveredAddresses = [];
+      let receivedAddresses = [];
+
+      if (deliveredChecked) {
+        // Fetch delivered addresses
+        const deliveredResponse = await axios.get('http://localhost:8000/openPhoneEventData?filter=delivered');
+        deliveredAddresses = deliveredResponse.data.data
+          .filter((event: { event_type_id: number; }) => event.event_type_id === 2)
+          .map((event: { address: any; }) => event.address);
+      }
+
+      if (receivedChecked) {
+        // Fetch received addresses
+        const receivedResponse = await axios.get('http://localhost:8000/openPhoneEventData?filter=received');
+        receivedAddresses = receivedResponse.data.data
+          .map((event: { address: any; }) => event.address);
+      }
+
+      // Combine both delivered and received addresses
+      const combinedAddresses = [...new Set([...deliveredAddresses, ...receivedAddresses])];
+
+      // Filter the addresses based on the combined addresses
+      const filtered = addresses2.filter((addressObj: { address: any; }) => combinedAddresses.includes(addressObj.address));
+      console.log('Filtered Addresses:', filtered); // Log filtered addresses
+      setFilteredAddresses2(filtered.length > 0 ? filtered : addresses2);
+    };
+
+    fetchFilteredAddresses();
+  }, [deliveredChecked, receivedChecked, addresses2]);
+
+
+
+  useEffect(() => {
     const fetchEventCounts = async () => {
       try {
         const response = await fetch(
@@ -379,6 +409,14 @@ const Dashboard = () => {
 
     fetchEventCounts();
   }, []); // Empty dependency array means this effect runs once on mount
+
+  const handleDeliveredChange = () => {
+    setDeliveredChecked(!deliveredChecked);
+  };
+
+  const handleReceivedChange = () => {
+    setReceivedChecked(!receivedChecked);
+  };
 
   const handleBookmarkClick = (addressId: number) => {
     const address = addresses1.find((a) => a.id === addressId);
@@ -559,35 +597,7 @@ const Dashboard = () => {
     });
   };
 
-  const filteredData = eventData.filter((event) => {
-    if (
-      selectedOptions.includes("delivered") &&
-      selectedOptions.includes("received")
-    ) {
-      return event.event_type_id === 2 || event.event_type_id === 1;
-    } else if (selectedOptions.includes("delivered")) {
-      return event.event_type_id === 2;
-    } else if (selectedOptions.includes("received")) {
-      return event.event_type_id === 1;
-    }
-    return true;
-  });
-
-  const tableData = filteredData
-    .filter(
-      (event) => event.address_id !== null && event.address_id !== undefined
-    )
-    .map((event) => ({
-      ownerid: event.conversation_id,
-      PhoneNumber: event.to,
-      Status: event.is_stop ? "Inactive" : "Active",
-      Responses: event.is_stop ? "Stop" : "Interested",
-    }));
-
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = tableData.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(tableData.length / recordsPerPage);
+  
 
   const handlePageChange = (pageNumber: React.SetStateAction<number>) => {
     setCurrentPage(pageNumber);
@@ -644,16 +654,8 @@ const Dashboard = () => {
     setSelectedAddress(address.fullAddress);
   };
 
-  // useEffect(() => {
-  //   if (tableData.length > 0) {
-  //     // Set default selectedRowId only if it is not already set
-  //     if (selectedRowId === null && tableData.length > 0) {
-  //       const firstRowId = tableData[0].ownerid;
-  //       setSelectedRowId(firstRowId);
-  //       handleRowClick(firstRowId);
-  //     }
-  //   }
-  // }, [tableData, selectedRowId]);
+  
+
 
   const fetchData = async (value: string) => {
     try {
@@ -744,78 +746,7 @@ const Dashboard = () => {
     setFilterOption(type);
   };
 
-  // const toggleMessagePin = async (messageId: number) => {
-  //   console.log("🚀 ~ toggleMessagePin ~ messageId:", messageId);
-  //   try {
-  //     const response = await axios.post(
-  //       `http://localhost:8000/openPhoneEventData/toggle-message-pin/${messageId}`
-  //     );
-  //     console.log("API Response:", response.data);
 
-  //     if (response.data && response.data.message) {
-  //       // Update the local pinned messages state
-  //       setPinnedMessages((prevPinnedMessages) => {
-  //         const newPinnedMessages = new Set(prevPinnedMessages);
-  //         if (newPinnedMessages.has(messageId)) {
-  //           newPinnedMessages.delete(messageId);
-  //         } else {
-  //           newPinnedMessages.add(messageId);
-
-  //         }
-  //         return newPinnedMessages;
-  //       });
-
-  //       console.log("Pin status updated successfully");
-  //     } else {
-  //       console.error("Unexpected response format:", response.data);
-  //     }
-  //   } catch (error: any) {
-  //     console.error("Error toggling message pin:", error);
-  //     if (error.response) {
-  //       console.error("Error response:", error.response.data);
-  //     }
-  //   }
-  // };
-
-  // const toggleMessagePin = async (messageId: number, message: any) => {
-  //   console.log("🚀 ~ Dashboard ~ groupedMessages:", groupedMessages)
-
-  //   console.log("🚀 ~ toggleMessagePin ~ message:", messageId, message);
-  //   try {
-  //     const response = await axios.post(
-  //       `http://localhost:8000/openPhoneEventData/toggle-message-pin/${messageId}`
-  //     );
-
-  //     if (response.data && response.data.message) {
-  //       // Update the specific message's is_message_pinned property first
-  //       setMessages((prevMessages) =>
-  //         prevMessages.map((msg) =>
-  //           msg.id === messageId
-  //             ? { ...msg, is_message_pinned: !msg.is_message_pinned }
-  //             : msg
-  //         )
-  //       );
-
-  //       // Then update the local pinned messages state
-  //       setPinnedMessages((prevPinnedMessages) => {
-  //         const newPinnedMessages = new Set(prevPinnedMessages);
-  //         if (newPinnedMessages.has(messageId)) {
-  //           newPinnedMessages.delete(messageId);
-  //         } else {
-  //           newPinnedMessages.add(messageId);
-  //         }
-  //         return newPinnedMessages;
-  //       });
-  //     } else {
-  //       console.error("Unexpected response format:", response.data);
-  //     }
-  //   } catch (error: any) {
-  //     console.error("Error toggling message pin:", error);
-  //     if (error.response) {
-  //       console.error("Error response:", error.response.data);
-  //     }
-  //   }
-  // };
 
   const [updatedMessages, setUpdatedMessages] = useState(groupedMessages);
   console.log("🚀 ~ Dashboard ~ updatedMessages:", updatedMessages);
@@ -884,11 +815,16 @@ const Dashboard = () => {
 
                   <ul className={`dropdown-type ${isType ? "show" : ""}`}>
                     <li className="dropdown-item">
-                      <input type="checkbox" />
+                      <input type="checkbox"
+                checked={deliveredChecked}
+                onChange={handleDeliveredChange}
+                      />
                       <label className="ms-2">Delivered</label>
                     </li>
                     <li className="dropdown-item pt-2">
-                      <input type="checkbox" id="notDelivered" />
+                      <input type="checkbox" checked={receivedChecked}
+                onChange={handleReceivedChange} 
+                id="notDelivered" />
                       <label className="ms-2" htmlFor="notDelivered">
                         Received
                       </label>
@@ -1128,52 +1064,57 @@ const Dashboard = () => {
             </div>
             <div>
             <div className="address-list">
-        <div className="search-wrapper-add">
-          {results.length > 0 && (
-            <SearchResultList results={results} onSelect={handleSelectAddress} />
-          )}
+  <div className="search-wrapper-add">
+    {results.length > 0 && (
+      <SearchResultList results={results} onSelect={handleSelectAddress} />
+    )}
+  </div>
+
+  {addressesToShow.length > 0 ? (
+    addressesToShow.map((address) => (
+      <li
+        key={address.id}
+        className={`list-group-item justify-content-between ${
+          selectedAddressId === address.id ? "selected-address" : ""
+        }`}
+        onClick={() => handleAddressSelect(address.displayAddress, address.id)}
+      >
+        <div className="setaddress d-flex align-items-center gap-3">
+          <i
+            className={`bi ${
+              address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
+            } clickable-icon`}
+            style={{
+              cursor: "pointer",
+              color: address.is_bookmarked ? "blue" : "grey",
+            }}
+            onClick={() => handleBookmarkClick(address.id)}
+          ></i>
+
+          <span className="ml-2">
+            
+            {address.displayAddress || address.fullAddress}
+            {address.notificationCount > 0 && (
+              <span className="notification-count ml-2">
+                ({address.notificationCount} new)
+              </span>
+            )}
+          </span>
         </div>
 
-                {addressesToShow.length > 0 ? (
-                  addressesToShow.map((address) => (
-                    <li
-                      key={address.id}
-                      className={`list-group-item justify-content-between ${selectedAddressId === address.id
-                        ? "selected-address"
-                        : ""
-                        }`}
-                      onClick={() =>
-                        handleAddressSelect(address.displayAddress, address.id)
-                      }
-                    >
-                      <div className="setaddress d-flex align-items-center gap-3 ">
-                        <i
-                          className={`bi ${address.is_bookmarked
-                            ? "bi-bookmark-fill"
-                            : "bi-bookmark"
-                            } clickable-icon`}
-                          style={{
-                            cursor: "pointer",
-                            color: address.is_bookmarked ? "blue" : "grey",
-                          }}
-                          onClick={() => handleBookmarkClick(address.id)}
-                        ></i>
-                        {/* <span className="ml-2">{address.displayAddress}</span> */}
-                        <span className="ml-2">
-                          {address.displayAddress}
-                          {address.notificationCount > 0 && (
-                            <span className="notification-count ml-2">
-                              ({address.notificationCount} new)
-                            </span>
-                          )}
-                        </span>
-                      </div>
-                    </li>
-                  ))
-                ) : (
-                  <p>No addresses found.</p>
-                )}
-              </div>
+        {address.fullAddress && (
+          <div className="filtered-address">
+            {address.fullAddress}
+          </div>
+        )}
+      </li>
+    ))
+  ) : (
+    <p>No addresses found.</p>
+  )}
+</div>
+
+
               {/* 
               <div className="pagination-container">
                 <ul className="pagination">
