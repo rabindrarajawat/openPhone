@@ -27,6 +27,31 @@ interface Address1 {
 
 }
 
+interface Message {
+  event_type_id: number;
+  body: string;
+  to: string;
+  created_at: string;
+  conversation_id: string;
+}
+
+// interface GroupedMessages {
+//   [conversationId: string]: Message[];
+// }
+
+// interface YourComponentProps {
+//   events: Message[];
+//   groupedMessages: GroupedMessages;
+// }
+
+// interface Event {
+//   event_type_id: number;
+//   body: string;
+//   to: string;
+//   created_at: string;
+//   conversation_id: string;
+// }
+
 interface Notification {
   id: number;
   address_id: number | null;
@@ -53,32 +78,8 @@ interface Notification {
     is_stop: boolean;
     phone_number_id: string;
     user_id: string;
-  }};
-
-interface Message {
-  event_type_id: number;
-  body: string;
-  to: string;
-  created_at: string;
-  conversation_id: string;
-}
-
-// interface GroupedMessages {
-//   [conversationId: string]: Message[];
-// }
-
-// interface YourComponentProps {
-//   events: Message[];
-//   groupedMessages: GroupedMessages;
-// }
-
-// interface Event {
-//   event_type_id: number;
-//   body: string;
-//   to: string;
-//   created_at: string;
-//   conversation_id: string;
-// }
+  }
+};
 
 interface EventItem {
   created_at: string;
@@ -145,6 +146,7 @@ const Dashboard = () => {
     null
   );
   const [currentPage, setCurrentPage] = useState(1);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const [uniqueFromNumbers, setUniqueFromNumbers] = useState<string[]>([]);
 
@@ -293,6 +295,30 @@ const Dashboard = () => {
     }
   }, [router]);
 
+  // useEffect(() => {
+  //   axios
+  //     .get("http://localhost:8000/address/getalladdress")
+  //     .then((response) => {
+  //       // console.log('API Response:', response.data);
+  //       const formattedAddresses = response.data.map((item: any) => ({
+  //         id: item.id,
+  //         displayAddress: item.address,
+  //         is_bookmarked: item.is_bookmarked,
+  //         auction_event_id: item.auction_event_id,
+  //         created_at: item.created_at,
+  //       }));
+  //       setAddresses1(formattedAddresses);
+
+  //       if (formattedAddresses.length > 0) {
+  //         setSelectedAddress(formattedAddresses[0].displayAddress);
+  //         setSelectedAddressId(formattedAddresses[0].id);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching addresses:", error);
+  //     });
+  // }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -305,7 +331,7 @@ const Dashboard = () => {
           auction_event_id: item.auction_event_id,
           created_at: item.created_at,
           notificationCount: 0,
-          address:item.address
+          address: item.address
         }));
 
         // Fetch unread notifications
@@ -864,7 +890,7 @@ const Dashboard = () => {
                     <li className="dropdown-item pt-2">
                       <input type="checkbox" id="notDelivered" />
                       <label className="ms-2" htmlFor="notDelivered">
-                        received
+                        Received
                       </label>
                     </li>
                   </ul>
@@ -1108,41 +1134,89 @@ const Dashboard = () => {
           )}
         </div>
 
-        {addresses1.length > 0 ? (
-          <ul className="borderless-list">
-            {addresses1.map((address) => (
-              <li
-                key={address.id}
-                className={`list-group-item borderless-item setaddress ${selectedAddressId === address.id ? 'selected-address' : ''}`}
-                onClick={() => handleAddressSelect(address.displayAddress, address.id)}
-              >
-                <div className="d-flex align-items-center gap-3">
-                  <i
-                    className={`bi ${address.is_bookmarked ? 'bi-bookmark-fill' : 'bi-bookmark'} clickable-icon`}
-                    style={{ cursor: 'pointer', color: address.is_bookmarked ? 'blue' : 'grey' }}
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent triggering the select address when clicking the bookmark icon
-                      handleBookmarkClick(address.id);
-                    }}
-                  ></i>
-                  <span className="ml-2">
-                    {address.displayAddress}
-                    {address.notificationCount > 0 && (
-                      <span className="notification-count ml-2">
-                        ({address.notificationCount} new)
-                      </span>
-                    )}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No addresses found.</p>
-        )}
-      </div>
-
-
+                {addressesToShow.length > 0 ? (
+                  addressesToShow.map((address) => (
+                    <li
+                      key={address.id}
+                      className={`list-group-item justify-content-between ${selectedAddressId === address.id
+                        ? "selected-address"
+                        : ""
+                        }`}
+                      onClick={() =>
+                        handleAddressSelect(address.displayAddress, address.id)
+                      }
+                    >
+                      <div className="setaddress d-flex align-items-center gap-3 ">
+                        <i
+                          className={`bi ${address.is_bookmarked
+                            ? "bi-bookmark-fill"
+                            : "bi-bookmark"
+                            } clickable-icon`}
+                          style={{
+                            cursor: "pointer",
+                            color: address.is_bookmarked ? "blue" : "grey",
+                          }}
+                          onClick={() => handleBookmarkClick(address.id)}
+                        ></i>
+                        {/* <span className="ml-2">{address.displayAddress}</span> */}
+                        <span className="ml-2">
+                          {address.displayAddress}
+                          {address.notificationCount > 0 && (
+                            <span className="notification-count ml-2">
+                              ({address.notificationCount} new)
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    </li>
+                  ))
+                ) : (
+                  <p>No addresses found.</p>
+                )}
+              </div>
+              {/* 
+              <div className="pagination-container">
+                <ul className="pagination">
+                  <li
+                    className={`page-item ${currentPage === 1 ? "disabled" : ""
+                      }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      &lt;
+                    </button>
+                  </li>
+                  {[...Array(totalPages)].map((_, i) => (
+                    <li
+                      key={i}
+                      className={`page-item ${currentPage === i + 1 ? "active" : ""
+                        }`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() => handlePageChange(i + 1)}
+                      >
+                        {i + 1}
+                      </button>
+                    </li>
+                  ))}
+                  <li
+                    className={`page-item ${currentPage === totalPages ? "disabled" : ""
+                      }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      &gt;
+                    </button>
+                  </li>
+                </ul>
+              </div> */}
             </div>
           </div>
         </div>
