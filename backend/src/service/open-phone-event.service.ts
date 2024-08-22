@@ -24,9 +24,8 @@ export class OpenPhoneEventService {
     private addressRepository: Repository<AddressEntity>,
     private addressService: AddressService,
     private auctionService: AuctionEventService,
-    private notificationService: NotificationService,
-
-  ) { }
+    private notificationService: NotificationService
+  ) {}
 
   async create(payload: OpenPhoneEventDto) {
     try {
@@ -58,7 +57,7 @@ export class OpenPhoneEventService {
       if (body) {
         const extractedInfo = this.extractInformation(body);
 
-        auctionTypeId = this.auctionTypeId(extractedInfo.auction_type)
+        auctionTypeId = this.auctionTypeId(extractedInfo.auction_type);
         if (
           !extractedInfo.address &&
           payload.data.object.status === "outgoing"
@@ -448,37 +447,41 @@ export class OpenPhoneEventService {
     }));
   }
 
-  async findAllFiltered(filter?: 'delivered' | 'received') {
+  async findAllFiltered(filter?: "delivered" | "received") {
     const query = this.openPhoneEventRepository
-      .createQueryBuilder('event')
-      .leftJoinAndSelect('event.address', 'address');
+      .createQueryBuilder("event")
+      .leftJoinAndSelect("event.address", "address");
 
-    if (filter === 'delivered') {
-      query.where('event.event_type_id = :id', { id: 2 });
-    } else if (filter === 'received') {
-      query.where('event.event_type_id = :id', { id: 1 });
+    if (filter === "delivered") {
+      query.where("event.event_type_id = :id", { id: 2 });
+    } else if (filter === "received") {
+      query.where("event.event_type_id = :id", { id: 1 });
     }
 
     const events = await query.getMany();
 
-    const addressIds = events.map(event => event.address_id).filter(id => id != null);
+    const addressIds = events
+      .map((event) => event.address_id)
+      .filter((id) => id != null);
     const addresses = await this.addressRepository.findByIds(addressIds);
-    const addressMap = new Map(addresses.map(addr => [addr.id, addr.address]));
+    const addressMap = new Map(
+      addresses.map((addr) => [addr.id, addr.address])
+    );
 
-    return events.map(event => ({
+    return events.map((event) => ({
       ...event,
       address: event.address_id ? addressMap.get(event.address_id) : null,
     }));
   }
 
-
   async toggleMessagePin(id: number): Promise<{ message: string }> {
-    const event = await this.openPhoneEventRepository.findOne({ where: { id } });
+    const event = await this.openPhoneEventRepository.findOne({
+      where: { id },
+    });
     if (!event) {
       throw new NotFoundException(`Event with ID ${id} not found`);
     }
     event.is_message_pinned = !event.is_message_pinned;
-
 
     const updatedData = await this.openPhoneEventRepository.save(event);
 
@@ -489,12 +492,14 @@ export class OpenPhoneEventService {
     } else {
       return {
         message: `Message unpinned for event_id ${id}`,
-      };;
+      };
     }
   }
 
   async toggleNumberPin(conversation_id: string): Promise<{ message: string }> {
-    const event = await this.openPhoneEventRepository.findOne({ where: { conversation_id } });
+    const event = await this.openPhoneEventRepository.findOne({
+      where: { conversation_id },
+    });
     if (!event) {
       throw new NotFoundException(`Event with ID ${conversation_id} not found`);
     }
@@ -507,10 +512,9 @@ export class OpenPhoneEventService {
     } else {
       return {
         message: `Number unpinnrd for conversation_id ${conversation_id}`,
-      };;
+      };
     }
   }
-
 
   async getAllPinnedMessages(): Promise<OpenPhoneEventEntity[]> {
     return this.openPhoneEventRepository.find({
@@ -524,20 +528,14 @@ export class OpenPhoneEventService {
   //   });
   // }
 
-
-  async getAllPinnedNumbers(conversationId: string): Promise<OpenPhoneEventEntity[]> {
+  async getAllPinnedNumbers(
+    conversationId: string
+  ): Promise<OpenPhoneEventEntity[]> {
     return this.openPhoneEventRepository.find({
       where: {
         // is_number_pinned: true,
-        conversation_id: conversationId
+        conversation_id: conversationId,
       },
     });
   }
-
-
-
-
 }
-
-
-
