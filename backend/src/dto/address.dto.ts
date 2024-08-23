@@ -7,7 +7,9 @@ export class AddressDto {
   address: string;
 
   is_bookmarked: boolean;
-
+  
+  @IsNotEmpty()
+  @IsDateString()
   auction_event_id: number;
 
   @IsNotEmpty()
