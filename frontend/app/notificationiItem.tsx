@@ -94,7 +94,7 @@ const NotificationItem: React.FC<Notification> = ({ event, is_read, event_id, ha
         </div>
 
       </div>
-
+</div>
     </li>
   );
 };
