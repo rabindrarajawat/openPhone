@@ -1096,7 +1096,7 @@ const Dashboard = () => {
             {address.displayAddress || address.fullAddress}
             {address.notificationCount > 0 && (
               <span className="notification-count ml-2">
-                ({address.notificationCount} new)
+                ({address.notificationCount})
               </span>
             )}
           </span>
