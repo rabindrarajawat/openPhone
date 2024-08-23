@@ -49,7 +49,7 @@ const NotificationItem: React.FC<Notification> = ({ event, is_read, event_id, ha
         <div className='event-from'>{event.from}
 
 
-     
+
         </div>
         <div className='message-body'>
           Message:
@@ -71,9 +71,30 @@ const NotificationItem: React.FC<Notification> = ({ event, is_read, event_id, ha
               </button>
             )}
           </div>
+        <div className='message-body'>
+          Message:
+          {isExpanded || !event.body || event.body.length <= maxContentLength
+            ? event.body || 'No content available'
+            : `${event.body.slice(0, maxContentLength)}.. `}
+          {event.body && event.body.length > maxContentLength && (
+            <button onClick={toggleReadMore} className='read-more-btn text-success'>
+              {isExpanded ? '..Read Less' : 'Read More'}
+            </button>
+          )}
+          <div>
+            {!is_read && (
+              <button
+                onClick={() => handleMarkAsRead(event_id)}
+                className='notification-info'
+              >
+                Mark as Read
+              </button>
+            )}
+          </div>
         </div>
+
       </div>
-    
+
     </li>
   );
 };
