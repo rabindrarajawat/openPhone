@@ -21,6 +21,7 @@ interface Address {
 }
 
 const ConversationTable = () => {
+  const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
   const [records, setRecords] = useState<ConversationRecord[]>([]);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<ConversationRecord | null>(null);
@@ -32,7 +33,7 @@ const ConversationTable = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/openPhoneEventData/getConversationsWithoutAddress');
+      const response = await axios.get(`${Base_Url}openPhoneEventData/getConversationsWithoutAddress`);
       console.log('API response:', response);
 
       const data = response.data.data; // Adjusted to match your response structure

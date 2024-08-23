@@ -11,11 +11,9 @@ const SideBar = () => {
   const router = useRouter();
 
   const handleLogout = () => {
-    // Remove the token from local storage
+    console.log("Logout clicked"); // Debugging line
     localStorage.removeItem("authToken");
-
-    // Redirect to the home page
-    router.push("/");
+    window.location.href = "/"
   };
 
   return (
