@@ -21,7 +21,7 @@ async function bootstrap() {
       transform: true, // Automatically transform payloads to be objects typed according to their DTOs
     }),
   );
-
+  app.setGlobalPrefix('api');
   // Determine the port from the environment or use default
   const port = process.env.APP_PORT || 8000;
   await app.listen(port);
