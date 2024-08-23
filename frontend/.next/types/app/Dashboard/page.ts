@@ -1,4 +1,4 @@
-// File: D:\mayank\openPhone\frontend\app\Dashboard\page.tsx
+// File: /home/im/Downloads/openPhone/frontend/app/Dashboard/page.tsx
 import * as entry from '../../../../app/Dashboard/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
