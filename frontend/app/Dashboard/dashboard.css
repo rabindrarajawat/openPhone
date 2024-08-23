@@ -224,7 +224,7 @@
   border: 3px solid #D7F5DC;
 
   border-radius: 6px;
-  height: 550px;
+  height: 675px;
 }
 
 
@@ -379,7 +379,7 @@
 
 .input-msg {
   width: 280%;
-  height: 140%;
+  height: 180%;
   margin-top: 8%;
   margin-top: -255px;
   margin-left: -541px;
@@ -460,8 +460,8 @@
 
 
 .list-group-item {
-  margin-left: -192px;
-  margin-top: 10%;
+  margin-left: -188px;
+    margin-top: 10%;
 }
 
 .pagination-container .pagination {
@@ -662,6 +662,10 @@
 .selected-address .setaddress {
   color: #007bff;
 }
+.address-list{
+  margin-left: 45px;
+  margin-top: 49px;
+}
 
 .checkbox {
   cursor: pointer;
@@ -684,9 +688,6 @@
 
 .notification-count {
   font-weight: bold;
-  /* color: rgb(234, 113, 113); */
-  color: #29cc39;
-  /* margin-left: 5px; */
-  padding-left: 5px;
+  color: #17A505;
   /* Adjust color as needed */
 }

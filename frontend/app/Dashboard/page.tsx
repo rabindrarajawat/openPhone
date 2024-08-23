@@ -12,14 +12,21 @@ import { SearchResultList } from "../SearchResultList/SearchResultList";
 
 interface Address {
   fullAddress: string;
+
+
+
 }
+
 interface Address1 {
-  is_bookmarked: boolean;
-  displayAddress: string;
+  fullAddress: string;
   id: number;
+  displayAddress: string;
+  is_bookmarked: boolean;
   auction_event_id: number;
   created_at: string;
   notificationCount: number; // Add this field
+  address:string;
+
 }
 
 interface Message {
@@ -29,6 +36,8 @@ interface Message {
   created_at: string;
   conversation_id: string;
 }
+
+
 
 interface Notification {
   id: number;
@@ -91,14 +100,11 @@ const Dashboard = () => {
   const [isFollowUpClicked, setIsFollowUpClicked] = useState(false); // Add state for Follow-up button
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [selectedAddress, setSelectedAddress] = useState("Search Address");
-  const [addresses, setAddresses] = useState<string[]>([]); // State to store addresses
   const [eventData, setEventData] = useState<EventItem[]>([]);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [fromNumber, setFromNumber] = useState("");
-  const [selectedAddress1, setSelectedAddress1] = useState<string>("");
-  const [apiResponseBody, setApiResponseBody] = useState<Message[]>([]);
-  const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
-  const [isMessageExpanded, setIsMessageExpanded] = useState(false);
+
+ 
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
@@ -108,10 +114,8 @@ const Dashboard = () => {
   const [callResponse, setCallResponse] = useState<number>(0);
   const [input, setInput] = useState<string>("");
   const [results, setResultsState] = useState<Address[]>([]);
-  const [allSelected, setAllSelected] = useState(false);
   const [addresses1, setAddresses1] = useState<Address1[]>([]);
 
-  const [isOpen, setIsOpen] = useState(true);
   const [isType, setIsType] = useState(false);
   const dropdownToggleRef = useRef(null);
   const [isDate, setIsDate] = useState(true);
@@ -152,10 +156,14 @@ const Dashboard = () => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [updateTrigger, setUpdateTrigger] = useState(false); // State to force re-render
-  const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(
-    new Set<string>()
-  );
-  const [searchQuery, setSearchQuery] = useState("");
+  const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(new Set<string>());
+  const [searchQuery, setSearchQuery] = useState('');
+  const [deliveredChecked, setDeliveredChecked] = useState(false);
+  const [receivedChecked, setReceivedChecked] = useState(false);
+  const [addresses2, setAddresses2] = useState<Address1[]>([]);
+  const [filteredAddresses2, setFilteredAddresses2] = useState<Address1[]>([]);
+
+
 
   useEffect(() => {
     const storedPins = localStorage.getItem("pinnedConversations");
@@ -164,6 +172,7 @@ const Dashboard = () => {
     }
   }, []);
 
+  
   const [pinnedMessages, setPinnedMessages] = useState<Set<number>>(new Set());
   const [messages, setMessages] = useState<EventItem[]>([]);
 
@@ -212,21 +221,13 @@ const Dashboard = () => {
   };
 
   const filteredAddresses = addresses1.filter((address) => {
-    const matchesAuctionType =
-      selectedAuctionTypes.length === 0 ||
-      selectedAuctionTypes.includes(address.auction_event_id);
-    const matchesBookmark =
-      filterOption === "all" ||
-      (filterOption === "bookmarked" && address.is_bookmarked) ||
-      filterOption === "default";
-    const matchesDateFilter =
-      selectedDateFilter === "all" ||
-      (selectedDateFilter === "weekly" &&
-        isWithinLastWeek(address.created_at)) ||
-      (selectedDateFilter === "monthly" &&
-        isWithinLastMonth(address.created_at));
-    const matchesCustomDateFilter =
-      (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
+
+    const matchesAuctionType = selectedAuctionTypes.length === 0 || selectedAuctionTypes.includes(address.auction_event_id);
+    const matchesBookmark = filterOption === 'all' || (filterOption === 'bookmarked' && address.is_bookmarked) || (filterOption === 'default');
+    const matchesDateFilter = selectedDateFilter === 'all' ||
+      (selectedDateFilter === 'weekly' && isWithinLastWeek(address.created_at)) ||
+      (selectedDateFilter === 'monthly' && isWithinLastMonth(address.created_at));
+    const matchesCustomDateFilter = (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
       (!toDate || new Date(address.created_at) <= new Date(toDate));
 
     // Apply the search filter
@@ -242,11 +243,17 @@ const Dashboard = () => {
       matchesSearch
     );
   });
-  const addressesToShow =
-    filteredAddresses.length > 0 ? filteredAddresses : addresses1;
+
+  
+  const addressesToShow = filteredAddresses.length > 0
+  ? filteredAddresses.filter((address) => filteredAddresses2.some((filteredAddress) => filteredAddress.address === address.address))
+  : filteredAddresses2.length > 0
+    ? filteredAddresses2
+    : addresses1;
+  console.log("addressesToShow",addressesToShow);
 
   const handleToggle = () => {
-    setIsOpen((prevIsOpen) => !prevIsOpen);
+    setIsType(!isType);
   };
   const handleToggle1 = () => {
     setIsType((prevIsOpen) => !prevIsOpen);
@@ -285,6 +292,8 @@ const Dashboard = () => {
     }
   }, [router]);
 
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -301,6 +310,11 @@ const Dashboard = () => {
           notificationCount: 0,
           address: item.address,
         }));
+        setAddresses2(formattedAddresses);
+        setFilteredAddresses2(formattedAddresses);
+        console.log("formattedAddresses",formattedAddresses)
+
+
 
         // Fetch unread notifications
         const notificationResponse = await axios.get(
@@ -337,6 +351,40 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
+    const fetchFilteredAddresses = async () => {
+      let deliveredAddresses = [];
+      let receivedAddresses = [];
+
+      if (deliveredChecked) {
+        // Fetch delivered addresses
+        const deliveredResponse = await axios.get('http://localhost:8000/openPhoneEventData?filter=delivered');
+        deliveredAddresses = deliveredResponse.data.data
+          .filter((event: { event_type_id: number; }) => event.event_type_id === 2)
+          .map((event: { address: any; }) => event.address);
+      }
+
+      if (receivedChecked) {
+        // Fetch received addresses
+        const receivedResponse = await axios.get('http://localhost:8000/openPhoneEventData?filter=received');
+        receivedAddresses = receivedResponse.data.data
+          .map((event: { address: any; }) => event.address);
+      }
+
+      // Combine both delivered and received addresses
+      const combinedAddresses = [...new Set([...deliveredAddresses, ...receivedAddresses])];
+
+      // Filter the addresses based on the combined addresses
+      const filtered = addresses2.filter((addressObj: { address: any; }) => combinedAddresses.includes(addressObj.address));
+      console.log('Filtered Addresses:', filtered); // Log filtered addresses
+      setFilteredAddresses2(filtered.length > 0 ? filtered : addresses2);
+    };
+
+    fetchFilteredAddresses();
+  }, [deliveredChecked, receivedChecked, addresses2]);
+
+
+
+  useEffect(() => {
     const fetchEventCounts = async () => {
       try {
         const response = await fetch(
@@ -355,6 +403,14 @@ const Dashboard = () => {
 
     fetchEventCounts();
   }, []); // Empty dependency array means this effect runs once on mount
+
+  const handleDeliveredChange = () => {
+    setDeliveredChecked(!deliveredChecked);
+  };
+
+  const handleReceivedChange = () => {
+    setReceivedChecked(!receivedChecked);
+  };
 
   const handleBookmarkClick = (addressId: number) => {
     const address = addresses1.find((a) => a.id === addressId);
@@ -417,6 +473,8 @@ const Dashboard = () => {
     }
   };
 
+ 
+
   useEffect(() => {
     if (selectedAddress && selectedAddress !== "Search Address") {
       axios
@@ -464,6 +522,9 @@ const Dashboard = () => {
     }
   }, [selectedAddress]);
 
+ 
+
+  
   const toggleMessageExpansion = (index: any) => {
     setExpandedMessages((prev) => {
       const newExpandedMessages = new Map(prev);
@@ -476,35 +537,7 @@ const Dashboard = () => {
     });
   };
 
-  const filteredData = eventData.filter((event) => {
-    if (
-      selectedOptions.includes("delivered") &&
-      selectedOptions.includes("received")
-    ) {
-      return event.event_type_id === 2 || event.event_type_id === 1;
-    } else if (selectedOptions.includes("delivered")) {
-      return event.event_type_id === 2;
-    } else if (selectedOptions.includes("received")) {
-      return event.event_type_id === 1;
-    }
-    return true;
-  });
-
-  const tableData = filteredData
-    .filter(
-      (event) => event.address_id !== null && event.address_id !== undefined
-    )
-    .map((event) => ({
-      ownerid: event.conversation_id,
-      PhoneNumber: event.to,
-      Status: event.is_stop ? "Inactive" : "Active",
-      Responses: event.is_stop ? "Stop" : "Interested",
-    }));
-
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = tableData.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(tableData.length / recordsPerPage);
+  
 
   const handlePageChange = (pageNumber: React.SetStateAction<number>) => {
     setCurrentPage(pageNumber);
@@ -560,6 +593,9 @@ const Dashboard = () => {
     setSelectedAddress(address.fullAddress);
   };
 
+  
+
+
   const fetchData = async (value: string) => {
     try {
       const response = await axios.get(
@@ -571,14 +607,19 @@ const Dashboard = () => {
         address.fullAddress.toLowerCase().includes(value.toLowerCase())
       );
       setResultsState(results);
+      
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
+
+
   const toggleSidebar = () => {
     setIsSidebarVisible((prevState) => !prevState);
   };
+
+
 
   const handleChange = (value: string) => {
     setInput(value);
@@ -588,6 +629,7 @@ const Dashboard = () => {
   const handleSelectAddress = (address: Address) => {
     setInput(address.fullAddress);
     setResultsState([]);
+  
   };
 
   useEffect(() => {
@@ -606,7 +648,6 @@ const Dashboard = () => {
           setEvents(response.data.data);
         } catch (error) {
         } finally {
-          // setLoading(false);
         }
       }
 
@@ -629,6 +670,8 @@ const Dashboard = () => {
   const handleFilterChange = (type: "all" | "bookmarked" | "default") => {
     setFilterOption(type);
   };
+
+
 
   const [updatedMessages, setUpdatedMessages] = useState(groupedMessages);
   console.log("🚀 ~ Dashboard ~ updatedMessages:", updatedMessages);
@@ -695,11 +738,16 @@ const Dashboard = () => {
 
                   <ul className={`dropdown-type ${isType ? "show" : ""}`}>
                     <li className="dropdown-item">
-                      <input type="checkbox" />
+                      <input type="checkbox"
+                checked={deliveredChecked}
+                onChange={handleDeliveredChange}
+                      />
                       <label className="ms-2">Delivered</label>
                     </li>
                     <li className="dropdown-item pt-2">
-                      <input type="checkbox" id="notDelivered" />
+                      <input type="checkbox" checked={receivedChecked}
+                onChange={handleReceivedChange} 
+                id="notDelivered" />
                       <label className="ms-2" htmlFor="notDelivered">
                         Received
                       </label>
@@ -840,6 +888,7 @@ const Dashboard = () => {
                             />
                           </div>
                           <div className="d-flex align-items-center mt-2 gap-2">
+                           
                             <button
                               className="btn btn-primary btn btn-primary reset-button"
                               type="button"
@@ -940,58 +989,59 @@ const Dashboard = () => {
               </div>
             </div>
             <div>
-              <div className="address-list">
-                <div className="search-wrapper-add">
-                  {results.length > 0 && (
-                    <SearchResultList
-                      results={results}
-                      onSelect={handleSelectAddress}
-                    />
-                  )}
-                </div>
+            <div className="address-list">
+  <div className="search-wrapper-add">
+    {results.length > 0 && (
+      <SearchResultList results={results} onSelect={handleSelectAddress} />
+    )}
+  </div>
 
-                {addressesToShow.length > 0 ? (
-                  addressesToShow.map((address) => (
-                    <li
-                      key={address.id}
-                      className={`list-group-item justify-content-between ${
-                        selectedAddressId === address.id
-                          ? "selected-address"
-                          : ""
-                      }`}
-                      onClick={() =>
-                        handleAddressSelect(address.displayAddress, address.id)
-                      }
-                    >
-                      <div className="setaddress d-flex align-items-center gap-3 ">
-                        <i
-                          className={`bi ${
-                            address.is_bookmarked
-                              ? "bi-bookmark-fill"
-                              : "bi-bookmark"
-                          } clickable-icon`}
-                          style={{
-                            cursor: "pointer",
-                            color: address.is_bookmarked ? "blue" : "grey",
-                          }}
-                          onClick={() => handleBookmarkClick(address.id)}
-                        ></i>
-                        {/* <span className="ml-2">{address.displayAddress}</span> */}
-                        <span className="ml-2">
-                          {address.displayAddress}
-                          {address.notificationCount > 0 && (
-                            <span className="notification-count ml-2">
-                              ({address.notificationCount})
-                            </span>
-                          )}
-                        </span>
-                      </div>
-                    </li>
-                  ))
-                ) : (
-                  <p>No addresses found.</p>
-                )}
-              </div>
+  {addressesToShow.length > 0 ? (
+    addressesToShow.map((address) => (
+      <li
+        key={address.id}
+        className={`list-group-item justify-content-between ${
+          selectedAddressId === address.id ? "selected-address" : ""
+        }`}
+        onClick={() => handleAddressSelect(address.displayAddress, address.id)}
+      >
+        <div className="setaddress d-flex align-items-center gap-3">
+          <i
+            className={`bi ${
+              address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
+            } clickable-icon`}
+            style={{
+              cursor: "pointer",
+              color: address.is_bookmarked ? "blue" : "grey",
+            }}
+            onClick={() => handleBookmarkClick(address.id)}
+          ></i>
+
+          <span className="ml-2">
+            
+            {address.displayAddress || address.fullAddress}
+            {address.notificationCount > 0 && (
+              <span className="notification-count ml-2">
+                ({address.notificationCount})
+              </span>
+            )}
+          </span>
+        </div>
+
+        {address.fullAddress && (
+          <div className="filtered-address">
+            {address.fullAddress}
+          </div>
+        )}
+      </li>
+    ))
+  ) : (
+    <p>No addresses found.</p>
+  )}
+</div>
+
+
+              
             </div>
           </div>
         </div>
@@ -1222,6 +1272,8 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+     
     </div>
   );
 };
