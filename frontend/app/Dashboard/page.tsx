@@ -734,7 +734,7 @@ const Dashboard = () => {
                     onClick={handleToggle}
                     aria-expanded={isType}
                   >
-                    <img src="/dropdownicon.svg" alt="Dropdown Icon" />
+                    <Image src="/dropdownicon.svg" alt="Dropdown Icon" />
                   </button>
 
                   <ul className={`dropdown-type ${isType ? "show" : ""}`}>
@@ -766,7 +766,7 @@ const Dashboard = () => {
                   onClick={handleToggle1}
                   aria-expanded={isType}
                 >
-                  <img src="/dropdownicon.svg" alt="Dropdown Icon" />
+                  <Image src="/dropdownicon.svg" alt="Dropdown Icon" />
                 </button>
 
                 <ul className={`dropdown-type ${isType ? "show" : ""}`}>
@@ -813,7 +813,7 @@ const Dashboard = () => {
                   onClick={handleToggle1}
                   aria-expanded={isType}
                 >
-                  <img src="/dropdownicon.svg" alt="Dropdown Icon" />
+                  <Image src="/dropdownicon.svg" alt="Dropdown Icon" />
                 </button>
 
                 <ul className={`dropdown-Date ${isType ? "show" : ""}`}>
@@ -857,7 +857,7 @@ const Dashboard = () => {
                           onClick={handleCustomDateToggle}
                           aria-expanded={isCustomDateOpen}
                         >
-                          <img src="/dropdownicon.svg" alt="Dropdown Icon" />
+                          <Image src="/dropdownicon.svg" alt="Dropdown Icon" />
                         </button>
                       </label>
 
@@ -910,7 +910,7 @@ const Dashboard = () => {
 
         <div>
           <div className="heading">
-            <img src="/Done.svg" alt="" /> Comprehensive view of Address
+            <Image src="/Done.svg" alt="" /> Comprehensive view of Address
           </div>
           <div className="logos-row-msg1">
             <div className="nav-msg1">
@@ -955,13 +955,13 @@ const Dashboard = () => {
         <div className="main-Address ">
           <span className="">
             {" "}
-            <img src="/User.svg" alt="users" className="person-icon ms-4" />
+            <Image src="/User.svg" alt="users" className="person-icon ms-4" />
           </span>
           <div className="Address ms-4">Address</div>
           <div className="main-search">
             <div className="search-box ">
               <span className="icon">
-                <img src="/Icon.svg" alt="icon" />
+                <Image src="/Icon.svg" alt="icon" />
               </span>
               <input
                 type="text"
@@ -984,7 +984,7 @@ const Dashboard = () => {
                 className="redo-container text-center"
                 onClick={handleDefaultClick}
               >
-                <img src="/redo.svg" alt="redo" className="ms-3" />
+                <Image src="/redo.svg" alt="redo" className="ms-3" />
                 <div>Default</div>
               </div>
             </div>
@@ -1096,7 +1096,7 @@ const Dashboard = () => {
         <div className="conversation">
           {selectedAddress && (
             <div className="conversation-chat">
-              <img src="converstation.svg" alt="" /> Conversation From { }
+              <Image src="converstation.svg" alt="" /> Conversation From { }
               {uniqueFromNumbers.length > 0 && (
                 <select
                   value={fromNumber}
@@ -1140,8 +1140,8 @@ const Dashboard = () => {
 
                           <i
                             className={`bi pinnumber ${pinnedConversations.has(conversationId)
-                                ? "bi-pin-fill text-primary"
-                                : "bi-pin"
+                              ? "bi-pin-fill text-primary"
+                              : "bi-pin"
                               }`}
                             onClick={() => handlePinNumber(conversationId)}
                           ></i>
@@ -1166,8 +1166,8 @@ const Dashboard = () => {
                                           toggleMessageExpansion(index)
                                         }
                                         className={`read-less-btn ${message.event_type_id === 1
-                                            ? "read-less-btn-right"
-                                            : "read-less-btn-left"
+                                          ? "read-less-btn-right"
+                                          : "read-less-btn-left"
                                           }`}
                                       >
                                         Read Less
@@ -1175,8 +1175,8 @@ const Dashboard = () => {
 
                                       <i
                                         className={`bi ${message.is_message_pinned
-                                            ? "bi-star-fill text-warning"
-                                            : "bi-star"
+                                          ? "bi-star-fill text-warning"
+                                          : "bi-star"
                                           } star-icon`}
                                         onClick={() =>
                                           toggleMessagePin(
@@ -1198,8 +1198,8 @@ const Dashboard = () => {
                                               toggleMessageExpansion(index)
                                             }
                                             className={`read-more-btn ${message.event_type_id === 1
-                                                ? "read-more-btn-right"
-                                                : "read-more-btn-left"
+                                              ? "read-more-btn-right"
+                                              : "read-more-btn-left"
                                               }`}
                                           >
                                             Read More
@@ -1207,8 +1207,8 @@ const Dashboard = () => {
                                           <i
                                             style={{ cursor: "pointer" }}
                                             className={`bi ${message.is_message_pinned
-                                                ? "bi-star-fill text-warning"
-                                                : "bi-star"
+                                              ? "bi-star-fill text-warning"
+                                              : "bi-star"
                                               } star-icon cursor-pointer`}
                                             onClick={() =>
                                               toggleMessagePin(
@@ -1224,8 +1224,8 @@ const Dashboard = () => {
                                             {message.body}{" "}
                                             <i
                                               className={`bi ${message.is_message_pinned
-                                                  ? "bi-star-fill text-warning"
-                                                  : "bi-star"
+                                                ? "bi-star-fill text-warning"
+                                                : "bi-star"
                                                 } star-icon`}
                                               onClick={() =>
                                                 toggleMessagePin(
