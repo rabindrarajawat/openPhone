@@ -679,7 +679,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     setUpdatedMessages(groupedMessages);
-  }, [events, groupedMessages]);
+  }, [events]);
 
   const toggleMessagePin = async (
     messageId: number,
