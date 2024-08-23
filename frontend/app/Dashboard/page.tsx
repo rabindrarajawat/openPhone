@@ -288,7 +288,7 @@ const Dashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (!token) {
-      router.push("/");
+      window.location.href = "/" 
     }
   }, [router]);
 

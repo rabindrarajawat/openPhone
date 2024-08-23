@@ -13,7 +13,8 @@ const SideBar = () => {
   const handleLogout = () => {
     console.log("Logout clicked"); // Debugging line
     localStorage.removeItem("authToken");
-    window.location.href = "/"   };
+    window.location.href = "/" 
+    };
   return (
     <>
       <ul className="sidebar">
