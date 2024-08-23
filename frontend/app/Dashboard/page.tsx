@@ -37,22 +37,7 @@ interface Message {
   conversation_id: string;
 }
 
-// interface GroupedMessages {
-//   [conversationId: string]: Message[];
-// }
 
-// interface YourComponentProps {
-//   events: Message[];
-//   groupedMessages: GroupedMessages;
-// }
-
-// interface Event {
-//   event_type_id: number;
-//   body: string;
-//   to: string;
-//   created_at: string;
-//   conversation_id: string;
-// }
 
 interface Notification {
   id: number;
@@ -115,17 +100,11 @@ const Dashboard = () => {
   const [isFollowUpClicked, setIsFollowUpClicked] = useState(false); // Add state for Follow-up button
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [selectedAddress, setSelectedAddress] = useState("Search Address");
-  const [addresses, setAddresses] = useState<string[]>([]); // State to store addresses
   const [eventData, setEventData] = useState<EventItem[]>([]);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [fromNumber, setFromNumber] = useState("");
-  const [selectedAddress1, setSelectedAddress1] = useState<string>("");
-  const [apiResponseBody, setApiResponseBody] = useState<Message[]>([]);
-  const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
-  const [isMessageExpanded, setIsMessageExpanded] = useState(false);
-  // const [expandedMessages, setExpandedMessages] = useState<Set<number>>(
-  //   new Set()
-  // );
+
+ 
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
@@ -135,10 +114,8 @@ const Dashboard = () => {
   const [callResponse, setCallResponse] = useState<number>(0);
   const [input, setInput] = useState<string>("");
   const [results, setResultsState] = useState<Address[]>([]);
-  const [allSelected, setAllSelected] = useState(false);
   const [addresses1, setAddresses1] = useState<Address1[]>([]);
 
-  const [isOpen, setIsOpen] = useState(true);
   const [isType, setIsType] = useState(false);
   const dropdownToggleRef = useRef(null);
   const [isDate, setIsDate] = useState(true);
@@ -195,10 +172,7 @@ const Dashboard = () => {
     }
   }, []);
 
-  // const [groupedMessage, setGroupedMessages] = useState<
-  //   Record<string, EventItem[]>
-  // >({});
-
+  
   const [pinnedMessages, setPinnedMessages] = useState<Set<number>>(new Set());
   const [messages, setMessages] = useState<EventItem[]>([]);
 
@@ -483,41 +457,7 @@ const Dashboard = () => {
     }
   };
 
-  // useEffect(() => {
-  //  }, [pinnedConversations]);
-
-  // useEffect(() => {
-  //   if (selectedAddress && selectedAddress !== "Search Address") {
-  //     axios
-  //       .get(
-  //         `http://localhost:8000/openPhoneEventData/events?address=${encodeURIComponent(
-  //           selectedAddress
-  //         )}`
-  //       )
-  //       .then((response) => {
-  //         const data = response.data.data;
-  //         if (data && Array.isArray(data.events)) {
-  //           setEventData(data.events);
-  //           if (data.events.length > 0) {
-  //             setPhoneNumber(data.events[0].to);
-  //             setFromNumber(data.events[0].from);
-  //           } else {
-  //             setPhoneNumber("");
-  //             setFromNumber("");
-  //           }
-  //           setMessageDelivered(data.messageDelivered || 0);
-  //           setMessageResponse(data.messageResponse || 0);
-  //           setCall(data.call || 0);
-  //           setCallResponse(data.callResponse || 0);
-  //         } else {
-  //           console.error("Events data is not an array or is missing");
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error fetching event data:", error);
-  //       });
-  //   }
-  // }, [selectedAddress]);
+ 
 
   useEffect(() => {
     if (selectedAddress && selectedAddress !== "Search Address") {
@@ -566,25 +506,9 @@ const Dashboard = () => {
     }
   }, [selectedAddress]);
 
-  // const handleRowClick = (ownerId: number) => {
-  //   if (selectedRowId !== ownerId) {
-  //     setSelectedRowId(ownerId);
-  //     console.log("Selected owner ID:", ownerId);
+ 
 
-  //     axios
-  //       .get<ApiResponse>(
-  //         `http://localhost:8000/openPhoneEventData/events-by-conversation?conversation_id=${ownerId}`
-  //       )
-  //       .then((response) => {
-  //         console.log("API response for selected owner ID:", response.data);
-  //         setApiResponseBody(response.data.data); // Store the data array in state
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error fetching data for selected owner ID:", error);
-  //       });
-  //   }
-  // };
-
+  
   const toggleMessageExpansion = (index: any) => {
     setExpandedMessages((prev) => {
       const newExpandedMessages = new Map(prev);
@@ -668,28 +592,19 @@ const Dashboard = () => {
         address.fullAddress.toLowerCase().includes(value.toLowerCase())
       );
       setResultsState(results);
-      // if (setResults) {
-      //   setResults(results);
-      // }
+      
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-  // const handleRowClick = (ownerId: number) => {
-  //     setSelectedRowId(ownerId);
-  //     console.log('Selected owner ID:', ownerId);
-  // };
+
 
   const toggleSidebar = () => {
     setIsSidebarVisible((prevState) => !prevState);
   };
 
-  // const handleBookmarkClick = (index: any) => {
-  //   const newBookmarkedAddresses = [...bookmarkedAddresses];
-  //   newBookmarkedAddresses[index] = !newBookmarkedAddresses[index];
-  //   setBookmarkedAddresses(newBookmarkedAddresses);
-  // };
+
 
   const handleChange = (value: string) => {
     setInput(value);
@@ -699,9 +614,7 @@ const Dashboard = () => {
   const handleSelectAddress = (address: Address) => {
     setInput(address.fullAddress);
     setResultsState([]);
-    // if (onSelectAddress) {
-    //   onSelectAddress(address);
-    // }
+  
   };
 
   useEffect(() => {
@@ -713,9 +626,7 @@ const Dashboard = () => {
           });
           setEvents(response.data.data);
         } catch (error) {
-          // setError('Error fetching event bodies');
         } finally {
-          // setLoading(false);
         }
       }
 
@@ -752,7 +663,6 @@ const Dashboard = () => {
   console.log("🚀 ~ Dashboard ~ updatedMessages:", updatedMessages);
 
   useEffect(() => {
-    // Update state whenever events change
     setUpdatedMessages(groupedMessages);
   }, [events]);
 
@@ -787,7 +697,6 @@ const Dashboard = () => {
   };
   return (
     <div>
-      {/* <Navbar onSelectAddress={handleAddressSelect1} /> */}
       <Navbar
         toggleSidebar={toggleSidebar}
         onSelectAddress={handleAddressSelect1}
@@ -965,9 +874,7 @@ const Dashboard = () => {
                             />
                           </div>
                           <div className="d-flex align-items-center mt-2 gap-2">
-                            {/* <button className="btn btn-primary done-button" type="button" onClick={handleDone}>
-                              Done
-                            </button> */}
+                           
                             <button
                               className="btn btn-primary btn btn-primary reset-button"
                               type="button"
@@ -1115,49 +1022,7 @@ const Dashboard = () => {
 </div>
 
 
-              {/* 
-              <div className="pagination-container">
-                <ul className="pagination">
-                  <li
-                    className={`page-item ${currentPage === 1 ? "disabled" : ""
-                      }`}
-                  >
-                    <button
-                      className="page-link"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      &lt;
-                    </button>
-                  </li>
-                  {[...Array(totalPages)].map((_, i) => (
-                    <li
-                      key={i}
-                      className={`page-item ${currentPage === i + 1 ? "active" : ""
-                        }`}
-                    >
-                      <button
-                        className="page-link"
-                        onClick={() => handlePageChange(i + 1)}
-                      >
-                        {i + 1}
-                      </button>
-                    </li>
-                  ))}
-                  <li
-                    className={`page-item ${currentPage === totalPages ? "disabled" : ""
-                      }`}
-                  >
-                    <button
-                      className="page-link"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      &gt;
-                    </button>
-                  </li>
-                </ul>
-              </div> */}
+              
             </div>
           </div>
         </div>
@@ -1371,331 +1236,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* <div className={`box ${isSidebarVisible ? "sidebar-visible" : ""}`}>
-        <div className="mg-2">
-          <div className="mg-1">
-            <div className="open">OpenPhone</div>
-
-            <div className="msg">Message and Calls</div>
-            <div className={`msg dropdown ${dropdownOpen ? "show" : ""}`}>
-              <button
-                className="dropdown  dropdown-toggle"
-                type="button"
-                onClick={toggleDropdown}
-              >
-                Status
-              </button>
-              <div className={`dropdown-menu ${dropdownOpen ? "show" : ""}`}>
-                <div className="form-check custom-dropdown-item">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="checkbox-delivered"
-                    checked={selectedOptions.includes("delivered")}
-                    onChange={() => handleOptionToggle("delivered")}
-                  />
-                  <label
-                    className="form-check-label"
-                    htmlFor="checkbox-delivered"
-                  >
-                    Delivered
-                  </label>
-                </div>
-                <div className="form-check custom-dropdown-item">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="checkbox-delivered"
-                    checked={selectedOptions.includes("delivered")}
-                    onChange={() => handleOptionToggle("delivered")}
-                  />
-                  <label
-                    className="form-check-label"
-                    htmlFor="checkbox-delivered"
-                  >
-                    Not Delivered
-                  </label>
-                </div>
-
-                <div className="form-check custom-dropdown-item">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="checkbox-not-delivered"
-                    checked={selectedOptions.includes("received")}
-                    onChange={() => handleOptionToggle("received")}
-                  />
-                  <label
-                    className="form-check-label"
-                    htmlFor="checkbox-not-delivered"
-                  >
-                    Received
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div className={`dropdown dropdown-type  ${statusDropdownOpen ? "show" : ""}`}>
-              <button
-                className="dropdown status  dropdown-toggle"
-                type="button"
-                onClick={toggleStatusDropdown}
-              >
-                Type
-              </button>
-              <div
-                className={`dropdown-menu  dropdown-type ${statusDropdownOpen ? "show" : ""}`}
-              >
-                <div className="form-check type  custom-dropdown-item">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="checkbox-case"
-                    checked={selectedOptions.includes("case")}
-                    onChange={() => handleOptionToggle("case")}
-                  />
-                  <label className="form-check-label" htmlFor="checkbox-case">
-                    Case
-                  </label>
-                </div>
-
-                <div className="form-check custom-dropdown-item">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="checkbox-auction"
-                    checked={selectedOptions.includes("auction")}
-                    onChange={() => handleOptionToggle("auction")}
-                  />
-                  <label className="form-check-label" htmlFor="checkbox-auction">
-                    Auction
-                  </label>
-                </div>
-                <div className="form-check custom-dropdown-item">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="checkbox-tax-deed"
-                    checked={selectedOptions.includes("tax-deed")}
-                    onChange={() => handleOptionToggle("tax-deed")}
-                  />
-                  <label className="form-check-label" htmlFor="checkbox-tax-deed">
-                    Tax deed
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div className={`dropdown dropdown-date ${dateDropdownOpen ? "show" : ""}`}>
-              <button
-                className="dropdown date  dropdown-toggle"
-                type="button"
-                onClick={toggleDateDropdown}
-              >
-                Date
-              </button>
-              <div className={`dropdown-menu ${dateDropdownOpen ? "show" : ""}`}>
-                <div className="form-check custom-dropdown-item">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="checkbox-weekly"
-                    checked={selectedOptions.includes("Weekly")}
-                    onChange={() => handleOptionToggle("Weekly")}
-                  />
-                  <label className="form-check-label" htmlFor="checkbox-weekly">
-                    Weekly
-                  </label>
-                </div>
-
-                <div className="form-check custom-dropdown-item">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="checkbox-monthly"
-                    checked={selectedOptions.includes("Monthly")}
-                    onChange={() => handleOptionToggle("Monthly")}
-                  />
-                  <label className="form-check-label" htmlFor="checkbox-monthly">
-                    Monthly
-                  </label>
-                </div>
-
-             
-              </div>
-          
-            </div>
-          </div>
-        </div>
-
-        <div className="box1 d-none d-sm-block">
-         
-          <div className="heading">
-            <img src="Vector 310.svg" alt=""  height='' width='' /> Analytic Data of Selected Address</div>
-          <div className="logos-row-msg">
-            <div className="nav-msg">
-              <div className="message">Message Delivered</div>
-              <input
-                type="text"
-                className="round-input"
-                value={messageDelivered}
-                readOnly
-              />
-            </div>
-            <div className="nav-msg">
-              <div className="message response ">Message Response</div>
-              <input
-                type="text"
-                className="round-input"
-                value={messageResponse}
-                readOnly
-              />
-            </div>
-            <div className="nav-msg">
-              <div className="message call-">Call </div>
-              <input
-                type="text"
-                className="round-input"
-                value={call}
-                readOnly
-              />
-            </div>
-            <div className="nav-msg">
-              <div className="message call-response">Call Response</div>
-              <input
-                type="text"
-                className="round-input"
-                value={callResponse}
-                readOnly
-              />
-            </div>
-          </div>
-        
-          <div className="line"></div>
-
-          <div className="tracking-container-box">
-
-            <div >
-
-              <div className="address"> <img src="User.svg" alt="" /> Address</div>
-              <div className='address-list'>
-                <div className="search-wrapper-add">
-                  <input
-                    className="search-to"
-                    type="search"
-                    placeholder="Search Address"
-                    aria-label="Search"
-                    value={input}
-                    onChange={(e) => handleChange(e.target.value)}
-                  />
-                  {results.length > 0 && (
-                    <SearchResultList results={results} onSelect={handleSelectAddress} />
-                  )}
-                  <img src="/Icon.svg" alt="icon" className="search-icon" />
-                </div>
-
-                {addresses1.length > 0 ? (
-                  addresses1.map((address) => (
-                    <li key={address.id}
-                      className="list-group-item d-flex justify-content-between align-items-center"
-                      onClick={() => handleAddressSelect(address.displayAddress, address.id)} // Pass the address ID on click
-                    >
-                      <div className="setaddress d-flex align-items-center gap-3 ">
-                        <i
-                          className={`bi ${address.is_bookmarked ? 'bi-bookmark-fill' : 'bi-bookmark'} clickable-icon`}
-                          style={{ cursor: 'pointer', color: address.is_bookmarked ? 'blue' : 'grey' }}
-                          onClick={() => handleBookmarkClick(address.id)}
-                        ></i>
-                        <span className="ml-2">{address.displayAddress}</span>
-                      </div>
-                    </li>
-                  ))
-                ) : (
-                  <p>No addresses found.</p>
-                )}
-
-              </div>
-         
-            </div>
-          )}
-
-
-            <div className="conversation"> <img src="converstation.svg" alt="" /> Conversation From {fromNumber}
-
-              <div className="search-wrapper search-new">
-                <input
-                  className="search"
-                  type="search"
-                  placeholder="Search To"
-                  aria-label="Search"
-                  value={input}
-                  onChange={(e) => handleChange(e.target.value)}
-                />
-                {results.length > 0 && (
-                  <SearchResultList results={results} onSelect={handleSelectAddress} />
-                )}
-              </div>
-
-
-
-              <div className="input-msg">
-             
-                <div className="screenshot-msg">
-                  <div className="inbox-chat">
-                    {apiResponseBody.length > 0
-                      ? apiResponseBody.map((message, index) => (
-                        <div
-                          key={index}
-                          className={
-                            message.event_type_id === 1
-                              ? "chat-message-right"
-                              : "chat-message-left"
-                          }
-                        >
-                          {expandedMessages.has(index) ? (
-                            <div>
-                              {message.body}
-                              <button
-                                onClick={() => toggleMessageExpansion(index)}
-                                className={`read-more-btn ${message.event_type_id === 1
-                                  ? "read-more-btn-right"
-                                  : "read-more-btn-left"
-                                  }`}
-                              >
-                                Read Less
-                              </button>
-                            </div>
-                          ) : (
-                            <div>
-                              {message.body && message.body.length > 100 ? (
-                                <>
-                                  {message.body.substring(0, 100)}...
-                                  <button
-                                    onClick={() => toggleMessageExpansion(index)}
-                                    className={`read-more-btn ${message.event_type_id === 2 ? "read-more-btn-right" : "read-more-btn-left"
-                                      }`}
-                                  >
-                                    Read More
-                                  </button>
-                                </>
-                              ) : (
-                                message.body || "No message body"
-                              )}
-                            </div>
-
-                          )}
-                        </div>
-                      ))
-                      : "Loading..."}
-                  </div>
-                </div>
-
-         
-              </div>
-            </div>
-          </div>
-
-        </div >
-
-      </div > */}
+     
     </div>
   );
 };
