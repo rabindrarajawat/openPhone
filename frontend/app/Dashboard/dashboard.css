@@ -167,7 +167,7 @@
   width: 300px;
   height: 60px;
   border-radius: 5px 0px 0px 0px;
-  opacity: 0px;
+  /* opacity: 0px; */
   background: linear-gradient(90deg, #ffffff 0%, #e5d4fc 100%);
   box-shadow: 0px 2px 5px 0px #26334d08;
   margin-top: 5px;
@@ -222,9 +222,8 @@
   padding-left: 14px;
   padding-right: 30px;
   border: 3px solid #D7F5DC;
-
   border-radius: 6px;
-  height: 675px;
+  height: 590px;
 }
 
 
@@ -348,7 +347,7 @@
   height: 39px;
   border: 2px solid grey;
   border-radius: 3.27px;
-  opacity: 0px;
+  /* opacity: 0px; */
   margin-top: 5px;
   display: flex;
   padding: 10px;
@@ -378,15 +377,13 @@
 }
 
 .input-msg {
-  width: 280%;
-  height: 180%;
+  width: 980px;
+  height: 477px;
   margin-top: 8%;
   margin-top: -255px;
   margin-left: -541px;
   border-radius: 5px 0px 0px 0px;
-  /* background: linear-gradient(171.76deg, #CBE3FF 4.95%, #D2FFCC 92.28%); */
   border: 3px solid #D7F5DC;
-  /* box-shadow: 3px 8px 12.7px 0px #567CFF2E; */
   position: relative;
   z-index: 1;
   margin-right: 40px;
@@ -461,7 +458,7 @@
 
 .list-group-item {
   margin-left: -188px;
-    margin-top: 10%;
+  margin-top: 10%;
 }
 
 .pagination-container .pagination {
@@ -662,7 +659,8 @@
 .selected-address .setaddress {
   color: #007bff;
 }
-.address-list{
+
+.address-list {
   margin-left: 45px;
   margin-top: 49px;
 }
@@ -673,13 +671,11 @@
 
 .text-primary {
   color: blue;
-  /* Adjust the color as needed */
 }
 
 .active-filter {
   font-weight: bold;
   color: blue;
-  /* Optional: to visually indicate the active filter */
 }
 
 .pinnumber {
@@ -689,5 +685,13 @@
 .notification-count {
   font-weight: bold;
   color: #17A505;
-  /* Adjust color as needed */
+}
+
+.main-content {
+  margin-left: -16px;
+}
+
+.main-main {
+  display: flex;
+  margin-top: -40px;
 }
