@@ -10,8 +10,7 @@ import { Request, Response } from "express";
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
-    console.log("🚀 ~ GlobalExceptionFilter ~ exception:", exception)
-    // console.log("🚀 ~ GlobalExceptionFilter ~ exception:", exception)
+    console.log("🚀 ~ GlobalExceptionFilter ~ exception:", exception);
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();

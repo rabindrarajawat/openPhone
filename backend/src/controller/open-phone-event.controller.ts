@@ -12,6 +12,7 @@ export class OpenPhoneEventController {
   ) {}
   @Post()
   async createOpenPhoneEvent(@Body() payload: any) {
+    console.log("🚀 ~ OpenPhoneEventController ~ createOpenPhoneEvent ~ payload:", payload)
     const { openPhoneEvent, addressCreated } =
       await this.openPhoneEventService.create(payload);
 
