@@ -6,12 +6,14 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { BookmarkService } from "src/service/bookmark.service";
 import { BookmarkEntity } from "src/entities/bookmark.entity";
 import { AddressEntity } from "src/entities/address.entity";
+import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([BookmarkEntity,AddressEntity]), 
   ],
-  providers: [BookmarkService],
+  providers: [BookmarkService,JwtService,ConfigService],
   controllers: [BookmarkController], 
 })
 export class BookmarkModule {}
