@@ -1,6 +1,6 @@
 
 
-import { Controller, Post, Get, Body, Query, Param } from "@nestjs/common";
+import { Controller, Post, Get, Body, Query, Param, BadRequestException } from "@nestjs/common";
 import { OpenPhoneEventService } from "../service/open-phone-event.service";
 import { AddressService } from "src/service/address.service";
 
@@ -9,7 +9,7 @@ export class OpenPhoneEventController {
   constructor(
     private readonly openPhoneEventService: OpenPhoneEventService,
     private readonly addressService: AddressService
-  ) {}
+  ) { }
   @Post()
   async createOpenPhoneEvent(@Body() payload: any) {
     console.log("🚀 ~ OpenPhoneEventController ~ createOpenPhoneEvent ~ payload:", payload)
@@ -44,21 +44,33 @@ export class OpenPhoneEventController {
 
   @Get("events-by-address-and-from")
   async getEventBodiesByAddressAndFromNumber(
-    @Query("address_id") addressId: number,
+    @Query("address_id") addressId: string,
     @Query("from_number") fromNumber?: string
   ) {
-    // console.log('Received from_number:', fromNumber); // Check if the fromNumber is correctly decoded
+    // Convert addressId to a number
+    const addressIdNum = Number(addressId);
+
+    // Check if the conversion was successful
+    if (isNaN(addressIdNum)) {
+      throw new BadRequestException('Invalid address_id: must be a number.');
+    }
+
+    // // Log received parameters for debugging
+    // console.log('Received address_id:', addressIdNum);
+    // console.log('Received from_number:', fromNumber);
 
     const eventBodies =
       await this.openPhoneEventService.findEventBodiesByAddressAndFromNumber(
-        addressId,
+        addressIdNum,
         fromNumber
       );
+
     return {
-      message: `Event bodies fetched successfully for address_id: ${addressId} and from: ${fromNumber || "all numbers"}`,
+      message: `Event bodies fetched successfully for address_id: ${addressIdNum} and from: ${fromNumber || "all numbers"}`,
       data: eventBodies,
     };
   }
+
 
   @Get("all")
   async getAllOpenPhoneEvent() {
@@ -75,7 +87,7 @@ export class OpenPhoneEventController {
     };
   }
 
-  
+
   @Get()
   async getAllOpenPhoneEvents(@Query('filter') filter?: 'delivered' | 'received') {
     const events = await this.openPhoneEventService.findAllFiltered(filter);
@@ -101,7 +113,7 @@ export class OpenPhoneEventController {
   async getPinnedMessages() {
     return this.openPhoneEventService.getAllPinnedMessages();
   }
-  
+
   @Get('pinned-numbers/:conversationId')
   async getPinnedNumbers(@Param('conversationId') conversationId: string) {
     return this.openPhoneEventService.getAllPinnedNumbers(conversationId);
