@@ -349,14 +349,14 @@ export class OpenPhoneEventService {
     fromNumber?: string
   ) {
 
-    if (isNaN(addressId)) {
-      throw new BadRequestException('Invalid addressId: not a number.');
-    }
+    // if (isNaN(addressId)) {
+    //   throw new BadRequestException('Invalid addressId: not a number.');
+    // }
 
-    // Ensure fromNumber is a string or undefined
-    if (fromNumber !== undefined && typeof fromNumber !== 'string') {
-      throw new BadRequestException('Invalid fromNumber: not a string.');
-    }
+    // // Ensure fromNumber is a string or undefined
+    // if (fromNumber !== undefined && typeof fromNumber !== 'string') {
+    //   throw new BadRequestException('Invalid fromNumber: not a string.');
+    // }
 
     // Step 1: Find events that match the provided address_id and from_number
     const initialEvents = await this.openPhoneEventRepository.find({
