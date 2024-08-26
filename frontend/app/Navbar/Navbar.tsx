@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import './Navbar.css';
 import { ToastContainer } from 'react-toastify';
@@ -51,6 +51,7 @@ interface SearchBarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddress }) => {
+  const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
   const [userName, setUserName] = useState<string>('');
   const [input, setInput] = useState<string>('');
   const [results, setResultsState] = useState<Address[]>([]);
@@ -72,7 +73,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/notifications');
+        const response = await axios.get(`${Base_Url}notifications`);
         // console.log("Notifications:", response.data);
         setNotifications(response.data.filter((notification: Notification) => !notification.is_read));
       } catch (error) {
@@ -86,7 +87,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
 
   const fetchData = async (value: string) => {
     try {
-      const response = await axios.get(`http://localhost:8000/address/search?address=${encodeURIComponent(value)}`);
+      const response = await axios.get(`${Base_Url}address/search?address=${encodeURIComponent(value)}`);
       const results = response.data.results.filter((address: Address) =>
         address.fullAddress.toLowerCase().includes(value.toLowerCase())
       );
@@ -116,7 +117,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
 
   const handleMarkAsRead = async (event_id: number) => {
     try {
-      const response = await axios.post(`http://localhost:8000/notifications/${event_id}/read`);
+      const response = await axios.post(`${Base_Url}notifications/${event_id}/read`);
       console.log("Backend Response:", response);
 
       if (response.status === 200 || response.status === 201) {
@@ -176,7 +177,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
                     event={notification.event}
                     is_read={notification.is_read}
                     event_id={notification.event_id}
-                    handleMarkAsRead={handleMarkAsRead} id={0} address_id={null} created_at={''}                  />
+                    handleMarkAsRead={handleMarkAsRead} id={0} address_id={null} created_at={''} />
                 ))}
               </ul>
 

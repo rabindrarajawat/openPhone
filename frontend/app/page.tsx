@@ -9,6 +9,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 export default function Home() {
+  const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
+
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,7 +18,7 @@ export default function Home() {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:8000/users/login", {
+      const response = await axios.post(`${Base_Url}users/login`, {
         email,
         password,
       });
@@ -92,7 +94,7 @@ export default function Home() {
             </button>
           </div>
         </div>
-       </div>
+      </div>
     </div>
   );
 }
