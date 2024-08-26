@@ -44,7 +44,7 @@ export class OpenPhoneEventController {
 
   @Get("events-by-address-and-from")
   async getEventBodiesByAddressAndFromNumber(
-    @Query("address_id") addressId: string,
+    @Query("address_id") addressId: number,
     @Query("from_number") fromNumber?: string
   ) {
     // Convert addressId to a number
@@ -54,11 +54,6 @@ export class OpenPhoneEventController {
     if (isNaN(addressIdNum)) {
       throw new BadRequestException('Invalid address_id: must be a number.');
     }
-
-    // // Log received parameters for debugging
-    // console.log('Received address_id:', addressIdNum);
-    // console.log('Received from_number:', fromNumber);
-
     const eventBodies =
       await this.openPhoneEventService.findEventBodiesByAddressAndFromNumber(
         addressIdNum,
