@@ -25,7 +25,7 @@ interface Address1 {
   auction_event_id: number;
   created_at: string;
   notificationCount: number; // Add this field
-  address:string;
+  address: string;
 
 }
 
@@ -93,6 +93,7 @@ interface EventItem {
 }
 
 const Dashboard = () => {
+  const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
   const [dropdownOpen, setDropdownOpen] = useState(true);
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(true);
   const [dateDropdownOpen, setDateDropdownOpen] = useState(true);
@@ -104,7 +105,7 @@ const Dashboard = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [fromNumber, setFromNumber] = useState("");
 
- 
+
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
@@ -172,7 +173,7 @@ const Dashboard = () => {
     }
   }, []);
 
-  
+
   const [pinnedMessages, setPinnedMessages] = useState<Set<number>>(new Set());
   const [messages, setMessages] = useState<EventItem[]>([]);
 
@@ -244,13 +245,13 @@ const Dashboard = () => {
     );
   });
 
-  
+
   const addressesToShow = filteredAddresses.length > 0
-  ? filteredAddresses.filter((address) => filteredAddresses2.some((filteredAddress) => filteredAddress.address === address.address))
-  : filteredAddresses2.length > 0
-    ? filteredAddresses2
-    : addresses1;
-  console.log("addressesToShow",addressesToShow);
+    ? filteredAddresses.filter((address) => filteredAddresses2.some((filteredAddress) => filteredAddress.address === address.address))
+    : filteredAddresses2.length > 0
+      ? filteredAddresses2
+      : addresses1;
+  console.log("addressesToShow", addressesToShow);
 
   const handleToggle = () => {
     setIsType(!isType);
@@ -299,7 +300,7 @@ const Dashboard = () => {
       try {
         // Fetch all addresses
         const addressResponse = await axios.get(
-          "http://localhost:8000/address/getalladdress"
+          `${Base_Url}address/getalladdress`
         );
         const formattedAddresses = addressResponse.data.map((item: any) => ({
           id: item.id,
@@ -312,13 +313,13 @@ const Dashboard = () => {
         }));
         setAddresses2(formattedAddresses);
         setFilteredAddresses2(formattedAddresses);
-        console.log("formattedAddresses",formattedAddresses)
+        console.log("formattedAddresses", formattedAddresses)
 
 
 
         // Fetch unread notifications
         const notificationResponse = await axios.get(
-          "http://localhost:8000/notifications"
+          `${Base_Url}notifications`
         );
         const unreadNotifications = notificationResponse.data.filter(
           (notification: any) => !notification.is_read
@@ -357,7 +358,7 @@ const Dashboard = () => {
 
       if (deliveredChecked) {
         // Fetch delivered addresses
-        const deliveredResponse = await axios.get('http://localhost:8000/openPhoneEventData?filter=delivered');
+        const deliveredResponse = await axios.get(`${Base_Url}openPhoneEventData?filter=delivered`);
         deliveredAddresses = deliveredResponse.data.data
           .filter((event: { event_type_id: number; }) => event.event_type_id === 2)
           .map((event: { address: any; }) => event.address);
@@ -365,7 +366,7 @@ const Dashboard = () => {
 
       if (receivedChecked) {
         // Fetch received addresses
-        const receivedResponse = await axios.get('http://localhost:8000/openPhoneEventData?filter=received');
+        const receivedResponse = await axios.get(`${Base_Url}openPhoneEventData?filter=received`);
         receivedAddresses = receivedResponse.data.data
           .map((event: { address: any; }) => event.address);
       }
@@ -388,7 +389,7 @@ const Dashboard = () => {
     const fetchEventCounts = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8000/openPhoneEventData/all"
+          `${Base_Url}openPhoneEventData/all`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch event counts");
@@ -423,7 +424,7 @@ const Dashboard = () => {
     );
 
     axios
-      .post(`http://localhost:8000/bookmarks/${addressId}`, {
+      .post(`${Base_Url}bookmarks/${addressId}`, {
         is_bookmarked: newIsBookmarked,
       })
       .then((response) => {
@@ -445,7 +446,7 @@ const Dashboard = () => {
 
       // API call to toggle pin/unpin
       const response = await axios.post(
-        `http://localhost:8000/openPhoneEventData/toggle-number-pin/${conversationId}`
+        `${Base_Url}openPhoneEventData/toggle-number-pin/${conversationId}`
       );
 
       if (response.status === 200 || response.status === 201) {
@@ -473,13 +474,13 @@ const Dashboard = () => {
     }
   };
 
- 
+
 
   useEffect(() => {
     if (selectedAddress && selectedAddress !== "Search Address") {
       axios
         .get(
-          `http://localhost:8000/openPhoneEventData/events?address=${encodeURIComponent(
+          `${Base_Url}openPhoneEventData/events?address=${encodeURIComponent(
             selectedAddress
           )}`
         )
@@ -522,9 +523,9 @@ const Dashboard = () => {
     }
   }, [selectedAddress]);
 
- 
 
-  
+
+
   const toggleMessageExpansion = (index: any) => {
     setExpandedMessages((prev) => {
       const newExpandedMessages = new Map(prev);
@@ -537,7 +538,7 @@ const Dashboard = () => {
     });
   };
 
-  
+
 
   const handlePageChange = (pageNumber: React.SetStateAction<number>) => {
     setCurrentPage(pageNumber);
@@ -581,7 +582,7 @@ const Dashboard = () => {
 
   const handleCheckboxClick = (addressId: any) => {
     axios
-      .post(`http://localhost:8000/bookmarks/${addressId}`)
+      .post(`${Base_Url}bookmarks/${addressId}`)
       .then((response) => {
         console.log("Bookmark added successfully:", response.data);
       })
@@ -593,13 +594,13 @@ const Dashboard = () => {
     setSelectedAddress(address.fullAddress);
   };
 
-  
+
 
 
   const fetchData = async (value: string) => {
     try {
       const response = await axios.get(
-        `http://localhost:8000/address/search?address=${encodeURIComponent(
+        `${Base_Url}address/search?address=${encodeURIComponent(
           value
         )}`
       );
@@ -607,7 +608,7 @@ const Dashboard = () => {
         address.fullAddress.toLowerCase().includes(value.toLowerCase())
       );
       setResultsState(results);
-      
+
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -629,7 +630,7 @@ const Dashboard = () => {
   const handleSelectAddress = (address: Address) => {
     setInput(address.fullAddress);
     setResultsState([]);
-  
+
   };
 
   useEffect(() => {
@@ -637,7 +638,7 @@ const Dashboard = () => {
       async function fetchEvents() {
         try {
           const response = await axios.get(
-            "http://localhost:8000/openPhoneEventData/events-by-address-and-from",
+            `${Base_Url}openPhoneEventData/events-by-address-and-from`,
             {
               params: {
                 address_id: selectedAddressId,
@@ -678,7 +679,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     setUpdatedMessages(groupedMessages);
-  }, [events,groupedMessages]);
+  }, [events]);
 
   const toggleMessagePin = async (
     messageId: number,
@@ -686,7 +687,7 @@ const Dashboard = () => {
   ) => {
     try {
       await axios.post(
-        `http://localhost:8000/openPhoneEventData/toggle-message-pin/${messageId}`
+        `${Base_Url}openPhoneEventData/toggle-message-pin/${messageId}`
       );
 
       setUpdatedMessages((prevMessages) => {
@@ -733,21 +734,21 @@ const Dashboard = () => {
                     onClick={handleToggle}
                     aria-expanded={isType}
                   >
-                    <img src="/dropdownicon.svg" alt="Dropdown Icon" />
+                    <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
                   </button>
 
                   <ul className={`dropdown-type ${isType ? "show" : ""}`}>
                     <li className="dropdown-item">
                       <input type="checkbox"
-                checked={deliveredChecked}
-                onChange={handleDeliveredChange}
+                        checked={deliveredChecked}
+                        onChange={handleDeliveredChange}
                       />
                       <label className="ms-2">Delivered</label>
                     </li>
                     <li className="dropdown-item pt-2">
                       <input type="checkbox" checked={receivedChecked}
-                onChange={handleReceivedChange} 
-                id="notDelivered" />
+                        onChange={handleReceivedChange}
+                        id="notDelivered" />
                       <label className="ms-2" htmlFor="notDelivered">
                         Received
                       </label>
@@ -765,7 +766,7 @@ const Dashboard = () => {
                   onClick={handleToggle1}
                   aria-expanded={isType}
                 >
-                  <img src="/dropdownicon.svg" alt="Dropdown Icon" />
+                  <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
                 </button>
 
                 <ul className={`dropdown-type ${isType ? "show" : ""}`}>
@@ -812,7 +813,7 @@ const Dashboard = () => {
                   onClick={handleToggle1}
                   aria-expanded={isType}
                 >
-                  <img src="/dropdownicon.svg" alt="Dropdown Icon" />
+                  <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
                 </button>
 
                 <ul className={`dropdown-Date ${isType ? "show" : ""}`}>
@@ -856,7 +857,7 @@ const Dashboard = () => {
                           onClick={handleCustomDateToggle}
                           aria-expanded={isCustomDateOpen}
                         >
-                          <img src="/dropdownicon.svg" alt="Dropdown Icon" />
+                          <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
                         </button>
                       </label>
 
@@ -888,7 +889,7 @@ const Dashboard = () => {
                             />
                           </div>
                           <div className="d-flex align-items-center mt-2 gap-2">
-                           
+
                             <button
                               className="btn btn-primary btn btn-primary reset-button"
                               type="button"
@@ -907,9 +908,9 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div>
+        <div className="main-content">
           <div className="heading">
-            <img src="/Done.svg" alt="" /> Comprehensive view of Address
+            <Image src="/Done.svg" alt="" width={24} height={24} /> Comprehensive view of Address
           </div>
           <div className="logos-row-msg1">
             <div className="nav-msg1">
@@ -951,177 +952,175 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="main-Address ">
-          <span className="">
-            {" "}
-            <img src="/User.svg" alt="users" className="person-icon ms-4" />
-          </span>
-          <div className="Address ms-4">Address</div>
-          <div className="main-search">
-            <div className="search-box ">
-              <span className="icon">
-                <img src="/Icon.svg" alt="icon" />
-              </span>
-              <input
-                type="text"
-                placeholder="Search Address"
-                value={searchQuery}
-                onChange={handleSearchChange}
-              ></input>
-            </div>
-
-            <div className="icon-labels">
-              <div
-                className={`bookmark-container text-center ${
-                  filterOption === "bookmarked" ? "active-filter" : ""
-                }`}
-                onClick={() => handleFilterChange("bookmarked")}
-              >
-                <i className="bi bi-bookmark ms-4"></i>
-                <div className="ms-4">Select all</div>
-              </div>
-              <div
-                className="redo-container text-center"
-                onClick={handleDefaultClick}
-              >
-                <img src="/redo.svg" alt="redo" className="ms-3" />
-                <div>Default</div>
-              </div>
-            </div>
-            <div>
-            <div className="address-list">
-  <div className="search-wrapper-add">
-    {results.length > 0 && (
-      <SearchResultList results={results} onSelect={handleSelectAddress} />
-    )}
-  </div>
-
-  {addressesToShow.length > 0 ? (
-    addressesToShow.map((address) => (
-      <li
-        key={address.id}
-        className={`list-group-item justify-content-between ${
-          selectedAddressId === address.id ? "selected-address" : ""
-        }`}
-        onClick={() => handleAddressSelect(address.displayAddress, address.id)}
-      >
-        <div className="setaddress d-flex align-items-center gap-3">
-          <i
-            className={`bi ${
-              address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
-            } clickable-icon`}
-            style={{
-              cursor: "pointer",
-              color: address.is_bookmarked ? "blue" : "grey",
-            }}
-            onClick={() => handleBookmarkClick(address.id)}
-          ></i>
-
-          <span className="ml-2">
-            
-            {address.displayAddress || address.fullAddress}
-            {address.notificationCount > 0 && (
-              <span className="notification-count ml-2">
-                ({address.notificationCount})
-              </span>
-            )}
-          </span>
-        </div>
-
-        {address.fullAddress && (
-          <div className="filtered-address">
-            {address.fullAddress}
-          </div>
-        )}
-      </li>
-    ))
-  ) : (
-    <p>No addresses found.</p>
-  )}
-</div>
-
-
-              
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div className="Analyticdata ">
-            <span>
-              <i className="bi bi-bar-chart-line-fill"></i>
+        <div className="main-main">
+          <div className="main-Address ">
+            <span className="">
+              {" "}
+              <Image src="/User.svg" alt="users" width={24} height={24} className="person-icon ms-4" />
             </span>
-            <span className="ms-4">Analytic Data of Selected Address</span>
-          </div>
-          <div className=" main-message">
-            <div className="logos-row-msg">
-              <div className="nav-msg">
-                <div className="message Delivered">Message Delivered</div>
+            <div className="Address ms-4">Address</div>
+            <div className="main-search">
+              <div className="search-box ">
+                <span className="icon">
+                  <Image src="/Icon.svg" alt="icon" width={24} height={24} />
+                </span>
                 <input
                   type="text"
-                  className="round-input"
-                  value={messageDelivered}
-                  readOnly
-                />
+                  placeholder="Search Address"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                ></input>
               </div>
-              <div className="nav-msg">
-                <div className="message response1 ">Message Response</div>
-                <input
-                  type="text"
-                  className="round-input"
-                  value={messageResponse}
-                  readOnly
-                />
-              </div>
-              <div className="nav-msg">
-                <div className="message call-1">Call </div>
-                <input
-                  type="text"
-                  className="round-input"
-                  value={call}
-                  readOnly
-                />
-              </div>
-              <div className="nav-msg">
-                <div className="message call-response-1">Call Response</div>
-                <input
-                  type="text"
-                  className="round-input"
-                  value={callResponse}
-                  readOnly
-                />
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <div className="conversation">
-          {selectedAddress && (
-            <div className="conversation-chat">
-              <img src="converstation.svg" alt="" /> Conversation From {}
-              {uniqueFromNumbers.length > 0 && (
-                <select
-                  value={fromNumber}
-                  onChange={(e) => setFromNumber(e.target.value)} // Update fromNumber on selection
+              <div className="icon-labels">
+                <div
+                  className={`bookmark-container text-center ${filterOption === "bookmarked" ? "active-filter" : ""
+                    }`}
+                  onClick={() => handleFilterChange("bookmarked")}
                 >
-                  {uniqueFromNumbers.map((number, index) => (
-                    <option key={index} value={number}>
-                      {number}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-          )}
+                  <i className="bi bi-bookmark ms-4"></i>
+                  <div className="ms-4">Select all</div>
+                </div>
+                <div
+                  className="redo-container text-center"
+                  onClick={handleDefaultClick}
+                >
+                  <Image src="/redo.svg" alt="redo" width={24} height={24} className="ms-3" />
+                  <div>Default</div>
+                </div>
+              </div>
+              <div>
+                <div className="address-list">
+                  <div className="search-wrapper-add">
+                    {results.length > 0 && (
+                      <SearchResultList results={results} onSelect={handleSelectAddress} />
+                    )}
+                  </div>
 
-          <div className="search-wrapper ">
-            <input className="search" type="search" placeholder="Search To" />
+                  {addressesToShow.length > 0 ? (
+                    addressesToShow.map((address) => (
+                      <li
+                        key={address.id}
+                        className={`list-group-item justify-content-between ${selectedAddressId === address.id ? "selected-address" : ""
+                          }`}
+                        onClick={() => handleAddressSelect(address.displayAddress, address.id)}
+                      >
+                        <div className="setaddress d-flex align-items-center gap-3">
+                          <i
+                            className={`bi ${address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
+                              } clickable-icon`}
+                            style={{
+                              cursor: "pointer",
+                              color: address.is_bookmarked ? "blue" : "grey",
+                            }}
+                            onClick={() => handleBookmarkClick(address.id)}
+                          ></i>
+
+                          <span className="ml-2">
+
+                            {address.displayAddress || address.fullAddress}
+                            {address.notificationCount > 0 && (
+                              <span className="notification-count ml-2">
+                                ({address.notificationCount})
+                              </span>
+                            )}
+                          </span>
+                        </div>
+
+                        {address.fullAddress && (
+                          <div className="filtered-address">
+                            {address.fullAddress}
+                          </div>
+                        )}
+                      </li>
+                    ))
+                  ) : (
+                    <p>No addresses found.</p>
+                  )}
+                </div>
+
+
+
+              </div>
+            </div>
           </div>
-          <div className="input-msg">
-            <div className="screenshot-msg">
-              <div className="inbox-chat">
-                {events.length > 0
-                  ? Object.keys(updatedMessages).map((conversationId) => {
+
+          <div>
+            <div className="Analyticdata ">
+              <span>
+                <i className="bi bi-bar-chart-line-fill"></i>
+              </span>
+              <span className="ms-4">Analytic Data of Selected Address</span>
+            </div>
+            <div className=" main-message">
+              <div className="logos-row-msg">
+                <div className="nav-msg">
+                  <div className="message Delivered">Message Delivered</div>
+                  <input
+                    type="text"
+                    className="round-input"
+                    value={messageDelivered}
+                    readOnly
+                  />
+                </div>
+                <div className="nav-msg">
+                  <div className="message response1 ">Message Response</div>
+                  <input
+                    type="text"
+                    className="round-input"
+                    value={messageResponse}
+                    readOnly
+                  />
+                </div>
+                <div className="nav-msg">
+                  <div className="message call-1">Call </div>
+                  <input
+                    type="text"
+                    className="round-input"
+                    value={call}
+                    readOnly
+                  />
+                </div>
+                <div className="nav-msg">
+                  <div className="message call-response-1">Call Response</div>
+                  <input
+                    type="text"
+                    className="round-input"
+                    value={callResponse}
+                    readOnly
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="conversation">
+            {selectedAddress && (
+              <div className="conversation-chat">
+                <Image src="converstation.svg" alt="" width={24} height={24} /> Conversation From { }
+                {uniqueFromNumbers.length > 0 && (
+                  <select
+                    value={fromNumber}
+                    onChange={(e) => setFromNumber(e.target.value)} // Update fromNumber on selection
+                  >
+                    {uniqueFromNumbers.map((number, index) => (
+                      <option key={index} value={number}>
+                        {number}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            )}
+
+            <div className="search-wrapper ">
+              <input className="search" type="search" placeholder="Search To" />
+            </div>
+            <div className="input-msg">
+              <div className="screenshot-msg">
+                <div className="inbox-chat">
+                  {events.length > 0
+                    ? Object.keys(updatedMessages).map((conversationId) => {
                       const isStop = updatedMessages[conversationId].some(
                         (message) => message.is_stop
                       );
@@ -1141,11 +1140,10 @@ const Dashboard = () => {
                             </span>
 
                             <i
-                              className={`bi pinnumber ${
-                                pinnedConversations.has(conversationId)
-                                  ? "bi-pin-fill text-primary"
-                                  : "bi-pin"
-                              }`}
+                              className={`bi pinnumber ${pinnedConversations.has(conversationId)
+                                ? "bi-pin-fill text-primary"
+                                : "bi-pin"
+                                }`}
                               onClick={() => handlePinNumber(conversationId)}
                             ></i>
                           </div>
@@ -1168,21 +1166,19 @@ const Dashboard = () => {
                                           onClick={() =>
                                             toggleMessageExpansion(index)
                                           }
-                                          className={`read-less-btn ${
-                                            message.event_type_id === 1
-                                              ? "read-less-btn-right"
-                                              : "read-less-btn-left"
-                                          }`}
+                                          className={`read-less-btn ${message.event_type_id === 1
+                                            ? "read-less-btn-right"
+                                            : "read-less-btn-left"
+                                            }`}
                                         >
                                           Read Less
                                         </button>
 
                                         <i
-                                          className={`bi ${
-                                            message.is_message_pinned
-                                              ? "bi-star-fill text-warning"
-                                              : "bi-star"
-                                          } star-icon`}
+                                          className={`bi ${message.is_message_pinned
+                                            ? "bi-star-fill text-warning"
+                                            : "bi-star"
+                                            } star-icon`}
                                           onClick={() =>
                                             toggleMessagePin(
                                               message.id,
@@ -1194,7 +1190,7 @@ const Dashboard = () => {
                                     ) : (
                                       <div>
                                         {message.body &&
-                                        message.body.length > 100 ? (
+                                          message.body.length > 100 ? (
                                           <>
                                             {message.body.substring(0, 100)}
                                             ...
@@ -1202,21 +1198,19 @@ const Dashboard = () => {
                                               onClick={() =>
                                                 toggleMessageExpansion(index)
                                               }
-                                              className={`read-more-btn ${
-                                                message.event_type_id === 1
-                                                  ? "read-more-btn-right"
-                                                  : "read-more-btn-left"
-                                              }`}
+                                              className={`read-more-btn ${message.event_type_id === 1
+                                                ? "read-more-btn-right"
+                                                : "read-more-btn-left"
+                                                }`}
                                             >
                                               Read More
                                             </button>
                                             <i
                                               style={{ cursor: "pointer" }}
-                                              className={`bi ${
-                                                message.is_message_pinned
-                                                  ? "bi-star-fill text-warning"
-                                                  : "bi-star"
-                                              } star-icon cursor-pointer`}
+                                              className={`bi ${message.is_message_pinned
+                                                ? "bi-star-fill text-warning"
+                                                : "bi-star"
+                                                } star-icon cursor-pointer`}
                                               onClick={() =>
                                                 toggleMessagePin(
                                                   message.id,
@@ -1230,11 +1224,10 @@ const Dashboard = () => {
                                             <>
                                               {message.body}{" "}
                                               <i
-                                                className={`bi ${
-                                                  message.is_message_pinned
-                                                    ? "bi-star-fill text-warning"
-                                                    : "bi-star"
-                                                } star-icon`}
+                                                className={`bi ${message.is_message_pinned
+                                                  ? "bi-star-fill text-warning"
+                                                  : "bi-star"
+                                                  } star-icon`}
                                                 onClick={() =>
                                                   toggleMessagePin(
                                                     message.id,
@@ -1266,14 +1259,15 @@ const Dashboard = () => {
                         </div>
                       );
                     })
-                  : "Loading..."}
+                    : "Loading..."}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-     
+
     </div>
   );
 };
