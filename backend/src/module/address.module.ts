@@ -3,10 +3,12 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { AddressController } from "src/controller/address.controller";
 import { AddressEntity } from "../entities/address.entity";
 import { AddressService } from "src/service/address.service";
+import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
 
 @Module({
   imports: [TypeOrmModule.forFeature([AddressEntity])],
   controllers: [AddressController],
-  providers: [AddressService],
+  providers: [AddressService,JwtService,ConfigService],
 })
 export class AdressModule {}

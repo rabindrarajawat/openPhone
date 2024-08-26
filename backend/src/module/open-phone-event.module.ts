@@ -10,10 +10,13 @@ import { AuctionEventService } from "src/service/auction-event.service";
 import { NotificationEntity } from "src/entities/notification.entity";
 import { NotificationService } from "src/service/notification.service";
 import { NotificationGateway } from "src/gateways/notification.gateway";
+import { AuthGuard } from "src/authguard/auth.guard";
+import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([OpenPhoneEventEntity, AddressEntity,AuctionEventEntity,NotificationEntity,NotificationGateway])],
+  imports: [TypeOrmModule.forFeature([OpenPhoneEventEntity, AddressEntity,AuctionEventEntity,NotificationEntity,NotificationGateway,AuthGuard])],
   controllers: [OpenPhoneEventController],
-  providers: [OpenPhoneEventService, AddressService,AuctionEventService,NotificationService,NotificationGateway],
+  providers: [OpenPhoneEventService, AddressService,AuctionEventService,NotificationService,NotificationGateway,JwtService,ConfigService],
 })
 export class OpenPhoneEventModule {}
