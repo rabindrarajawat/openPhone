@@ -663,8 +663,9 @@
   color: #007bff;
 }
 .address-list{
-  margin-left: 45px;
+  margin-left: 11px;
   margin-top: 49px;
+  margin-right: -65px;
 }
 
 .checkbox {
