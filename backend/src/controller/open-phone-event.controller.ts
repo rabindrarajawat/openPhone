@@ -50,10 +50,10 @@ export class OpenPhoneEventController {
     // Convert addressId to a number
     const addressIdNum = Number(addressId);
 
-    // Check if the conversion was successful
-    if (isNaN(addressIdNum)) {
-      throw new BadRequestException('Invalid address_id: must be a number.');
-    }
+    // // Check if the conversion was successful
+    // if (isNaN(addressIdNum)) {
+    //   throw new BadRequestException('Invalid address_id: must be a number.');
+    // }
     const eventBodies =
       await this.openPhoneEventService.findEventBodiesByAddressAndFromNumber(
         addressIdNum,
