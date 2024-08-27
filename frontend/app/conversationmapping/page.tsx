@@ -27,17 +27,26 @@ const ConversationTable = () => {
   const [selectedRecord, setSelectedRecord] = useState<ConversationRecord | null>(null);
   const [selectedAddress, setSelectedAddress] = useState('Search Address');
   const [currentPage, setCurrentPage] = useState(0);
-  const recordsPerPage = 5; // Set records per page to 5
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
-
+  const recordsPerPage = 5;
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${Base_Url}openPhoneEventData/getConversationsWithoutAddress`);
-      console.log('API response:', response);
+      const token = localStorage.getItem("authToken");
 
-      const data = response.data.data; // Adjusted to match your response structure
-      console.log('Data:', data);
+      if (!token) {
+        console.error("No auth token found. Please log in.");
+        return;
+      }
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const response = await axios.get(`${Base_Url}openPhoneEventData/getConversationsWithoutAddress`,config);
+      const data = response.data.data;
 
       if (Array.isArray(data)) {
         setRecords(data);
@@ -81,13 +90,9 @@ const ConversationTable = () => {
 
   return (
     <div>
-      {/* <Navbar onSelectAddress={handleAddressSelect1} /> */}
       <Navbar toggleSidebar={toggleSidebar} onSelectAddress={handleAddressSelect1} />
       {isSidebarVisible && <SideBar />}
-      {/* <SideBar /> */}
-      {/* <div className={styles.mainContainer}> */}
       <div className={`styles.mainContainer ${isSidebarVisible ? 'sidebar-visible' : ''}`}>
-
         <Container className={styles.container}>
           <h2 className={styles.tableHeading}>Conversation Mapping</h2>
           <Table bordered hover className={styles.conversationTable}>
@@ -132,7 +137,7 @@ const ConversationTable = () => {
               show={showPopup}
               onHide={handlePopupClose}
               conversationId={selectedRecord.conversation_id}
-              onSaveSuccess={fetchData} // Pass the fetchData function to Popup
+              onSaveSuccess={fetchData}
             />
           )}
         </Container>
