@@ -476,7 +476,8 @@ useEffect(() => {
     axios
       .post(`${Base_Url}bookmarks/${addressId}`, {
         is_bookmarked: newIsBookmarked,config
-      })
+      },config
+    )
       .then((response) => {
         // Update the state only if the API call was successful
         setAddresses1((prevAddresses) =>
@@ -630,7 +631,7 @@ useEffect(() => {
 
   const handleCheckboxClick = (addressId: any) => {
     axios
-      .post(`${Base_Url}bookmarks/${addressId}`)
+      .post(`${Base_Url}bookmarks/${addressId}`,config)
       .then((response) => {
         console.log("Bookmark added successfully:", response.data);
       })
@@ -650,7 +651,7 @@ useEffect(() => {
       const response = await axios.get(
         `${Base_Url}address/search?address=${encodeURIComponent(
           value
-        )}`
+        )}`,config
       );
       const results = response.data.results.filter((address: Address) =>
         address.fullAddress.toLowerCase().includes(value.toLowerCase())
@@ -691,7 +692,7 @@ useEffect(() => {
               params: {
                 address_id: selectedAddressId,
                 from_number: fromNumber,
-              }, // Pass fromNumber directly
+              },...config // Pass fromNumber directly
             },
           );
           setEvents(response.data.data);
