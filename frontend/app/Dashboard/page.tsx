@@ -166,7 +166,7 @@ const Dashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
     
 
-  const addressesPerPage = 8;
+  const addressesPerPage = 9;
 
 
 
@@ -250,11 +250,7 @@ const Dashboard = () => {
   });
 
 
-  // const addressesToShow = filteredAddresses.length > 0
-  //   ? filteredAddresses.filter((address) => filteredAddresses2.some((filteredAddress) => filteredAddress.address === address.address))
-  //   : filteredAddresses2.length > 0
-  //     ? filteredAddresses2
-  //     : addresses1;
+  
 
 
 // Calculate indices for pagination
@@ -321,80 +317,88 @@ const handlePageChange = (page: number) => {
       window.location.href = "/" 
     }
   }, [router]);
-
-
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Retrieve the token from local storage
-        const token = localStorage.getItem("authToken");
   
-        if (!token) {
-          console.error("No auth token found. Please log in.");
-          return;
+ 
+ // Retrieve Token
+const token = localStorage.getItem("authToken");
+
+if (!token) {
+  console.error("No auth token found. Please log in.");
+  return;
+}
+
+// Set the Authorization header with the token
+const config = {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+};
+
+console.log("Token being used:", token); // Log the token to check if its valid
+
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      // Fetch all addresses with the token in the headers
+      console.log("Config before getalladdress:", config);
+      const addressResponse = await axios.get(
+        `${Base_Url}address/getalladdress`,
+        config
+      );
+      console.log("Config for address API:", config); 
+      const formattedAddresses = addressResponse.data.map((item: any) => ({
+        id: item.id,
+        displayAddress: item.address,
+        is_bookmarked: item.is_bookmarked,
+        auction_event_id: item.auction_event_id,
+        created_at: item.created_at,
+        notificationCount: 0,
+        address: item.address,
+      }));
+      setAddresses2(formattedAddresses);
+      setFilteredAddresses2(formattedAddresses);
+      console.log("Formatted addresses:", formattedAddresses);
+
+      // Fetch unread notifications with the token in the headers
+
+      console.log("Config before notifications:", config); 
+      const notificationResponse = await axios.get(
+        `${Base_Url}notifications`,config
+      );
+      console.log("Config for address API:", config); 
+
+
+      console.log("Notification API Response:", notificationResponse); // Log the response to check what’s returned
+
+      const unreadNotifications = notificationResponse.data.filter(
+        (notification: any) => !notification.is_read
+      );
+      setNotifications(unreadNotifications);
+
+      // Calculate notification counts
+      const addressNotificationCounts = formattedAddresses.map(
+        (address: any) => {
+          const count = unreadNotifications.filter(
+            (notification: any) => notification.address_id === address.id
+          ).length;
+          return { ...address, notificationCount: count };
         }
-  
-        // Set the Authorization header with the token
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        };
-  
-        // Fetch all addresses with the token in the headers
-        const addressResponse = await axios.get(
-          `${Base_Url}address/getalladdress`,
-          config
-        );
-        console.log("config")
-        const formattedAddresses = addressResponse.data.map((item: any) => ({
-          id: item.id,
-          displayAddress: item.address,
-          is_bookmarked: item.is_bookmarked,
-          auction_event_id: item.auction_event_id,
-          created_at: item.created_at,
-          notificationCount: 0,
-          address: item.address,
-        }));
-        setAddresses2(formattedAddresses);
-        setFilteredAddresses2(formattedAddresses);
-        console.log("formattedAddresses", formattedAddresses);
-  
-        // Fetch unread notifications with the token in the headers
-        const notificationResponse = await axios.get(
-          `${Base_Url}notifications`,
-          config
-        );
-        const unreadNotifications = notificationResponse.data.filter(
-          (notification: any) => !notification.is_read
-        );
-        setNotifications(unreadNotifications);
-  
-        // Calculate notification counts
-        const addressNotificationCounts = formattedAddresses.map(
-          (address: any) => {
-            const count = unreadNotifications.filter(
-              (notification: any) => notification.address_id === address.id
-            ).length;
-            return { ...address, notificationCount: count };
-          }
-        );
-  
-        setAddresses1(addressNotificationCounts);
-  
-        // Set default selected address
-        if (addressNotificationCounts.length > 0) {
-          setSelectedAddress(addressNotificationCounts[0].displayAddress);
-          setSelectedAddressId(addressNotificationCounts[0].id);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      );
+
+      setAddresses1(addressNotificationCounts);
+
+      // Set default selected address
+      if (addressNotificationCounts.length > 0) {
+        setSelectedAddress(addressNotificationCounts[0].displayAddress);
+        setSelectedAddressId(addressNotificationCounts[0].id);
       }
-    };
-  
-    fetchData();
-  }, []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  fetchData();
+}, []);
   
 
   useEffect(() => {
@@ -404,7 +408,7 @@ const handlePageChange = (page: number) => {
 
       if (deliveredChecked) {
         // Fetch delivered addresses
-        const deliveredResponse = await axios.get(`${Base_Url}openPhoneEventData?filter=delivered`);
+        const deliveredResponse = await axios.get(`${Base_Url}openPhoneEventData?filter=delivered`,config);
         deliveredAddresses = deliveredResponse.data.data
           .filter((event: { event_type_id: number; }) => event.event_type_id === 2)
           .map((event: { address: any; }) => event.address);
@@ -412,7 +416,7 @@ const handlePageChange = (page: number) => {
 
       if (receivedChecked) {
         // Fetch received addresses
-        const receivedResponse = await axios.get(`${Base_Url}openPhoneEventData?filter=received`);
+        const receivedResponse = await axios.get(`${Base_Url}openPhoneEventData?filter=received`,config);
         receivedAddresses = receivedResponse.data.data
           .map((event: { address: any; }) => event.address);
       }
@@ -435,7 +439,7 @@ const handlePageChange = (page: number) => {
     const fetchEventCounts = async () => {
       try {
         const response = await fetch(
-          `${Base_Url}openPhoneEventData/all`
+          `${Base_Url}openPhoneEventData/all`,config
         );
         if (!response.ok) {
           throw new Error("Failed to fetch event counts");
@@ -471,7 +475,7 @@ const handlePageChange = (page: number) => {
 
     axios
       .post(`${Base_Url}bookmarks/${addressId}`, {
-        is_bookmarked: newIsBookmarked,
+        is_bookmarked: newIsBookmarked,config
       })
       .then((response) => {
         // Update the state only if the API call was successful
@@ -492,7 +496,7 @@ const handlePageChange = (page: number) => {
 
       // API call to toggle pin/unpin
       const response = await axios.post(
-        `${Base_Url}openPhoneEventData/toggle-number-pin/${conversationId}`
+        `${Base_Url}openPhoneEventData/toggle-number-pin/${conversationId}`,config
       );
 
       if (response.status === 200 || response.status === 201) {
@@ -528,7 +532,7 @@ const handlePageChange = (page: number) => {
         .get(
           `${Base_Url}openPhoneEventData/events?address=${encodeURIComponent(
             selectedAddress
-          )}`
+          )}`,config
         )
         .then((response) => {
           const data = response.data.data;
@@ -688,7 +692,7 @@ const handlePageChange = (page: number) => {
                 address_id: selectedAddressId,
                 from_number: fromNumber,
               }, // Pass fromNumber directly
-            }
+            },
           );
           setEvents(response.data.data);
         } catch (error) {
@@ -731,7 +735,7 @@ const handlePageChange = (page: number) => {
   ) => {
     try {
       await axios.post(
-        `${Base_Url}openPhoneEventData/toggle-message-pin/${messageId}`
+        `${Base_Url}openPhoneEventData/toggle-message-pin/${messageId}`,config
       );
 
       setUpdatedMessages((prevMessages) => {
