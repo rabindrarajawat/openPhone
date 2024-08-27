@@ -9,6 +9,7 @@ import "./dashboard.css";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { SearchResultList } from "../SearchResultList/SearchResultList";
+import Pagination from "../Pagination/pagination";
 
 interface Address {
   fullAddress: string;
@@ -125,7 +126,6 @@ const Dashboard = () => {
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
     null
   );
-  const [currentPage, setCurrentPage] = useState(1);
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const [uniqueFromNumbers, setUniqueFromNumbers] = useState<string[]>([]);
@@ -163,6 +163,10 @@ const Dashboard = () => {
   const [receivedChecked, setReceivedChecked] = useState(false);
   const [addresses2, setAddresses2] = useState<Address1[]>([]);
   const [filteredAddresses2, setFilteredAddresses2] = useState<Address1[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+    
+
+  const addressesPerPage = 8;
 
 
 
@@ -246,11 +250,36 @@ const Dashboard = () => {
   });
 
 
-  const addressesToShow = filteredAddresses.length > 0
-    ? filteredAddresses.filter((address) => filteredAddresses2.some((filteredAddress) => filteredAddress.address === address.address))
-    : filteredAddresses2.length > 0
-      ? filteredAddresses2
-      : addresses1;
+  // const addressesToShow = filteredAddresses.length > 0
+  //   ? filteredAddresses.filter((address) => filteredAddresses2.some((filteredAddress) => filteredAddress.address === address.address))
+  //   : filteredAddresses2.length > 0
+  //     ? filteredAddresses2
+  //     : addresses1;
+
+
+// Calculate indices for pagination
+const indexOfLastAddress = currentPage * addressesPerPage;
+const indexOfFirstAddress = indexOfLastAddress - addressesPerPage;
+
+// Determine the addresses to show based on the filtered results
+const addressesToShow = filteredAddresses.length > 0
+  ? filteredAddresses.filter((address) => 
+      filteredAddresses2.some((filteredAddress) => filteredAddress.address === address.address)
+    )
+  : filteredAddresses2.length > 0
+  ? filteredAddresses2
+  : addresses1;
+
+// Apply pagination to the addressesToShow
+const currentAddresses = addressesToShow.slice(indexOfFirstAddress, indexOfLastAddress);
+
+// Calculate total pages for pagination
+const totalPages = Math.ceil(addressesToShow.length / addressesPerPage);
+
+// Handler to change the page
+const handlePageChange = (page: number) => {
+  setCurrentPage(page);
+};
   console.log("addressesToShow", addressesToShow);
 
   const handleToggle = () => {
@@ -298,10 +327,27 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch all addresses
+        // Retrieve the token from local storage
+        const token = localStorage.getItem("authToken");
+  
+        if (!token) {
+          console.error("No auth token found. Please log in.");
+          return;
+        }
+  
+        // Set the Authorization header with the token
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+  
+        // Fetch all addresses with the token in the headers
         const addressResponse = await axios.get(
-          `${Base_Url}address/getalladdress`
+          `${Base_Url}address/getalladdress`,
+          config
         );
+        console.log("config")
         const formattedAddresses = addressResponse.data.map((item: any) => ({
           id: item.id,
           displayAddress: item.address,
@@ -313,19 +359,18 @@ const Dashboard = () => {
         }));
         setAddresses2(formattedAddresses);
         setFilteredAddresses2(formattedAddresses);
-        console.log("formattedAddresses", formattedAddresses)
-
-
-
-        // Fetch unread notifications
+        console.log("formattedAddresses", formattedAddresses);
+  
+        // Fetch unread notifications with the token in the headers
         const notificationResponse = await axios.get(
-          `${Base_Url}notifications`
+          `${Base_Url}notifications`,
+          config
         );
         const unreadNotifications = notificationResponse.data.filter(
           (notification: any) => !notification.is_read
         );
         setNotifications(unreadNotifications);
-
+  
         // Calculate notification counts
         const addressNotificationCounts = formattedAddresses.map(
           (address: any) => {
@@ -335,9 +380,9 @@ const Dashboard = () => {
             return { ...address, notificationCount: count };
           }
         );
-
+  
         setAddresses1(addressNotificationCounts);
-
+  
         // Set default selected address
         if (addressNotificationCounts.length > 0) {
           setSelectedAddress(addressNotificationCounts[0].displayAddress);
@@ -347,9 +392,10 @@ const Dashboard = () => {
         console.error("Error fetching data:", error);
       }
     };
-
+  
     fetchData();
   }, []);
+  
 
   useEffect(() => {
     const fetchFilteredAddresses = async () => {
@@ -540,9 +586,7 @@ const Dashboard = () => {
 
 
 
-  const handlePageChange = (pageNumber: React.SetStateAction<number>) => {
-    setCurrentPage(pageNumber);
-  };
+ 
 
   const handleFollowUpClick = () => {
     setIsFollowUpClicked(!isFollowUpClicked); // Toggle the Follow-up button state
@@ -952,7 +996,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="main-main">
           <div className="main-Address ">
             <span className="">
               {" "}
@@ -990,61 +1033,68 @@ const Dashboard = () => {
                 </div>
               </div>
               <div>
-                <div className="address-list">
-                  <div className="search-wrapper-add">
-                    {results.length > 0 && (
-                      <SearchResultList results={results} onSelect={handleSelectAddress} />
-                    )}
-                  </div>
+              <ul className="address-list">
+    <div className="search-wrapper-add">
+      {results.length > 0 && (
+        <SearchResultList results={results} onSelect={handleSelectAddress} />
+      )}
+    </div>
 
-                  {addressesToShow.length > 0 ? (
-                    addressesToShow.map((address) => (
-                      <li
-                        key={address.id}
-                        className={`list-group-item justify-content-between ${selectedAddressId === address.id ? "selected-address" : ""
-                          }`}
-                        onClick={() => handleAddressSelect(address.displayAddress, address.id)}
-                      >
-                        <div className="setaddress d-flex align-items-center gap-3">
-                          <i
-                            className={`bi ${address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
-                              } clickable-icon`}
-                            style={{
-                              cursor: "pointer",
-                              color: address.is_bookmarked ? "blue" : "grey",
-                            }}
-                            onClick={() => handleBookmarkClick(address.id)}
-                          ></i>
+    {currentAddresses.length > 0 ? (
+      currentAddresses.map((address) => (
+        <li
+          key={address.id}
+          className={`list-group-item justify-content-between ${
+            selectedAddressId === address.id ? "selected-address" : ""
+          }`}
+          onClick={() => handleAddressSelect(address.displayAddress, address.id)}
+        >
+          <div className="setaddress d-flex align-items-center gap-3">
+            <i
+              className={`bi ${
+                address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
+              } clickable-icon`}
+              style={{
+                cursor: "pointer",
+                color: address.is_bookmarked ? "blue" : "grey",
+              }}
+              onClick={() => handleBookmarkClick(address.id)}
+            ></i>
 
-                          <span className="ml-2">
+            <span className="ml-2">
+              {address.displayAddress || address.fullAddress}
+              {address.notificationCount > 0 && (
+                <span className="notification-count ml-2">
+                  ({address.notificationCount})
+                </span>
+              )}
+            </span>
+          </div>
 
-                            {address.displayAddress || address.fullAddress}
-                            {address.notificationCount > 0 && (
-                              <span className="notification-count ml-2">
-                                ({address.notificationCount})
-                              </span>
-                            )}
-                          </span>
-                        </div>
+          {address.fullAddress && (
+            <div className="filtered-address">
+              {address.fullAddress}
+            </div>
+          )}
+        </li>
+      ))
+    ) : (
+      <p>No addresses found.</p>
+    )}
 
-                        {address.fullAddress && (
-                          <div className="filtered-address">
-                            {address.fullAddress}
-                          </div>
-                        )}
-                      </li>
-                    ))
-                  ) : (
-                    <p>No addresses found.</p>
-                  )}
-                </div>
+   
+  </ul>
 
 
 
               </div>
             </div>
+          <Pagination
+      currentPage={currentPage}
+      totalPages={totalPages}
+      onPageChange={handlePageChange}
+    />
           </div>
-
           <div>
             <div className="Analyticdata ">
               <span>
@@ -1264,7 +1314,7 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-        </div>
+       
       </div>
 
 
