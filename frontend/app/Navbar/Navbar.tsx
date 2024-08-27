@@ -133,7 +133,7 @@ console.log("Token being used:", token); // Log the token to check if its valid
 
   const handleMarkAsRead = async (event_id: number) => {
     try {
-      const response = await axios.post(`${Base_Url}notifications/${event_id}/read`,config);
+      const response = await axios.post(`${Base_Url}notifications/${event_id}/read`, null,config);
       console.log("Backend Response:", response);
 
       if (response.status === 200 || response.status === 201) {
