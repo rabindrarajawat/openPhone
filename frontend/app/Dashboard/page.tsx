@@ -653,7 +653,7 @@ const Dashboard = () => {
       }
 
       fetchEvents();
-    }, 700);
+    }, 900);
     return () => clearTimeout(timer);
   }, [selectedAddressId, fromNumber]);
 
