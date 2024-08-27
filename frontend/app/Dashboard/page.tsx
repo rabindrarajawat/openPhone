@@ -1092,13 +1092,16 @@ useEffect(() => {
 
 
               </div>
+           
             </div>
-          <Pagination
+            <Pagination
       currentPage={currentPage}
       totalPages={totalPages}
       onPageChange={handlePageChange}
     />
+         
           </div>
+     
           <div>
             <div className="Analyticdata ">
               <span>
