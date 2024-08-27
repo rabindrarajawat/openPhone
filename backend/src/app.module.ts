@@ -28,7 +28,9 @@ import { BookmarkEntity } from "./entities/bookmark.entity";
 import { NotificationEntity } from "./entities/notification.entity";
 import { BookmarkModule } from "./module/bookmark.module";
 import { NotificationModule } from "./module/notification.module";
-
+import { AuthGuard } from "./authguard/auth.guard";
+import { JwtModule } from "@nestjs/jwt";
+ 
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -57,12 +59,16 @@ import { NotificationModule } from "./module/notification.module";
       }),
       inject: [ConfigService],
     }),
+    // JwtModule.register({
+    //   secret: process.env.JWT_SECRET_PRIVATE,
+    //   signOptions: { expiresIn: '60m' },
+    // }), 
     OpenPhoneEventModule,
     AdressModule,
     OpenPhoneEventDirectionModule,
     OpenPhoneEventTypeModule,
     CaseEventModule,
-    AuctionEventModule, TaxDeadModule, MessageMasterModule, RoleModule, usersModule, ConversationMappingModule,BookmarkModule,NotificationModule
+    AuctionEventModule, TaxDeadModule, MessageMasterModule, RoleModule, usersModule, ConversationMappingModule,BookmarkModule,NotificationModule,
   ],
 })
 export class AppModule { }
