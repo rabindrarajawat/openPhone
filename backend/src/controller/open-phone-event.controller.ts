@@ -1,117 +1,196 @@
-
-
-import { Controller, Post, Get, Body, Query, Param, BadRequestException } from "@nestjs/common";
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Query,
+  Param,
+  BadRequestException,
+  UseGuards,
+  InternalServerErrorException,
+} from "@nestjs/common";
 import { OpenPhoneEventService } from "../service/open-phone-event.service";
-import { AddressService } from "src/service/address.service";
+import { AddressService } from "../service/address.service";
+import { AuthGuard } from "../authguard/auth.guard";
 
 @Controller("openPhoneEventData")
 export class OpenPhoneEventController {
   constructor(
     private readonly openPhoneEventService: OpenPhoneEventService,
     private readonly addressService: AddressService
-  ) { }
+  ) {}
+
   @Post()
   async createOpenPhoneEvent(@Body() payload: any) {
-    console.log("🚀 ~ OpenPhoneEventController ~ createOpenPhoneEvent ~ payload:", payload)
-    const { openPhoneEvent, addressCreated } =
-      await this.openPhoneEventService.create(payload);
+    try {
+      console.log(
+        "🚀 ~ OpenPhoneEventController ~ createOpenPhoneEvent ~ payload:",
+        payload
+      );
+      const { openPhoneEvent, addressCreated } =
+        await this.openPhoneEventService.create(payload);
 
-    let responseMessage = "Open phone event data created successfully.";
-    if (addressCreated) {
-      responseMessage += " New address data created.";
+      let responseMessage = "Open phone event data created successfully.";
+      if (addressCreated) {
+        responseMessage += " New address data created.";
+      }
+
+      return {
+        message: responseMessage,
+        openPhoneEventId: openPhoneEvent.id,
+        addressCreated: addressCreated,
+      };
+    } catch (error) {
+      console.error("Error in createOpenPhoneEvent:", error);
+      throw new InternalServerErrorException(
+        "Failed to create open phone event"
+      );
     }
-    // else {
-    //   responseMessage += "";
-    // }
-
-    return {
-      message: responseMessage,
-      openPhoneEventId: openPhoneEvent.id,
-      // addressId: address.id,
-      addressCreated: addressCreated,
-    };
   }
 
   @Get("events")
+  @UseGuards(AuthGuard)
   async getOpenPhoneEventsByAddress(@Query("address") address: string) {
-    const openPhoneEvents =
-      await this.openPhoneEventService.findOpenPhoneEventsByAddress(address);
-    return {
-      message: `OpenPhoneEvents found for address: ${address}`,
-      data: openPhoneEvents,
-    };
+    try {
+      const openPhoneEvents =
+        await this.openPhoneEventService.findOpenPhoneEventsByAddress(address);
+      return {
+        message: `OpenPhoneEvents found for address: ${address}`,
+        data: openPhoneEvents,
+      };
+    } catch (error) {
+      console.error("Error in getOpenPhoneEventsByAddress:", error);
+      throw new InternalServerErrorException(
+        "Failed to fetch open phone events"
+      );
+    }
   }
 
   @Get("events-by-address-and-from")
+  @UseGuards(AuthGuard)
   async getEventBodiesByAddressAndFromNumber(
     @Query("address_id") addressId: number,
     @Query("from_number") fromNumber?: string
   ) {
-    // Convert addressId to a number
-    const addressIdNum = Number(addressId);
+    try {
+      const addressIdNum = Number(addressId);
+      if (isNaN(addressIdNum)) {
+        throw new BadRequestException("Invalid address_id: must be a number.");
+      }
+      const eventBodies =
+        await this.openPhoneEventService.findEventBodiesByAddressAndFromNumber(
+          addressIdNum,
+          fromNumber
+        );
 
-    // // Check if the conversion was successful
-    // if (isNaN(addressIdNum)) {
-    //   throw new BadRequestException('Invalid address_id: must be a number.');
-    // }
-    const eventBodies =
-      await this.openPhoneEventService.findEventBodiesByAddressAndFromNumber(
-        addressIdNum,
-        fromNumber
-      );
-
-    return {
-      message: `Event bodies fetched successfully for address_id: ${addressIdNum} and from: ${fromNumber || "all numbers"}`,
-      data: eventBodies,
-    };
+      return {
+        message: `Event bodies fetched successfully for address_id: ${addressIdNum} and from: ${fromNumber || "all numbers"}`,
+        data: eventBodies,
+      };
+    } catch (error) {
+      console.error("Error in getEventBodiesByAddressAndFromNumber:", error);
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new InternalServerErrorException("Failed to fetch event bodies");
+    }
   }
 
-
   @Get("all")
+  @UseGuards(AuthGuard)
   async getAllOpenPhoneEvent() {
-    return this.openPhoneEventService.findAllOpenPhoneEvents();
+    try {
+      return this.openPhoneEventService.findAllOpenPhoneEvents();
+    } catch (error) {
+      console.error("Error in getAllOpenPhoneEvent:", error);
+      throw new InternalServerErrorException(
+        "Failed to fetch all open phone events"
+      );
+    }
   }
 
   @Get("getConversationsWithoutAddress")
+  @UseGuards(AuthGuard)
   async getConversationsWithoutAddress() {
-    const conversationIds =
-      await this.openPhoneEventService.findConversationsWithoutAddress();
-    return {
-      message: "Conversations without address IDs fetched successfully.",
-      data: conversationIds,
-    };
+    try {
+      const conversationIds =
+        await this.openPhoneEventService.findConversationsWithoutAddress();
+      return {
+        message: "Conversations without address IDs fetched successfully.",
+        data: conversationIds,
+      };
+    } catch (error) {
+      console.error("Error in getConversationsWithoutAddress:", error);
+      throw new InternalServerErrorException(
+        "Failed to fetch conversations without address"
+      );
+    }
   }
-
 
   @Get()
-  async getAllOpenPhoneEvents(@Query('filter') filter?: 'delivered' | 'received') {
-    const events = await this.openPhoneEventService.findAllFiltered(filter);
-    return {
-      message: 'Open phone events fetched successfully',
-      data: events,
-    };
+  @UseGuards(AuthGuard)
+  async getAllOpenPhoneEvents(
+    @Query("filter") filter?: "delivered" | "received"
+  ) {
+    try {
+      const events = await this.openPhoneEventService.findAllFiltered(filter);
+      return {
+        message: "Open phone events fetched successfully",
+        data: events,
+      };
+    } catch (error) {
+      console.error("Error in getAllOpenPhoneEvents:", error);
+      throw new InternalServerErrorException(
+        "Failed to fetch filtered open phone events"
+      );
+    }
   }
 
-  @Post('toggle-message-pin/:id')
-  async toggleMessagePin(@Param('id') id: number) {
-    const updatedEvent = await this.openPhoneEventService.toggleMessagePin(id);
-    return updatedEvent
+  @Post("toggle-message-pin/:id")
+  @UseGuards(AuthGuard)
+  async toggleMessagePin(@Param("id") id: number) {
+    try {
+      const updatedEvent =
+        await this.openPhoneEventService.toggleMessagePin(id);
+      return updatedEvent;
+    } catch (error) {
+      console.error("Error in toggleMessagePin:", error);
+      throw new InternalServerErrorException("Failed to toggle message pin");
+    }
   }
 
-  @Post('toggle-number-pin/:id')
-  async toggleNumberPin(@Param('id') conversation_id: string) {
-    const updatedEvent = await this.openPhoneEventService.toggleNumberPin(conversation_id);
-    return updatedEvent
+  @Post("toggle-number-pin/:id")
+  @UseGuards(AuthGuard)
+  async toggleNumberPin(@Param("id") conversation_id: string) {
+    try {
+      const updatedEvent =
+        await this.openPhoneEventService.toggleNumberPin(conversation_id);
+      return updatedEvent;
+    } catch (error) {
+      console.error("Error in toggleNumberPin:", error);
+      throw new InternalServerErrorException("Failed to toggle number pin");
+    }
   }
 
-  @Get('pinned-messages')
+  @Get("pinned-messages")
+  @UseGuards(AuthGuard)
   async getPinnedMessages() {
-    return this.openPhoneEventService.getAllPinnedMessages();
+    try {
+      return this.openPhoneEventService.getAllPinnedMessages();
+    } catch (error) {
+      console.error("Error in getPinnedMessages:", error);
+      throw new InternalServerErrorException("Failed to fetch pinned messages");
+    }
   }
 
-  @Get('pinned-numbers/:conversationId')
-  async getPinnedNumbers(@Param('conversationId') conversationId: string) {
-    return this.openPhoneEventService.getAllPinnedNumbers(conversationId);
+  @Get("pinned-numbers/:conversationId")
+  @UseGuards(AuthGuard)
+  async getPinnedNumbers(@Param("conversationId") conversationId: string) {
+    try {
+      return this.openPhoneEventService.getAllPinnedNumbers(conversationId);
+    } catch (error) {
+      console.error("Error in getPinnedNumbers:", error);
+      throw new InternalServerErrorException("Failed to fetch pinned numbers");
+    }
   }
-
 }
