@@ -697,3 +697,57 @@
   display: flex;
   margin-top: -40px;
 }
+
+@media (max-width: 367px) {
+  .main-container {
+    flex-direction: column;
+    padding: 5px; /* Reduce padding */
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Ensure full width */
+    overflow-x: hidden; /* Prevent horizontal overflow */
+  }
+
+  .content-with-border-right {
+    border-right: none;
+    padding-right: 0;
+    width: 100%;
+  }
+
+  .openphone, .information, .status, .type, .Date {
+    margin: 5px 0; /* Reduce margins */
+    width: 100%;
+    text-align: center;
+  }
+
+  .custom-date-dropdown {
+    width: 100%;
+    padding: 5px;
+  }
+
+  .message1, .message {
+    width: 100%;
+    font-size: 14px; /* Adjust font size */
+    text-align: center;
+    padding: 5px;
+  }
+
+  .search-box input {
+    width: 100%;
+    padding: 8px 10px; /* Reduce padding */
+    box-sizing: border-box; /* Ensure padding doesn't affect width */
+  }
+
+  /* Ensure other elements are within the screen width */
+  .main-Address, .main-search, .search-wrapper, .input-msg, .screenshot-msg, .bookmark-container, .redo-container {
+    width: 100%;
+    padding: 5px;
+    margin: 0; /* Eliminate margins that may push content */
+  }
+
+  .pagination-container {
+    width: 100%;
+    margin-top: 20px;
+    text-align: center;
+  }
+}
