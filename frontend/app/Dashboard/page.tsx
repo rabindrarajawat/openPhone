@@ -164,7 +164,7 @@ const Dashboard = () => {
   const [addresses2, setAddresses2] = useState<Address1[]>([]);
   const [filteredAddresses2, setFilteredAddresses2] = useState<Address1[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-    
+
 
   const addressesPerPage = 9;
 
@@ -250,32 +250,32 @@ const Dashboard = () => {
   });
 
 
-  
 
 
-// Calculate indices for pagination
-const indexOfLastAddress = currentPage * addressesPerPage;
-const indexOfFirstAddress = indexOfLastAddress - addressesPerPage;
 
-// Determine the addresses to show based on the filtered results
-const addressesToShow = filteredAddresses.length > 0
-  ? filteredAddresses.filter((address) => 
+  // Calculate indices for pagination
+  const indexOfLastAddress = currentPage * addressesPerPage;
+  const indexOfFirstAddress = indexOfLastAddress - addressesPerPage;
+
+  // Determine the addresses to show based on the filtered results
+  const addressesToShow = filteredAddresses.length > 0
+    ? filteredAddresses.filter((address) =>
       filteredAddresses2.some((filteredAddress) => filteredAddress.address === address.address)
     )
-  : filteredAddresses2.length > 0
-  ? filteredAddresses2
-  : addresses1;
+    : filteredAddresses2.length > 0
+      ? filteredAddresses2
+      : addresses1;
 
-// Apply pagination to the addressesToShow
-const currentAddresses = addressesToShow.slice(indexOfFirstAddress, indexOfLastAddress);
+  // Apply pagination to the addressesToShow
+  const currentAddresses = addressesToShow.slice(indexOfFirstAddress, indexOfLastAddress);
 
-// Calculate total pages for pagination
-const totalPages = Math.ceil(addressesToShow.length / addressesPerPage);
+  // Calculate total pages for pagination
+  const totalPages = Math.ceil(addressesToShow.length / addressesPerPage);
 
-// Handler to change the page
-const handlePageChange = (page: number) => {
-  setCurrentPage(page);
-};
+  // Handler to change the page
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
   console.log("addressesToShow", addressesToShow);
 
   const handleToggle = () => {
@@ -314,92 +314,92 @@ const handlePageChange = (page: number) => {
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (!token) {
-      window.location.href = "/" 
+      window.location.href = "/"
     }
   }, [router]);
-  
- 
- // Retrieve Token
-const token = localStorage.getItem("authToken");
-
-if (!token) {
-  console.error("No auth token found. Please log in.");
-  return;
-}
-
-// Set the Authorization header with the token
-const config = {
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-};
-
-console.log("Token being used:", token); // Log the token to check if its valid
-
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      // Fetch all addresses with the token in the headers
-      console.log("Config before getalladdress:", config);
-      const addressResponse = await axios.get(
-        `${Base_Url}address/getalladdress`,
-        config
-      );
-      console.log("Config for address API:", config); 
-      const formattedAddresses = addressResponse.data.map((item: any) => ({
-        id: item.id,
-        displayAddress: item.address,
-        is_bookmarked: item.is_bookmarked,
-        auction_event_id: item.auction_event_id,
-        created_at: item.created_at,
-        notificationCount: 0,
-        address: item.address,
-      }));
-      setAddresses2(formattedAddresses);
-      setFilteredAddresses2(formattedAddresses);
-      console.log("Formatted addresses:", formattedAddresses);
-
-      // Fetch unread notifications with the token in the headers
-
-      console.log("Config before notifications:", config); 
-      const notificationResponse = await axios.get(
-        `${Base_Url}notifications`,config
-      );
-      console.log("Config for address API:", config); 
 
 
-      console.log("Notification API Response:", notificationResponse); // Log the response to check what’s returned
+  // Retrieve Token
+  const token = localStorage.getItem("authToken");
 
-      const unreadNotifications = notificationResponse.data.filter(
-        (notification: any) => !notification.is_read
-      );
-      setNotifications(unreadNotifications);
+  if (!token) {
+    console.error("No auth token found. Please log in.");
+    return;
+  }
 
-      // Calculate notification counts
-      const addressNotificationCounts = formattedAddresses.map(
-        (address: any) => {
-          const count = unreadNotifications.filter(
-            (notification: any) => notification.address_id === address.id
-          ).length;
-          return { ...address, notificationCount: count };
-        }
-      );
-
-      setAddresses1(addressNotificationCounts);
-
-      // Set default selected address
-      if (addressNotificationCounts.length > 0) {
-        setSelectedAddress(addressNotificationCounts[0].displayAddress);
-        setSelectedAddressId(addressNotificationCounts[0].id);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
+  // Set the Authorization header with the token
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   };
 
-  fetchData();
-}, []);
-  
+  console.log("Token being used:", token); // Log the token to check if its valid
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch all addresses with the token in the headers
+        console.log("Config before getalladdress:", config);
+        const addressResponse = await axios.get(
+          `${Base_Url}address/getalladdress`,
+          config
+        );
+        console.log("Config for address API:", config);
+        const formattedAddresses = addressResponse.data.map((item: any) => ({
+          id: item.id,
+          displayAddress: item.address,
+          is_bookmarked: item.is_bookmarked,
+          auction_event_id: item.auction_event_id,
+          created_at: item.created_at,
+          notificationCount: 0,
+          address: item.address,
+        }));
+        setAddresses2(formattedAddresses);
+        setFilteredAddresses2(formattedAddresses);
+        console.log("Formatted addresses:", formattedAddresses);
+
+        // Fetch unread notifications with the token in the headers
+
+        console.log("Config before notifications:", config);
+        const notificationResponse = await axios.get(
+          `${Base_Url}notifications`, config
+        );
+        console.log("Config for address API:", config);
+
+
+        console.log("Notification API Response:", notificationResponse); // Log the response to check what’s returned
+
+        const unreadNotifications = notificationResponse.data.filter(
+          (notification: any) => !notification.is_read
+        );
+        setNotifications(unreadNotifications);
+
+        // Calculate notification counts
+        const addressNotificationCounts = formattedAddresses.map(
+          (address: any) => {
+            const count = unreadNotifications.filter(
+              (notification: any) => notification.address_id === address.id
+            ).length;
+            return { ...address, notificationCount: count };
+          }
+        );
+
+        setAddresses1(addressNotificationCounts);
+
+        // Set default selected address
+        if (addressNotificationCounts.length > 0) {
+          setSelectedAddress(addressNotificationCounts[0].displayAddress);
+          setSelectedAddressId(addressNotificationCounts[0].id);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
 
   useEffect(() => {
     const fetchFilteredAddresses = async () => {
@@ -408,7 +408,7 @@ useEffect(() => {
 
       if (deliveredChecked) {
         // Fetch delivered addresses
-        const deliveredResponse = await axios.get(`${Base_Url}openPhoneEventData?filter=delivered`,config);
+        const deliveredResponse = await axios.get(`${Base_Url}openPhoneEventData?filter=delivered`, config);
         deliveredAddresses = deliveredResponse.data.data
           .filter((event: { event_type_id: number; }) => event.event_type_id === 2)
           .map((event: { address: any; }) => event.address);
@@ -416,7 +416,7 @@ useEffect(() => {
 
       if (receivedChecked) {
         // Fetch received addresses
-        const receivedResponse = await axios.get(`${Base_Url}openPhoneEventData?filter=received`,config);
+        const receivedResponse = await axios.get(`${Base_Url}openPhoneEventData?filter=received`, config);
         receivedAddresses = receivedResponse.data.data
           .map((event: { address: any; }) => event.address);
       }
@@ -439,7 +439,7 @@ useEffect(() => {
     const fetchEventCounts = async () => {
       try {
         const response = await fetch(
-          `${Base_Url}openPhoneEventData/all`,config
+          `${Base_Url}openPhoneEventData/all`, config
         );
         if (!response.ok) {
           throw new Error("Failed to fetch event counts");
@@ -475,9 +475,9 @@ useEffect(() => {
 
     axios
       .post(`${Base_Url}bookmarks/${addressId}`, {
-        is_bookmarked: newIsBookmarked,config
-      },config
-    )
+        is_bookmarked: newIsBookmarked, config
+      }, config
+      )
       .then((response) => {
         // Update the state only if the API call was successful
         setAddresses1((prevAddresses) =>
@@ -497,7 +497,7 @@ useEffect(() => {
 
       // API call to toggle pin/unpin
       const response = await axios.post(
-        `${Base_Url}openPhoneEventData/toggle-number-pin/${conversationId}`,config
+        `${Base_Url}openPhoneEventData/toggle-number-pin/${conversationId}`, config
       );
 
       if (response.status === 200 || response.status === 201) {
@@ -533,7 +533,7 @@ useEffect(() => {
         .get(
           `${Base_Url}openPhoneEventData/events?address=${encodeURIComponent(
             selectedAddress
-          )}`,config
+          )}`, config
         )
         .then((response) => {
           const data = response.data.data;
@@ -591,7 +591,7 @@ useEffect(() => {
 
 
 
- 
+
 
   const handleFollowUpClick = () => {
     setIsFollowUpClicked(!isFollowUpClicked); // Toggle the Follow-up button state
@@ -631,7 +631,7 @@ useEffect(() => {
 
   const handleCheckboxClick = (addressId: any) => {
     axios
-      .post(`${Base_Url}bookmarks/${addressId}`,config)
+      .post(`${Base_Url}bookmarks/${addressId}`, config)
       .then((response) => {
         console.log("Bookmark added successfully:", response.data);
       })
@@ -651,7 +651,7 @@ useEffect(() => {
       const response = await axios.get(
         `${Base_Url}address/search?address=${encodeURIComponent(
           value
-        )}`,config
+        )}`, config
       );
       const results = response.data.results.filter((address: Address) =>
         address.fullAddress.toLowerCase().includes(value.toLowerCase())
@@ -692,7 +692,7 @@ useEffect(() => {
               params: {
                 address_id: selectedAddressId,
                 from_number: fromNumber,
-              },...config // Pass fromNumber directly
+              }, ...config // Pass fromNumber directly
             },
           );
           setEvents(response.data.data);
@@ -736,7 +736,7 @@ useEffect(() => {
   ) => {
     try {
       await axios.post(
-        `${Base_Url}openPhoneEventData/toggle-message-pin/${messageId}`,config
+        `${Base_Url}openPhoneEventData/toggle-message-pin/${messageId}`, config
       );
 
       setUpdatedMessages((prevMessages) => {
@@ -1000,7 +1000,7 @@ useEffect(() => {
             </div>
           </div>
         </div>
-
+        <div className="main-main">
           <div className="main-Address ">
             <span className="">
               {" "}
@@ -1038,71 +1038,69 @@ useEffect(() => {
                 </div>
               </div>
               <div>
-              <ul className="address-list">
-    <div className="search-wrapper-add">
-      {results.length > 0 && (
-        <SearchResultList results={results} onSelect={handleSelectAddress} />
-      )}
-    </div>
+                <ul className="address-list">
+                  <div className="search-wrapper-add">
+                    {results.length > 0 && (
+                      <SearchResultList results={results} onSelect={handleSelectAddress} />
+                    )}
+                  </div>
 
-    {currentAddresses.length > 0 ? (
-      currentAddresses.map((address) => (
-        <li
-          key={address.id}
-          className={`list-group-item justify-content-between ${
-            selectedAddressId === address.id ? "selected-address" : ""
-          }`}
-          onClick={() => handleAddressSelect(address.displayAddress, address.id)}
-        >
-          <div className="setaddress d-flex align-items-center gap-3">
-            <i
-              className={`bi ${
-                address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
-              } clickable-icon`}
-              style={{
-                cursor: "pointer",
-                color: address.is_bookmarked ? "blue" : "grey",
-              }}
-              onClick={() => handleBookmarkClick(address.id)}
-            ></i>
+                  {currentAddresses.length > 0 ? (
+                    currentAddresses.map((address) => (
+                      <li
+                        key={address.id}
+                        className={`list-group-item justify-content-between ${selectedAddressId === address.id ? "selected-address" : ""
+                          }`}
+                        onClick={() => handleAddressSelect(address.displayAddress, address.id)}
+                      >
+                        <div className="setaddress d-flex align-items-center gap-3">
+                          <i
+                            className={`bi ${address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
+                              } clickable-icon`}
+                            style={{
+                              cursor: "pointer",
+                              color: address.is_bookmarked ? "blue" : "grey",
+                            }}
+                            onClick={() => handleBookmarkClick(address.id)}
+                          ></i>
 
-            <span className="ml-2">
-              {address.displayAddress || address.fullAddress}
-              {address.notificationCount > 0 && (
-                <span className="notification-count ml-2">
-                  ({address.notificationCount})
-                </span>
-              )}
-            </span>
-          </div>
+                          <span className="ml-2">
+                            {address.displayAddress || address.fullAddress}
+                            {address.notificationCount > 0 && (
+                              <span className="notification-count ml-2">
+                                ({address.notificationCount})
+                              </span>
+                            )}
+                          </span>
+                        </div>
 
-          {address.fullAddress && (
-            <div className="filtered-address">
-              {address.fullAddress}
-            </div>
-          )}
-        </li>
-      ))
-    ) : (
-      <p>No addresses found.</p>
-    )}
+                        {address.fullAddress && (
+                          <div className="filtered-address">
+                            {address.fullAddress}
+                          </div>
+                        )}
+                      </li>
+                    ))
+                  ) : (
+                    <p>No addresses found.</p>
+                  )}
 
-   
-  </ul>
+
+                </ul>
 
 
 
               </div>
-           
+
             </div>
             <Pagination
-      currentPage={currentPage}
-      totalPages={totalPages}
-      onPageChange={handlePageChange}
-    />
-         
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+
           </div>
-     
+
           <div>
             <div className="Analyticdata ">
               <span>
@@ -1322,7 +1320,8 @@ useEffect(() => {
               </div>
             </div>
           </div>
-       
+
+        </div>
       </div>
 
 
