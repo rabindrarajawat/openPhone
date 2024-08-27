@@ -20,7 +20,7 @@ export class OpenPhoneEventController {
   constructor(
     private readonly openPhoneEventService: OpenPhoneEventService,
     private readonly addressService: AddressService
-  ) {}
+  ) { }
 
   // @Post()
   // async createOpenPhoneEvent(@Body() payload: any) {
@@ -61,9 +61,9 @@ export class OpenPhoneEventController {
     try {
       const signature = request.headers['openphone-signature'] as string | undefined;
       const isLocal = request.headers['is-local'] as string | undefined;
-      
+
       const isLocalEnv = isLocal === 'true';
-      
+
       if (!isLocalEnv && !signature) {
         throw new BadRequestException('Missing OpenPhone signature');
       }
@@ -116,19 +116,19 @@ export class OpenPhoneEventController {
   @Get("events-by-address-and-from")
   @UseGuards(AuthGuard)
   async getEventBodiesByAddressAndFromNumber(
-    @Query("address_id") addressId: number,
+    @Query("address_id") addressId: string, // Query parameters are typically strings
     @Query("from_number") fromNumber?: string
   ) {
     try {
-      const addressIdNum = Number(addressId);
+      const addressIdNum = Number(addressId); // Convert addressId to number
       if (isNaN(addressIdNum)) {
         throw new BadRequestException("Invalid address_id: must be a number.");
       }
-      const eventBodies =
-        await this.openPhoneEventService.findEventBodiesByAddressAndFromNumber(
-          addressIdNum,
-          fromNumber
-        );
+
+      const eventBodies = await this.openPhoneEventService.findEventBodiesByAddressAndFromNumber(
+        addressIdNum,
+        fromNumber
+      );
 
       return {
         message: `Event bodies fetched successfully for address_id: ${addressIdNum} and from: ${fromNumber || "all numbers"}`,
@@ -142,6 +142,7 @@ export class OpenPhoneEventController {
       throw new InternalServerErrorException("Failed to fetch event bodies");
     }
   }
+
 
   @Get("all")
   @UseGuards(AuthGuard)
