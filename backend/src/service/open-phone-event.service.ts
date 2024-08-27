@@ -27,7 +27,7 @@ export class OpenPhoneEventService {
     private addressService: AddressService,
     private auctionService: AuctionEventService,
     private notificationService: NotificationService
-  ) {}
+  ) { }
 
   // async create(payload: OpenPhoneEventDto) {
   //   try {
@@ -283,7 +283,7 @@ export class OpenPhoneEventService {
 
           addressCreated = true;
           addressId = savedAddress.id;
-        } 
+        }
         // else {
         //   addressId = existingAddress.id;
         // }
@@ -558,16 +558,6 @@ export class OpenPhoneEventService {
     addressId: number,
     fromNumber?: string
   ) {
-    // if (isNaN(addressId)) {
-    //   throw new BadRequestException('Invalid addressId: not a number.');
-    // }
-
-    // // Ensure fromNumber is a string or undefined
-    // if (fromNumber !== undefined && typeof fromNumber !== 'string') {
-    //   throw new BadRequestException('Invalid fromNumber: not a string.');
-    // }
-
-    // Step 1: Find events that match the provided address_id and from_number
     const initialEvents = await this.openPhoneEventRepository.find({
       where: { address_id: addressId, from: fromNumber },
       order: { id: "ASC" },
@@ -579,22 +569,22 @@ export class OpenPhoneEventService {
       );
     }
 
-    // Step 2: Extract the conversation_id from the found events
+    // Extract the conversation_id from the found events
     const conversationIds = initialEvents.map((event) => event.conversation_id);
 
-    // Step 3: Find all events that share the same conversation_id(s)
+    // Find all events that share the same conversation_id(s)
     const relatedEvents = await this.openPhoneEventRepository.find({
       where: { conversation_id: In(conversationIds) },
       order: { id: "ASC" },
     });
 
-    // Step 4: Combine initial and related events, and remove duplicates
+    // Combine initial and related events, and remove duplicates
     const allEvents = [...initialEvents, ...relatedEvents];
     const uniqueEvents = Array.from(
       new Map(allEvents.map((event) => [event.id, event])).values()
     );
 
-    // Step 5: Return unique events with only the needed fields
+    // Return unique events with only the needed fields
     return uniqueEvents.map((event) => ({
       event_type_id: event.event_type_id,
       body: event.body,
@@ -606,6 +596,7 @@ export class OpenPhoneEventService {
       is_stop: event.is_stop,
     }));
   }
+
 
   async findAllOpenPhoneEvents(): Promise<{
     messageDelivered: number;
