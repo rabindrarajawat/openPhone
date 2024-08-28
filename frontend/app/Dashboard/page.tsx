@@ -651,43 +651,6 @@ const Dashboard = () => {
 
   };
 
-<<<<<<< HEAD
-=======
-  useEffect(() => {
-    const timer = setTimeout(async () => {
-      async function fetchEvents() {
-        try {
-          const response = await axios.get(
-            `${Base_Url}openPhoneEventData/events-by-address-and-from`,
-            {
-              params: {
-                address_id: selectedAddressId,
-                from_number: fromNumber,
-              },...config // Pass fromNumber directly
-            },
-          );
-          setEvents(response.data.data);
-        } catch (error) {
-        } finally {
-        }
-      }
-
-      fetchEvents();
-    }, 900);
-    return () => clearTimeout(timer);
-  }, [selectedAddressId, fromNumber]);
-
-  const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>(
-    (acc, message) => {
-      if (!acc[message.conversation_id]) {
-        acc[message.conversation_id] = [];
-      }
-      acc[message.conversation_id].push(message);
-      return acc;
-    },
-    {}
-  );
->>>>>>> 460155230895388329ae8d91cfcc12253eac7c18
 
   const handleFilterChange = (type: "all" | "bookmarked" | "default") => {
     setFilterOption(type);
