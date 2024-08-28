@@ -9,7 +9,8 @@ import "./dashboard.css";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { SearchResultList } from "../SearchResultList/SearchResultList";
-import Pagination from "../Pagination/pagination";
+import { config } from "process";
+import  Pagination  from "../Pagination/pagination";
 
 interface Address {
   fullAddress: string;
@@ -162,23 +163,16 @@ const Dashboard = () => {
 
   const addressesPerPage = 9;
 
-    // Retrieve Token
-    const token = localStorage.getItem("authToken");
 
-  
 
-    const config = useMemo(() => ({
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }), [token]);
-  
-    console.log("Token being used:", token); // Log the token to check if its valid
-  
 
 
 
   useEffect(() => {
+
+    // Retrieve Token
+   
+  
     const storedPins = localStorage.getItem("pinnedConversations");
     if (storedPins) {
       setPinnedConversations(new Set<string>(JSON.parse(storedPins)));
@@ -197,6 +191,17 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+
+    // Retrieve Token
+    const token = localStorage.getItem('authToken');
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    console.log('Token being used:', token);
+  
       try {
         // Fetch all addresses with the token in the headers
         console.log("Config before getalladdress:", config);
@@ -257,10 +262,21 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, [Base_Url,config]);
+  }, [Base_Url]);
 
 
   useEffect(() => {
+
+    // Retrieve Token
+    const token = localStorage.getItem('authToken');
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    console.log('Token being used:', token);
+  
     const fetchFilteredAddresses = async () => {
       let deliveredAddresses = [];
       let receivedAddresses = [];
@@ -290,11 +306,22 @@ const Dashboard = () => {
     };
 
     fetchFilteredAddresses();
-  }, [deliveredChecked, receivedChecked, addresses2,Base_Url,config]);
+  }, [deliveredChecked, receivedChecked, addresses2,Base_Url]);
 
 
 
   useEffect(() => {
+
+    // Retrieve Token
+    const token = localStorage.getItem('authToken');
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    console.log('Token being used:', token);
+  
     const fetchEventCounts = async () => {
       try {
         const response = await fetch(
@@ -312,13 +339,24 @@ const Dashboard = () => {
     };
 
     fetchEventCounts();
-  }, [Base_Url,config]); // Empty dependency array means this effect runs once on mount
+  }, [Base_Url]); // Empty dependency array means this effect runs once on mount
 
 
 
 
 
   useEffect(() => {
+
+    // Retrieve Token
+    const token = localStorage.getItem('authToken');
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    console.log('Token being used:', token);
+  
     if (selectedAddress && selectedAddress !== "Search Address") {
       axios
         .get(
@@ -363,7 +401,7 @@ const Dashboard = () => {
           console.error("Error fetching event data:", error);
         });
     }
-  }, [selectedAddress,Base_Url,config]);
+  }, [selectedAddress,Base_Url]);
 
   useEffect(() => {
     const timer = setTimeout(async () => {
@@ -387,7 +425,8 @@ const Dashboard = () => {
       fetchEvents();
     }, 700);
     return () => clearTimeout(timer);
-  }, [selectedAddressId, fromNumber,Base_Url,config]);
+  }, [selectedAddressId, fromNumber,Base_Url]);
+
 
  
 
@@ -405,7 +444,7 @@ const Dashboard = () => {
   const [updatedMessages, setUpdatedMessages] = useState(groupedMessages); 
   useEffect(() => {
     setUpdatedMessages(groupedMessages);
-  }, [events,Base_Url,config,groupedMessages]);
+  }, [events,Base_Url,groupedMessages]);
 
 
   const handleDefaultClick = () => {
@@ -467,9 +506,7 @@ const Dashboard = () => {
     );
   });
 
-
-
-
+    
 
   // Calculate indices for pagination
   const indexOfLastAddress = currentPage * addressesPerPage;
@@ -495,6 +532,10 @@ const Dashboard = () => {
     setCurrentPage(page);
   };
   console.log("addressesToShow", addressesToShow);
+
+
+
+
 
   const handleToggle = () => {
     setIsType(!isType);
@@ -548,8 +589,8 @@ const Dashboard = () => {
 
     axios
       .post(`${Base_Url}bookmarks/${addressId}`, {
-        is_bookmarked: newIsBookmarked, config
-      }, config
+        is_bookmarked: newIsBookmarked,config
+      }
       )
       .then((response) => {
         // Update the state only if the API call was successful
@@ -659,6 +700,17 @@ const Dashboard = () => {
   // Hook called unconditionally
   
   const toggleMessagePin = async (messageId: number, conversationId: string) => {
+
+    // Retrieve Token
+    const token = localStorage.getItem('authToken');
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    console.log('Token being used:', token);
+  
     try {
       await axios.post(`${Base_Url}openPhoneEventData/toggle-message-pin/${messageId}`, null, config);
   
