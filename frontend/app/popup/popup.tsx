@@ -1,4 +1,4 @@
-// src/popup/Popup.jsx
+
 'use client';
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
@@ -15,6 +15,7 @@ type PopupProps = {
 };
 
 const Popup = ({ show, onHide, conversationId, onSaveSuccess }: PopupProps) => {
+  const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
   const [addresses, setAddresses] = useState<string[]>([]);
   const [filteredAddresses, setFilteredAddresses] = useState<string[]>([]);
   const [selectedAddress, setSelectedAddress] = useState('');
@@ -25,7 +26,7 @@ const Popup = ({ show, onHide, conversationId, onSaveSuccess }: PopupProps) => {
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/address/getalladdress');
+        const response = await axios.get(`${Base_Url}address/getalladdress`);
         console.log('API response:', response.data);
 
         if (Array.isArray(response.data)) {
@@ -59,7 +60,7 @@ const Popup = ({ show, onHide, conversationId, onSaveSuccess }: PopupProps) => {
     }
 
     try {
-      await axios.post('http://localhost:8000/conversation-mapping/map', {
+      await axios.post(`${Base_Url}conversation-mapping/map`, {
         conversationId,
         address: selectedAddress,
       });

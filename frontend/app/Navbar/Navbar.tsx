@@ -3,9 +3,8 @@ import Image from 'next/image';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import './Navbar.css';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { SearchResultList } from "../SearchResultList/SearchResultList";
+import NotificationItem from '../notificationiItem'; // Adjust the import path as needed
 
 interface Address {
   fullAddress: string;
@@ -49,12 +48,31 @@ interface SearchBarProps {
   onSelectAddress: (address: Address) => void;
 }
 
+
 const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddress }) => {
+  const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
   const [userName, setUserName] = useState<string>('');
   const [input, setInput] = useState<string>('');
   const [results, setResultsState] = useState<Address[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
+
+
+  const token = localStorage.getItem("authToken");
+
+if (!token) {
+  console.error("No auth token found. Please log in.");
+  return;
+}
+
+// Set the Authorization header with the token
+const config = {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+};
+
+console.log("Token being used:", token); // Log the token to check if its valid
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -71,8 +89,8 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/notifications');
-        console.log("Notifications:", response.data);
+        const response = await axios.get(`${Base_Url}notifications`,config);
+        // console.log("Notifications:", response.data);
         setNotifications(response.data.filter((notification: Notification) => !notification.is_read));
       } catch (error) {
         console.error("Error fetching notifications:", error);
@@ -85,7 +103,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
 
   const fetchData = async (value: string) => {
     try {
-      const response = await axios.get(`http://localhost:8000/address/search?address=${encodeURIComponent(value)}`);
+      const response = await axios.get(`${Base_Url}address/search?address=${encodeURIComponent(value)}`,config);
       const results = response.data.results.filter((address: Address) =>
         address.fullAddress.toLowerCase().includes(value.toLowerCase())
       );
@@ -106,9 +124,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
   const handleSelectAddress = (address: Address) => {
     setInput(address.fullAddress);
     setResultsState([]);
-    if (onSelectAddress) {
-      onSelectAddress(address);
-    }
+    onSelectAddress(address);
   };
 
   const handleBellClick = () => {
@@ -117,7 +133,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
 
   const handleMarkAsRead = async (event_id: number) => {
     try {
-      const response = await axios.post(`http://localhost:8000/notifications/${event_id}/read`);
+      const response = await axios.post(`${Base_Url}notifications/${event_id}/read`, null,config);
       console.log("Backend Response:", response);
 
       if (response.status === 200 || response.status === 201) {
@@ -136,7 +152,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
   const newNotificationCount = notifications.length;
 
   return (
-    <nav className="navbar ">
+    <nav className="navbar">
       <div className="container-fluid">
         <Image
           src="/line.svg"
@@ -146,10 +162,6 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
           height={50}
           onClick={toggleSidebar}
         />
-        {/* <div className="navbar-brand1">
-          OpenPhone
-        </div> */}
-
         <div className='nav-list'>
           <div className='profileicon'>
             <Image src="/account_circle.svg" alt="Profile" className='profile' width={50} height={50} />
@@ -168,20 +180,25 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
 
           {showDropdown && (
             <div className="notification-dropdown">
-              <div>{newNotificationCount} new messages</div>
+              <div className='main-notification'>
+                <span><i className="bi bi-telephone-inbound-fill call-icon"></i> Calls</span>
+                <span className='text-danger'> <i className="bi bi-chat-right-text icon-message"></i> Message </span>
+              </div>
+              <div className='border-bottom mt-2'></div>
+
               <ul>
                 {notifications.map(notification => (
-                  <li key={notification.event_id} className={!notification.is_read ? 'new-notification' : ''}>
-                    <strong onClick={() => handleMarkAsRead(notification.event_id)}>
-                      From: {notification.event.from}
-                    </strong><br />
-                    {/* Other notification content can go here */}
-                  </li>
+                  <NotificationItem
+                    key={notification.event_id}
+                    event={notification.event}
+                    is_read={notification.is_read}
+                    event_id={notification.event_id}
+                    handleMarkAsRead={handleMarkAsRead} id={0} address_id={null} created_at={''} />
                 ))}
               </ul>
+
             </div>
           )}
-
         </div>
       </div>
     </nav>
