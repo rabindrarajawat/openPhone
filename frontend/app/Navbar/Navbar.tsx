@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useMemo } from 'react';
 import Image from 'next/image';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import './Navbar.css';
 import 'react-toastify/dist/ReactToastify.css';
-import NotificationItem from '../notificationiItem'; // Adjust the import path as needed
+import NotificationItem from '../notificationiItem';
 
 interface Address {
   fullAddress: string;
@@ -49,30 +49,25 @@ interface SearchBarProps {
 }
 
 
-const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddress }) => {
+const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
-  const [userName, setUserName] = useState<string>('');
-  const [input, setInput] = useState<string>('');
-  const [results, setResultsState] = useState<Address[]>([]);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
 
+
+
+  const [userName, setUserName] = useState<string>('');
+
   const token = localStorage.getItem("authToken");
 
-if (!token) {
-  console.error("No auth token found. Please log in.");
-  return;
-}
 
-// Set the Authorization header with the token
-const config = {
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-};
+  const config = useMemo(() => ({
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }), [token]);
 
-console.log("Token being used:", token); // Log the token to check if its valid
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -86,11 +81,13 @@ console.log("Token being used:", token); // Log the token to check if its valid
     }
   }, []);
 
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await axios.get(`${Base_Url}notifications`,config);
-        // console.log("Notifications:", response.data);
+        const response = await axios.get(`${Base_Url}notifications`, config);
         setNotifications(response.data.filter((notification: Notification) => !notification.is_read));
       } catch (error) {
         console.error("Error fetching notifications:", error);
@@ -99,33 +96,14 @@ console.log("Token being used:", token); // Log the token to check if its valid
     };
 
     fetchNotifications();
-  }, []);
+  }, [Base_Url,config]);
 
-  const fetchData = async (value: string) => {
-    try {
-      const response = await axios.get(`${Base_Url}address/search?address=${encodeURIComponent(value)}`,config);
-      const results = response.data.results.filter((address: Address) =>
-        address.fullAddress.toLowerCase().includes(value.toLowerCase())
-      );
-      setResultsState(results);
-      if (setResults) {
-        setResults(results);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
 
-  const handleChange = (value: string) => {
-    setInput(value);
-    fetchData(value);
-  };
 
-  const handleSelectAddress = (address: Address) => {
-    setInput(address.fullAddress);
-    setResultsState([]);
-    onSelectAddress(address);
-  };
+
+
+
+
 
   const handleBellClick = () => {
     setShowDropdown(!showDropdown);
@@ -133,11 +111,10 @@ console.log("Token being used:", token); // Log the token to check if its valid
 
   const handleMarkAsRead = async (event_id: number) => {
     try {
-      const response = await axios.post(`${Base_Url}notifications/${event_id}/read`, null,config);
+      const response = await axios.post(`${Base_Url}notifications/${event_id}/read`, null, config);
       console.log("Backend Response:", response);
 
       if (response.status === 200 || response.status === 201) {
-        // Update notifications state
         setNotifications(prevNotifications =>
           prevNotifications.filter(notification => notification.event_id !== event_id)
         );
