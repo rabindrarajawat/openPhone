@@ -185,139 +185,6 @@ const Dashboard = () => {
     }
   }, []);
 
-
-  const [pinnedMessages, setPinnedMessages] = useState<Set<number>>(new Set());
-  const [messages, setMessages] = useState<EventItem[]>([]);
-
-  const handleDefaultClick = () => {
-    setFilterOption("all");
-  };
-
-  const handleTimeFilterChange = (filter: "weekly" | "monthly") => {
-    if (timeFilter === filter) {
-      // If the same filter is clicked again, remove the filter
-      setTimeFilter("all");
-      setShowAllAddresses(true); // Show all addresses if no filters are selected
-    } else {
-      setTimeFilter(filter);
-      setShowAllAddresses(false); // Hide all addresses until a filter is applied
-    }
-  };
-
-  const handleCheckboxChange = (typeId: number) => {
-    setSelectedAuctionTypes((prevSelected) => {
-      if (prevSelected.includes(typeId)) {
-        // Remove the filter if already selected
-        return prevSelected.filter((id) => id !== typeId);
-      } else {
-        return [...prevSelected, typeId];
-      }
-    });
-  };
-
-  // Helper function to check if a date is within the last week
-  const isWithinLastWeek = (dateString: string | number | Date) => {
-    const date = new Date(dateString);
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-    return date >= oneWeekAgo;
-  };
-
-  // Helper function to check if a date is within the last month
-  const isWithinLastMonth = (dateString: string | number | Date) => {
-    const date = new Date(dateString);
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
-    return date >= oneMonthAgo;
-  };
-
-  const filteredAddresses = addresses1.filter((address) => {
-
-    const matchesAuctionType = selectedAuctionTypes.length === 0 || selectedAuctionTypes.includes(address.auction_event_id);
-    const matchesBookmark = filterOption === 'all' || (filterOption === 'bookmarked' && address.is_bookmarked) || (filterOption === 'default');
-    const matchesDateFilter = selectedDateFilter === 'all' ||
-      (selectedDateFilter === 'weekly' && isWithinLastWeek(address.created_at)) ||
-      (selectedDateFilter === 'monthly' && isWithinLastMonth(address.created_at));
-    const matchesCustomDateFilter = (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
-      (!toDate || new Date(address.created_at) <= new Date(toDate));
-
-    // Apply the search filter
-    const matchesSearch = address.displayAddress
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-
-    return (
-      matchesAuctionType &&
-      matchesBookmark &&
-      matchesDateFilter &&
-      matchesCustomDateFilter &&
-      matchesSearch
-    );
-  });
-
-
-
-
-
-  // Calculate indices for pagination
-  const indexOfLastAddress = currentPage * addressesPerPage;
-  const indexOfFirstAddress = indexOfLastAddress - addressesPerPage;
-
-  // Determine the addresses to show based on the filtered results
-  const addressesToShow = filteredAddresses.length > 0
-    ? filteredAddresses.filter((address) =>
-      filteredAddresses2.some((filteredAddress) => filteredAddress.address === address.address)
-    )
-    : filteredAddresses2.length > 0
-      ? filteredAddresses2
-      : addresses1;
-
-  // Apply pagination to the addressesToShow
-  const currentAddresses = addressesToShow.slice(indexOfFirstAddress, indexOfLastAddress);
-
-  // Calculate total pages for pagination
-  const totalPages = Math.ceil(addressesToShow.length / addressesPerPage);
-
-  // Handler to change the page
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-  console.log("addressesToShow", addressesToShow);
-
-  const handleToggle = () => {
-    setIsType(!isType);
-  };
-  const handleToggle1 = () => {
-    setIsType((prevIsOpen) => !prevIsOpen);
-  };
-  const handleDate = () => {
-    setIsDate(!isDate);
-  };
-
-  const handleCustomDateToggle = () => {
-    setIsCustomDateOpen(!isCustomDateOpen);
-  };
-
-  const handleDone = () => {
-    setIsCustomDateOpen(true);
-  };
-
-  const handleReset = () => {
-    setFromDate("");
-    setToDate("");
-    setIsCustomDateOpen(true);
-  };
-
-  const handleSearchChange = (e: {
-    target: { value: React.SetStateAction<string> };
-  }) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const recordsPerPage = 6;
-
   const router = useRouter();
 
   useEffect(() => {
@@ -327,23 +194,6 @@ const Dashboard = () => {
     }
   }, [router]);
 
-
-  // Retrieve Token
-  const token = localStorage.getItem("authToken");
-
-  if (!token) {
-    console.error("No auth token found. Please log in.");
-    return;
-  }
-
-  // Set the Authorization header with the token
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-
-  console.log("Token being used:", token); // Log the token to check if its valid
 
   useEffect(() => {
     const fetchData = async () => {
@@ -407,7 +257,7 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, []);
+  }, [Base_Url,config]);
 
 
   useEffect(() => {
@@ -750,55 +600,6 @@ const Dashboard = () => {
 
 
 
-  useEffect(() => {
-    if (selectedAddress && selectedAddress !== "Search Address") {
-      axios
-        .get(
-          `${Base_Url}openPhoneEventData/events?address=${encodeURIComponent(
-            selectedAddress
-          )}`, config
-        )
-        .then((response) => {
-          const data = response.data.data;
-          if (data && Array.isArray(data.events)) {
-            setEventData(data.events);
-
-            // Filter events to only include those with an address_id
-            const eventsWithAddressId = data.events.filter(
-              (event: any) => event.address_id
-            );
-
-            // Extract unique 'fromNumber' values from filtered events
-            const uniqueNumbers = Array.from(
-              new Set<string>(
-                eventsWithAddressId.map((event: any) => event.from)
-              )
-            );
-            setUniqueFromNumbers(uniqueNumbers);
-
-            if (eventsWithAddressId.length > 0) {
-              setPhoneNumber(eventsWithAddressId[0].to);
-              setFromNumber(eventsWithAddressId[0].from);
-            } else {
-              setPhoneNumber("");
-              setFromNumber("");
-            }
-            setMessageDelivered(data.messageDelivered || 0);
-            setMessageResponse(data.messageResponse || 0);
-            setCall(data.call || 0);
-            setCallResponse(data.callResponse || 0);
-          } else {
-            console.error("Events data is not an array or is missing");
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching event data:", error);
-        });
-    }
-  }, [selectedAddress]);
-
-
-
 
   const toggleMessageExpansion = (index: any) => {
     setExpandedMessages((prev) => {
@@ -824,16 +625,7 @@ const Dashboard = () => {
     setEventData([]);
   };
 
-  const handleCheckboxClick = (addressId: any) => {
-    axios
-      .post(`${Base_Url}bookmarks/${addressId}`, config)
-      .then((response) => {
-        console.log("Bookmark added successfully:", response.data);
-      })
-      .catch((error) => {
-        console.error("Error adding bookmark:", error);
-      });
-  };
+
   const handleAddressSelect1 = (address: Address) => {
     setSelectedAddress(address.fullAddress);
   };
@@ -841,22 +633,7 @@ const Dashboard = () => {
 
 
 
-  const fetchData = async (value: string) => {
-    try {
-      const response = await axios.get(
-        `${Base_Url}address/search?address=${encodeURIComponent(
-          value
-        )}`, config
-      );
-      const results = response.data.results.filter((address: Address) =>
-        address.fullAddress.toLowerCase().includes(value.toLowerCase())
-      );
-      setResultsState(results);
-
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+ 
 
 
 
@@ -874,40 +651,6 @@ const Dashboard = () => {
 
   };
 
-  useEffect(() => {
-    const timer = setTimeout(async () => {
-      async function fetchEvents() {
-        try {
-          const response = await axios.get(
-            `${Base_Url}openPhoneEventData/events-by-address-and-from`,
-            {
-              params: {
-                address_id: selectedAddressId,
-                from_number: fromNumber,
-              }, ...config // Pass fromNumber directly
-            },
-          );
-          setEvents(response.data.data);
-        } catch (error) {
-        } finally {
-        }
-      }
-
-      fetchEvents();
-    }, 900);
-    return () => clearTimeout(timer);
-  }, [selectedAddressId, fromNumber]);
-
-  const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>(
-    (acc, message) => {
-      if (!acc[message.conversation_id]) {
-        acc[message.conversation_id] = [];
-      }
-      acc[message.conversation_id].push(message);
-      return acc;
-    },
-    {}
-  );
 
   const handleFilterChange = (type: "all" | "bookmarked" | "default") => {
     setFilterOption(type);
@@ -917,10 +660,8 @@ const Dashboard = () => {
   
   const toggleMessagePin = async (messageId: number, conversationId: string) => {
     try {
-      await axios.post(
-        `${Base_Url}openPhoneEventData/toggle-message-pin/${messageId}`, config
-      );
-
+      await axios.post(`${Base_Url}openPhoneEventData/toggle-message-pin/${messageId}`, null, config);
+  
       setUpdatedMessages((prevMessages) => {
         const updatedMessages = { ...prevMessages };
         const conversationMessages = updatedMessages[conversationId].map((msg) => {
@@ -1181,155 +922,155 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="main-main">
-          <div className="main-Address ">
-            <span className="">
-              {" "}
-              <Image src="/User.svg" alt="users" width={24} height={24} className="person-icon ms-4" />
+
+        <div className="main-Address ">
+          <span className="">
+            {" "}
+            <Image src="/User.svg" alt="users" width={24} height={24} className="person-icon ms-4" />
+          </span>
+          <div className="Address ms-4">Address</div>
+          <div className="main-search">
+            <div className="search-box ">
+              <span className="icon">
+                <Image src="/Icon.svg" alt="icon" width={24} height={24} />
+              </span>
+              <input
+                type="text"
+                placeholder="Search Address"
+                value={searchQuery}
+                onChange={handleSearchChange}
+              ></input>
+            </div>
+
+            <div className="icon-labels">
+              <div
+                className={`bookmark-container text-center ${filterOption === "bookmarked" ? "active-filter" : ""
+                  }`}
+                onClick={() => handleFilterChange("bookmarked")}
+              >
+                <i className="bi bi-bookmark ms-4"></i>
+                <div className="ms-4">Select all</div>
+              </div>
+              <div
+                className="redo-container text-center"
+                onClick={handleDefaultClick}
+              >
+                <Image src="/redo.svg" alt="redo" width={24} height={24} className="ms-3" />
+                <div>Default</div>
+              </div>
+            </div>
+            <div>
+              <ul className="address-list">
+                <div className="search-wrapper-add">
+                  {results.length > 0 && (
+                    <SearchResultList results={results} onSelect={handleSelectAddress} />
+                  )}
+                </div>
+
+                {currentAddresses.length > 0 ? (
+                  currentAddresses.map((address) => (
+                    <li
+                      key={address.id}
+                      className={`list-group-item justify-content-between ${selectedAddressId === address.id ? "selected-address" : ""
+                        }`}
+                      onClick={() => handleAddressSelect(address.displayAddress, address.id)}
+                    >
+                      <div className="setaddress d-flex align-items-center gap-3">
+                        <i
+                          className={`bi ${address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
+                            } clickable-icon`}
+                          style={{
+                            cursor: "pointer",
+                            color: address.is_bookmarked ? "blue" : "grey",
+                          }}
+                          onClick={() => handleBookmarkClick(address.id)}
+                        ></i>
+
+                        <span className="ml-2">
+                          {address.displayAddress || address.fullAddress}
+                          {address.notificationCount > 0 && (
+                            <span className="notification-count ml-2">
+                              ({address.notificationCount})
+                            </span>
+                          )}
+                        </span>
+                      </div>
+
+                      {address.fullAddress && (
+                        <div className="filtered-address">
+                          {address.fullAddress}
+                        </div>
+                      )}
+                    </li>
+                  ))
+                ) : (
+                  <p>No addresses found.</p>
+                )}
+
+
+              </ul>
+
+
+
+            </div>
+
+          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+
+        </div>
+
+        <div>
+          <div className="Analyticdata ">
+            <span>
+              <i className="bi bi-bar-chart-line-fill"></i>
             </span>
-            <div className="Address ms-4">Address</div>
-            <div className="main-search">
-              <div className="search-box ">
-                <span className="icon">
-                  <Image src="/Icon.svg" alt="icon" width={24} height={24} />
-                </span>
+            <span className="ms-4">Analytic Data of Selected Address</span>
+          </div>
+          <div className=" main-message">
+            <div className="logos-row-msg">
+              <div className="nav-msg">
+                <div className="message Delivered">Message Delivered</div>
                 <input
                   type="text"
-                  placeholder="Search Address"
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                ></input>
+                  className="round-input"
+                  value={messageDelivered}
+                  readOnly
+                />
               </div>
-
-              <div className="icon-labels">
-                <div
-                  className={`bookmark-container text-center ${filterOption === "bookmarked" ? "active-filter" : ""
-                    }`}
-                  onClick={() => handleFilterChange("bookmarked")}
-                >
-                  <i className="bi bi-bookmark ms-4"></i>
-                  <div className="ms-4">Select all</div>
-                </div>
-                <div
-                  className="redo-container text-center"
-                  onClick={handleDefaultClick}
-                >
-                  <Image src="/redo.svg" alt="redo" width={24} height={24} className="ms-3" />
-                  <div>Default</div>
-                </div>
+              <div className="nav-msg">
+                <div className="message response1 ">Message Response</div>
+                <input
+                  type="text"
+                  className="round-input"
+                  value={messageResponse}
+                  readOnly
+                />
               </div>
-              <div>
-                <ul className="address-list">
-                  <div className="search-wrapper-add">
-                    {results.length > 0 && (
-                      <SearchResultList results={results} onSelect={handleSelectAddress} />
-                    )}
-                  </div>
-
-                  {currentAddresses.length > 0 ? (
-                    currentAddresses.map((address) => (
-                      <li
-                        key={address.id}
-                        className={`list-group-item justify-content-between ${selectedAddressId === address.id ? "selected-address" : ""
-                          }`}
-                        onClick={() => handleAddressSelect(address.displayAddress, address.id)}
-                      >
-                        <div className="setaddress d-flex align-items-center gap-3">
-                          <i
-                            className={`bi ${address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
-                              } clickable-icon`}
-                            style={{
-                              cursor: "pointer",
-                              color: address.is_bookmarked ? "blue" : "grey",
-                            }}
-                            onClick={() => handleBookmarkClick(address.id)}
-                          ></i>
-
-                          <span className="ml-2">
-                            {address.displayAddress || address.fullAddress}
-                            {address.notificationCount > 0 && (
-                              <span className="notification-count ml-2">
-                                ({address.notificationCount})
-                              </span>
-                            )}
-                          </span>
-                        </div>
-
-                        {address.fullAddress && (
-                          <div className="filtered-address">
-                            {address.fullAddress}
-                          </div>
-                        )}
-                      </li>
-                    ))
-                  ) : (
-                    <p>No addresses found.</p>
-                  )}
-
-
-                </ul>
-
-
-
+              <div className="nav-msg">
+                <div className="message call-1">Call </div>
+                <input
+                  type="text"
+                  className="round-input"
+                  value={call}
+                  readOnly
+                />
               </div>
-
-            </div>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-
-          </div>
-
-          <div>
-            <div className="Analyticdata ">
-              <span>
-                <i className="bi bi-bar-chart-line-fill"></i>
-              </span>
-              <span className="ms-4">Analytic Data of Selected Address</span>
-            </div>
-            <div className=" main-message">
-              <div className="logos-row-msg">
-                <div className="nav-msg">
-                  <div className="message Delivered">Message Delivered</div>
-                  <input
-                    type="text"
-                    className="round-input"
-                    value={messageDelivered}
-                    readOnly
-                  />
-                </div>
-                <div className="nav-msg">
-                  <div className="message response1 ">Message Response</div>
-                  <input
-                    type="text"
-                    className="round-input"
-                    value={messageResponse}
-                    readOnly
-                  />
-                </div>
-                <div className="nav-msg">
-                  <div className="message call-1">Call </div>
-                  <input
-                    type="text"
-                    className="round-input"
-                    value={call}
-                    readOnly
-                  />
-                </div>
-                <div className="nav-msg">
-                  <div className="message call-response-1">Call Response</div>
-                  <input
-                    type="text"
-                    className="round-input"
-                    value={callResponse}
-                    readOnly
-                  />
-                </div>
+              <div className="nav-msg">
+                <div className="message call-response-1">Call Response</div>
+                <input
+                  type="text"
+                  className="round-input"
+                  value={callResponse}
+                  readOnly
+                />
               </div>
             </div>
           </div>
+        </div>
 
         <div className="conversation">
           {selectedAddress && (
@@ -1411,43 +1152,60 @@ const Dashboard = () => {
                                         Read Less
                                       </button>
 
-                                        <i
-                                          className={`bi ${message.is_message_pinned
-                                            ? "bi-star-fill text-warning"
-                                            : "bi-star"
-                                            } star-icon`}
-                                          onClick={() =>
-                                            toggleMessagePin(
-                                              message.id,
-                                              conversationId
-                                            )
-                                          }
-                                        ></i>
-                                      </div>
-                                    ) : (
-                                      <div>
-                                        {message.body &&
-                                          message.body.length > 100 ? (
+                                      <i
+                                        className={`bi ${message.is_message_pinned
+                                          ? "bi-star-fill text-warning"
+                                          : "bi-star"
+                                          } star-icon`}
+                                        onClick={() =>
+                                          toggleMessagePin(
+                                            message.id,
+                                            conversationId
+                                          )
+                                        }
+                                      ></i>
+                                    </div>
+                                  ) : (
+                                    <div>
+                                      {message.body &&
+                                        message.body.length > 100 ? (
+                                        <>
+                                          {message.body.substring(0, 100)}
+                                          ...
+                                          <button
+                                            onClick={() =>
+                                              toggleMessageExpansion(index)
+                                            }
+                                            className={`read-more-btn ${message.event_type_id === 1
+                                              ? "read-more-btn-right"
+                                              : "read-more-btn-left"
+                                              }`}
+                                          >
+                                            Read More
+                                          </button>
+                                          <i
+                                            style={{ cursor: "pointer" }}
+                                            className={`bi ${message.is_message_pinned
+                                              ? "bi-star-fill text-warning"
+                                              : "bi-star"
+                                              } star-icon cursor-pointer`}
+                                            onClick={() =>
+                                              toggleMessagePin(
+                                                message.id,
+                                                conversationId
+                                              )
+                                            }
+                                          ></i>
+                                        </>
+                                      ) : (
+                                        (
                                           <>
-                                            {message.body.substring(0, 100)}
-                                            ...
-                                            <button
-                                              onClick={() =>
-                                                toggleMessageExpansion(index)
-                                              }
-                                              className={`read-more-btn ${message.event_type_id === 1
-                                                ? "read-more-btn-right"
-                                                : "read-more-btn-left"
-                                                }`}
-                                            >
-                                              Read More
-                                            </button>
+                                            {message.body}{" "}
                                             <i
-                                              style={{ cursor: "pointer" }}
                                               className={`bi ${message.is_message_pinned
                                                 ? "bi-star-fill text-warning"
                                                 : "bi-star"
-                                                } star-icon cursor-pointer`}
+                                                } star-icon`}
                                               onClick={() =>
                                                 toggleMessagePin(
                                                   message.id,
@@ -1456,53 +1214,35 @@ const Dashboard = () => {
                                               }
                                             ></i>
                                           </>
-                                        ) : (
-                                          (
-                                            <>
-                                              {message.body}{" "}
-                                              <i
-                                                className={`bi ${message.is_message_pinned
-                                                  ? "bi-star-fill text-warning"
-                                                  : "bi-star"
-                                                  } star-icon`}
-                                                onClick={() =>
-                                                  toggleMessagePin(
-                                                    message.id,
-                                                    conversationId
-                                                  )
-                                                }
-                                              ></i>
-                                            </>
-                                          ) || "No message body"
-                                        )}
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                                <div
-                                  className={
-                                    message.event_type_id === 1
-                                      ? "message-date message-date-right"
-                                      : "message-date message-date-left"
-                                  }
-                                >
-                                  {new Date(
-                                    message.created_at
-                                  ).toLocaleDateString()}
+                                        ) || "No message body"
+                                      )}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
-                            )
-                          )}
-                        </div>
-                      );
-                    })
-                    : "Loading..."}
-                </div>
+                              <div
+                                className={
+                                  message.event_type_id === 1
+                                    ? "message-date message-date-right"
+                                    : "message-date message-date-left"
+                                }
+                              >
+                                {new Date(
+                                  message.created_at
+                                ).toLocaleDateString()}
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    );
+                  })
+                  : "Loading..."}
               </div>
             </div>
           </div>
-
         </div>
+
       </div>
 
 
