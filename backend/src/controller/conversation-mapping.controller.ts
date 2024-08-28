@@ -1,7 +1,10 @@
-import { BadRequestException, Body, Controller, Post } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Post, UseGuards } from "@nestjs/common";
+import { AuthGuard } from "src/authguard/auth.guard";
 import { ConversationMapingService } from "src/service/conversation-mapping.service";
 
 @Controller('conversation-mapping')
+@UseGuards(AuthGuard)
+
 export class ConversationMapingController {
     constructor(private readonly conversationMapingService: ConversationMapingService) { }
 
