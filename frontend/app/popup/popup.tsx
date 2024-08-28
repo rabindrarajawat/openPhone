@@ -14,74 +14,75 @@ type PopupProps = {
   onSaveSuccess: () => void; // Add the onSaveSuccess prop
 };
 
-const Popup = ({ show, onHide, conversationId, onSaveSuccess }: PopupProps) => {
+const Popup = 
+({ show, onHide, conversationId, onSaveSuccess }: PopupProps) => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
-  const [addresses, setAddresses] = useState<string[]>([]);
-  const [filteredAddresses, setFilteredAddresses] = useState<string[]>([]);
-  const [selectedAddress, setSelectedAddress] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownToggleRef = useRef<HTMLButtonElement>(null);
+  // const [addresses, setAddresses] = useState<string[]>([]);
+  // const [filteredAddresses, setFilteredAddresses] = useState<string[]>([]);
+  // const [selectedAddress, setSelectedAddress] = useState('');
+  // const [searchTerm, setSearchTerm] = useState('');
+  // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // const dropdownToggleRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    const fetchAddresses = async () => {
-      try {
-        const response = await axios.get(`${Base_Url}address/getalladdress`);
-        console.log('API response:', response.data);
+  // useEffect(() => {
+  //   const fetchAddresses = async () => {
+  //     try {
+  //       const response = await axios.get(`${Base_Url}address/getalladdress`);
+  //       console.log('API response:', response.data);
 
-        if (Array.isArray(response.data)) {
-          const addressesArray = response.data.map((item: any) => item.address);
-          setAddresses(addressesArray);
-          setFilteredAddresses(addressesArray);
-        } else {
-          console.error('Unexpected API response format:', response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching addresses:', error);
-      }
-    };
+  //       if (Array.isArray(response.data)) {
+  //         const addressesArray = response.data.map((item: any) => item.address);
+  //         setAddresses(addressesArray);
+  //         setFilteredAddresses(addressesArray);
+  //       } else {
+  //         console.error('Unexpected API response format:', response.data);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching addresses:', error);
+  //     }
+  //   };
 
-    fetchAddresses();
-  }, []);
+  //   fetchAddresses();
+  // }, []);
 
-  useEffect(() => {
-    setFilteredAddresses(
-      addresses.filter((address) =>
-        address.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-  }, [searchTerm, addresses]);
+  // useEffect(() => {
+  //   setFilteredAddresses(
+  //     addresses.filter((address) =>
+  //       address.toLowerCase().includes(searchTerm.toLowerCase())
+  //     )
+  //   );
+  // }, [searchTerm, addresses]);
 
-  const handleSave = async () => {
-    console.log('Save button clicked'); // Debug line
-    if (!selectedAddress) {
-      toast.error('Please select an address before saving.');
-      return;
-    }
+  // const handleSave = async () => {
+  //   console.log('Save button clicked'); // Debug line
+  //   if (!selectedAddress) {
+  //     toast.error('Please select an address before saving.');
+  //     return;
+  //   }
 
-    try {
-      await axios.post(`${Base_Url}conversation-mapping/map`, {
-        conversationId,
-        address: selectedAddress,
-      });
-      toast.success('Saved successfully!');
-      setTimeout(() => {
-        onHide();
-        onSaveSuccess(); // Call the function to refresh data
-      }, 2000); // Delay hiding the modal to allow toast to show
-    } catch (error) {
-      console.error('Error saving data:', error);
-      toast.error('Failed to save data.');
-    }
-  };
+  //   try {
+  //     await axios.post(`${Base_Url}conversation-mapping/map`, {
+  //       conversationId,
+  //       address: selectedAddress,
+  //     });
+  //     toast.success('Saved successfully!');
+  //     setTimeout(() => {
+  //       onHide();
+  //       onSaveSuccess(); // Call the function to refresh data
+  //     }, 2000); // Delay hiding the modal to allow toast to show
+  //   } catch (error) {
+  //     console.error('Error saving data:', error);
+  //     toast.error('Failed to save data.');
+  //   }
+  // };
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(prev => !prev);
-  };
+  // const toggleDropdown = () => {
+  //   setIsDropdownOpen(prev => !prev);
+  // };
 
   return (
     <>
-      <Modal show={show} onHide={onHide} centered>
+      {/* <Modal show={show} onHide={onHide} centered>
         <Modal.Header closeButton>
           <Modal.Title>Select Address</Modal.Title>
         </Modal.Header>
@@ -136,7 +137,7 @@ const Popup = ({ show, onHide, conversationId, onSaveSuccess }: PopupProps) => {
           </Button>
         </Modal.Footer>
       </Modal>
-      <ToastContainer />
+      <ToastContainer /> */}
     </>
   );
 };
