@@ -176,26 +176,28 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
           </div>
 
           {showDropdown && (
-            <div className="notification-dropdown">
-              <div className='main-notification'>
-                <span><i className="bi bi-telephone-inbound-fill call-icon"></i> Calls</span>
-                <span className='text-danger'> <i className="bi bi-chat-right-text icon-message"></i> Message </span>
-              </div>
-              <div className='border-bottom mt-2'></div>
+  <div className="notification-dropdown">
+    <div className='main-notification'>
+      <span><i className="bi bi-telephone-inbound-fill call-icon"></i> Calls</span>
+      <span className='text-danger'> <i className="bi bi-chat-right-text icon-message"></i> Message </span>
+    </div>
+    <div className='border-bottom mt-2'></div>
 
-              <ul>
-                {notifications.map(notification => (
-                  <NotificationItem
-                    key={notification.event_id}
-                    event={notification.event}
-                    is_read={notification.is_read}
-                    event_id={notification.event_id}
-                    handleMarkAsRead={handleMarkAsRead} id={0} address_id={null} created_at={''} />
-                ))}
-              </ul>
+    <ul>
+      {notifications.map(notification => (
+        <li key={notification.event_id}>
+          <NotificationItem
+            event={notification.event}
+            is_read={notification.is_read}
+            event_id={notification.event_id}
+            handleMarkAsRead={handleMarkAsRead} id={0} address_id={null} created_at={''} 
+          />
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
 
-            </div>
-          )}
         </div>
       </div>
     </nav>
