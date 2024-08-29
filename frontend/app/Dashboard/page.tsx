@@ -10,7 +10,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { SearchResultList } from "../SearchResultList/SearchResultList";
 import { config } from "process";
-import  Pagination  from "../Pagination/pagination";
+import Pagination from "../Pagination/pagination";
 
 interface Address {
   fullAddress: string;
@@ -96,7 +96,7 @@ interface EventItem {
 
 const Dashboard = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
-  
+
   const [selectedAddress, setSelectedAddress] = useState("Search Address");
   const [eventData, setEventData] = useState<EventItem[]>([]);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -151,7 +151,7 @@ const Dashboard = () => {
 
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  
+
   const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(new Set<string>());
   const [searchQuery, setSearchQuery] = useState('');
   const [deliveredChecked, setDeliveredChecked] = useState(false);
@@ -171,8 +171,8 @@ const Dashboard = () => {
   useEffect(() => {
 
     // Retrieve Token
-   
-  
+
+
     const storedPins = localStorage.getItem("pinnedConversations");
     if (storedPins) {
       setPinnedConversations(new Set<string>(JSON.parse(storedPins)));
@@ -192,16 +192,16 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
 
-    // Retrieve Token
-    const token = localStorage.getItem('authToken');
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
+      // Retrieve Token
+      const token = localStorage.getItem('authToken');
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
 
-    console.log('Token being used:', token);
-  
+      console.log('Token being used:', token);
+
       try {
         // Fetch all addresses with the token in the headers
         console.log("Config before getalladdress:", config);
@@ -276,7 +276,7 @@ const Dashboard = () => {
     };
 
     console.log('Token being used:', token);
-  
+
     const fetchFilteredAddresses = async () => {
       let deliveredAddresses = [];
       let receivedAddresses = [];
@@ -306,7 +306,7 @@ const Dashboard = () => {
     };
 
     fetchFilteredAddresses();
-  }, [deliveredChecked, receivedChecked, addresses2,Base_Url]);
+  }, [deliveredChecked, receivedChecked, addresses2, Base_Url]);
 
 
 
@@ -321,7 +321,7 @@ const Dashboard = () => {
     };
 
     console.log('Token being used:', token);
-  
+
     const fetchEventCounts = async () => {
       try {
         const response = await fetch(
@@ -356,7 +356,7 @@ const Dashboard = () => {
     };
 
     console.log('Token being used:', token);
-  
+
     if (selectedAddress && selectedAddress !== "Search Address") {
       axios
         .get(
@@ -401,7 +401,7 @@ const Dashboard = () => {
           console.error("Error fetching event data:", error);
         });
     }
-  }, [selectedAddress,Base_Url]);
+  }, [selectedAddress, Base_Url]);
 
   useEffect(() => {
     // Retrieve Token
@@ -412,31 +412,31 @@ const Dashboard = () => {
       },
     };
 
-   const timer = setTimeout(async () => {
-     async function fetchEvents() {
-       try {
-         const response = await axios.get(
-           `${Base_Url}openPhoneEventData/events-by-address-and-from`,
-           {
-             params: {
-               address_id: selectedAddressId,
-               from_number: fromNumber,
-             }, ...config // Pass fromNumber directly
-           },
-         );
-         setEvents(response.data.data);
-       } catch (error) {
-       } finally {
-       }
-     }
+    const timer = setTimeout(async () => {
+      async function fetchEvents() {
+        try {
+          const response = await axios.get(
+            `${Base_Url}openPhoneEventData/events-by-address-and-from`,
+            {
+              params: {
+                address_id: selectedAddressId,
+                from_number: fromNumber,
+              }, ...config // Pass fromNumber directly
+            },
+          );
+          setEvents(response.data.data);
+        } catch (error) {
+        } finally {
+        }
+      }
 
-     fetchEvents();
-   }, 700);
-   return () => clearTimeout(timer);
- }, [selectedAddressId, fromNumber,Base_Url]);
+      fetchEvents();
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [selectedAddressId, fromNumber, Base_Url]);
 
 
- 
+
 
   const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>(
     (acc, message) => {
@@ -448,11 +448,11 @@ const Dashboard = () => {
     },
     {}
   );
-  
-  const [updatedMessages, setUpdatedMessages] = useState(groupedMessages); 
+
+  const [updatedMessages, setUpdatedMessages] = useState(groupedMessages);
   useEffect(() => {
     setUpdatedMessages(groupedMessages);
-  }, [events,Base_Url,groupedMessages]);
+  }, [events, Base_Url, groupedMessages]);
 
 
   const handleDefaultClick = () => {
@@ -514,7 +514,7 @@ const Dashboard = () => {
     );
   });
 
-    
+
 
   // Calculate indices for pagination
   const indexOfLastAddress = currentPage * addressesPerPage;
@@ -551,7 +551,7 @@ const Dashboard = () => {
   const handleToggle1 = () => {
     setIsType((prevIsOpen) => !prevIsOpen);
   };
- 
+
 
   const handleCustomDateToggle = () => {
     setIsCustomDateOpen(!isCustomDateOpen);
@@ -597,7 +597,7 @@ const Dashboard = () => {
 
     axios
       .post(`${Base_Url}bookmarks/${addressId}`, {
-        is_bookmarked: newIsBookmarked,config
+        is_bookmarked: newIsBookmarked, config
       }
       )
       .then((response) => {
@@ -682,7 +682,7 @@ const Dashboard = () => {
 
 
 
- 
+
 
 
 
@@ -692,7 +692,7 @@ const Dashboard = () => {
 
 
 
- 
+
 
   const handleSelectAddress = (address: Address) => {
     setInput(address.fullAddress);
@@ -706,7 +706,7 @@ const Dashboard = () => {
   };
 
   // Hook called unconditionally
-  
+
   const toggleMessagePin = async (messageId: number, conversationId: string) => {
 
     // Retrieve Token
@@ -718,10 +718,10 @@ const Dashboard = () => {
     };
 
     console.log('Token being used:', token);
-  
+
     try {
       await axios.post(`${Base_Url}openPhoneEventData/toggle-message-pin/${messageId}`, null, config);
-  
+
       setUpdatedMessages((prevMessages) => {
         const updatedMessages = { ...prevMessages };
         const conversationMessages = updatedMessages[conversationId].map((msg) => {
@@ -740,7 +740,7 @@ const Dashboard = () => {
       console.error('Failed to toggle pin state:', error);
     }
   };
-  
+
   return (
     <div>
       <Navbar
