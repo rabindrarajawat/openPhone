@@ -22,53 +22,15 @@ export class OpenPhoneEventController {
     private readonly addressService: AddressService
   ) {}
 
-  // @Post()
-  // async createOpenPhoneEvent(@Body() payload: any) {
-  //   try {
-  //     console.log(
-  //       "🚀 ~ OpenPhoneEventController ~ createOpenPhoneEvent ~ payload:",
-  //       payload
-  //     );
-  //     const { openPhoneEvent, addressCreated } =
-  //       await this.openPhoneEventService.create(payload);
-
-  //     let responseMessage = "Open phone event data created successfully.";
-  //     if (addressCreated) {
-  //       responseMessage += " New address data created.";
-  //     }
-
-  //     return {
-  //       message: responseMessage,
-  //       openPhoneEventId: openPhoneEvent.id,
-  //       addressCreated: addressCreated,
-  //     };
-  //   } catch (error) {
-  //     console.error("Error in createOpenPhoneEvent:", error);
-  //     throw new InternalServerErrorException(
-  //       "Failed to create open phone event"
-  //     );
-  //   }
-  // }
-
-
-
-
   @Post()
-  async createOpenPhoneEvent(
-    @Body() payload: any,
-    @Req() request: Request
-  ) {
+  async createOpenPhoneEvent(@Body() payload: any) {
     try {
-      const signature = request.headers['openphone-signature'] as string | undefined;
-      const isLocal = request.headers['is-local'] as string | undefined;
-      
-      const isLocalEnv = isLocal === 'true';
-      
-      if (!isLocalEnv && !signature) {
-        throw new BadRequestException('Missing OpenPhone signature');
-      }
-
-      const { openPhoneEvent, addressCreated } = await this.openPhoneEventService.create(payload, signature || '', isLocalEnv);
+      console.log(
+        "🚀 ~ OpenPhoneEventController ~ createOpenPhoneEvent ~ payload:",
+        payload
+      );
+      const { openPhoneEvent, addressCreated } =
+        await this.openPhoneEventService.create(payload);
 
       let responseMessage = "Open phone event data created successfully.";
       if (addressCreated) {
@@ -82,12 +44,50 @@ export class OpenPhoneEventController {
       };
     } catch (error) {
       console.error("Error in createOpenPhoneEvent:", error);
-      if (error instanceof BadRequestException) {
-        throw error;
-      }
-      throw new InternalServerErrorException("Failed to create open phone event");
+      throw new InternalServerErrorException(
+        "Failed to create open phone event"
+      );
     }
   }
+
+
+
+
+  // @Post()
+  // async createOpenPhoneEvent(
+  //   @Body() payload: any,
+  //   @Req() request: Request
+  // ) {
+  //   try {
+  //     const signature = request.headers['openphone-signature'] as string | undefined;
+  //     const isLocal = request.headers['is-local'] as string | undefined;
+      
+  //     const isLocalEnv = isLocal === 'true';
+      
+  //     if (!isLocalEnv && !signature) {
+  //       throw new BadRequestException('Missing OpenPhone signature');
+  //     }
+
+  //     const { openPhoneEvent, addressCreated } = await this.openPhoneEventService.create(payload, signature || '', isLocalEnv);
+
+  //     let responseMessage = "Open phone event data created successfully.";
+  //     if (addressCreated) {
+  //       responseMessage += " New address data created.";
+  //     }
+
+  //     return {
+  //       message: responseMessage,
+  //       openPhoneEventId: openPhoneEvent.id,
+  //       addressCreated: addressCreated,
+  //     };
+  //   } catch (error) {
+  //     console.error("Error in createOpenPhoneEvent:", error);
+  //     if (error instanceof BadRequestException) {
+  //       throw error;
+  //     }
+  //     throw new InternalServerErrorException("Failed to create open phone event");
+  //   }
+  // }
 
 
 

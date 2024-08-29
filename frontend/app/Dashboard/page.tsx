@@ -96,7 +96,7 @@ interface EventItem {
 
 const Dashboard = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
-  
+
   const [selectedAddress, setSelectedAddress] = useState("Search Address");
   const [eventData, setEventData] = useState<EventItem[]>([]);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -151,7 +151,7 @@ const Dashboard = () => {
 
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  
+
   const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(new Set<string>());
   const [searchQuery, setSearchQuery] = useState('');
   const [deliveredChecked, setDeliveredChecked] = useState(false);
@@ -166,6 +166,10 @@ const Dashboard = () => {
 
 
 
+
+
+
+  useEffect(() => {
 
 
   useEffect(() => {
@@ -263,6 +267,7 @@ const Dashboard = () => {
 
     fetchData();
   }, [Base_Url]);
+  }, [Base_Url]);
 
 
   useEffect(() => {
@@ -339,6 +344,7 @@ const Dashboard = () => {
     };
 
     fetchEventCounts();
+  }, [Base_Url]); // Empty dependency array means this effect runs once on mount
   }, [Base_Url]); // Empty dependency array means this effect runs once on mount
 
 
@@ -431,12 +437,12 @@ const Dashboard = () => {
       }
 
       fetchEvents();
-    }, 700);
+    }, 1000);
     return () => clearTimeout(timer);
   }, [selectedAddressId, fromNumber,Base_Url]);
 
 
- 
+
 
   const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>(
     (acc, message) => {
@@ -448,8 +454,8 @@ const Dashboard = () => {
     },
     {}
   );
-  
-  const [updatedMessages, setUpdatedMessages] = useState(groupedMessages); 
+
+  const [updatedMessages, setUpdatedMessages] = useState(groupedMessages);
   useEffect(() => {
     setUpdatedMessages(groupedMessages);
   }, [events,Base_Url,groupedMessages]);
@@ -551,7 +557,7 @@ const Dashboard = () => {
   const handleToggle1 = () => {
     setIsType((prevIsOpen) => !prevIsOpen);
   };
- 
+
 
   const handleCustomDateToggle = () => {
     setIsCustomDateOpen(!isCustomDateOpen);
@@ -682,7 +688,7 @@ const Dashboard = () => {
 
 
 
- 
+
 
 
 
@@ -692,7 +698,7 @@ const Dashboard = () => {
 
 
 
- 
+
 
   const handleSelectAddress = (address: Address) => {
     setInput(address.fullAddress);
@@ -706,7 +712,7 @@ const Dashboard = () => {
   };
 
   // Hook called unconditionally
-  
+
   const toggleMessagePin = async (messageId: number, conversationId: string) => {
 
     // Retrieve Token
@@ -721,7 +727,7 @@ const Dashboard = () => {
   
     try {
       await axios.post(`${Base_Url}openPhoneEventData/toggle-message-pin/${messageId}`, null, config);
-  
+
       setUpdatedMessages((prevMessages) => {
         const updatedMessages = { ...prevMessages };
         const conversationMessages = updatedMessages[conversationId].map((msg) => {
@@ -740,7 +746,7 @@ const Dashboard = () => {
       console.error('Failed to toggle pin state:', error);
     }
   };
-  
+
   return (
     <div>
       <Navbar

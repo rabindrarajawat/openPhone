@@ -16,6 +16,10 @@ const SideBar = () => {
     window.location.href = "/"
   };
 
+  const handleConversation = () => {
+    window.location.href = "/conversationmapping"
+  };
+
   return (
     <>
       <ul className="sidebar">
@@ -34,17 +38,17 @@ const SideBar = () => {
           </li>
         </div>
         <div>
-          <li className="nav">
-            <Link href="/conversationmapping">
-              <Image
-                src="/mapingi.svg"
-                alt="Logo"
-                className="logo2"
-                width={50}
-                height={50}
-              />
-              <p className="dash">Map Address</p>
-            </Link>
+          <li className="nav" onClick={handleConversation}>
+            {/* <Link href="/conversationmapping"> */}
+            <Image
+              src="/mapingi.svg"
+              alt="Logo"
+              className="logo2"
+              width={50}
+              height={50}
+            />
+            <p className="dash">Map Address</p>
+            {/* </Link> */}
           </li>
         </div>
 
