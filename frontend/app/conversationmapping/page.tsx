@@ -1,6 +1,13 @@
+<<<<<<< HEAD
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Table, Container } from 'react-bootstrap';
+=======
+// src/components/ConversationTable.jsx
+'use client'
+import React, { useState, useEffect } from "react";
+import { Table, Container } from "react-bootstrap";
+>>>>>>> 676043e8ba8f2fbac2ae748721c45b48ea185455
 import axios from 'axios';
 import ReactPaginate from 'react-paginate';
 import Popup from '../popup/popup';
@@ -26,8 +33,8 @@ const ConversationTable = () => {
   const [selectedRecord, setSelectedRecord] = useState<ConversationRecord | null>(null);
   const [selectedAddress, setSelectedAddress] = useState('Search Address');
   const [currentPage, setCurrentPage] = useState(0);
-  const recordsPerPage = 5; // Set records per page to 5
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+<<<<<<< HEAD
 
   useEffect(() => {
    
@@ -44,9 +51,27 @@ const ConversationTable = () => {
     try {
       const response = await axios.get(`${Base_Url}openPhoneEventData/getConversationsWithoutAddress`, config);
       console.log('API response:', response);
+=======
+  const recordsPerPage = 5;
 
-      const data = response.data.data; // Adjusted to match your response structure
-      console.log('Data:', data);
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+>>>>>>> 676043e8ba8f2fbac2ae748721c45b48ea185455
+
+      if (!token) {
+        console.error("No auth token found. Please log in.");
+        return;
+      }
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const response = await axios.get(`${Base_Url}openPhoneEventData/getConversationsWithoutAddress`, config);
+      const data = response.data.data;
 
       if (Array.isArray(data)) {
         setRecords(data);
@@ -60,6 +85,10 @@ const ConversationTable = () => {
   fetchData();
 }, [Base_Url]); // Dependency on config to re-fetch if token changes
 
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleRowClick = (record: ConversationRecord) => {
     setSelectedRecord(record);
@@ -95,7 +124,11 @@ const ConversationTable = () => {
     <div>
       <Navbar toggleSidebar={toggleSidebar} onSelectAddress={handleAddressSelect1} />
       {isSidebarVisible && <SideBar />}
+<<<<<<< HEAD
       <div className={`${styles.mainContainer} ${isSidebarVisible ? styles.sidebarVisible : ''}`}>
+=======
+      <div className={`${styles.mainContainer} ${isSidebarVisible ? 'sidebar-visible' : ''}`}>
+>>>>>>> 676043e8ba8f2fbac2ae748721c45b48ea185455
         <Container className={styles.container}>
           <h2 className={styles.tableHeading}>Conversation Mapping</h2>
           <Table bordered hover className={styles.conversationTable}>
@@ -140,7 +173,7 @@ const ConversationTable = () => {
               show={showPopup}
               onHide={handlePopupClose}
               conversationId={selectedRecord.conversation_id}
-              onSaveSuccess={fetchData} // Pass the fetchData function to Popup
+              onSaveSuccess={fetchData}
             />
           )}
         </Container>
