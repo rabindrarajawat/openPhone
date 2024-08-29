@@ -1,0 +1,50 @@
+/* pagination.css */
+.pagination-container {
+  position: relative;
+  margin-top: 1rem; 
+  margin-bottom: 35px;
+}
+
+.pagination {
+  position: absolute; 
+  bottom: 0;          
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.page-link {
+  border: none;           /* Remove border */
+  outline: none;          /* Remove outline */
+  background: none;       /* Remove background color */
+  padding: 0.5rem 0.75rem; /* Adjust padding if necessary */
+  margin: 0;              /* Remove margin */
+  color: #007bff;         /* Default text color */
+  font-size: 1rem;        /* Font size */
+  text-align: center;     /* Center text */
+  cursor: pointer;        /* Pointer cursor for clickable items */
+}
+
+.page-item.disabled .page-link {
+  pointer-events: none;  /* Disable interaction with disabled items */
+  color: #6c757d;        /* Color for disabled state */
+}
+
+.page-item.active .page-link {
+  font-weight: bold;     /* Bold font for active page */
+}
+
+
+
+.setPagination {
+  display: flex;  
+  margin-top: 52px;
+  align-items: center;
+  margin-left: -320px /* Center items vertically */;
+}
+
+.setPagination .page-item {
+  margin: 0 0.25rem;    /* Spacing between items */
+}
