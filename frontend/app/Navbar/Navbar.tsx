@@ -7,6 +7,8 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { SearchResultList } from "../SearchResultList/SearchResultList";
 import NotificationItem from '../notificationiItem'; // Adjust the import path as needed
+import Pagination from "../Pagination/pagination";
+
 
 interface Address {
   fullAddress: string;
@@ -71,9 +73,20 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
   }, []);
 
   useEffect(() => {
+      // Retrieve Token
+      const token = localStorage.getItem('authToken');
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      console.log('Token being used:', token);
     const fetchNotifications = async () => {
+      
+      
       try {
-        const response = await axios.get(`${Base_Url}notifications`);
+        const response = await axios.get(`${Base_Url}notifications`,config);
         // console.log("Notifications:", response.data);
         setNotifications(response.data.filter((notification: Notification) => !notification.is_read));
       } catch (error) {
@@ -83,7 +96,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
     };
 
     fetchNotifications();
-  }, []);
+  }, [Base_Url]);
 
   const fetchData = async (value: string) => {
     try {

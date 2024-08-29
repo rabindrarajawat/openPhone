@@ -1,12 +1,11 @@
-// src/components/ConversationTable.jsx
-'use client'
-import React, { useState, useEffect } from "react";
-import { Table, Container } from "react-bootstrap";
+'use client';
+import React, { useState, useEffect } from 'react';
+import { Table, Container } from 'react-bootstrap';
 import axios from 'axios';
 import ReactPaginate from 'react-paginate';
 import Popup from '../popup/popup';
 import styles from './page.module.css';
-import SideBar from "../SideNavbar/sideNavbar";
+import SideBar from '../SideNavbar/sideNavbar';
 import Navbar from '../Navbar/Navbar';
 
 type ConversationRecord = {
@@ -30,10 +29,20 @@ const ConversationTable = () => {
   const recordsPerPage = 5; // Set records per page to 5
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
+  useEffect(() => {
+   
+  const token = localStorage.getItem('authToken');
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    console.log('Token being used:', token);
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${Base_Url}openPhoneEventData/getConversationsWithoutAddress`);
+      const response = await axios.get(`${Base_Url}openPhoneEventData/getConversationsWithoutAddress`, config);
       console.log('API response:', response);
 
       const data = response.data.data; // Adjusted to match your response structure
@@ -48,10 +57,9 @@ const ConversationTable = () => {
       console.error('Error fetching data:', error);
     }
   };
+  fetchData();
+}, [Base_Url]); // Dependency on config to re-fetch if token changes
 
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   const handleRowClick = (record: ConversationRecord) => {
     setSelectedRecord(record);
@@ -79,15 +87,15 @@ const ConversationTable = () => {
     setIsSidebarVisible(prevState => !prevState);
   };
 
+  function fetchData(): void {
+    throw new Error('Function not implemented.');
+  }
+
   return (
     <div>
-      {/* <Navbar onSelectAddress={handleAddressSelect1} /> */}
       <Navbar toggleSidebar={toggleSidebar} onSelectAddress={handleAddressSelect1} />
       {isSidebarVisible && <SideBar />}
-      {/* <SideBar /> */}
-      {/* <div className={styles.mainContainer}> */}
-      <div className={`styles.mainContainer ${isSidebarVisible ? 'sidebar-visible' : ''}`}>
-
+      <div className={`${styles.mainContainer} ${isSidebarVisible ? styles.sidebarVisible : ''}`}>
         <Container className={styles.container}>
           <h2 className={styles.tableHeading}>Conversation Mapping</h2>
           <Table bordered hover className={styles.conversationTable}>

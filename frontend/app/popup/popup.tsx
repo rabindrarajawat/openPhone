@@ -42,7 +42,7 @@ const Popup = ({ show, onHide, conversationId, onSaveSuccess }: PopupProps) => {
     };
 
     fetchAddresses();
-  }, []);
+  }, [Base_Url]);
 
   useEffect(() => {
     setFilteredAddresses(
