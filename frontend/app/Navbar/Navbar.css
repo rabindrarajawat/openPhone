@@ -238,7 +238,6 @@
 .icon-message {
     margin-right: 14px;
     margin-left: 4px;
-    color: #EA0000;
     margin-top: 17px;
     /* padding: 8px 2px; */
     padding-top: 12px;
@@ -277,4 +276,11 @@
 
 .message-body {
     margin-left: 56px;
+}
+.message-icon{
+    margin-left: 28px;
+    margin-right:4px;   
+}
+.icon-color{
+    color:red
 }

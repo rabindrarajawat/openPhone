@@ -43,7 +43,7 @@ const NotificationItem: React.FC<Notification> = ({ event, is_read, event_id, ha
     <li key={event_id} className={!is_read ? 'new-notification' : ''}>
       <div>
         <span>
-          <i className="bi bi-chat-right-text icon-message icon-missed"></i>
+          <i className="bi bi-chat-right-text  icon-message icon-missed bg-light text-danger"></i>
         </span>
         <span className='missed-message'>You have missed message from</span>
         <div className='event-from'>{event.from}

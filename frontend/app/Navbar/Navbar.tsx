@@ -15,6 +15,7 @@ interface Address {
 }
 
 interface Notification {
+  type: string;
   id: number;
   address_id: number | null;
   event_id: number;
@@ -59,6 +60,23 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
   const [results, setResultsState] = useState<Address[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState('messages'); // Default to 'messages'
+    // Debugging logs
+    console.log('Notifications:', notifications);
+    console.log('Active Tab:', activeTab);
+
+      const filteredNotifications = notifications.filter(notification => {
+    // Debugging log for each notification
+    console.log('Notification:', notification);
+
+    // Assuming all notifications are messages if there's no type field
+    return activeTab === 'messages'; // Default to showing all notifications
+  });
+
+  // Debug: check filtered notifications
+  console.log('Filtered Notifications:', filteredNotifications);
+
+
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -145,6 +163,9 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
       console.error("Error marking notification as read:", error);
     }
   };
+  console.log('Notifications:', notifications);
+
+ 
 
   const newNotificationCount = notifications.length;
 
@@ -176,27 +197,41 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
           </div>
 
           {showDropdown && (
-  <div className="notification-dropdown">
-    <div className='main-notification'>
-      <span><i className="bi bi-telephone-inbound-fill call-icon"></i> Calls</span>
-      <span className='text-danger'> <i className="bi bi-chat-right-text icon-message"></i> Message </span>
-    </div>
-    <div className='border-bottom mt-2'></div>
+        <div className="notification-dropdown">
+          <div className="main-notification">
+            <span
+              className={activeTab === 'calls' ? 'text-danger' : ''}
+              onClick={() => setActiveTab('calls')}
+            >
+              <i className="bi bi-telephone-inbound-fill call-icon"></i> Calls
+            </span>
+            <span
+              className={activeTab === 'messages' ? 'text-danger': ''}
+              onClick={() => setActiveTab('messages')}
+            >
+              <i className="bi bi-chat-right-text message-icon"></i> Messages
+            </span>
+          </div>
+          <div className="border-bottom mt-2"></div>
 
-    <ul>
-      {notifications.map(notification => (
-        <li key={notification.event_id}>
-          <NotificationItem
-            event={notification.event}
-            is_read={notification.is_read}
-            event_id={notification.event_id}
-            handleMarkAsRead={handleMarkAsRead} id={0} address_id={null} created_at={''} 
-          />
-        </li>
-      ))}
-    </ul>
-  </div>
-)}
+          {/* Display all notifications if they are all messages */}
+          <ul>
+            {filteredNotifications.length > 0 ? (
+              filteredNotifications.map(notification => (
+                <li key={notification.event_id}>
+                  <NotificationItem
+                    event={notification.event}
+                    is_read={notification.is_read}
+                    event_id={notification.event_id}
+                    handleMarkAsRead={handleMarkAsRead} id={0} address_id={null} created_at={''}                  />
+                </li>
+              ))
+            ) : (
+              <li>No notifications available</li>
+            )}
+          </ul>
+        </div>
+      )}
 
         </div>
       </div>
