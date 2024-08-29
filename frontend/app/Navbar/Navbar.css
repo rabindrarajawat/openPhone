@@ -182,12 +182,16 @@
     border: 1px solid #ccc;
     border-radius: 9px;
     width: 434px;
-    /* height: 351px; */
+    height: 351px;
     z-index: 1000;
+    overflow-y: auto; /* Enables vertical scrolling */
+    overflow-x: hidden; /* Hides horizontal scrolling */
 
 }
 
 .notification-dropdown ul {
+    display: block; /* Display notifications in a column */
+
     list-style-type: none;
     padding: 3px 7px 7px 5px;
     margin: 0;
