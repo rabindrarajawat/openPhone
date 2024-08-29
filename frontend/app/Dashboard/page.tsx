@@ -404,6 +404,14 @@ const Dashboard = () => {
   }, [selectedAddress,Base_Url]);
 
   useEffect(() => {
+     // Retrieve Token
+     const token = localStorage.getItem('authToken');
+     const config = {
+       headers: {
+         Authorization: `Bearer ${token}`,
+       },
+     };
+
     const timer = setTimeout(async () => {
       async function fetchEvents() {
         try {
