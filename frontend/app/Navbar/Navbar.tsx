@@ -1,10 +1,14 @@
-import React, { useEffect, useState,useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import './Navbar.css';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import NotificationItem from '../notificationiItem';
+import { SearchResultList } from "../SearchResultList/SearchResultList";
+import NotificationItem from '../notificationiItem'; // Adjust the import path as needed
+import Pagination from "../Pagination/pagination";
+
 
 interface Address {
   fullAddress: string;
@@ -48,26 +52,13 @@ interface SearchBarProps {
   onSelectAddress: (address: Address) => void;
 }
 
-
-const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
+const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddress }) => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
-
-  const [showDropdown, setShowDropdown] = useState<boolean>(false);
-
-
-
-
   const [userName, setUserName] = useState<string>('');
-
-  const token = localStorage.getItem("authToken");
-
-
-  const config = useMemo(() => ({
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }), [token]);
-
+  const [input, setInput] = useState<string>('');
+  const [results, setResultsState] = useState<Address[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -81,13 +72,22 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
     }
   }, []);
 
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-
-
   useEffect(() => {
+      // Retrieve Token
+      const token = localStorage.getItem('authToken');
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      console.log('Token being used:', token);
     const fetchNotifications = async () => {
+      
+      
       try {
-        const response = await axios.get(`${Base_Url}notifications`, config);
+        const response = await axios.get(`${Base_Url}notifications`,config);
+        // console.log("Notifications:", response.data);
         setNotifications(response.data.filter((notification: Notification) => !notification.is_read));
       } catch (error) {
         console.error("Error fetching notifications:", error);
@@ -96,14 +96,33 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
     };
 
     fetchNotifications();
-  }, [Base_Url,config]);
+  }, [Base_Url]);
 
+  const fetchData = async (value: string) => {
+    try {
+      const response = await axios.get(`${Base_Url}address/search?address=${encodeURIComponent(value)}`);
+      const results = response.data.results.filter((address: Address) =>
+        address.fullAddress.toLowerCase().includes(value.toLowerCase())
+      );
+      setResultsState(results);
+      if (setResults) {
+        setResults(results);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
+  const handleChange = (value: string) => {
+    setInput(value);
+    fetchData(value);
+  };
 
-
-
-
-
+  const handleSelectAddress = (address: Address) => {
+    setInput(address.fullAddress);
+    setResultsState([]);
+    onSelectAddress(address);
+  };
 
   const handleBellClick = () => {
     setShowDropdown(!showDropdown);
@@ -111,10 +130,11 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
 
   const handleMarkAsRead = async (event_id: number) => {
     try {
-      const response = await axios.post(`${Base_Url}notifications/${event_id}/read`, null, config);
+      const response = await axios.post(`${Base_Url}notifications/${event_id}/read`);
       console.log("Backend Response:", response);
 
       if (response.status === 200 || response.status === 201) {
+        // Update notifications state
         setNotifications(prevNotifications =>
           prevNotifications.filter(notification => notification.event_id !== event_id)
         );
