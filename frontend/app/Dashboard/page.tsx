@@ -404,28 +404,36 @@ const Dashboard = () => {
   }, [selectedAddress,Base_Url]);
 
   useEffect(() => {
-    const timer = setTimeout(async () => {
-      async function fetchEvents() {
-        try {
-          const response = await axios.get(
-            `${Base_Url}openPhoneEventData/events-by-address-and-from`,
-            {
-              params: {
-                address_id: selectedAddressId,
-                from_number: fromNumber,
-              }, ...config // Pass fromNumber directly
-            },
-          );
-          setEvents(response.data.data);
-        } catch (error) {
-        } finally {
-        }
-      }
+    // Retrieve Token
+    const token = localStorage.getItem('authToken');
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
 
-      fetchEvents();
-    }, 700);
-    return () => clearTimeout(timer);
-  }, [selectedAddressId, fromNumber,Base_Url]);
+   const timer = setTimeout(async () => {
+     async function fetchEvents() {
+       try {
+         const response = await axios.get(
+           `${Base_Url}openPhoneEventData/events-by-address-and-from`,
+           {
+             params: {
+               address_id: selectedAddressId,
+               from_number: fromNumber,
+             }, ...config // Pass fromNumber directly
+           },
+         );
+         setEvents(response.data.data);
+       } catch (error) {
+       } finally {
+       }
+     }
+
+     fetchEvents();
+   }, 700);
+   return () => clearTimeout(timer);
+ }, [selectedAddressId, fromNumber,Base_Url]);
 
 
  
