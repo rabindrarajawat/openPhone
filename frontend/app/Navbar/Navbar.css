@@ -284,3 +284,39 @@
 .icon-color{
     color:red
 }
+.event-from1{
+
+    margin-left: -103px;
+    color: #5A657B;
+    font-size: -127px;
+    font-weight: 500;
+}
+
+.call-notifications{
+font-size: 19px;
+margin-left: 36px;
+}
+.missed-call{
+
+    font-size: 18px;
+    margin-left:16px;
+}
+
+.notification-info1
+{
+    background-color: white;
+color: green;
+border: 2px solid green;
+border-radius: 20px;
+padding: 0px 6px;
+margin-bottom: 0px;
+/* margin-top: -67px; */
+cursor: pointer;
+margin-left: 20px;
+font-size: 12px;
+border-color: green;
+}
+.callset{
+    margin-left:25px;
+
+}
