@@ -744,8 +744,8 @@ const Dashboard = () => {
   return (
     <div>
       <Navbar
-        toggleSidebar={toggleSidebar}
-        onSelectAddress={handleAddressSelect1}
+        // toggleSidebar={toggleSidebar}
+        // onSelectAddress={handleAddressSelect1}
       />
       {isSidebarVisible && <SideBar />}
       <div className="main-container">
