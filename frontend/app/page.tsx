@@ -33,6 +33,12 @@ export default function Home() {
     }
   };
 
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleLogin();
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.loginItem}>
@@ -58,6 +64,7 @@ export default function Home() {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onKeyPress={handleKeyPress} // Add this line
             />
           </div>
           <div>
@@ -68,6 +75,7 @@ export default function Home() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onKeyPress={handleKeyPress} // Add this line
             />
           </div>
           {error && <div className="text-danger mt-3">{error}</div>}
