@@ -615,28 +615,43 @@ const Dashboard = () => {
 
   const handlePinNumber = async (conversationId: string) => {
     try {
+      const token = localStorage.getItem('authToken');
+      
+      if (!token) {
+        console.error("No authentication token found.");
+        return;
+      }
+  
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+  
       const isPinned = pinnedConversations.has(conversationId);
-
+  
       // API call to toggle pin/unpin
       const response = await axios.post(
-        `${Base_Url}openPhoneEventData/toggle-number-pin/${conversationId}`, config
+        `${Base_Url}openPhoneEventData/toggle-number-pin/${conversationId}`, 
+        {},  
+        config 
       );
-
+  
       if (response.status === 200 || response.status === 201) {
         setPinnedConversations((prevState) => {
           const newSet = new Set<string>(prevState);
-
+  
           if (isPinned) {
             newSet.delete(conversationId);
           } else {
             newSet.add(conversationId);
           }
-
+  
           localStorage.setItem(
             "pinnedConversations",
             JSON.stringify([...newSet])
           );
-
+  
           return newSet;
         });
       } else {
@@ -646,6 +661,7 @@ const Dashboard = () => {
       console.error("Error toggling the pin:", error);
     }
   };
+  
 
 
 
@@ -983,7 +999,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="main-Address">
+        <div className="main-Address ">
           <span className="">
             {" "}
             <Image src="/User.svg" alt="users" width={24} height={24} className="person-icon ms-4" />
