@@ -586,6 +586,18 @@ const Dashboard = () => {
   };
 
   const handleBookmarkClick = (addressId: number) => {
+    const token = localStorage.getItem('authToken');
+      
+    if (!token) {
+      console.error("No authentication token found.");
+      return;
+    }
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
     const address = addresses1.find((a) => a.id === addressId);
     if (!address) return;
 
@@ -597,8 +609,8 @@ const Dashboard = () => {
 
     axios
       .post(`${Base_Url}bookmarks/${addressId}`, {
-        is_bookmarked: newIsBookmarked, config
-      }
+        is_bookmarked: newIsBookmarked
+      },config
       )
       .then((response) => {
         // Update the state only if the API call was successful
