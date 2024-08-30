@@ -30,8 +30,8 @@ const ConversationTable = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
   useEffect(() => {
-   
-  const token = localStorage.getItem('authToken');
+
+    const token = localStorage.getItem('authToken');
     const config = {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -40,25 +40,25 @@ const ConversationTable = () => {
 
     console.log('Token being used:', token);
 
-  const fetchData = async () => {
-    try {
-      const response = await axios.get(`${Base_Url}openPhoneEventData/getConversationsWithoutAddress`, config);
-      console.log('API response:', response);
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${Base_Url}openPhoneEventData/getConversationsWithoutAddress`, config);
+        console.log('API response:', response);
 
-      const data = response.data.data; // Adjusted to match your response structure
-      console.log('Data:', data);
+        const data = response.data.data; // Adjusted to match your response structure
+        console.log('Data:', data);
 
-      if (Array.isArray(data)) {
-        setRecords(data);
-      } else {
-        console.error('API response is not an array:', data);
+        if (Array.isArray(data)) {
+          setRecords(data);
+        } else {
+          console.error('API response is not an array:', data);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
-  fetchData();
-}, [Base_Url]); // Dependency on config to re-fetch if token changes
+    };
+    fetchData();
+  }, [Base_Url]); // Dependency on config to re-fetch if token changes
 
 
   const handleRowClick = (record: ConversationRecord) => {
@@ -88,14 +88,33 @@ const ConversationTable = () => {
   };
 
   function fetchData(): void {
-    throw new Error('Function not implemented.');
+    const token = localStorage.getItem('authToken');
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    axios.get(`${Base_Url}openPhoneEventData/getConversationsWithoutAddress`, config)
+      .then((response) => {
+        const data = response.data.data; // Adjust to your actual response structure
+        if (Array.isArray(data)) {
+          setRecords(data);
+        } else {
+          console.error('API response is not an array:', data);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
   }
+
 
   return (
     <div>
       <Navbar
-      //  toggleSidebar={toggleSidebar} onSelectAddress={handleAddressSelect1}
-        />
+      // toggleSidebar={toggleSidebar} onSelectAddress={handleAddressSelect1}
+      />
       {isSidebarVisible && <SideBar />}
       <div className={`${styles.mainContainer} ${isSidebarVisible ? styles.sidebarVisible : ''}`}>
         <Container className={styles.container}>
