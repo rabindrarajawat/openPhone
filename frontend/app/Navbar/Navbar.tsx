@@ -3,19 +3,10 @@ import Image from 'next/image';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import './Navbar.css';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { SearchResultList } from "../SearchResultList/SearchResultList";
-import NotificationItem from '../notificationiItem'; // Adjust the import path as needed
-import Pagination from "../Pagination/pagination";
-
-
-interface Address {
-  fullAddress: string;
-}
+import NotificationItem from '../msgnotificationiItem';
+import CallNotificationItem from '../callnotificationitem';
 
 interface Notification {
-  type: string;
   id: number;
   address_id: number | null;
   event_id: number;
@@ -44,39 +35,12 @@ interface Notification {
   };
 }
 
-interface NavbarProps extends SearchBarProps {
-  toggleSidebar: () => void;
-}
-
-interface SearchBarProps {
-  setResults?: (results: Address[]) => void;
-  onSelectAddress: (address: Address) => void;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddress }) => {
+const Navbar: React.FC = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
   const [userName, setUserName] = useState<string>('');
-  const [input, setInput] = useState<string>('');
-  const [results, setResultsState] = useState<Address[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState('messages'); // Default to 'messages'
-    // Debugging logs
-    console.log('Notifications:', notifications);
-    console.log('Active Tab:', activeTab);
-
-      const filteredNotifications = notifications.filter(notification => {
-    // Debugging log for each notification
-    console.log('Notification:', notification);
-
-    // Assuming all notifications are messages if there's no type field
-    return activeTab === 'messages'; // Default to showing all notifications
-  });
-
-  // Debug: check filtered notifications
-  console.log('Filtered Notifications:', filteredNotifications);
-
-
+  const [activeTab, setActiveTab] = useState('messages');
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -91,21 +55,16 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
   }, []);
 
   useEffect(() => {
-      // Retrieve Token
-      const token = localStorage.getItem('authToken');
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
+    const token = localStorage.getItem('authToken');
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
 
-      console.log('Token being used:', token);
     const fetchNotifications = async () => {
-      
-      
       try {
         const response = await axios.get(`${Base_Url}notifications`,config);
-        // console.log("Notifications:", response.data);
         setNotifications(response.data.filter((notification: Notification) => !notification.is_read));
       } catch (error) {
         console.error("Error fetching notifications:", error);
@@ -116,43 +75,28 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
     fetchNotifications();
   }, [Base_Url]);
 
-  const fetchData = async (value: string) => {
-    try {
-      const response = await axios.get(`${Base_Url}address/search?address=${encodeURIComponent(value)}`);
-      const results = response.data.results.filter((address: Address) =>
-        address.fullAddress.toLowerCase().includes(value.toLowerCase())
-      );
-      setResultsState(results);
-      if (setResults) {
-        setResults(results);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  const handleChange = (value: string) => {
-    setInput(value);
-    fetchData(value);
-  };
-
-  const handleSelectAddress = (address: Address) => {
-    setInput(address.fullAddress);
-    setResultsState([]);
-    onSelectAddress(address);
-  };
-
   const handleBellClick = () => {
     setShowDropdown(!showDropdown);
   };
 
   const handleMarkAsRead = async (event_id: number) => {
+    const token = localStorage.getItem('authToken');
+    
+    if (!token) {
+      console.error('No authentication token found');
+      return;
+    }
+  
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+  
     try {
-      const response = await axios.post(`${Base_Url}notifications/${event_id}/read`);
-      console.log("Backend Response:", response);
-
+      const response = await axios.post(`${Base_Url}notifications/${event_id}/read`, {}, config);
+      
       if (response.status === 200 || response.status === 201) {
-        // Update notifications state
         setNotifications(prevNotifications =>
           prevNotifications.filter(notification => notification.event_id !== event_id)
         );
@@ -160,12 +104,24 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
         console.error("Failed to mark notification as read:", response);
       }
     } catch (error) {
-      console.error("Error marking notification as read:", error);
+      // if (error.response && error.response.status === 401) {
+      //   console.error("Unauthorized: Token might be invalid or expired");
+      //   // Optionally, handle re-authentication or redirect to login
+      // } else {
+      //   console.error("Error marking notification as read:", error);
+      // }
     }
   };
-  console.log('Notifications:', notifications);
+  
 
- 
+  const filteredNotifications = notifications.filter(notification => {
+    if (activeTab === 'calls') {
+      return notification.event.event_type_id === 3 || notification.event.event_type_id === 4;
+    } else if (activeTab === 'messages') {
+      return notification.event.event_type_id === 1 || notification.event.event_type_id === 2;
+    }
+    return false;
+  });
 
   const newNotificationCount = notifications.length;
 
@@ -178,7 +134,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
           className="logo1"
           width={50}
           height={50}
-          onClick={toggleSidebar}
+          onClick={() => {}}
         />
         <div className='nav-list'>
           <div className='profileicon'>
@@ -197,42 +153,49 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
           </div>
 
           {showDropdown && (
-        <div className="notification-dropdown">
-          <div className="main-notification">
-            <span
-              className={activeTab === 'calls' ? 'text-danger' : ''}
-              onClick={() => setActiveTab('calls')}
-            >
-              <i className="bi bi-telephone-inbound-fill call-icon"></i> Calls
-            </span>
-            <span
-              className={activeTab === 'messages' ? 'text-danger': ''}
-              onClick={() => setActiveTab('messages')}
-            >
-              <i className="bi bi-chat-right-text message-icon"></i> Messages
-            </span>
-          </div>
-          <div className="border-bottom mt-2"></div>
+            <div className="notification-dropdown">
+              <div className="main-notification">
+                <span
+                  className={activeTab === 'calls' ? 'text-danger' : ''}
+                  onClick={() => setActiveTab('calls')}
+                >
+                  <i className="bi bi-telephone-inbound-fill call-icon"></i> Calls
+                </span>
+                <span
+                  className={activeTab === 'messages' ? 'text-danger' : ''}
+                  onClick={() => setActiveTab('messages')}
+                >
+                  <i className="bi bi-chat-right-text message-icon"></i> Messages
+                </span>
+              </div>
+              <div className="border-bottom mt-2"></div>
 
-          {/* Display all notifications if they are all messages */}
-          <ul>
-            {filteredNotifications.length > 0 ? (
-              filteredNotifications.map(notification => (
-                <li key={notification.event_id}>
-                  <NotificationItem
-                    event={notification.event}
-                    is_read={notification.is_read}
-                    event_id={notification.event_id}
-                    handleMarkAsRead={handleMarkAsRead} id={0} address_id={null} created_at={''}                  />
-                </li>
-              ))
-            ) : (
-              <li>No notifications available</li>
-            )}
-          </ul>
-        </div>
-      )}
-
+              <ul>
+                {filteredNotifications.length > 0 ? (
+                  filteredNotifications.map(notification => (
+                    activeTab === 'calls' ? (
+                      <CallNotificationItem
+                        key={notification.event_id}
+                        event={notification.event}
+                        is_read={notification.is_read}
+                        event_id={notification.event_id}
+                        handleMarkAsRead={handleMarkAsRead}
+                      />
+                    ) : (
+                      <NotificationItem
+                          key={notification.event_id}
+                          event={notification.event}
+                          is_read={notification.is_read}
+                          event_id={notification.event_id}
+                          handleMarkAsRead={handleMarkAsRead} id={0} address_id={null} created_at={''}                      />
+                    )
+                  ))
+                ) : (
+                  <li>No notifications available</li>
+                )}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </nav>

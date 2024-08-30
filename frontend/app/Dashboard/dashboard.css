@@ -717,11 +717,11 @@
     /* Prevent horizontal overflow */
   }
 
-  /* .content-with-border-right {
+  .content-with-border-right {
     border-right: none;
     padding-right: 6px;
     width: 100%;
-  } */
+  }
 
   .openphone,
   .information,
