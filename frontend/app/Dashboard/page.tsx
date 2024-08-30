@@ -189,6 +189,7 @@ const Dashboard = () => {
   }, [router]);
 
 
+
   useEffect(() => {
     const fetchData = async () => {
 
@@ -263,6 +264,7 @@ const Dashboard = () => {
 
     fetchData();
   }, [Base_Url]);
+
 
 
   useEffect(() => {
@@ -611,7 +613,7 @@ const Dashboard = () => {
     axios
       .post(`${Base_Url}bookmarks/${addressId}`, {
         is_bookmarked: newIsBookmarked
-      },config
+      }, config
       )
       .then((response) => {
         // Update the state only if the API call was successful
@@ -642,29 +644,29 @@ const Dashboard = () => {
       };
 
       const isPinned = pinnedConversations.has(conversationId);
-  
+
       // API call to toggle pin/unpin
       const response = await axios.post(
         `${Base_Url}openPhoneEventData/toggle-number-pin/${conversationId}`,
         {},
         config
       );
-  
+
       if (response.status === 200 || response.status === 201) {
         setPinnedConversations((prevState) => {
           const newSet = new Set<string>(prevState);
-  
+
           if (isPinned) {
             newSet.delete(conversationId);
           } else {
             newSet.add(conversationId);
           }
-  
+
           localStorage.setItem(
             "pinnedConversations",
             JSON.stringify([...newSet])
           );
-  
+
           return newSet;
         });
       } else {
@@ -775,8 +777,8 @@ const Dashboard = () => {
   return (
     <div>
       <Navbar
-        // toggleSidebar={toggleSidebar}
-        // onSelectAddress={handleAddressSelect1}
+      // toggleSidebar={toggleSidebar}
+      // onSelectAddress={handleAddressSelect1}
       />
       {isSidebarVisible && <SideBar />}
       <div className="main-container">
