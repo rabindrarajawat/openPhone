@@ -50,7 +50,7 @@ const Popup =
       };
 
       fetchAddresses();
-    }, []);
+    }, [Base_Url]);
 
     useEffect(() => {
       setFilteredAddresses(
