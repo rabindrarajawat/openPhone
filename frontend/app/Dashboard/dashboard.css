@@ -432,12 +432,12 @@
 
 .inbox-chat {
   font-family: 'Roboto', sans-serif;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 400;
   line-height: 20px;
   text-align: left;
   /* background: #3361FF; */
-  color: #FFFFFF;
+  color: #3875df;
   padding-left: 5px;
   padding-right: 5px;
   margin-top: 9px;
@@ -712,11 +712,11 @@
     /* Prevent horizontal overflow */
   }
 
-  /* .content-with-border-right {
+  .content-with-border-right {
     border-right: none;
     padding-right: 6px;
     width: 100%;
-  } */
+  }
 
   .openphone,
   .information,
