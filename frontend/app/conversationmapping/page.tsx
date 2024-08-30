@@ -93,7 +93,9 @@ const ConversationTable = () => {
 
   return (
     <div>
-      <Navbar toggleSidebar={toggleSidebar} onSelectAddress={handleAddressSelect1} />
+      <Navbar
+      //  toggleSidebar={toggleSidebar} onSelectAddress={handleAddressSelect1}
+        />
       {isSidebarVisible && <SideBar />}
       <div className={`${styles.mainContainer} ${isSidebarVisible ? styles.sidebarVisible : ''}`}>
         <Container className={styles.container}>
