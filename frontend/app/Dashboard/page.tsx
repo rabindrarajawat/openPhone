@@ -192,7 +192,6 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
 
-      // Retrieve Token
       const token = localStorage.getItem('authToken');
       const config = {
         headers: {
@@ -203,7 +202,6 @@ const Dashboard = () => {
       console.log('Token being used:', token);
 
       try {
-        // Fetch all addresses with the token in the headers
         console.log("Config before getalladdress:", config);
         const addressResponse = await axios.get(
           `${Base_Url}address/getalladdress`,
@@ -223,7 +221,6 @@ const Dashboard = () => {
         setFilteredAddresses2(formattedAddresses);
         console.log("Formatted addresses:", formattedAddresses);
 
-        // Fetch unread notifications with the token in the headers
 
         console.log("Config before notifications:", config);
         const notificationResponse = await axios.get(
@@ -232,14 +229,13 @@ const Dashboard = () => {
         console.log("Config for address API:", config);
 
 
-        console.log("Notification API Response:", notificationResponse); // Log the response to check what’s returned
+        console.log("Notification API Response:", notificationResponse); 
 
         const unreadNotifications = notificationResponse.data.filter(
           (notification: any) => !notification.is_read
         );
         setNotifications(unreadNotifications);
 
-        // Calculate notification counts
         const addressNotificationCounts = formattedAddresses.map(
           (address: any) => {
             const count = unreadNotifications.filter(
@@ -251,7 +247,6 @@ const Dashboard = () => {
 
         setAddresses1(addressNotificationCounts);
 
-        // Set default selected address
         if (addressNotificationCounts.length > 0) {
           setSelectedAddress(addressNotificationCounts[0].displayAddress);
           setSelectedAddressId(addressNotificationCounts[0].id);
@@ -267,7 +262,6 @@ const Dashboard = () => {
 
   useEffect(() => {
 
-    // Retrieve Token
     const token = localStorage.getItem('authToken');
     const config = {
       headers: {
@@ -282,7 +276,6 @@ const Dashboard = () => {
       let receivedAddresses = [];
 
       if (deliveredChecked) {
-        // Fetch delivered addresses
         const deliveredResponse = await axios.get(`${Base_Url}openPhoneEventData?filter=delivered`, config);
         deliveredAddresses = deliveredResponse.data.data
           .filter((event: { event_type_id: number; }) => event.event_type_id === 2)
@@ -290,18 +283,15 @@ const Dashboard = () => {
       }
 
       if (receivedChecked) {
-        // Fetch received addresses
         const receivedResponse = await axios.get(`${Base_Url}openPhoneEventData?filter=received`, config);
         receivedAddresses = receivedResponse.data.data
           .map((event: { address: any; }) => event.address);
       }
 
-      // Combine both delivered and received addresses
       const combinedAddresses = [...new Set([...deliveredAddresses, ...receivedAddresses])];
 
-      // Filter the addresses based on the combined addresses
       const filtered = addresses2.filter((addressObj: { address: any; }) => combinedAddresses.includes(addressObj.address));
-      console.log('Filtered Addresses:', filtered); // Log filtered addresses
+      console.log('Filtered Addresses:', filtered); 
       setFilteredAddresses2(filtered.length > 0 ? filtered : addresses2);
     };
 
@@ -312,7 +302,6 @@ const Dashboard = () => {
 
   useEffect(() => {
 
-    // Retrieve Token
     const token = localStorage.getItem('authToken');
     const config = {
       headers: {
@@ -339,8 +328,7 @@ const Dashboard = () => {
     };
 
     fetchEventCounts();
-  }, [Base_Url]); // Empty dependency array means this effect runs once on mount
-
+  }, [Base_Url]); 
 
 
 
@@ -696,11 +684,37 @@ const Dashboard = () => {
 
 
 
-  const handleAddressSelect = (address: string, addressId: number) => {
+  const handleAddressSelect = async (address: string, addressId: number) => {
     setSelectedAddress(address);
     setSelectedAddressId(addressId);
     setEventData([]);
+  
+    // Update the state to remove the notification count for the selected address
+    setAddresses1(prevAddresses =>
+      prevAddresses.map(addr =>
+        addr.id === addressId ? { ...addr, notificationCount: 0 } : addr
+      )
+    );
+  
+    try {
+      // Send an API request to mark notifications for this address as read
+      const token = localStorage.getItem('authToken');
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+  
+      await axios.post(`${Base_Url}notifications/mark-as-read`, { address_id: addressId }, config);
+  
+      // Optionally, you can refetch notifications or update the notification state here
+      // const updatedNotifications = await axios.get(`${Base_Url}notifications`, config);
+      // setNotifications(updatedNotifications.data);
+    } catch (error) {
+      console.error("Error marking notifications as read:", error);
+    }
   };
+  
 
 
   const handleAddressSelect1 = (address: Address) => {
