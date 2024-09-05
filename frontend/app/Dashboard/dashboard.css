@@ -17,8 +17,8 @@
 
 .content-with-border-right {
   border-right: 2px solid #e8e8e8;
-  padding-right: 63px;
-  height: 90vh;
+  padding-right: 8px;
+  height: 85vh;
 
 }
 
@@ -129,7 +129,7 @@
   width: 92%;
   height: 20px;
   margin-top: -22px;
-  margin-left: 30px;
+  margin-left: -10px;
   font-family: "Roboto", sans-serif;
   font-size: 20px;
   font-weight: 800;
@@ -142,9 +142,9 @@
   display: flex;
   justify-content: left;
   align-items: left;
-  margin-left: 25px;
+  margin-left: -10px;
   margin-top: 15px;
-  gap: 63px;
+  gap: 48px;
 }
 
 .round-input1 {
@@ -225,7 +225,7 @@
   padding-right: 30px;
   border: 3px solid #D7F5DC;
   border-radius: 6px;
-  height: 660px;
+  height: 585px;
 }
 
 
@@ -345,7 +345,7 @@
 }
 
 .message {
-  width: 210px;
+  width: 205px;
   height: 39px;
   border: 2px solid grey;
   border-radius: 3.27px;
@@ -380,7 +380,7 @@
 
 .input-msg {
   width: 980px;
-  height: 545px;
+  height: 470px;
   margin-top: 8%;
   margin-top: -255px;
   margin-left: -541px;
@@ -432,12 +432,12 @@
 
 .inbox-chat {
   font-family: 'Roboto', sans-serif;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 400;
   line-height: 20px;
   text-align: left;
   /* background: #3361FF; */
-  color: #FFFFFF;
+  color: #3875df;
   padding-left: 5px;
   padding-right: 5px;
   margin-top: 9px;
@@ -595,7 +595,7 @@
   width: 350px;
   height: 310px;
   margin-top: 30px;
-  margin-left: -452px;
+  margin-left: -435px;
   display: flexs;
 }
 
@@ -661,10 +661,11 @@
 .selected-address .setaddress {
   color: #007bff;
 }
-.address-list{
-  margin-left: 11px;
+
+.address-list {
+  /* margin-left: 11px; */
   margin-top: 49px;
-  margin-right: -65px;
+  /* margin-right: -65px; */
 }
 
 .checkbox {
@@ -690,32 +691,45 @@
 }
 
 .main-content {
-  margin-left:18px;
+  margin-left: 25px;
+}
+
+.dataa {
+  margin-left: -25px;
 }
 
 .main-main {
   display: flex;
-  margin-top: -40px;
+  margin-top: -50px;
+  margin-left: 40px;
 }
 
 @media (max-width: 367px) {
   .main-container {
     flex-direction: column;
-    padding: 5px; /* Reduce padding */
+    padding: 5px;
+    /* Reduce padding */
     justify-content: center;
     align-items: center;
-    width: 100%; /* Ensure full width */
-    overflow-x: hidden; /* Prevent horizontal overflow */
+    width: 100%;
+    /* Ensure full width */
+    overflow-x: hidden;
+    /* Prevent horizontal overflow */
   }
 
   .content-with-border-right {
     border-right: none;
-    padding-right: 0;
+    padding-right: 6px;
     width: 100%;
   }
 
-  .openphone, .information, .status, .type, .Date {
-    margin: 5px 0; /* Reduce margins */
+  .openphone,
+  .information,
+  .status,
+  .type,
+  .Date {
+    margin: 5px 0;
+    /* Reduce margins */
     width: 100%;
     text-align: center;
   }
@@ -725,24 +739,35 @@
     padding: 5px;
   }
 
-  .message1, .message {
+  .message1,
+  .message {
     width: 100%;
-    font-size: 14px; /* Adjust font size */
+    font-size: 14px;
+    /* Adjust font size */
     text-align: center;
     padding: 5px;
   }
 
   .search-box input {
     width: 100%;
-    padding: 8px 10px; /* Reduce padding */
-    box-sizing: border-box; /* Ensure padding doesn't affect width */
+    padding: 8px 10px;
+    /* Reduce padding */
+    box-sizing: border-box;
+    /* Ensure padding doesn't affect width */
   }
 
   /* Ensure other elements are within the screen width */
-  .main-Address, .main-search, .search-wrapper, .input-msg, .screenshot-msg, .bookmark-container, .redo-container {
+  .main-Address,
+  .main-search,
+  .search-wrapper,
+  .input-msg,
+  .screenshot-msg,
+  .bookmark-container,
+  .redo-container {
     width: 100%;
     padding: 5px;
-    margin: 0; /* Eliminate margins that may push content */
+    margin: 0;
+    /* Eliminate margins that may push content */
   }
 
   .pagination-container {
