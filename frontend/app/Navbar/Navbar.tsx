@@ -1,18 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import './Navbar.css';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { SearchResultList } from "../SearchResultList/SearchResultList";
-import NotificationItem from '../notificationiItem'; // Adjust the import path as needed
-import Pagination from "../Pagination/pagination";
-
-
-interface Address {
-  fullAddress: string;
-}
+import NotificationItem from '../msgnotificationiItem';
+import CallNotificationItem from '../callnotificationitem';
 
 interface Notification {
   id: number;
@@ -43,22 +35,13 @@ interface Notification {
   };
 }
 
-interface NavbarProps extends SearchBarProps {
-  toggleSidebar: () => void;
-}
-
-interface SearchBarProps {
-  setResults?: (results: Address[]) => void;
-  onSelectAddress: (address: Address) => void;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddress }) => {
+const Navbar: React.FC = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
   const [userName, setUserName] = useState<string>('');
-  const [input, setInput] = useState<string>('');
-  const [results, setResultsState] = useState<Address[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState('messages');
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -73,21 +56,18 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
   }, []);
 
   useEffect(() => {
-      // Retrieve Token
-      const token = localStorage.getItem('authToken');
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
+    const token = localStorage.getItem('authToken');
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
 
-      console.log('Token being used:', token);
     const fetchNotifications = async () => {
-      
-      
+
+
       try {
-        const response = await axios.get(`${Base_Url}notifications`,config);
-        // console.log("Notifications:", response.data);
+        const response = await axios.get(`${Base_Url}notifications`, config);
         setNotifications(response.data.filter((notification: Notification) => !notification.is_read));
       } catch (error) {
         console.error("Error fetching notifications:", error);
@@ -98,43 +78,46 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
     fetchNotifications();
   }, [Base_Url]);
 
-  const fetchData = async (value: string) => {
-    try {
-      const response = await axios.get(`${Base_Url}address/search?address=${encodeURIComponent(value)}`);
-      const results = response.data.results.filter((address: Address) =>
-        address.fullAddress.toLowerCase().includes(value.toLowerCase())
-      );
-      setResultsState(results);
-      if (setResults) {
-        setResults(results);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  const handleChange = (value: string) => {
-    setInput(value);
-    fetchData(value);
-  };
-
-  const handleSelectAddress = (address: Address) => {
-    setInput(address.fullAddress);
-    setResultsState([]);
-    onSelectAddress(address);
-  };
-
   const handleBellClick = () => {
     setShowDropdown(!showDropdown);
   };
 
+  const handleClickOutside = (event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setShowDropdown(false);
+    }
+  };
+
+  useEffect(() => {
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDropdown]);
+
   const handleMarkAsRead = async (event_id: number) => {
+    const token = localStorage.getItem('authToken');
+
+    if (!token) {
+      console.error('No authentication token found');
+      return;
+    }
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
     try {
-      const response = await axios.post(`${Base_Url}notifications/${event_id}/read`);
-      console.log("Backend Response:", response);
+      const response = await axios.post(`${Base_Url}notifications/${event_id}/read`, {}, config);
 
       if (response.status === 200 || response.status === 201) {
-        // Update notifications state
         setNotifications(prevNotifications =>
           prevNotifications.filter(notification => notification.event_id !== event_id)
         );
@@ -145,6 +128,15 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
       console.error("Error marking notification as read:", error);
     }
   };
+
+  const filteredNotifications = notifications.filter(notification => {
+    if (activeTab === 'calls') {
+      return notification.event.event_type_id === 3 || notification.event.event_type_id === 4;
+    } else if (activeTab === 'messages') {
+      return notification.event.event_type_id === 1 || notification.event.event_type_id === 2;
+    }
+    return false;
+  });
 
   const newNotificationCount = notifications.length;
 
@@ -157,7 +149,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
           className="logo1"
           width={50}
           height={50}
-          onClick={toggleSidebar}
+          onClick={() => { }}
         />
         <div className='nav-list'>
           <div className='profileicon'>
@@ -176,24 +168,47 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, setResults, onSelectAddr
           </div>
 
           {showDropdown && (
-            <div className="notification-dropdown">
-              <div className='main-notification'>
-                <span><i className="bi bi-telephone-inbound-fill call-icon"></i> Calls</span>
-                <span className='text-danger'> <i className="bi bi-chat-right-text icon-message"></i> Message </span>
+            <div className="notification-dropdown" ref={dropdownRef}>
+              <div className="main-notification">
+                <span
+                  className={activeTab === 'calls' ? 'text-danger' : ''}
+                  onClick={() => setActiveTab('calls')}
+                >
+                  <i className="bi bi-telephone-inbound-fill call-icon"></i> Calls
+                </span>
+                <span
+                  className={activeTab === 'messages' ? 'text-danger' : ''}
+                  onClick={() => setActiveTab('messages')}
+                >
+                  <i className="bi bi-chat-right-text message-icon"></i> Messages
+                </span>
               </div>
-              <div className='border-bottom mt-2'></div>
+              <div className="border-bottom mt-2"></div>
 
               <ul>
-                {notifications.map(notification => (
-                  <NotificationItem
-                    key={notification.event_id}
-                    event={notification.event}
-                    is_read={notification.is_read}
-                    event_id={notification.event_id}
-                    handleMarkAsRead={handleMarkAsRead} id={0} address_id={null} created_at={''} />
-                ))}
+                {filteredNotifications.length > 0 ? (
+                  filteredNotifications.map(notification => (
+                    activeTab === 'calls' ? (
+                      <CallNotificationItem
+                        key={notification.event_id}
+                        event={notification.event}
+                        is_read={notification.is_read}
+                        event_id={notification.event_id}
+                        handleMarkAsRead={handleMarkAsRead}
+                      />
+                    ) : (
+                      <NotificationItem
+                        key={notification.event_id}
+                        event={notification.event}
+                        is_read={notification.is_read}
+                        event_id={notification.event_id}
+                        handleMarkAsRead={handleMarkAsRead} id={0} address_id={null} created_at={''} />
+                    )
+                  ))
+                ) : (
+                  <li>No notifications available</li>
+                )}
               </ul>
-
             </div>
           )}
         </div>

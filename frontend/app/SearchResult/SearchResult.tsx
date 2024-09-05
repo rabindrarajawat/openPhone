@@ -8,8 +8,10 @@ interface SearchResultProps {
 
 export const SearchResult: React.FC<SearchResultProps> = ({ result }) => {
   return (
-    <div className="search-result">
-      {result}
-    </div>
+    <>
+    </>
+    // <div className="search-result">
+    //   {result}
+    // </div>
   );
 };
