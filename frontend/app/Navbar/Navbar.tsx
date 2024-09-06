@@ -64,6 +64,8 @@ const Navbar: React.FC = () => {
     };
 
     const fetchNotifications = async () => {
+
+
       try {
         const response = await axios.get(`${Base_Url}notifications`, config);
         setNotifications(response.data.filter((notification: Notification) => !notification.is_read));
@@ -147,7 +149,7 @@ const Navbar: React.FC = () => {
           className="logo1"
           width={50}
           height={50}
-          onClick={() => {}}
+          onClick={() => { }}
         />
         <div className='nav-list'>
           <div className='profileicon'>
