@@ -42,7 +42,7 @@ export class OpenPhoneEventController {
 
       return {
         message: responseMessage,
-        openPhoneEventId: openPhoneEvent.id,
+        openPhoneEventId: openPhoneEvent?.id,
         addressCreated: addressCreated,
       };
     } catch (error) {
