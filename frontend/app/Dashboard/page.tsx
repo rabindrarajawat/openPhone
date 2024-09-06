@@ -159,6 +159,8 @@ const Dashboard = () => {
   const [addresses2, setAddresses2] = useState<Address1[]>([]);
   const [filteredAddresses2, setFilteredAddresses2] = useState<Address1[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTo, setSearchTo] = useState(""); // State to hold search input
+
 
 
   const addressesPerPage = 9;
@@ -523,16 +525,20 @@ const Dashboard = () => {
   const indexOfFirstAddress = indexOfLastAddress - addressesPerPage;
 
   // Determine the addresses to show based on the filtered results
-  const addressesToShow = filteredAddresses.length > 0
-    ? filteredAddresses.filter((address) =>
-      filteredAddresses2.some((filteredAddress) => filteredAddress.address === address.address)
-    )
-    : filteredAddresses2.length > 0
-      ? filteredAddresses2
-      : addresses1;
+  const addressesToShow =
+    filteredAddresses.length > 0 // If there are any filtered addresses
+      ? filteredAddresses.filter((address) =>
+        filteredAddresses2.some(
+          (filteredAddress) => filteredAddress.address === address.address
+        )
+      )
+      : []; // If no addresses match the filter, show no addresses
 
   // Apply pagination to the addressesToShow
-  const currentAddresses = addressesToShow.slice(indexOfFirstAddress, indexOfLastAddress);
+  const currentAddresses = addressesToShow.slice(
+    indexOfFirstAddress,
+    indexOfLastAddress
+  );
 
   // Calculate total pages for pagination
   const totalPages = Math.ceil(addressesToShow.length / addressesPerPage);
@@ -541,7 +547,9 @@ const Dashboard = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
+
   console.log("addressesToShow", addressesToShow);
+
 
 
 
@@ -773,6 +781,19 @@ const Dashboard = () => {
       console.error('Failed to toggle pin state:', error);
     }
   };
+
+  const handleSearchToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTo(e.target.value);
+  };
+
+  // Filter messages based on the search query
+  const filteredMessages = searchTo
+    ? Object.keys(updatedMessages).filter((conversationId) =>
+      updatedMessages[conversationId].some((message) =>
+        message.to.toLowerCase().includes(searchTo.toLowerCase())
+      )
+    )
+    : Object.keys(updatedMessages);
 
   return (
     <div>
@@ -1060,6 +1081,7 @@ const Dashboard = () => {
                     )}
                   </div>
 
+                  {/* Check if there are no addresses to show after filters */}
                   {currentAddresses.length > 0 ? (
                     currentAddresses.map((address) => (
                       <li
@@ -1099,9 +1121,8 @@ const Dashboard = () => {
                   ) : (
                     <p>No addresses found.</p>
                   )}
-
-
                 </ul>
+
 
 
 
@@ -1168,7 +1189,8 @@ const Dashboard = () => {
           <div className="conversation">
             {selectedAddress && (
               <div className="conversation-chat">
-                <Image src="converstation.svg" alt="" width={24} height={24} /> Conversation From { }
+                <Image src="converstation.svg" alt="" width={24} height={24} />{" "}
+                Conversation From{" "}
                 {uniqueFromNumbers.length > 0 && (
                   <select
                     value={fromNumber}
@@ -1184,114 +1206,119 @@ const Dashboard = () => {
               </div>
             )}
 
-            <div className="search-wrapper ">
-              <input className="search" type="search" placeholder="Search To" />
+            <div className="search-wrapper">
+              <input
+                className="search"
+                type="search"
+                placeholder="Search To"
+                value={searchTo} // Bind input value to search state
+                onChange={handleSearchToChange} // Update search state on input change
+              />
             </div>
+
             <div className="input-msg">
               <div className="screenshot-msg">
                 <div className="inbox-chat">
                   {events.length > 0
-                    ? Object.keys(updatedMessages).map((conversationId) => {
-                      const isStop = updatedMessages[conversationId].some(
-                        (message) => message.is_stop
-                      );
-                      console.log(
-                        "🚀 ~ Dashboard ~ isStop:",
-                        updatedMessages,
-                        isStop
-                      );
+                    ? filteredMessages.length > 0
+                      ? filteredMessages.map((conversationId) => {
+                        const isStop = updatedMessages[conversationId].some(
+                          (message) => message.is_stop
+                        );
+                        return (
+                          <div key={conversationId}>
+                            <div className="to-line">.</div>
+                            <div className="to-value">
+                              <strong>To </strong>
+                              <span
+                                style={{
+                                  color: isStop ? "red" : "inherit",
+                                }}
+                              >
+                                {updatedMessages[conversationId][0].to}
+                              </span>
 
-                      return (
-                        <div key={conversationId}>
-                          <div className="to-line">.</div>
-                          <div className="to-value">
-                            <strong>To </strong>
-                            <span style={{ color: isStop ? "red" : "inherit" }}>
-                              {updatedMessages[conversationId][0].to}
-                            </span>
+                              <i
+                                className={`bi pinnumber ${pinnedConversations.has(conversationId)
+                                  ? "bi-pin-fill text-primary"
+                                  : "bi-pin"
+                                  }`}
+                                onClick={() => handlePinNumber(conversationId)}
+                              ></i>
+                            </div>
 
-                            <i
-                              className={`bi pinnumber ${pinnedConversations.has(conversationId)
-                                ? "bi-pin-fill text-primary"
-                                : "bi-pin"
-                                }`}
-                              onClick={() => handlePinNumber(conversationId)}
-                            ></i>
-                          </div>
+                            {updatedMessages[conversationId].map(
+                              (message, index) => (
+                                <div key={index}>
+                                  <div
+                                    className={
+                                      message.event_type_id === 1
+                                        ? "chat-message-right"
+                                        : "chat-message-left"
+                                    }
+                                  >
+                                    <div className="message-body-1">
+                                      {expandedMessages.has(index) ? (
+                                        <div>
+                                          {message.body}
+                                          <button
+                                            onClick={() =>
+                                              toggleMessageExpansion(index)
+                                            }
+                                            className={`read-less-btn ${message.event_type_id === 1
+                                              ? "read-less-btn-right"
+                                              : "read-less-btn-left"
+                                              }`}
+                                          >
+                                            Read Less
+                                          </button>
 
-                          {updatedMessages[conversationId].map(
-                            (message, index) => (
-                              <div key={index}>
-                                <div
-                                  className={
-                                    message.event_type_id === 1
-                                      ? "chat-message-right"
-                                      : "chat-message-left"
-                                  }
-                                >
-                                  <div className="message-body-1">
-                                    {expandedMessages.has(index) ? (
-                                      <div>
-                                        {message.body}
-                                        <button
-                                          onClick={() =>
-                                            toggleMessageExpansion(index)
-                                          }
-                                          className={`read-less-btn ${message.event_type_id === 1
-                                            ? "read-less-btn-right"
-                                            : "read-less-btn-left"
-                                            }`}
-                                        >
-                                          Read Less
-                                        </button>
-
-                                        <i
-                                          className={`bi ${message.is_message_pinned
-                                            ? "bi-star-fill text-warning"
-                                            : "bi-star"
-                                            } star-icon`}
-                                          onClick={() =>
-                                            toggleMessagePin(
-                                              message.id,
-                                              conversationId
-                                            )
-                                          }
-                                        ></i>
-                                      </div>
-                                    ) : (
-                                      <div>
-                                        {message.body &&
-                                          message.body.length > 100 ? (
-                                          <>
-                                            {message.body.substring(0, 100)}
-                                            ...
-                                            <button
-                                              onClick={() =>
-                                                toggleMessageExpansion(index)
-                                              }
-                                              className={`read-more-btn ${message.event_type_id === 1
-                                                ? "read-more-btn-right"
-                                                : "read-more-btn-left"
-                                                }`}
-                                            >
-                                              Read More
-                                            </button>
-                                            <i
-                                              style={{ cursor: "pointer" }}
-                                              className={`bi ${message.is_message_pinned
-                                                ? "bi-star-fill text-warning"
-                                                : "bi-star"
-                                                } star-icon cursor-pointer`}
-                                              onClick={() =>
-                                                toggleMessagePin(
-                                                  message.id,
-                                                  conversationId
-                                                )
-                                              }
-                                            ></i>
-                                          </>
-                                        ) : (
-                                          (
+                                          <i
+                                            className={`bi ${message.is_message_pinned
+                                              ? "bi-star-fill text-warning"
+                                              : "bi-star"
+                                              } star-icon`}
+                                            onClick={() =>
+                                              toggleMessagePin(
+                                                message.id,
+                                                conversationId
+                                              )
+                                            }
+                                          ></i>
+                                        </div>
+                                      ) : (
+                                        <div>
+                                          {message.body &&
+                                            message.body.length > 100 ? (
+                                            <>
+                                              {message.body.substring(0, 100)}
+                                              ...
+                                              <button
+                                                onClick={() =>
+                                                  toggleMessageExpansion(index)
+                                                }
+                                                className={`read-more-btn ${message.event_type_id === 1
+                                                  ? "read-more-btn-right"
+                                                  : "read-more-btn-left"
+                                                  }`}
+                                              >
+                                                Read More
+                                              </button>
+                                              <i
+                                                style={{ cursor: "pointer" }}
+                                                className={`bi ${message.is_message_pinned
+                                                  ? "bi-star-fill text-warning"
+                                                  : "bi-star"
+                                                  } star-icon cursor-pointer`}
+                                                onClick={() =>
+                                                  toggleMessagePin(
+                                                    message.id,
+                                                    conversationId
+                                                  )
+                                                }
+                                              ></i>
+                                            </>
+                                          ) : (
                                             <>
                                               {message.body}{" "}
                                               <i
@@ -1307,29 +1334,29 @@ const Dashboard = () => {
                                                 }
                                               ></i>
                                             </>
-                                          ) || "No message body"
-                                        )}
-                                      </div>
-                                    )}
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div
+                                    className={
+                                      message.event_type_id === 1
+                                        ? "message-date message-date-right"
+                                        : "message-date message-date-left"
+                                    }
+                                  >
+                                    {new Date(
+                                      message.created_at
+                                    ).toLocaleDateString()}
                                   </div>
                                 </div>
-                                <div
-                                  className={
-                                    message.event_type_id === 1
-                                      ? "message-date message-date-right"
-                                      : "message-date message-date-left"
-                                  }
-                                >
-                                  {new Date(
-                                    message.created_at
-                                  ).toLocaleDateString()}
-                                </div>
-                              </div>
-                            )
-                          )}
-                        </div>
-                      );
-                    })
+                              )
+                            )}
+                          </div>
+                        );
+                      })
+                      : "No chats found for this number"
                     : "Loading..."}
                 </div>
               </div>
