@@ -39,13 +39,13 @@ export class OpenPhoneEventService {
       }
 
       // Validate the payload
-      const errors = await validate(payload);
-      if (errors.length > 0) {
-        const errorMessages = errors
-          .map((error) => Object.values(error.constraints))
-          .flat();
-        throw new BadRequestException(`Invalid payload: ${errorMessages.join(", ")}`);
-      }
+      // const errors = await validate(payload);
+      // if (errors.length > 0) {
+      //   const errorMessages = errors
+      //     .map((error) => Object.values(error.constraints))
+      //     .flat();
+      //   throw new BadRequestException(`Invalid payload: ${errorMessages.join(", ")}`);
+      // }
 
       const messageData = payload.data.object;
       const body = messageData.body || null; // Handle the case where body might be null
