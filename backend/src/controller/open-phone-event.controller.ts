@@ -20,7 +20,7 @@ export class OpenPhoneEventController {
   constructor(
     private readonly openPhoneEventService: OpenPhoneEventService,
     private readonly addressService: AddressService
-  ) {}
+  ) { }
 
   @Post()
   async createOpenPhoneEvent(@Body() payload: any) {
@@ -34,6 +34,12 @@ export class OpenPhoneEventController {
 
       // Proceed with creating the event
       const { openPhoneEvent, addressCreated } = await this.openPhoneEventService.create(payload);
+
+
+      // If no entry was created in openPhoneEvent
+      if (!openPhoneEvent || !openPhoneEvent.id) {
+        return { message: "Empty payload received", status: 200 };
+      }
 
       let responseMessage = "Open phone event data created successfully.";
       if (addressCreated) {
@@ -63,9 +69,9 @@ export class OpenPhoneEventController {
   //   try {
   //     const signature = request.headers['openphone-signature'] as string | undefined;
   //     const isLocal = request.headers['is-local'] as string | undefined;
-      
+
   //     const isLocalEnv = isLocal === 'true';
-      
+
   //     if (!isLocalEnv && !signature) {
   //       throw new BadRequestException('Missing OpenPhone signature');
   //     }
