@@ -25,12 +25,15 @@ export class OpenPhoneEventController {
   @Post()
   async createOpenPhoneEvent(@Body() payload: any) {
     try {
-      console.log(
-        "🚀 ~ OpenPhoneEventController ~ createOpenPhoneEvent ~ payload:",
-        payload
-      );
-      const { openPhoneEvent, addressCreated } =
-        await this.openPhoneEventService.create(payload);
+      console.log("🚀 ~ OpenPhoneEventController ~ createOpenPhoneEvent ~ payload:", payload);
+
+      // Check for empty or null payload
+      if (!payload || Object.keys(payload).length === 0) {
+        return { message: "Empty payload received", status: 200 };
+      }
+
+      // Proceed with creating the event
+      const { openPhoneEvent, addressCreated } = await this.openPhoneEventService.create(payload);
 
       let responseMessage = "Open phone event data created successfully.";
       if (addressCreated) {
@@ -44,11 +47,10 @@ export class OpenPhoneEventController {
       };
     } catch (error) {
       console.error("Error in createOpenPhoneEvent:", error);
-      throw new InternalServerErrorException(
-        "Failed to create open phone event"
-      );
+      throw new InternalServerErrorException("Failed to create open phone event");
     }
   }
+
 
 
 
