@@ -26,8 +26,12 @@ interface Address1 {
   is_bookmarked: boolean;
   auction_event_id: number;
   created_at: string;
-  notificationCount: number; // Add this field
+  notificationCount: number; 
   address: string;
+  event_id: number;
+    is_read: boolean;
+
+
 
 }
 
@@ -527,7 +531,7 @@ const Dashboard = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
-  console.log("addressesToShow", addressesToShow);
+  // console.log("addressesToShow", addressesToShow);
 
 
 
@@ -684,7 +688,8 @@ const Dashboard = () => {
 
 
 
-  const handleAddressSelect = async (address: string, addressId: number) => {
+  const handleAddressSelect = async (address: string, addressId: number, event_id: number) => {
+    console.log(`Address: ${address}, AddressId: ${addressId}, EventId: ${event_id}`); // This should print the correct event_id
     setSelectedAddress(address);
     setSelectedAddressId(addressId);
     setEventData([]);
@@ -697,7 +702,6 @@ const Dashboard = () => {
     );
   
     try {
-      // Send an API request to mark notifications for this address as read
       const token = localStorage.getItem('authToken');
       const config = {
         headers: {
@@ -705,15 +709,21 @@ const Dashboard = () => {
         },
       };
   
-      await axios.post(`${Base_Url}notifications/mark-as-read`, { address_id: addressId }, config);
+      // API call to mark the specific notification as read
+      const response = await axios.post(`${Base_Url}notifications/${event_id}/read`, {}, config);
   
-      // Optionally, you can refetch notifications or update the notification state here
-      // const updatedNotifications = await axios.get(`${Base_Url}notifications`, config);
-      // setNotifications(updatedNotifications.data);
+      if (response.status === 200 || response.status === 201) {
+        setNotifications(prevNotifications => 
+          prevNotifications.filter(notification => notification.event_id !== event_id)
+        );
+      } else {
+        console.error("Failed to mark notification as read:", response);
+      }
     } catch (error) {
-      console.error("Error marking notifications as read:", error);
+      console.error("Error marking notification as read:", error);
     }
   };
+  
   
 
 
@@ -721,22 +731,10 @@ const Dashboard = () => {
     setSelectedAddress(address.fullAddress);
   };
 
-
-
-
-
-
-
-
   const toggleSidebar = () => {
     setIsSidebarVisible((prevState) => !prevState);
   };
-
-
-
-
-
-  const handleSelectAddress = (address: Address) => {
+ const handleSelectAddress = (address: Address) => {
     setInput(address.fullAddress);
     setResultsState([]);
 
@@ -1062,55 +1060,53 @@ const Dashboard = () => {
               </div>
             </div>
             <div>
-              <ul className="address-list">
-                <div className="search-wrapper-add">
-                  {results.length > 0 && (
-                    <SearchResultList results={results} onSelect={handleSelectAddress} />
-                  )}
-                </div>
+            <ul className="address-list">
+  <div className="search-wrapper-add">
+    {results.length > 0 && (
+      <SearchResultList results={results} onSelect={handleSelectAddress} />
+    )}
+  </div>
 
-                {currentAddresses.length > 0 ? (
-                  currentAddresses.map((address) => (
-                    <li
-                      key={address.id}
-                      className={`list-group-item justify-content-between ${selectedAddressId === address.id ? "selected-address" : ""
-                        }`}
-                      onClick={() => handleAddressSelect(address.displayAddress, address.id)}
-                    >
-                      <div className="setaddress d-flex align-items-center gap-3">
-                        <i
-                          className={`bi ${address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
-                            } clickable-icon`}
-                          style={{
-                            cursor: "pointer",
-                            color: address.is_bookmarked ? "blue" : "grey",
-                          }}
-                          onClick={() => handleBookmarkClick(address.id)}
-                        ></i>
+  {currentAddresses.length > 0 ? (
+  currentAddresses.map((address) => (
+    <li
+      key={address.id}
+      className={`list-group-item justify-content-between ${selectedAddressId === address.id ? "selected-address" : ""
+        }`}
+      onClick={() => handleAddressSelect(address.displayAddress, address.id, address.event_id)} // No conversion needed
+    >
+      <div className="setaddress d-flex align-items-center gap-3">
+        <i
+          className={`bi ${address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
+            } clickable-icon`}
+          style={{
+            cursor: "pointer",
+            color: address.is_bookmarked ? "blue" : "grey",
+          }}
+          onClick={() => handleBookmarkClick(address.id)}
+        ></i>
 
-                        <span className="ml-2">
-                          {address.displayAddress || address.fullAddress}
-                          {address.notificationCount > 0 && (
-                            <span className="notification-count ml-2">
-                              ({address.notificationCount})
-                            </span>
-                          )}
-                        </span>
-                      </div>
+        <span className="ml-2">
+          {address.displayAddress || address.fullAddress}
+          {address.notificationCount > 0 && (
+            <span className="notification-count ml-2">
+              ({address.notificationCount})
+            </span>
+          )}
+        </span>
+      </div>
 
-                      {address.fullAddress && (
-                        <div className="filtered-address">
-                          {address.fullAddress}
-                        </div>
-                      )}
-                    </li>
-                  ))
-                ) : (
-                  <p>No addresses found.</p>
-                )}
-
-
-              </ul>
+      {address.fullAddress && (
+        <div className="filtered-address">
+          {address.fullAddress}
+        </div>
+      )}
+    </li>
+  ))
+) : (
+  <p>No addresses found.</p>
+)}
+</ul>
 
 
 
@@ -1204,11 +1200,11 @@ const Dashboard = () => {
                     const isStop = updatedMessages[conversationId].some(
                       (message) => message.is_stop
                     );
-                    console.log(
-                      "🚀 ~ Dashboard ~ isStop:",
-                      updatedMessages,
-                      isStop
-                    );
+                    // console.log(
+                    //   "🚀 ~ Dashboard ~ isStop:",
+                    //   updatedMessages,
+                    //   isStop
+                    // );
 
                     return (
                       <div key={conversationId}>

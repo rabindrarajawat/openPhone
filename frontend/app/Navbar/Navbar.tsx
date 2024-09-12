@@ -6,6 +6,8 @@ import './Navbar.css';
 import NotificationItem from '../msgnotificationiItem';
 import CallNotificationItem from '../callnotificationitem';
 
+
+
 interface Notification {
   id: number;
   address_id: number | null;
@@ -42,6 +44,8 @@ const Navbar: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState('messages');
 
+
+
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     if (token) {
@@ -68,7 +72,7 @@ const Navbar: React.FC = () => {
         setNotifications(response.data.filter((notification: Notification) => !notification.is_read));
       } catch (error) {
         console.error("Error fetching notifications:", error);
-        setNotifications([]);
+        setNotifications([])
       }
     };
 
@@ -97,7 +101,7 @@ const Navbar: React.FC = () => {
       const response = await axios.post(`${Base_Url}notifications/${event_id}/read`, {}, config);
       
       if (response.status === 200 || response.status === 201) {
-        setNotifications(prevNotifications =>
+        setNotifications(prevNotifications => 
           prevNotifications.filter(notification => notification.event_id !== event_id)
         );
       } else {
