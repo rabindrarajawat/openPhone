@@ -148,14 +148,37 @@
 }
 
 .round-input1 {
-  border-radius: 50%;
+  /* border-radius: 50%;
   padding: 18px;
   width: 50px;
   height: 50px;
   border: 2px solid #dadbdd;
-  box-shadow: 0px 2px 5px 0px #26334d08;
+  box-shadow: 0px 2px 5px 0px #26334d08;*/
   margin-left: -55px;
   margin-top: 8px;
+  width: 50px;
+  /* Equal width and height for a perfect circle */
+  height: 50px;
+  text-align: center;
+  /* Center the text */
+  font-size: 14px;
+  /* Adjust font size to fit inside the circle */
+  padding: 0;
+  /* Remove padding to prevent overflow */
+  border-radius: 50%;
+  /* Make the input circular */
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .round-input1 {
+    width: 40px;
+    /* Adjust for smaller screens */
+    height: 40px;
+    font-size: 12px;
+    /* Smaller font size for smaller screens */
+  }
 }
 
 .nav-msg1 {
@@ -222,10 +245,11 @@
   margin-top: 201px;
   margin-left: -120px;
   padding-left: 14px;
-  padding-right: 30px;
+  padding-right: 10px;
   border: 3px solid #D7F5DC;
   border-radius: 6px;
   height: 585px;
+  width: 300px;
 }
 
 
@@ -663,10 +687,26 @@
 }
 
 .address-list {
-  /* margin-left: 11px; */
-  margin-top: 49px;
-  /* margin-right: -65px; */
+  margin-top: 20px;
+  padding-right: 10px;
+  overflow-y: auto;
+  height: 450px;
+  /* width: 250px; */
+
 }
+
+.address-list-container {
+  height: 400px;
+  /* Set this to the maximum height you want the address list to occupy */
+  overflow-y: auto;
+  /* Enable vertical scrolling if the content exceeds the height */
+  border: 1px solid #ddd;
+  /* Optional: Add a border to define the container */
+  padding: 10px;
+  /* Optional: Add padding inside the container */
+}
+
+
 
 .checkbox {
   cursor: pointer;
