@@ -17,7 +17,7 @@
 
 .content-with-border-right {
   border-right: 2px solid #e8e8e8;
-  padding-right: 43px;
+  padding-right: 8px;
   height: 85vh;
 
 }
@@ -144,18 +144,39 @@
   align-items: left;
   margin-left: -10px;
   margin-top: 15px;
-  gap: 60px;
+  gap: 48px;
 }
 
 .round-input1 {
-  border-radius: 50%;
-  padding: 18px;
-  width: 50px;
-  height: 50px;
-  border: 2px solid #dadbdd;
-  box-shadow: 0px 2px 5px 0px #26334d08;
+
   margin-left: -55px;
   margin-top: 8px;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  font-size: 14px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .round-input1 {
+    width: 40px;
+    /* Adjust for smaller screens */
+    height: 40px;
+    font-size: 12px;
+    /* Smaller font size for smaller screens */
+  }
+}
+
+@media (max-width: 600px) {
+  .round-input {
+    width: 40px;
+    height: 40px;
+    font-size: 1px;
+  }
 }
 
 .nav-msg1 {
@@ -222,10 +243,11 @@
   margin-top: 201px;
   margin-left: -120px;
   padding-left: 14px;
-  padding-right: 30px;
+  padding-right: 10px;
   border: 3px solid #D7F5DC;
   border-radius: 6px;
-  height:630px;
+  height: 585px;
+  width: 300px;
 }
 
 
@@ -263,7 +285,7 @@
 
 .icon-labels {
   align-items: center;
-  margin-left: 195px;
+  margin-left: 192px;
   margin-top: -33px;
   display: flex;
 }
@@ -318,7 +340,6 @@
 }
 
 .round-input {
-  border-radius: 50%;
   padding: 8px;
   width: 27px;
   height: 27px;
@@ -326,6 +347,13 @@
   box-shadow: 0px 2px 5px 0px #26334d08;
   margin-left: -35px;
   margin-top: 3px;
+  text-align: center;
+  font-size: 12px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+
 }
 
 .logos-row-msg {
@@ -338,14 +366,12 @@
 }
 
 .nav-msg {
-  /* text-align: center; */
   display: flex;
-  /* flex-direction: column; */
   align-items: center;
 }
 
 .message {
-  width: 210px;
+  width: 205px;
   height: 39px;
   border: 2px solid grey;
   border-radius: 3.27px;
@@ -595,7 +621,7 @@
   width: 350px;
   height: 310px;
   margin-top: 30px;
-  margin-left: -452px;
+  margin-left: -435px;
   display: flexs;
 }
 
@@ -663,10 +689,26 @@
 }
 
 .address-list {
-  /* margin-left: 11px; */
-  margin-top: 49px;
-  /* margin-right: -65px; */
+  margin-top: 20px;
+  padding-right: 10px;
+  overflow-y: auto;
+  height: 450px;
+  /* width: 250px; */
+
 }
+
+.address-list-container {
+  height: 400px;
+  /* Set this to the maximum height you want the address list to occupy */
+  overflow-y: auto;
+  /* Enable vertical scrolling if the content exceeds the height */
+  border: 1px solid #ddd;
+  /* Optional: Add a border to define the container */
+  padding: 10px;
+  /* Optional: Add padding inside the container */
+}
+
+
 
 .checkbox {
   cursor: pointer;
@@ -691,12 +733,17 @@
 }
 
 .main-content {
-  margin-left: 81px;
+  margin-left: 25px;
+}
+
+.dataa {
+  margin-left: -25px;
 }
 
 .main-main {
   display: flex;
   margin-top: -50px;
+  margin-left: 40px;
 }
 
 @media (max-width: 367px) {
