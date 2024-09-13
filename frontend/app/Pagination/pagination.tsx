@@ -20,17 +20,18 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
     }
   };
 
-  const pageRange = 5;
+  const pageRange = 2; // Number of pages to show around the current page
   let startPage = Math.max(1, currentPage - Math.floor(pageRange / 2));
   let endPage = Math.min(totalPages, startPage + pageRange - 1);
 
+  // Adjust startPage if endPage is too close to totalPages
   if (endPage - startPage < pageRange - 1) {
     startPage = Math.max(1, endPage - pageRange + 1);
   }
 
   return (
     <nav className="pagination-container">
-      <ul className="pagination  setPagination">
+      <ul className="pagination setPagination">
         <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
           <button className="page-link" onClick={handlePrevious}>
             &lt;&lt;
