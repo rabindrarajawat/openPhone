@@ -1137,7 +1137,7 @@ const Dashboard = () => {
                   <input
                     type="text"
                     className="round-input"
-                    value={messageDelivered}
+                    value={formatCount(messageDelivered)}
                     readOnly
                   />
                 </div>
@@ -1146,7 +1146,7 @@ const Dashboard = () => {
                   <input
                     type="text"
                     className="round-input"
-                    value={messageResponse}
+                    value={formatCount(messageResponse)}
                     readOnly
                   />
                 </div>
@@ -1155,7 +1155,7 @@ const Dashboard = () => {
                   <input
                     type="text"
                     className="round-input"
-                    value={call}
+                    value={formatCount(call)}
                     readOnly
                   />
                 </div>
@@ -1164,7 +1164,7 @@ const Dashboard = () => {
                   <input
                     type="text"
                     className="round-input"
-                    value={callResponse}
+                    value={formatCount(callResponse)}
                     readOnly
                   />
                 </div>
