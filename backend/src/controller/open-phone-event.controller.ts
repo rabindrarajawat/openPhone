@@ -20,17 +20,26 @@ export class OpenPhoneEventController {
   constructor(
     private readonly openPhoneEventService: OpenPhoneEventService,
     private readonly addressService: AddressService
-  ) {}
+  ) { }
 
   @Post()
   async createOpenPhoneEvent(@Body() payload: any) {
     try {
-      console.log(
-        "🚀 ~ OpenPhoneEventController ~ createOpenPhoneEvent ~ payload:",
-        payload
-      );
-      const { openPhoneEvent, addressCreated } =
-        await this.openPhoneEventService.create(payload);
+      console.log("🚀 ~ OpenPhoneEventController ~ createOpenPhoneEvent ~ payload:", payload);
+
+      // Check for empty or null payload
+      if (!payload || Object.keys(payload).length === 0) {
+        return { message: "Empty payload received", status: 200 };
+      }
+
+      // Proceed with creating the event
+      const { openPhoneEvent, addressCreated } = await this.openPhoneEventService.create(payload);
+
+
+      // If no entry was created in openPhoneEvent
+      if (!openPhoneEvent || !openPhoneEvent.id) {
+        return { message: "Empty payload received", status: 200 };
+      }
 
       let responseMessage = "Open phone event data created successfully.";
       if (addressCreated) {
@@ -39,16 +48,15 @@ export class OpenPhoneEventController {
 
       return {
         message: responseMessage,
-        openPhoneEventId: openPhoneEvent.id,
+        openPhoneEventId: openPhoneEvent?.id,
         addressCreated: addressCreated,
       };
     } catch (error) {
       console.error("Error in createOpenPhoneEvent:", error);
-      throw new InternalServerErrorException(
-        "Failed to create open phone event"
-      );
+      throw new InternalServerErrorException("Failed to create open phone event");
     }
   }
+
 
 
 
@@ -61,9 +69,9 @@ export class OpenPhoneEventController {
   //   try {
   //     const signature = request.headers['openphone-signature'] as string | undefined;
   //     const isLocal = request.headers['is-local'] as string | undefined;
-      
+
   //     const isLocalEnv = isLocal === 'true';
-      
+
   //     if (!isLocalEnv && !signature) {
   //       throw new BadRequestException('Missing OpenPhone signature');
   //     }

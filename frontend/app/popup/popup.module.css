@@ -1,0 +1,60 @@
+.dropdownMenu {
+    border: 3px solid #D7F5DC;
+    border-radius: 8px;
+    margin-top: 5px;
+    overflow-y: auto;
+    height: 250px;
+    padding-top: 15px;
+}
+
+.searchInput {
+    border: 3px solid #D7F5DC;
+    margin-left: 5px;
+    border-radius: 20px;
+    width: 50%;
+
+}
+
+.dropdownItem {
+    padding-top: 25px;
+    padding-left: 10px;
+    cursor: pointer;
+}
+
+.dropdownItem:hover {
+    color: #0d6efd;
+
+}
+
+/* Dropdown Button Styles */
+.dropdownButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: inherit;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 1s ease;
+}
+
+.dropdownButton:hover {
+    background-color: #0056b3;
+}
+
+.dropdownToggle {
+    position: relative;
+}
+
+.dropdownIcon {
+    margin-left: 10px;
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.open {
+    transform: rotate(180deg);
+}

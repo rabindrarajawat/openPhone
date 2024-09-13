@@ -14,9 +14,6 @@ import Pagination from "../Pagination/pagination";
 
 interface Address {
   fullAddress: string;
-
-
-
 }
 
 interface Address1 {
@@ -26,13 +23,8 @@ interface Address1 {
   is_bookmarked: boolean;
   auction_event_id: number;
   created_at: string;
-  notificationCount: number; 
+  notificationCount: number; // Add this field
   address: string;
-  event_id: number;
-    is_read: boolean;
-
-
-
 }
 
 interface Message {
@@ -42,8 +34,6 @@ interface Message {
   created_at: string;
   conversation_id: string;
 }
-
-
 
 interface Notification {
   id: number;
@@ -163,20 +153,10 @@ const Dashboard = () => {
   const [addresses2, setAddresses2] = useState<Address1[]>([]);
   const [filteredAddresses2, setFilteredAddresses2] = useState<Address1[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-
-
+  const [searchTo, setSearchTo] = useState(""); // State to hold search input
   const addressesPerPage = 9;
 
-
-
-
-
-
   useEffect(() => {
-
-    // Retrieve Token
-
-
     const storedPins = localStorage.getItem("pinnedConversations");
     if (storedPins) {
       setPinnedConversations(new Set<string>(JSON.parse(storedPins)));
@@ -193,9 +173,11 @@ const Dashboard = () => {
   }, [router]);
 
 
+
   useEffect(() => {
     const fetchData = async () => {
 
+      // Retrieve Token
       const token = localStorage.getItem('authToken');
       const config = {
         headers: {
@@ -206,6 +188,7 @@ const Dashboard = () => {
       console.log('Token being used:', token);
 
       try {
+        // Fetch all addresses with the token in the headers
         console.log("Config before getalladdress:", config);
         const addressResponse = await axios.get(
           `${Base_Url}address/getalladdress`,
@@ -225,6 +208,7 @@ const Dashboard = () => {
         setFilteredAddresses2(formattedAddresses);
         console.log("Formatted addresses:", formattedAddresses);
 
+        // Fetch unread notifications with the token in the headers
 
         console.log("Config before notifications:", config);
         const notificationResponse = await axios.get(
@@ -233,13 +217,14 @@ const Dashboard = () => {
         console.log("Config for address API:", config);
 
 
-        console.log("Notification API Response:", notificationResponse); 
+        console.log("Notification API Response:", notificationResponse); // Log the response to check what’s returned
 
         const unreadNotifications = notificationResponse.data.filter(
           (notification: any) => !notification.is_read
         );
         setNotifications(unreadNotifications);
 
+        // Calculate notification counts
         const addressNotificationCounts = formattedAddresses.map(
           (address: any) => {
             const count = unreadNotifications.filter(
@@ -251,6 +236,7 @@ const Dashboard = () => {
 
         setAddresses1(addressNotificationCounts);
 
+        // Set default selected address
         if (addressNotificationCounts.length > 0) {
           setSelectedAddress(addressNotificationCounts[0].displayAddress);
           setSelectedAddressId(addressNotificationCounts[0].id);
@@ -264,8 +250,10 @@ const Dashboard = () => {
   }, [Base_Url]);
 
 
+
   useEffect(() => {
 
+    // Retrieve Token
     const token = localStorage.getItem('authToken');
     const config = {
       headers: {
@@ -280,6 +268,7 @@ const Dashboard = () => {
       let receivedAddresses = [];
 
       if (deliveredChecked) {
+        // Fetch delivered addresses
         const deliveredResponse = await axios.get(`${Base_Url}openPhoneEventData?filter=delivered`, config);
         deliveredAddresses = deliveredResponse.data.data
           .filter((event: { event_type_id: number; }) => event.event_type_id === 2)
@@ -287,15 +276,18 @@ const Dashboard = () => {
       }
 
       if (receivedChecked) {
+        // Fetch received addresses
         const receivedResponse = await axios.get(`${Base_Url}openPhoneEventData?filter=received`, config);
         receivedAddresses = receivedResponse.data.data
           .map((event: { address: any; }) => event.address);
       }
 
+      // Combine both delivered and received addresses
       const combinedAddresses = [...new Set([...deliveredAddresses, ...receivedAddresses])];
 
+      // Filter the addresses based on the combined addresses
       const filtered = addresses2.filter((addressObj: { address: any; }) => combinedAddresses.includes(addressObj.address));
-      console.log('Filtered Addresses:', filtered); 
+      console.log('Filtered Addresses:', filtered); // Log filtered addresses
       setFilteredAddresses2(filtered.length > 0 ? filtered : addresses2);
     };
 
@@ -306,6 +298,7 @@ const Dashboard = () => {
 
   useEffect(() => {
 
+    // Retrieve Token
     const token = localStorage.getItem('authToken');
     const config = {
       headers: {
@@ -332,7 +325,8 @@ const Dashboard = () => {
     };
 
     fetchEventCounts();
-  }, [Base_Url]); 
+  }, [Base_Url]); // Empty dependency array means this effect runs once on mount
+
 
 
 
@@ -508,30 +502,31 @@ const Dashboard = () => {
 
 
 
-  // Calculate indices for pagination
   const indexOfLastAddress = currentPage * addressesPerPage;
   const indexOfFirstAddress = indexOfLastAddress - addressesPerPage;
 
-  // Determine the addresses to show based on the filtered results
-  const addressesToShow = filteredAddresses.length > 0
-    ? filteredAddresses.filter((address) =>
-      filteredAddresses2.some((filteredAddress) => filteredAddress.address === address.address)
-    )
-    : filteredAddresses2.length > 0
-      ? filteredAddresses2
-      : addresses1;
+  const addressesToShow =
+    filteredAddresses.length > 0 // If there are any filtered addresses
+      ? filteredAddresses.filter((address) =>
+        filteredAddresses2.some(
+          (filteredAddress) => filteredAddress.address === address.address
+        )
+      )
+      : [];
 
-  // Apply pagination to the addressesToShow
-  const currentAddresses = addressesToShow.slice(indexOfFirstAddress, indexOfLastAddress);
+  const currentAddresses = addressesToShow.slice(
+    indexOfFirstAddress,
+    indexOfLastAddress
+  );
 
-  // Calculate total pages for pagination
   const totalPages = Math.ceil(addressesToShow.length / addressesPerPage);
 
-  // Handler to change the page
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
+
   // console.log("addressesToShow", addressesToShow);
+
 
 
 
@@ -579,7 +574,7 @@ const Dashboard = () => {
 
   const handleBookmarkClick = (addressId: number) => {
     const token = localStorage.getItem('authToken');
-      
+
     if (!token) {
       console.error("No authentication token found.");
       return;
@@ -590,6 +585,7 @@ const Dashboard = () => {
         Authorization: `Bearer ${token}`,
       },
     };
+
     const address = addresses1.find((a) => a.id === addressId);
     if (!address) return;
 
@@ -602,7 +598,7 @@ const Dashboard = () => {
     axios
       .post(`${Base_Url}bookmarks/${addressId}`, {
         is_bookmarked: newIsBookmarked
-      },config
+      }, config
       )
       .then((response) => {
         // Update the state only if the API call was successful
@@ -620,42 +616,42 @@ const Dashboard = () => {
   const handlePinNumber = async (conversationId: string) => {
     try {
       const token = localStorage.getItem('authToken');
-      
+
       if (!token) {
         console.error("No authentication token found.");
         return;
       }
-  
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       };
-  
+
       const isPinned = pinnedConversations.has(conversationId);
-  
+
       // API call to toggle pin/unpin
       const response = await axios.post(
-        `${Base_Url}openPhoneEventData/toggle-number-pin/${conversationId}`, 
-        {},  
-        config 
+        `${Base_Url}openPhoneEventData/toggle-number-pin/${conversationId}`,
+        {},
+        config
       );
-  
+
       if (response.status === 200 || response.status === 201) {
         setPinnedConversations((prevState) => {
           const newSet = new Set<string>(prevState);
-  
+
           if (isPinned) {
             newSet.delete(conversationId);
           } else {
             newSet.add(conversationId);
           }
-  
+
           localStorage.setItem(
             "pinnedConversations",
             JSON.stringify([...newSet])
           );
-  
+
           return newSet;
         });
       } else {
@@ -665,7 +661,9 @@ const Dashboard = () => {
       console.error("Error toggling the pin:", error);
     }
   };
-  
+
+
+
 
 
 
@@ -688,53 +686,33 @@ const Dashboard = () => {
 
 
 
-  const handleAddressSelect = async (address: string, addressId: number, event_id: number) => {
-    console.log(`Address: ${address}, AddressId: ${addressId}, EventId: ${event_id}`); // This should print the correct event_id
+  const handleAddressSelect = (address: string, addressId: number) => {
     setSelectedAddress(address);
     setSelectedAddressId(addressId);
     setEventData([]);
-  
-    // Update the state to remove the notification count for the selected address
-    setAddresses1(prevAddresses =>
-      prevAddresses.map(addr =>
-        addr.id === addressId ? { ...addr, notificationCount: 0 } : addr
-      )
-    );
-  
-    try {
-      const token = localStorage.getItem('authToken');
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-  
-      // API call to mark the specific notification as read
-      const response = await axios.post(`${Base_Url}notifications/${event_id}/read`, {}, config);
-  
-      if (response.status === 200 || response.status === 201) {
-        setNotifications(prevNotifications => 
-          prevNotifications.filter(notification => notification.event_id !== event_id)
-        );
-      } else {
-        console.error("Failed to mark notification as read:", response);
-      }
-    } catch (error) {
-      console.error("Error marking notification as read:", error);
-    }
   };
-  
-  
 
 
   const handleAddressSelect1 = (address: Address) => {
     setSelectedAddress(address.fullAddress);
   };
 
+
+
+
+
+
+
+
   const toggleSidebar = () => {
     setIsSidebarVisible((prevState) => !prevState);
   };
- const handleSelectAddress = (address: Address) => {
+
+
+
+
+
+  const handleSelectAddress = (address: Address) => {
     setInput(address.fullAddress);
     setResultsState([]);
 
@@ -781,11 +759,35 @@ const Dashboard = () => {
     }
   };
 
+  const handleSearchToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTo(e.target.value);
+  };
+
+  // Filter messages based on the search query
+  const filteredMessages = searchTo
+    ? Object.keys(updatedMessages).filter((conversationId) =>
+      updatedMessages[conversationId].some((message) =>
+        message.to.toLowerCase().includes(searchTo.toLowerCase())
+      )
+    )
+    : Object.keys(updatedMessages);
+
+  // Function to format the count
+  const formatCount = (count: number) => {
+    if (count >= 1000000) {
+      return (count / 1000000).toFixed(1) + 'M'; // Convert to millions
+    } else if (count >= 1000) {
+      return (count / 1000).toFixed(1) + 'K'; // Convert to thousands
+    }
+    return count; // Return the original count if it's less than 1000
+  };
+
+
   return (
     <div>
       <Navbar
-        // toggleSidebar={toggleSidebar}
-        // onSelectAddress={handleAddressSelect1}
+      // toggleSidebar={toggleSidebar}
+      // onSelectAddress={handleAddressSelect1}
       />
       {isSidebarVisible && <SideBar />}
       <div className="main-container">
@@ -989,7 +991,7 @@ const Dashboard = () => {
               <input
                 type="text"
                 className="round-input1"
-                value={counts.messageDelivered}
+                value={formatCount(counts.messageDelivered)}
                 readOnly
               />
             </div>
@@ -998,7 +1000,7 @@ const Dashboard = () => {
               <input
                 type="text"
                 className="round-input1"
-                value={counts.messageResponse}
+                value={formatCount(counts.messageResponse)}
                 readOnly
               />
             </div>
@@ -1007,7 +1009,7 @@ const Dashboard = () => {
               <input
                 type="text"
                 className="round-input1"
-                value={counts.call}
+                value={formatCount(counts.call)}
                 readOnly
               />
             </div>
@@ -1016,277 +1018,247 @@ const Dashboard = () => {
               <input
                 type="text"
                 className="round-input1"
-                value={counts.callResponse}
+                value={formatCount(counts.callResponse)}
                 readOnly
               />
             </div>
           </div>
         </div>
-
-        <div className="main-Address ">
-          <span className="">
-            {" "}
-            <Image src="/User.svg" alt="users" width={24} height={24} className="person-icon ms-4" />
-          </span>
-          <div className="Address ms-4">Address</div>
-          <div className="main-search">
-            <div className="search-box ">
-              <span className="icon">
-                <Image src="/Icon.svg" alt="icon" width={24} height={24} />
-              </span>
-              <input
-                type="text"
-                placeholder="Search Address"
-                value={searchQuery}
-                onChange={handleSearchChange}
-              ></input>
-            </div>
-
-            <div className="icon-labels">
-              <div
-                className={`bookmark-container text-center ${filterOption === "bookmarked" ? "active-filter" : ""
-                  }`}
-                onClick={() => handleFilterChange("bookmarked")}
-              >
-                <i className="bi bi-bookmark ms-4"></i>
-                <div className="ms-4">Select all</div>
-              </div>
-              <div
-                className="redo-container text-center"
-                onClick={handleDefaultClick}
-              >
-                <Image src="/redo.svg" alt="redo" width={24} height={24} className="ms-3" />
-                <div>Default</div>
-              </div>
-            </div>
-            <div>
-            <ul className="address-list">
-  <div className="search-wrapper-add">
-    {results.length > 0 && (
-      <SearchResultList results={results} onSelect={handleSelectAddress} />
-    )}
-  </div>
-
-  {currentAddresses.length > 0 ? (
-  currentAddresses.map((address) => (
-    <li
-      key={address.id}
-      className={`list-group-item justify-content-between ${selectedAddressId === address.id ? "selected-address" : ""
-        }`}
-      onClick={() => handleAddressSelect(address.displayAddress, address.id, address.event_id)} // No conversion needed
-    >
-      <div className="setaddress d-flex align-items-center gap-3">
-        <i
-          className={`bi ${address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
-            } clickable-icon`}
-          style={{
-            cursor: "pointer",
-            color: address.is_bookmarked ? "blue" : "grey",
-          }}
-          onClick={() => handleBookmarkClick(address.id)}
-        ></i>
-
-        <span className="ml-2">
-          {address.displayAddress || address.fullAddress}
-          {address.notificationCount > 0 && (
-            <span className="notification-count ml-2">
-              ({address.notificationCount})
+        <div className="main-main">
+          <div className="main-Address ">
+            <span className="">
+              {" "}
+              <Image src="/User.svg" alt="users" width={24} height={24} className="person-icon ms-4" />
             </span>
-          )}
-        </span>
-      </div>
-
-      {address.fullAddress && (
-        <div className="filtered-address">
-          {address.fullAddress}
-        </div>
-      )}
-    </li>
-  ))
-) : (
-  <p>No addresses found.</p>
-)}
-</ul>
-
-
-
-            </div>
-
-          </div>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-
-        </div>
-
-        <div>
-          <div className="Analyticdata ">
-            <span>
-              <i className="bi bi-bar-chart-line-fill"></i>
-            </span>
-            <span className="ms-4">Analytic Data of Selected Address</span>
-          </div>
-          <div className=" main-message">
-            <div className="logos-row-msg">
-              <div className="nav-msg">
-                <div className="message Delivered">Message Delivered</div>
+            <div className="Address ms-4">Address</div>
+            <div className="main-search">
+              <div className="search-box ">
+                <span className="icon">
+                  <Image src="/Icon.svg" alt="icon" width={24} height={24} />
+                </span>
                 <input
                   type="text"
-                  className="round-input"
-                  value={messageDelivered}
-                  readOnly
-                />
+                  placeholder="Search Address"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                ></input>
               </div>
-              <div className="nav-msg">
-                <div className="message response1 ">Message Response</div>
-                <input
-                  type="text"
-                  className="round-input"
-                  value={messageResponse}
-                  readOnly
-                />
-              </div>
-              <div className="nav-msg">
-                <div className="message call-1">Call </div>
-                <input
-                  type="text"
-                  className="round-input"
-                  value={call}
-                  readOnly
-                />
-              </div>
-              <div className="nav-msg">
-                <div className="message call-response-1">Call Response</div>
-                <input
-                  type="text"
-                  className="round-input"
-                  value={callResponse}
-                  readOnly
-                />
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <div className="conversation">
-          {selectedAddress && (
-            <div className="conversation-chat">
-              <Image src="converstation.svg" alt="" width={24} height={24} /> Conversation From { }
-              {uniqueFromNumbers.length > 0 && (
-                <select
-                  value={fromNumber}
-                  onChange={(e) => setFromNumber(e.target.value)} // Update fromNumber on selection
+              <div className="icon-labels">
+                <div
+                  className={`bookmark-container text-center ${filterOption === "bookmarked" ? "active-filter" : ""
+                    }`}
+                  onClick={() => handleFilterChange("bookmarked")}
                 >
-                  {uniqueFromNumbers.map((number, index) => (
-                    <option key={index} value={number}>
-                      {number}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-          )}
-
-          <div className="search-wrapper ">
-            <input className="search" type="search" placeholder="Search To" />
-          </div>
-          <div className="input-msg">
-            <div className="screenshot-msg">
-              <div className="inbox-chat">
-                {events.length > 0
-                  ? Object.keys(updatedMessages).map((conversationId) => {
-                    const isStop = updatedMessages[conversationId].some(
-                      (message) => message.is_stop
-                    );
-                    // console.log(
-                    //   "🚀 ~ Dashboard ~ isStop:",
-                    //   updatedMessages,
-                    //   isStop
-                    // );
-
-                    return (
-                      <div key={conversationId}>
-                        <div className="to-line">.</div>
-                        <div className="to-value">
-                          <strong>To </strong>
-                          <span style={{ color: isStop ? "red" : "inherit" }}>
-                            {updatedMessages[conversationId][0].to}
-                          </span>
-
+                  <i className="bi bi-bookmark ms-4"></i>
+                  <div className="ms-4">Select all</div>
+                </div>
+                <div
+                  className="redo-container text-center"
+                  onClick={handleDefaultClick}
+                >
+                  <Image src="/redo.svg" alt="redo" width={24} height={24} className="ms-3" />
+                  <div>Default</div>
+                </div>
+              </div>
+              <div>
+                <ul className="address-list">
+                  <div className="search-wrapper-add">
+                    {results.length > 0 && (
+                      <SearchResultList results={results} onSelect={handleSelectAddress} />
+                    )}
+                  </div>
+                  {currentAddresses.length > 0 ? (
+                    currentAddresses.map((address) => (
+                      <li
+                        key={address.id}
+                        className={`list-group-item justify-content-between ${selectedAddressId === address.id ? "selected-address" : ""
+                          }`}
+                        onClick={() => handleAddressSelect(address.displayAddress, address.id)}
+                      >
+                        <div className="setaddress d-flex align-items-center gap-3">
                           <i
-                            className={`bi pinnumber ${pinnedConversations.has(conversationId)
-                              ? "bi-pin-fill text-primary"
-                              : "bi-pin"
-                              }`}
-                            onClick={() => handlePinNumber(conversationId)}
+                            className={`bi ${address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
+                              } clickable-icon`}
+                            style={{
+                              cursor: "pointer",
+                              color: address.is_bookmarked ? "blue" : "grey",
+                            }}
+                            onClick={() => handleBookmarkClick(address.id)}
                           ></i>
+
+                          <span className="ml-2">
+                            {address.displayAddress || address.fullAddress}
+                            {address.notificationCount > 0 && (
+                              <span className="notification-count ml-2">
+                                ({address.notificationCount})
+                              </span>
+                            )}
+                          </span>
                         </div>
 
-                        {updatedMessages[conversationId].map(
-                          (message, index) => (
-                            <div key={index}>
-                              <div
-                                className={
-                                  message.event_type_id === 1
-                                    ? "chat-message-right"
-                                    : "chat-message-left"
-                                }
-                              >
-                                <div className="message-body-1">
-                                  {expandedMessages.has(index) ? (
-                                    <div>
-                                      {message.body}
-                                      <button
-                                        onClick={() =>
-                                          toggleMessageExpansion(index)
-                                        }
-                                        className={`read-less-btn ${message.event_type_id === 1
-                                          ? "read-less-btn-right"
-                                          : "read-less-btn-left"
-                                          }`}
-                                      >
-                                        Read Less
-                                      </button>
+                        {address.fullAddress && (
+                          <div className="filtered-address">
+                            {address.fullAddress}
+                          </div>
+                        )}
+                      </li>
+                    ))
+                  ) : (
+                    <p>No addresses found.</p>
+                  )}
+                </ul>
 
-                                      <i
-                                        className={`bi ${message.is_message_pinned
-                                          ? "bi-star-fill text-warning"
-                                          : "bi-star"
-                                          } star-icon`}
-                                        onClick={() =>
-                                          toggleMessagePin(
-                                            message.id,
-                                            conversationId
-                                          )
-                                        }
-                                      ></i>
-                                    </div>
-                                  ) : (
-                                    <div>
-                                      {message.body &&
-                                        message.body.length > 100 ? (
-                                        <>
-                                          {message.body.substring(0, 100)}
-                                          ...
+              </div>
+            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+
+          <div className="dataa">
+            <div className="Analyticdata ">
+              <span>
+                <i className="bi bi-bar-chart-line-fill"></i>
+              </span>
+              <span className="ms-4">Analytic Data of Selected Address</span>
+            </div>
+            <div className=" main-message">
+              <div className="logos-row-msg">
+                <div className="nav-msg">
+                  <div className="message Delivered">Message Delivered</div>
+                  <input
+                    type="text"
+                    className="round-input"
+                    value={formatCount(messageDelivered)}
+                    readOnly
+                  />
+                </div>
+                <div className="nav-msg">
+                  <div className="message response1 ">Message Response</div>
+                  <input
+                    type="text"
+                    className="round-input"
+                    value={formatCount(messageResponse)}
+                    readOnly
+                  />
+                </div>
+                <div className="nav-msg">
+                  <div className="message call-1">Call </div>
+                  <input
+                    type="text"
+                    className="round-input"
+                    value={formatCount(call)}
+                    readOnly
+                  />
+                </div>
+                <div className="nav-msg">
+                  <div className="message call-response-1">Call Response</div>
+                  <input
+                    type="text"
+                    className="round-input"
+                    value={formatCount(callResponse)}
+                    readOnly
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="conversation">
+            {selectedAddress && (
+              <div className="conversation-chat">
+                <Image src="converstation.svg" alt="" width={24} height={24} />{" "}
+                Conversation From{" "}
+                {uniqueFromNumbers.length > 0 && (
+                  <select
+                    value={fromNumber}
+                    onChange={(e) => setFromNumber(e.target.value)} // Update fromNumber on selection
+                  >
+                    {uniqueFromNumbers.map((number, index) => (
+                      <option key={index} value={number}>
+                        {number}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            )}
+
+            <div className="search-wrapper">
+              <input
+                className="search"
+                type="search"
+                placeholder="Search To"
+                value={searchTo} // Bind input value to search state
+                onChange={handleSearchToChange} // Update search state on input change
+              />
+            </div>
+
+            <div className="input-msg">
+              <div className="screenshot-msg">
+                <div className="inbox-chat">
+                  {events.length > 0
+                    ? filteredMessages.length > 0
+                      ? filteredMessages.map((conversationId) => {
+                        const isStop = updatedMessages[conversationId].some(
+                          (message) => message.is_stop
+                        );
+                        return (
+                          <div key={conversationId}>
+                            <div className="to-line">.</div>
+                            <div className="to-value">
+                              <strong>To </strong>
+                              <span
+                                style={{
+                                  color: isStop ? "red" : "inherit",
+                                }}
+                              >
+                                {updatedMessages[conversationId][0].to}
+                              </span>
+
+                              <i
+                                className={`bi pinnumber ${pinnedConversations.has(conversationId)
+                                  ? "bi-pin-fill text-primary"
+                                  : "bi-pin"
+                                  }`}
+                                onClick={() => handlePinNumber(conversationId)}
+                              ></i>
+                            </div>
+
+                            {updatedMessages[conversationId].map(
+                              (message, index) => (
+                                <div key={index}>
+                                  <div
+                                    className={
+                                      message.event_type_id === 1
+                                        ? "chat-message-right"
+                                        : "chat-message-left"
+                                    }
+                                  >
+                                    <div className="message-body-1">
+                                      {expandedMessages.has(index) ? (
+                                        <div>
+                                          {message.body}
                                           <button
                                             onClick={() =>
                                               toggleMessageExpansion(index)
                                             }
-                                            className={`read-more-btn ${message.event_type_id === 1
-                                              ? "read-more-btn-right"
-                                              : "read-more-btn-left"
+                                            className={`read-less-btn ${message.event_type_id === 1
+                                              ? "read-less-btn-right"
+                                              : "read-less-btn-left"
                                               }`}
                                           >
-                                            Read More
+                                            Read Less
                                           </button>
+
                                           <i
-                                            style={{ cursor: "pointer" }}
                                             className={`bi ${message.is_message_pinned
                                               ? "bi-star-fill text-warning"
                                               : "bi-star"
-                                              } star-icon cursor-pointer`}
+                                              } star-icon`}
                                             onClick={() =>
                                               toggleMessagePin(
                                                 message.id,
@@ -1294,53 +1266,84 @@ const Dashboard = () => {
                                               )
                                             }
                                           ></i>
-                                        </>
+                                        </div>
                                       ) : (
-                                        (
-                                          <>
-                                            {message.body}{" "}
-                                            <i
-                                              className={`bi ${message.is_message_pinned
-                                                ? "bi-star-fill text-warning"
-                                                : "bi-star"
-                                                } star-icon`}
-                                              onClick={() =>
-                                                toggleMessagePin(
-                                                  message.id,
-                                                  conversationId
-                                                )
-                                              }
-                                            ></i>
-                                          </>
-                                        ) || "No message body"
+                                        <div>
+                                          {message.body &&
+                                            message.body.length > 100 ? (
+                                            <>
+                                              {message.body.substring(0, 100)}
+                                              ...
+                                              <button
+                                                onClick={() =>
+                                                  toggleMessageExpansion(index)
+                                                }
+                                                className={`read-more-btn ${message.event_type_id === 1
+                                                  ? "read-more-btn-right"
+                                                  : "read-more-btn-left"
+                                                  }`}
+                                              >
+                                                Read More
+                                              </button>
+                                              <i
+                                                style={{ cursor: "pointer" }}
+                                                className={`bi ${message.is_message_pinned
+                                                  ? "bi-star-fill text-warning"
+                                                  : "bi-star"
+                                                  } star-icon cursor-pointer`}
+                                                onClick={() =>
+                                                  toggleMessagePin(
+                                                    message.id,
+                                                    conversationId
+                                                  )
+                                                }
+                                              ></i>
+                                            </>
+                                          ) : (
+                                            <>
+                                              {message.body}{" "}
+                                              <i
+                                                className={`bi ${message.is_message_pinned
+                                                  ? "bi-star-fill text-warning"
+                                                  : "bi-star"
+                                                  } star-icon`}
+                                                onClick={() =>
+                                                  toggleMessagePin(
+                                                    message.id,
+                                                    conversationId
+                                                  )
+                                                }
+                                              ></i>
+                                            </>
+                                          )}
+                                        </div>
                                       )}
                                     </div>
-                                  )}
+                                  </div>
+                                  <div
+                                    className={
+                                      message.event_type_id === 1
+                                        ? "message-date message-date-right"
+                                        : "message-date message-date-left"
+                                    }
+                                  >
+                                    {new Date(
+                                      message.created_at
+                                    ).toLocaleDateString()}
+                                  </div>
                                 </div>
-                              </div>
-                              <div
-                                className={
-                                  message.event_type_id === 1
-                                    ? "message-date message-date-right"
-                                    : "message-date message-date-left"
-                                }
-                              >
-                                {new Date(
-                                  message.created_at
-                                ).toLocaleDateString()}
-                              </div>
-                            </div>
-                          )
-                        )}
-                      </div>
-                    );
-                  })
-                  : "Loading..."}
+                              )
+                            )}
+                          </div>
+                        );
+                      })
+                      : "No chats found for this number"
+                    : "Loading..."}
+                </div>
               </div>
             </div>
           </div>
         </div>
-
       </div>
 
 
