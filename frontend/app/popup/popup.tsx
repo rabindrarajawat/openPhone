@@ -127,7 +127,7 @@ const Popup =
                         onClick={() => {
                           setSelectedAddress(address);
                           setSearchTerm('');
-                          setIsDropdownOpen(false); // Close dropdown after selection
+                          setIsDropdownOpen(false);
                         }}
                       >
                         {address}

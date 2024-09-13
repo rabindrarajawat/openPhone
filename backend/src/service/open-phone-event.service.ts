@@ -27,7 +27,7 @@ export class OpenPhoneEventService {
     private addressService: AddressService,
     private auctionService: AuctionEventService,
     private notificationService: NotificationService
-  ) {}
+  ) { }
 
 
 
@@ -49,7 +49,7 @@ export class OpenPhoneEventService {
 
       const messageData = payload.data.object;
       const body = messageData.body || null; // Handle the case where body might be null
- const existingEvent = await this.openPhoneEventRepository.findOne({
+      const existingEvent = await this.openPhoneEventRepository.findOne({
         where: { conversation_id: messageData.conversationId },
       });
       // Check event type
@@ -73,7 +73,7 @@ export class OpenPhoneEventService {
         ) {
           throw new BadRequestException("Extracted address is null or empty");
         }
-       
+
         // Check if the address already exists
         const existingAddress = await this.addressRepository.findOne({
           where: { address: extractedInfo.address },
@@ -114,7 +114,7 @@ export class OpenPhoneEventService {
         }
       }
 
-     
+
 
       const openPhoneEvent = new OpenPhoneEventEntity();
       openPhoneEvent.event_type_id = eventTypeId;
@@ -130,8 +130,15 @@ export class OpenPhoneEventService {
           existingEvent.to !== messageData.from
         ) {
           openPhoneEvent.address_id = null;
+        } else if (messageData.status === "delivered" && messageData.direction === "outgoing") {
+          // For delivered outgoing messages, assign the correct address_id
+          openPhoneEvent.address_id = addressId || existingEvent.address_id;
         }
+      } else {
+        // If no existing event, assign the newly created address_id
+        openPhoneEvent.address_id = addressId;
       }
+
 
       openPhoneEvent.event_direction_id = this.getEventDirectionId(messageData.direction);
       openPhoneEvent.from = messageData.from;

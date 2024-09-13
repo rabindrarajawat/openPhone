@@ -14,9 +14,6 @@ import Pagination from "../Pagination/pagination";
 
 interface Address {
   fullAddress: string;
-
-
-
 }
 
 interface Address1 {
@@ -28,7 +25,6 @@ interface Address1 {
   created_at: string;
   notificationCount: number; // Add this field
   address: string;
-
 }
 
 interface Message {
@@ -38,8 +34,6 @@ interface Message {
   created_at: string;
   conversation_id: string;
 }
-
-
 
 interface Notification {
   id: number;
@@ -160,21 +154,9 @@ const Dashboard = () => {
   const [filteredAddresses2, setFilteredAddresses2] = useState<Address1[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTo, setSearchTo] = useState(""); // State to hold search input
-
-
-
   const addressesPerPage = 9;
 
-
-
-
-
-
   useEffect(() => {
-
-    // Retrieve Token
-
-
     const storedPins = localStorage.getItem("pinnedConversations");
     if (storedPins) {
       setPinnedConversations(new Set<string>(JSON.parse(storedPins)));
@@ -548,7 +530,7 @@ const Dashboard = () => {
     setCurrentPage(page);
   };
 
-  console.log("addressesToShow", addressesToShow);
+  // console.log("addressesToShow", addressesToShow);
 
 
 
@@ -795,6 +777,17 @@ const Dashboard = () => {
     )
     : Object.keys(updatedMessages);
 
+  // Function to format the count
+  const formatCount = (count: number) => {
+    if (count >= 1000000) {
+      return (count / 1000000).toFixed(1) + 'M'; // Convert to millions
+    } else if (count >= 1000) {
+      return (count / 1000).toFixed(1) + 'K'; // Convert to thousands
+    }
+    return count; // Return the original count if it's less than 1000
+  };
+
+
   return (
     <div>
       <Navbar
@@ -1003,7 +996,7 @@ const Dashboard = () => {
               <input
                 type="text"
                 className="round-input1"
-                value={counts.messageDelivered}
+                value={formatCount(counts.messageDelivered)}
                 readOnly
               />
             </div>
@@ -1012,7 +1005,7 @@ const Dashboard = () => {
               <input
                 type="text"
                 className="round-input1"
-                value={counts.messageResponse}
+                value={formatCount(counts.messageResponse)}
                 readOnly
               />
             </div>
@@ -1021,7 +1014,7 @@ const Dashboard = () => {
               <input
                 type="text"
                 className="round-input1"
-                value={counts.call}
+                value={formatCount(counts.call)}
                 readOnly
               />
             </div>
@@ -1030,7 +1023,7 @@ const Dashboard = () => {
               <input
                 type="text"
                 className="round-input1"
-                value={counts.callResponse}
+                value={formatCount(counts.callResponse)}
                 readOnly
               />
             </div>
@@ -1080,8 +1073,6 @@ const Dashboard = () => {
                       <SearchResultList results={results} onSelect={handleSelectAddress} />
                     )}
                   </div>
-
-                  {/* Check if there are no addresses to show after filters */}
                   {currentAddresses.length > 0 ? (
                     currentAddresses.map((address) => (
                       <li
@@ -1123,18 +1114,13 @@ const Dashboard = () => {
                   )}
                 </ul>
 
-
-
-
               </div>
-
             </div>
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={handlePageChange}
             />
-
           </div>
 
           <div className="dataa">
