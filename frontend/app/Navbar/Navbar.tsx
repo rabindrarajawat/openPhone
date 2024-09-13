@@ -140,6 +140,16 @@ const Navbar: React.FC = () => {
 
   const newNotificationCount = notifications.length;
 
+  const formatCount = (count: number) => {
+    if (count >= 1000000) {
+      return (count / 1000000).toFixed(1) + 'M'; // Convert to millions
+    } else if (count >= 1000) {
+      return (count / 1000).toFixed(1) + 'K'; // Convert to thousands
+    }
+    return count; // Return the original count if it's less than 1000
+  };
+
+
   return (
     <nav className="navbar">
       <div className="container-fluid">
@@ -163,7 +173,7 @@ const Navbar: React.FC = () => {
           <div className='bellicon' onClick={handleBellClick}>
             <Image src="/bell.svg" alt="Notifications" className='bell' width={50} height={50} />
             {newNotificationCount > 0 && (
-              <span className="new-notification-dot">{newNotificationCount}</span>
+              <span className="new-notification-dot">{formatCount(newNotificationCount)}</span>
             )}
           </div>
 

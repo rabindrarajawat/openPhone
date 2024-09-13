@@ -502,11 +502,9 @@ const Dashboard = () => {
 
 
 
-  // Calculate indices for pagination
   const indexOfLastAddress = currentPage * addressesPerPage;
   const indexOfFirstAddress = indexOfLastAddress - addressesPerPage;
 
-  // Determine the addresses to show based on the filtered results
   const addressesToShow =
     filteredAddresses.length > 0 // If there are any filtered addresses
       ? filteredAddresses.filter((address) =>
@@ -514,18 +512,15 @@ const Dashboard = () => {
           (filteredAddress) => filteredAddress.address === address.address
         )
       )
-      : []; // If no addresses match the filter, show no addresses
+      : [];
 
-  // Apply pagination to the addressesToShow
   const currentAddresses = addressesToShow.slice(
     indexOfFirstAddress,
     indexOfLastAddress
   );
 
-  // Calculate total pages for pagination
   const totalPages = Math.ceil(addressesToShow.length / addressesPerPage);
 
-  // Handler to change the page
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
