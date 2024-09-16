@@ -156,6 +156,9 @@ const Dashboard = () => {
   const [searchTo, setSearchTo] = useState(""); // State to hold search input
   const addressesPerPage = 9;
 
+  const [notificationCount, setNotificationCount] = useState(0);
+
+
   useEffect(() => {
     const storedPins = localStorage.getItem("pinnedConversations");
     if (storedPins) {
@@ -476,29 +479,56 @@ const Dashboard = () => {
     return date >= oneMonthAgo;
   };
 
-  const filteredAddresses = addresses1.filter((address) => {
+  // const filteredAddresses = addresses1.filter((address) => {
 
-    const matchesAuctionType = selectedAuctionTypes.length === 0 || selectedAuctionTypes.includes(address.auction_event_id);
-    const matchesBookmark = filterOption === 'all' || (filterOption === 'bookmarked' && address.is_bookmarked) || (filterOption === 'default');
-    const matchesDateFilter = selectedDateFilter === 'all' ||
-      (selectedDateFilter === 'weekly' && isWithinLastWeek(address.created_at)) ||
-      (selectedDateFilter === 'monthly' && isWithinLastMonth(address.created_at));
-    const matchesCustomDateFilter = (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
-      (!toDate || new Date(address.created_at) <= new Date(toDate));
+  //   const matchesAuctionType = selectedAuctionTypes.length === 0 || selectedAuctionTypes.includes(address.auction_event_id);
+  //   const matchesBookmark = filterOption === 'all' || (filterOption === 'bookmarked' && address.is_bookmarked) || (filterOption === 'default');
+  //   const matchesDateFilter = selectedDateFilter === 'all' ||
+  //     (selectedDateFilter === 'weekly' && isWithinLastWeek(address.created_at)) ||
+  //     (selectedDateFilter === 'monthly' && isWithinLastMonth(address.created_at));
+  //   const matchesCustomDateFilter = (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
+  //     (!toDate || new Date(address.created_at) <= new Date(toDate));
 
-    // Apply the search filter
-    const matchesSearch = address.displayAddress
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+  //   // Apply the search filter
+  //   const matchesSearch = address.displayAddress
+  //     .toLowerCase()
+  //     .includes(searchQuery.toLowerCase());
 
-    return (
-      matchesAuctionType &&
-      matchesBookmark &&
-      matchesDateFilter &&
-      matchesCustomDateFilter &&
-      matchesSearch
-    );
-  });
+  //   return (
+  //     matchesAuctionType &&
+  //     matchesBookmark &&
+  //     matchesDateFilter &&
+  //     matchesCustomDateFilter &&
+  //     matchesSearch
+  //   );
+  // });
+
+  // Now filter and sort the addresses
+  const filteredAddresses = addresses1
+    .filter((address) => {
+      // Apply your existing filter logic
+      const matchesAuctionType = selectedAuctionTypes.length === 0 || selectedAuctionTypes.includes(address.auction_event_id);
+      const matchesBookmark = filterOption === 'all' || (filterOption === 'bookmarked' && address.is_bookmarked) || (filterOption === 'default');
+      const matchesDateFilter = selectedDateFilter === 'all' ||
+        (selectedDateFilter === 'weekly' && isWithinLastWeek(address.created_at)) ||
+        (selectedDateFilter === 'monthly' && isWithinLastMonth(address.created_at));
+      const matchesCustomDateFilter = (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
+        (!toDate || new Date(address.created_at) <= new Date(toDate));
+      const matchesSearch = address.displayAddress.toLowerCase().includes(searchQuery.toLowerCase());
+
+      return (
+        matchesAuctionType &&
+        matchesBookmark &&
+        matchesDateFilter &&
+        matchesCustomDateFilter &&
+        matchesSearch
+      );
+    })
+    .sort((a: Address1, b: Address1) => {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+
+
 
 
 
@@ -686,11 +716,64 @@ const Dashboard = () => {
 
 
 
-  const handleAddressSelect = (address: string, addressId: number) => {
+  // const handleAddressSelect = (address: string, addressId: number) => {
+  //   setSelectedAddress(address);
+  //   setSelectedAddressId(addressId);
+  //   setEventData([]);
+  // };
+
+  const handleAddressSelect = async (address: string, addressId: number) => {
     setSelectedAddress(address);
     setSelectedAddressId(addressId);
     setEventData([]);
+
+    const token = localStorage.getItem('authToken');
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    if (!token) {
+      console.error('Authorization token is missing');
+      return;
+    }
+
+    console.log('Token being used:', token);
+
+    try {
+      const response = await fetch(`${Base_Url}notifications/${addressId}/read?addressId=${addressId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+
+        },
+
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to mark notifications as read');
+      }
+
+      const result = await response.json();
+      console.log(result.message); // Optional: handle success message
+
+      // Update notification count in state
+      setAddresses1(prevAddresses =>
+        prevAddresses.map(address =>
+          address.id === addressId
+            ? { ...address, notificationCount: 0 }
+            : address
+        )
+      );
+
+    } catch (error) {
+      console.error('Error marking notifications as read:', error);
+    }
   };
+
+
+
 
 
   const handleAddressSelect1 = (address: Address) => {
@@ -785,10 +868,8 @@ const Dashboard = () => {
 
   return (
     <div>
-      <Navbar
-      // toggleSidebar={toggleSidebar}
-      // onSelectAddress={handleAddressSelect1}
-      />
+      <Navbar />
+
       {isSidebarVisible && <SideBar />}
       <div className="main-container">
         <div className="content-with-border-right">

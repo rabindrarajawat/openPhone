@@ -31,6 +31,7 @@ import {
   Param,
   UseGuards,
   InternalServerErrorException,
+  Query,
 } from "@nestjs/common";
 import { NotificationService } from "../service/notification.service";
 import { AuthGuard } from "../authguard/auth.guard";
@@ -38,7 +39,7 @@ import { AuthGuard } from "../authguard/auth.guard";
 @Controller("notifications")
 @UseGuards(AuthGuard)
 export class NotificationController {
-  constructor(private notificationService: NotificationService) {}
+  constructor(private notificationService: NotificationService) { }
 
   @Post(":eventId")
   async createNotification(@Param("eventId") eventId: number) {
@@ -64,10 +65,11 @@ export class NotificationController {
 
   @Post(":notificationId/read")
   async markNotificationAsRead(
-    @Param("notificationId") notificationId: number
+    @Param("notificationId") notificationId: number,
+    @Query("addressId") addressId?: number
   ) {
     try {
-      await this.notificationService.markNotificationAsRead(notificationId);
+      await this.notificationService.markNotificationAsRead(notificationId, addressId);
       return { message: "Notification marked as read" };
     } catch (error) {
       console.error("Error in markNotificationAsRead:", error);
@@ -76,4 +78,5 @@ export class NotificationController {
       );
     }
   }
+
 }

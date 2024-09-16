@@ -88,7 +88,7 @@ export class NotificationService {
     @InjectRepository(OpenPhoneEventEntity)
     private eventRepository: Repository<OpenPhoneEventEntity>,
     private notificationGateway: NotificationGateway
-  ) {}
+  ) { }
 
   async createNotification(eventId: number): Promise<NotificationEntity> {
     try {
@@ -142,17 +142,32 @@ export class NotificationService {
     }
   }
 
-  async markNotificationAsRead(notificationId: number): Promise<void> {
+  async markNotificationAsRead(notificationId: number, addressId?: number): Promise<void> {
     try {
-      const notification = await this.notificationRepository.findOne({
-        where: { event_id: notificationId },
-      });
-      if (!notification) {
-        return;
+      let notifications;
+
+      if (addressId) {
+        // When addressId is provided, update all notifications with the given addressId
+        notifications = await this.notificationRepository.find({
+          where: { address_id: addressId },
+        });
+      } else {
+        // Otherwise, find notification by eventId
+        notifications = await this.notificationRepository.find({
+          where: { event_id: notificationId },
+        });
       }
 
-      notification.is_read = true;
-      await this.notificationRepository.save(notification);
+      if (!notifications.length) {
+        return; // No notifications to update
+      }
+
+      // Set all found notifications as read
+      for (const notification of notifications) {
+        notification.is_read = true;
+      }
+
+      await this.notificationRepository.save(notifications);
     } catch (error) {
       this.logger.error(
         `Error in markNotificationAsRead: ${error.message}`,
@@ -163,4 +178,5 @@ export class NotificationService {
       );
     }
   }
+
 }
