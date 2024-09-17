@@ -122,14 +122,18 @@
 
 .main-Address {
   display: flex;
-  margin-left: -1389px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px 0;
+  /* Control vertical space */
 }
 
 .heading {
-  width: 92%;
+  /* width: 92%; */
   height: 20px;
-  margin-top: -22px;
-  margin-left: -10px;
+  /* margin-top: -22px; */
+  /* margin-left: -10px; */
   font-family: "Roboto", sans-serif;
   font-size: 20px;
   font-weight: 800;
@@ -142,9 +146,12 @@
   display: flex;
   justify-content: left;
   align-items: left;
-  margin-left: -10px;
+  /* margin-left: -10px; */
   margin-top: 15px;
   gap: 48px;
+  padding-bottom: 0;
+  /* Reduce bottom padding */
+
 }
 
 .round-input1 {
@@ -223,11 +230,11 @@
 .Address {
   font-weight: 600;
   font-size: 20px;
-  margin-top: 161px;
+  /* margin-top: 161px; */
 }
 
 .Analyticdata {
-  margin-top: 161px;
+  margin-top: 19px;
   margin-left: 52px;
   font-weight: 600;
   font-size: 20px;
@@ -236,18 +243,18 @@
 
 .person-icon {
   font-size: x-large;
-  margin-top: 161px;
+  margin-top: 1%;
 }
 
 .main-search {
-  margin-top: 201px;
-  margin-left: -120px;
-  padding-left: 14px;
+  margin-top: 2vh;
+  /* margin-left: -120px; */
+  /* padding-left: 14px; */
   padding-right: 10px;
   border: 3px solid #D7F5DC;
   border-radius: 6px;
   height: 585px;
-  width: 300px;
+  /* width: 300px; */
 }
 
 
@@ -361,8 +368,7 @@
   justify-content: left;
   align-items: left;
   margin-left: 15px;
-  margin-top: -3px;
-  gap: 63px;
+  gap: 70px;
 }
 
 .nav-msg {
@@ -407,9 +413,8 @@
 .input-msg {
   width: 980px;
   height: 470px;
-  margin-top: 8%;
-  margin-top: -255px;
-  margin-left: -541px;
+  margin-top: 10px;
+  /* margin-left: -541px; */
   border-radius: 5px 0px 0px 0px;
   border: 3px solid #D7F5DC;
   position: relative;
@@ -442,10 +447,10 @@
 }
 
 .search-wrapper {
-  margin-top: -316px;
+  margin-top: -35px;
   position: absolute;
   z-index: 2;
-  margin-left: 16%;
+  margin-left: 60%;
   border-radius: 30px;
   /* padding: 10px; */
   height: 35px;
@@ -492,7 +497,7 @@
 .pagination-container .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 235px;
+  /* margin-top: 235px; */
 
 }
 
@@ -620,17 +625,20 @@
 .conversation {
   width: 350px;
   height: 310px;
-  margin-top: 30px;
-  margin-left: -435px;
-  display: flexs;
+  margin-top: 3vh;
+  margin-left: 5vh;
 }
 
 .conversation-chat {
-  /* display: flex; */
-  margin-top: 230px;
-  margin-left: -541px;
-  width: 350px;
-  height: 310px;
+  display: flex;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  /* Ensure the items are aligned to the left */
+  width: 100%;
+  /* Make sure the div takes full width */
+  gap: 10px;
+  /* Remove any padding or margin */
 }
 
 .message-date-right {
@@ -733,7 +741,10 @@
 }
 
 .main-content {
-  margin-left: 25px;
+  margin-left: 15px;
+  display: flex;
+  flex-direction: column;
+
 }
 
 .dataa {
@@ -742,8 +753,10 @@
 
 .main-main {
   display: flex;
-  margin-top: -50px;
-  margin-left: 40px;
+  position: relative;
+  justify-content: flex-start;
+  /* Align items at the start */
+
 }
 
 @media (max-width: 367px) {
@@ -814,7 +827,23 @@
 
   .pagination-container {
     width: 100%;
-    margin-top: 20px;
+    /* margin-top: 20px; */
     text-align: center;
   }
+}
+
+.analytic-chat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  /* Align content to the start (left) */
+  width: 100%;
+  /* Make sure the container takes the full width */
+
+}
+
+.add-icon {
+  display: flex;
+  position: relative;
+  gap: 5vh;
 }
