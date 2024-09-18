@@ -154,7 +154,7 @@ const Dashboard = () => {
   const [filteredAddresses2, setFilteredAddresses2] = useState<Address1[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTo, setSearchTo] = useState(""); // State to hold search input
-  const addressesPerPage = 9;
+  const addressesPerPage = 5;
 
   const [notificationCount, setNotificationCount] = useState(0);
 
@@ -871,140 +871,145 @@ const Dashboard = () => {
       <Navbar />
 
       {isSidebarVisible && <SideBar />}
-      <div className="main-container">
-        <div className="content-with-border-right">
-          <div className="openphone">
-            <span className="border-bottom pb-3">OpenPhone</span>
-          </div>
-          <div className="">
-            <div className="information">Message and Calls</div>
-            <div className="main-dropdown">
-              <div className="status">
-                Status
-                <span className="ms-2 mb-2 ">
-                  <button
-                    className="btn"
-                    type="button"
-                    onClick={handleToggle}
-                    aria-expanded={isType}
-                  >
-                    <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
-                  </button>
-
-                  <ul className={`dropdown-type ${isType ? "show" : ""}`}>
-                    <li className="dropdown-item">
-                      <input type="checkbox"
-                        checked={deliveredChecked}
-                        onChange={handleDeliveredChange}
-                      />
-                      <label className="ms-2">Delivered</label>
-                    </li>
-                    <li className="dropdown-item pt-2">
-                      <input type="checkbox" checked={receivedChecked}
-                        onChange={handleReceivedChange}
-                        id="notDelivered" />
-                      <label className="ms-2" htmlFor="notDelivered">
-                        Received
-                      </label>
-                    </li>
-                  </ul>
-                </span>
-              </div>
+      <div className="container row">
+        <div className="main-container col-12">
+          <div className="content-with-border-right">
+            <div className="openphone">
+              <span className="border-bottom pb-3">OpenPhone</span>
             </div>
-            <div className="type">
-              Type
-              <span className="ms-2 mb-2 ">
-                <button
-                  className="btn"
-                  type="button"
-                  onClick={handleToggle1}
-                  aria-expanded={isType}
-                >
-                  <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
-                </button>
+            <div className="">
+              <div className="information">Message and Calls</div>
+              <div className="d-flex flex-column justify-content-left">
+                <div className="container mb-1">
+                  <div className="me-4">
+                    Status
+                    {/* <span className=""> */}
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={handleToggle}
+                      aria-expanded={isType}
+                    >
+                      <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
+                    </button>
 
-                <ul className={`dropdown-type ${isType ? "show" : ""}`}>
-                  <li className="dropdown-item">
-                    <input
-                      type="checkbox"
-                      className="checkbox"
-                      id="case"
-                      onChange={() => handleCheckboxChange(3)}
-                    />
-                    <label className="ms-2">Case</label>
-                  </li>
-                  <li className="dropdown-item pt-2">
-                    <input
-                      type="checkbox"
-                      className="checkbox"
-                      id="auction"
-                      onChange={() => handleCheckboxChange(1)}
-                    />
-                    <label className="ms-2" htmlFor="auction">
-                      Auction
-                    </label>
-                  </li>
-                  <li className="dropdown-item pt-2">
-                    <input
-                      type="checkbox"
-                      className="checkbox"
-                      id="taxDeed"
-                      onChange={() => handleCheckboxChange(2)}
-                    />
-                    <label className="ms-2" htmlFor="taxDeed">
-                      Tax deed
-                    </label>
-                  </li>
-                </ul>
-              </span>
-            </div>
-            <div className="Date">
-              Date
-              <span className="ms-2 mb-2">
-                <button
-                  className="btn"
-                  type="button"
-                  onClick={handleToggle1}
-                  aria-expanded={isType}
-                >
-                  <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
-                </button>
+                    <div className={` ms-4${isType ? "show" : ""}`}>
+                      <li className="dropdown-item">
+                        <input type="checkbox"
+                          checked={deliveredChecked}
+                          onChange={handleDeliveredChange}
+                        />
+                        <label className="ms-2">Delivered</label>
+                      </li>
+                      <li className="dropdown-item pt-2">
+                        <input type="checkbox" checked={receivedChecked}
+                          onChange={handleReceivedChange}
+                          id="notDelivered" />
+                        <label className="ms-2" htmlFor="notDelivered">
+                          Received
+                        </label>
+                      </li>
+                    </div>
+                    {/* </span> */}
+                  </div>
+                  <div className="me-4 ">
+                    Type
+                    {/* <span className=""> */}
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={handleToggle1}
+                      aria-expanded={isType}
+                    >
+                      <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
+                    </button>
 
-                <ul className={`dropdown-Date ${isType ? "show" : ""}`}>
-                  <li className="dropdown-item">
-                    <input
-                      type="checkbox"
-                      id="weekly"
-                      className="checkbox"
-                      onChange={() =>
-                        setSelectedDateFilter(
-                          selectedDateFilter === "weekly" ? "all" : "weekly"
-                        )
-                      }
-                    />
-                    <label className="ms-2" htmlFor="weekly">
-                      Weekly{" "}
-                    </label>
-                  </li>
-                  <li className="dropdown-item pt-2">
-                    <input
-                      type="checkbox"
-                      id="monthly"
-                      className="checkbox"
-                      onChange={() =>
-                        setSelectedDateFilter(
-                          selectedDateFilter === "monthly" ? "all" : "monthly"
-                        )
-                      }
-                    />
-                    <label className="ms-2" htmlFor="monthly">
-                      Monthly{" "}
-                    </label>
-                  </li>
-                  <div className="custom">
-                    <li className="dropdown-item pt-2">
-                      <label className="custom" htmlFor="pending">
-                        custom
+                    <div className={`ms-4${isType ? "show" : ""}`}>
+                      <li className="dropdown-item">
+                        <input
+                          type="checkbox"
+                          className="checkbox"
+                          id="case"
+                          onChange={() => handleCheckboxChange(3)}
+                        />
+                        <label className="ms-2">Case</label>
+                      </li>
+                      <li className="dropdown-item pt-2">
+                        <input
+                          type="checkbox"
+                          className="checkbox"
+                          id="auction"
+                          onChange={() => handleCheckboxChange(1)}
+                        />
+                        <label className="ms-2" htmlFor="auction">
+                          Auction
+                        </label>
+                      </li>
+                      <li className="dropdown-item pt-2">
+                        <input
+                          type="checkbox"
+                          className="checkbox"
+                          id="taxDeed"
+                          onChange={() => handleCheckboxChange(2)}
+                        />
+                        <label className="ms-2" htmlFor="taxDeed">
+                          Tax deed
+                        </label>
+                      </li>
+                    </div>
+                    {/* </span> */}
+                  </div>
+                  <div className="me-4 ">
+                    Date
+                    {/* <span className="ms-2 mb-2"> */}
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={handleToggle1}
+                      aria-expanded={isType}
+                    >
+                      <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
+                    </button>
+
+                    <div className={`ms-4 dropdown-Date ${isType ? "show" : ""}`}>
+                      <li className="dropdown-item">
+                        <input
+                          type="checkbox"
+                          id="weekly"
+                          className="checkbox"
+                          onChange={() =>
+                            setSelectedDateFilter(
+                              selectedDateFilter === "weekly" ? "all" : "weekly"
+                            )
+                          }
+                        />
+                        <label className="ms-2" htmlFor="weekly">
+                          Weekly{" "}
+                        </label>
+                      </li>
+                      <li className="dropdown-item pt-2">
+                        <input
+                          type="checkbox"
+                          id="monthly"
+                          className="checkbox"
+                          onChange={() =>
+                            setSelectedDateFilter(
+                              selectedDateFilter === "monthly" ? "all" : "monthly"
+                            )
+                          }
+                        />
+                        <label className="ms-2" htmlFor="monthly">
+                          Monthly{" "}
+                        </label>
+                      </li>
+
+                    </div>
+                    {/* </span> */}
+                  </div>
+                  <div className="me-4 ">
+                    <li className="dropdown-item ">
+                      <label className="" htmlFor="pending">
+                        Custom
                         <button
                           className="btn ms-2"
                           type="button"
@@ -1025,7 +1030,6 @@ const Dashboard = () => {
                               type="date"
                               id="fromDate"
                               className="set-date  me-2"
-                              // placeholder="08/08/24"
                               value={fromDate}
                               onChange={(e) => setFromDate(e.target.value)}
                             />
@@ -1042,10 +1046,9 @@ const Dashboard = () => {
                               onChange={(e) => setToDate(e.target.value)}
                             />
                           </div>
-                          <div className="d-flex align-items-center mt-2 gap-2">
-
+                          <div className="">
                             <button
-                              className="btn btn-primary btn btn-primary reset-button"
+                              className="btn btn-primary px-2 mt-2 "
                               type="button"
                               onClick={handleReset}
                             >
@@ -1056,380 +1059,382 @@ const Dashboard = () => {
                       )}
                     </li>
                   </div>
-                </ul>
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="main-content">
-          <div className="heading">
-            <Image src="/Done.svg" alt="" width={24} height={24} /> Comprehensive view of Address
-          </div>
-          <div className="logos-row-msg1">
-            <div className="nav-msg1">
-              <div className="message1">Message Delivered</div>
-              <input
-                type="text"
-                className="round-input1"
-                value={formatCount(counts.messageDelivered)}
-                readOnly
-              />
-            </div>
-            <div className="nav-msg1">
-              <div className="message1 response ">Message Response</div>
-              <input
-                type="text"
-                className="round-input1"
-                value={formatCount(counts.messageResponse)}
-                readOnly
-              />
-            </div>
-            <div className="nav-msg1">
-              <div className="message1 call-">Call </div>
-              <input
-                type="text"
-                className="round-input1"
-                value={formatCount(counts.call)}
-                readOnly
-              />
-            </div>
-            <div className="nav-msg1">
-              <div className="message1 call-response">Call Response</div>
-              <input
-                type="text"
-                className="round-input1"
-                value={formatCount(counts.callResponse)}
-                readOnly
-              />
-            </div>
-          </div>
-
-          <div className="main-main">
-            <div className="main-Address ">
-              <div className="add-icon">
-                <Image src="/User.svg" alt="users" width={24} height={24} className="person-icon" />
-
-                <div className="Address">Address</div>
+                </div>
               </div>
-              <div className="main-search">
-                <div className="search-box ">
-                  <span className="icon">
-                    <Image src="/Icon.svg" alt="icon" width={24} height={24} />
-                  </span>
-                  <input
-                    type="text"
-                    placeholder="Search Address"
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                  ></input>
-                </div>
+            </div>
+          </div>
 
-                <div className="icon-labels">
-                  <div
-                    className={`bookmark-container text-center ${filterOption === "bookmarked" ? "active-filter" : ""
-                      }`}
-                    onClick={() => handleFilterChange("bookmarked")}
-                  >
-                    <i className="bi bi-bookmark ms-4"></i>
-                    <div className="ms-4">Select all</div>
-                  </div>
-                  <div
-                    className="redo-container text-center"
-                    onClick={handleDefaultClick}
-                  >
-                    <Image src="/redo.svg" alt="redo" width={24} height={24} className="ms-3" />
-                    <div>Default</div>
-                  </div>
-                </div>
-                <div>
-                  <ul className="address-list">
-                    <div className="search-wrapper-add">
-                      {results.length > 0 && (
-                        <SearchResultList results={results} onSelect={handleSelectAddress} />
-                      )}
-                    </div>
-                    {currentAddresses.length > 0 ? (
-                      currentAddresses.map((address) => (
-                        <li
-                          key={address.id}
-                          className={`list-group-item justify-content-between ${selectedAddressId === address.id ? "selected-address" : ""
-                            }`}
-                          onClick={() => handleAddressSelect(address.displayAddress, address.id)}
-                        >
-                          <div className="setaddress d-flex align-items-center gap-3">
-                            <i
-                              className={`bi ${address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
-                                } clickable-icon`}
-                              style={{
-                                cursor: "pointer",
-                                color: address.is_bookmarked ? "blue" : "grey",
-                              }}
-                              onClick={() => handleBookmarkClick(address.id)}
-                            ></i>
-
-                            <span className="ml-2">
-                              {address.displayAddress || address.fullAddress}
-                              {address.notificationCount > 0 && (
-                                <span className="notification-count ml-2">
-                                  ({address.notificationCount})
-                                </span>
-                              )}
-                            </span>
-                          </div>
-
-                          {address.fullAddress && (
-                            <div className="filtered-address">
-                              {address.fullAddress}
-                            </div>
-                          )}
-                        </li>
-                      ))
-                    ) : (
-                      <p>No addresses found.</p>
-                    )}
-                  </ul>
-
-                </div>
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
+          <div className="container">
+            <div className="heading">
+              <Image src="/Done.svg" alt="" width={24} height={24} /> Comprehensive view of Address
+            </div>
+            <div className="d-flex  gap-3 mt-2 container">
+              <div className="nav-msg1">
+                <div className="message1">Message Delivered</div>
+                <input
+                  type="text"
+                  className="round-input1"
+                  value={formatCount(counts.messageDelivered)}
+                  readOnly
                 />
               </div>
-
+              <div className="nav-msg1">
+                <div className="message1 response ">Message Response</div>
+                <input
+                  type="text"
+                  className="round-input1"
+                  value={formatCount(counts.messageResponse)}
+                  readOnly
+                />
+              </div>
+              <div className="nav-msg1">
+                <div className="message1 call-">Call </div>
+                <input
+                  type="text"
+                  className="round-input1"
+                  value={formatCount(counts.call)}
+                  readOnly
+                />
+              </div>
+              <div className="nav-msg1">
+                <div className="message1 call-response">Call Response</div>
+                <input
+                  type="text"
+                  className="round-input1"
+                  value={formatCount(counts.callResponse)}
+                  readOnly
+                />
+              </div>
             </div>
 
-            <div className="analytic-chat">
-              <div className="dataa">
-                <div className="Analyticdata ">
-                  <span>
-                    <i className="bi bi-bar-chart-line-fill"></i>
-                  </span>
-                  <span className="ms-4">Analytic Data of Selected Address</span>
+            <div className="main-main">
+              <div className="main-Address ">
+                <div className="add-icon">
+                  <Image src="/User.svg" alt="users" width={24} height={24} className="person-icon" />
+
+                  <div className="Address">Address</div>
                 </div>
-                <div className=" main-message">
-                  <div className="logos-row-msg">
-                    <div className="nav-msg">
-                      <div className="message Delivered">Message Delivered</div>
-                      <input
-                        type="text"
-                        className="round-input"
-                        value={formatCount(messageDelivered)}
-                        readOnly
-                      />
+                <div className="main-search">
+                  <div className="search-box ">
+                    <span className="icon">
+                      <Image src="/Icon.svg" alt="icon" width={24} height={24} />
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="Search Address"
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                    ></input>
+                  </div>
+
+                  <div className="icon-labels">
+                    <div
+                      className={`bookmark-container text-center ${filterOption === "bookmarked" ? "active-filter" : ""
+                        }`}
+                      onClick={() => handleFilterChange("bookmarked")}
+                    >
+                      <i className="bi bi-bookmark ms-4"></i>
+                      <div className="ms-4">Select all</div>
                     </div>
-                    <div className="nav-msg">
-                      <div className="message response1 ">Message Response</div>
-                      <input
-                        type="text"
-                        className="round-input"
-                        value={formatCount(messageResponse)}
-                        readOnly
-                      />
-                    </div>
-                    <div className="nav-msg">
-                      <div className="message call-1">Call </div>
-                      <input
-                        type="text"
-                        className="round-input"
-                        value={formatCount(call)}
-                        readOnly
-                      />
-                    </div>
-                    <div className="nav-msg">
-                      <div className="message call-response-1">Call Response</div>
-                      <input
-                        type="text"
-                        className="round-input"
-                        value={formatCount(callResponse)}
-                        readOnly
-                      />
+                    <div
+                      className="redo-container text-center"
+                      onClick={handleDefaultClick}
+                    >
+                      <Image src="/redo.svg" alt="redo" width={24} height={24} className="ms-3" />
+                      <div>Default</div>
                     </div>
                   </div>
-                </div>
-              </div>
+                  <div>
+                    <ul className="address-list">
+                      <div className="search-wrapper-add">
+                        {results.length > 0 && (
+                          <SearchResultList results={results} onSelect={handleSelectAddress} />
+                        )}
+                      </div>
+                      {currentAddresses.length > 0 ? (
+                        currentAddresses.map((address) => (
+                          <li
+                            key={address.id}
+                            className={`list-group-item justify-content-between ${selectedAddressId === address.id ? "selected-address" : ""
+                              }`}
+                            onClick={() => handleAddressSelect(address.displayAddress, address.id)}
+                          >
+                            <div className="setaddress d-flex align-items-center gap-3">
+                              <i
+                                className={`bi ${address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
+                                  } clickable-icon`}
+                                style={{
+                                  cursor: "pointer",
+                                  color: address.is_bookmarked ? "blue" : "grey",
+                                }}
+                                onClick={() => handleBookmarkClick(address.id)}
+                              ></i>
 
-              <div className="conversation">
-                {selectedAddress && (
-                  <div className="conversation-chat">
-                    <Image src="converstation.svg" alt="" width={24} height={24} />{" "}
-                    Conversation From{" "}
-                    {uniqueFromNumbers.length > 0 && (
-                      <select
-                        value={fromNumber}
-                        onChange={(e) => setFromNumber(e.target.value)} // Update fromNumber on selection
-                      >
-                        {uniqueFromNumbers.map((number, index) => (
-                          <option key={index} value={number}>
-                            {number}
-                          </option>
-                        ))}
-                      </select>
-                    )}
+                              <span className="ml-2 scroll">
+                                {address.displayAddress || address.fullAddress}
+                                {address.notificationCount > 0 && (
+                                  <span className="notification-count ml-2">
+                                    ({address.notificationCount})
+                                  </span>
+                                )}
+                              </span>
+                            </div>
+
+                            {address.fullAddress && (
+                              <div className="filtered-address">
+                                {address.fullAddress}
+                              </div>
+                            )}
+                          </li>
+                        ))
+                      ) : (
+                        <p>No addresses found.</p>
+                      )}
+                    </ul>
+
                   </div>
-                )}
 
-                <div className="search-wrapper">
-                  <input
-                    className="search"
-                    type="search"
-                    placeholder="Search To"
-                    value={searchTo} // Bind input value to search state
-                    onChange={handleSearchToChange} // Update search state on input change
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
                   />
                 </div>
 
-                <div className="input-msg">
-                  <div className="screenshot-msg">
-                    <div className="inbox-chat">
-                      {events.length > 0
-                        ? filteredMessages.length > 0
-                          ? filteredMessages.map((conversationId) => {
-                            const isStop = updatedMessages[conversationId].some(
-                              (message) => message.is_stop
-                            );
-                            return (
-                              <div key={conversationId}>
-                                <div className="to-line">.</div>
-                                <div className="to-value">
-                                  <strong>To </strong>
-                                  <span
-                                    style={{
-                                      color: isStop ? "red" : "inherit",
-                                    }}
-                                  >
-                                    {updatedMessages[conversationId][0].to}
-                                  </span>
 
-                                  <i
-                                    className={`bi pinnumber ${pinnedConversations.has(conversationId)
-                                      ? "bi-pin-fill text-primary"
-                                      : "bi-pin"
-                                      }`}
-                                    onClick={() => handlePinNumber(conversationId)}
-                                  ></i>
-                                </div>
+              </div>
 
-                                {updatedMessages[conversationId].map(
-                                  (message, index) => (
-                                    <div key={index}>
-                                      <div
-                                        className={
-                                          message.event_type_id === 1
-                                            ? "chat-message-right"
-                                            : "chat-message-left"
-                                        }
-                                      >
-                                        <div className="message-body-1">
-                                          {expandedMessages.has(index) ? (
-                                            <div>
-                                              {message.body}
-                                              <button
-                                                onClick={() =>
-                                                  toggleMessageExpansion(index)
-                                                }
-                                                className={`read-less-btn ${message.event_type_id === 1
-                                                  ? "read-less-btn-right"
-                                                  : "read-less-btn-left"
-                                                  }`}
-                                              >
-                                                Read Less
-                                              </button>
+              <div className="analytic-chat">
+                <div className="dataa">
+                  <div className="Analyticdata ">
+                    <span>
+                      <i className="bi bi-bar-chart-line-fill"></i>
+                    </span>
+                    <span className="ms-4">Analytic Data of Selected Address</span>
+                  </div>
+                  <div className=" main-message">
+                    <div className="d-flex justify-content-between ms-3 gap-4">
+                      <div className="nav-msg">
+                        <div className="message Delivered">Message Delivered</div>
+                        <input
+                          type="text"
+                          className="round-input"
+                          value={formatCount(messageDelivered)}
+                          readOnly
+                        />
+                      </div>
+                      <div className="nav-msg">
+                        <div className="message response1 ">Message Response</div>
+                        <input
+                          type="text"
+                          className="round-input"
+                          value={formatCount(messageResponse)}
+                          readOnly
+                        />
+                      </div>
+                      <div className="nav-msg">
+                        <div className="message call-1">Call </div>
+                        <input
+                          type="text"
+                          className="round-input"
+                          value={formatCount(call)}
+                          readOnly
+                        />
+                      </div>
+                      <div className="nav-msg">
+                        <div className="message call-response-1">Call Response</div>
+                        <input
+                          type="text"
+                          className="round-input"
+                          value={formatCount(callResponse)}
+                          readOnly
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-                                              <i
-                                                className={`bi ${message.is_message_pinned
-                                                  ? "bi-star-fill text-warning"
-                                                  : "bi-star"
-                                                  } star-icon`}
-                                                onClick={() =>
-                                                  toggleMessagePin(
-                                                    message.id,
-                                                    conversationId
-                                                  )
-                                                }
-                                              ></i>
-                                            </div>
-                                          ) : (
-                                            <div>
-                                              {message.body &&
-                                                message.body.length > 100 ? (
-                                                <>
-                                                  {message.body.substring(0, 100)}
-                                                  ...
-                                                  <button
-                                                    onClick={() =>
-                                                      toggleMessageExpansion(index)
-                                                    }
-                                                    className={`read-more-btn ${message.event_type_id === 1
-                                                      ? "read-more-btn-right"
-                                                      : "read-more-btn-left"
-                                                      }`}
-                                                  >
-                                                    Read More
-                                                  </button>
-                                                  <i
-                                                    style={{ cursor: "pointer" }}
-                                                    className={`bi ${message.is_message_pinned
-                                                      ? "bi-star-fill text-warning"
-                                                      : "bi-star"
-                                                      } star-icon cursor-pointer`}
-                                                    onClick={() =>
-                                                      toggleMessagePin(
-                                                        message.id,
-                                                        conversationId
-                                                      )
-                                                    }
-                                                  ></i>
-                                                </>
-                                              ) : (
-                                                <>
-                                                  {message.body}{" "}
-                                                  <i
-                                                    className={`bi ${message.is_message_pinned
-                                                      ? "bi-star-fill text-warning"
-                                                      : "bi-star"
-                                                      } star-icon`}
-                                                    onClick={() =>
-                                                      toggleMessagePin(
-                                                        message.id,
-                                                        conversationId
-                                                      )
-                                                    }
-                                                  ></i>
-                                                </>
-                                              )}
-                                            </div>
-                                          )}
+                <div className="conversation">
+                  {selectedAddress && (
+                    <div className="conversation-chat">
+                      <Image src="converstation.svg" alt="" width={24} height={24} />{" "}
+                      Conversation From{" "}
+                      {uniqueFromNumbers.length > 0 && (
+                        <select
+                          value={fromNumber}
+                          onChange={(e) => setFromNumber(e.target.value)} // Update fromNumber on selection
+                        >
+                          {uniqueFromNumbers.map((number, index) => (
+                            <option key={index} value={number}>
+                              {number}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="search-wrapper">
+                    <input
+                      className="search"
+                      type="search"
+                      placeholder="Search To"
+                      value={searchTo} // Bind input value to search state
+                      onChange={handleSearchToChange} // Update search state on input change
+                    />
+                  </div>
+
+                  <div className="input-msg">
+                    <div className="screenshot-msg">
+                      <div className="inbox-chat">
+                        {events.length > 0
+                          ? filteredMessages.length > 0
+                            ? filteredMessages.map((conversationId) => {
+                              const isStop = updatedMessages[conversationId].some(
+                                (message) => message.is_stop
+                              );
+                              return (
+                                <div key={conversationId}>
+                                  <div className="to-line">.</div>
+                                  <div className="to-value">
+                                    <strong>To </strong>
+                                    <span
+                                      style={{
+                                        color: isStop ? "red" : "inherit",
+                                      }}
+                                    >
+                                      {updatedMessages[conversationId][0].to}
+                                    </span>
+
+                                    <i
+                                      className={`bi pinnumber ${pinnedConversations.has(conversationId)
+                                        ? "bi-pin-fill text-primary"
+                                        : "bi-pin"
+                                        }`}
+                                      onClick={() => handlePinNumber(conversationId)}
+                                    ></i>
+                                  </div>
+
+                                  {updatedMessages[conversationId].map(
+                                    (message, index) => (
+                                      <div key={index}>
+                                        <div
+                                          className={
+                                            message.event_type_id === 1
+                                              ? "chat-message-right"
+                                              : "chat-message-left"
+                                          }
+                                        >
+                                          <div className="message-body-1">
+                                            {expandedMessages.has(index) ? (
+                                              <div>
+                                                {message.body}
+                                                <button
+                                                  onClick={() =>
+                                                    toggleMessageExpansion(index)
+                                                  }
+                                                  className={`read-less-btn ${message.event_type_id === 1
+                                                    ? "read-less-btn-right"
+                                                    : "read-less-btn-left"
+                                                    }`}
+                                                >
+                                                  Read Less
+                                                </button>
+
+                                                <i
+                                                  className={`bi ${message.is_message_pinned
+                                                    ? "bi-star-fill text-warning"
+                                                    : "bi-star"
+                                                    } star-icon`}
+                                                  onClick={() =>
+                                                    toggleMessagePin(
+                                                      message.id,
+                                                      conversationId
+                                                    )
+                                                  }
+                                                ></i>
+                                              </div>
+                                            ) : (
+                                              <div>
+                                                {message.body &&
+                                                  message.body.length > 100 ? (
+                                                  <>
+                                                    {message.body.substring(0, 100)}
+                                                    ...
+                                                    <button
+                                                      onClick={() =>
+                                                        toggleMessageExpansion(index)
+                                                      }
+                                                      className={`read-more-btn ${message.event_type_id === 1
+                                                        ? "read-more-btn-right"
+                                                        : "read-more-btn-left"
+                                                        }`}
+                                                    >
+                                                      Read More
+                                                    </button>
+                                                    <i
+                                                      style={{ cursor: "pointer" }}
+                                                      className={`bi ${message.is_message_pinned
+                                                        ? "bi-star-fill text-warning"
+                                                        : "bi-star"
+                                                        } star-icon cursor-pointer`}
+                                                      onClick={() =>
+                                                        toggleMessagePin(
+                                                          message.id,
+                                                          conversationId
+                                                        )
+                                                      }
+                                                    ></i>
+                                                  </>
+                                                ) : (
+                                                  <>
+                                                    {message.body}{" "}
+                                                    <i
+                                                      className={`bi ${message.is_message_pinned
+                                                        ? "bi-star-fill text-warning"
+                                                        : "bi-star"
+                                                        } star-icon`}
+                                                      onClick={() =>
+                                                        toggleMessagePin(
+                                                          message.id,
+                                                          conversationId
+                                                        )
+                                                      }
+                                                    ></i>
+                                                  </>
+                                                )}
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                        <div
+                                          className={
+                                            message.event_type_id === 1
+                                              ? "message-date message-date-right"
+                                              : "message-date message-date-left"
+                                          }
+                                        >
+                                          {new Date(
+                                            message.created_at
+                                          ).toLocaleDateString()}
                                         </div>
                                       </div>
-                                      <div
-                                        className={
-                                          message.event_type_id === 1
-                                            ? "message-date message-date-right"
-                                            : "message-date message-date-left"
-                                        }
-                                      >
-                                        {new Date(
-                                          message.created_at
-                                        ).toLocaleDateString()}
-                                      </div>
-                                    </div>
-                                  )
-                                )}
-                              </div>
-                            );
-                          })
-                          : "No chats found for this number"
-                        : "Loading..."}
+                                    )
+                                  )}
+                                </div>
+                              );
+                            })
+                            : "No chats found for this number"
+                          : "Loading..."}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
+        </div>
       </div>
 
 
