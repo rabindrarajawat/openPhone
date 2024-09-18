@@ -1121,7 +1121,7 @@ const Dashboard = () => {
                     </span>
                     <input
                       type="text"
-                      placeholder="Search Address"
+                      placeholder="Search"
                       value={searchQuery}
                       onChange={handleSearchChange}
                     ></input>
@@ -1145,7 +1145,7 @@ const Dashboard = () => {
                     </div>
                   </div>
                   <div>
-                    <ul className="address-list">
+                    <ul className="address-list ">
                       <div className="search-wrapper-add">
                         {results.length > 0 && (
                           <SearchResultList results={results} onSelect={handleSelectAddress} />

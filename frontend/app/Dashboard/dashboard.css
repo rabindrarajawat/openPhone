@@ -160,7 +160,7 @@
 }
 
 .message1 {
-  width: 18.5vw;
+  width: 18vw;
   height: 100%;
   border-radius: 5px 0px 0px 0px;
   background: linear-gradient(90deg, #ffffff 0%, #e5d4fc 100%);
@@ -216,32 +216,33 @@
   /* padding-right: 10px; */
   border: 3px solid #D7F5DC;
   border-radius: 6px;
-  height: 65vh;
-  width: 21vw;
+  height: 60vh;
+  width: 19vw;
 }
 
 
 .search-box {
   display: inline-table;
-  margin-left: 16px;
+  margin-left: 5px;
   margin-top: 17px;
   position: relative;
   width: 100%;
 }
 
 .search-box input {
-  height: 39px;
-  width: 178px;
+  height: 30px;
+  width: 55%;
   padding: 10px 15px 10px 40px;
   border: 2px solid #aad5bb;
   border-radius: 76px;
   outline: none;
 }
 
+
 .search-box .icon {
   position: absolute;
   top: 50%;
-  left: 10px;
+  left: 5px;
   transform: translateY(-50%);
 }
 
@@ -255,8 +256,8 @@
 
 .icon-labels {
   align-items: center;
-  margin-left: 192px;
-  margin-top: -33px;
+  margin-left: 140px;
+  margin-top: -30px;
   display: flex;
 }
 
@@ -332,7 +333,7 @@
 }
 
 .message {
-  width: 12.7vw;
+  width: 12vw;
   /* height: 100%; */
   border: 2px solid grey;
   border-radius: 3.27px;
@@ -365,8 +366,8 @@
 }
 
 .input-msg {
-  width: 53.2vw;
-  height: 48vh;
+  width: 51.2vw;
+  height: 46vh;
   margin-top: 10px;
   /* margin-left: -541px; */
   border-radius: 5px 0px 0px 0px;
@@ -401,16 +402,26 @@
 }
 
 .search-wrapper {
-  margin-top: -35px;
+  margin-top: -30px;
   position: absolute;
   z-index: 2;
-  margin-left: 53%;
+  margin-left: 50%;
   border-radius: 30px;
   height: 35px;
-  width: 150px;
+  width: 16%;
   background: linear-gradient(white, white) padding-box,
     linear-gradient(102.59deg, #D7F5DC -59.65%, #DEEFFF 71.41%) border-box;
   border: 2px solid transparent;
+}
+
+.search-wrapper::before {
+  content: url('/icon.svg');
+  position: absolute;
+  left: 14px;
+  top: 37%;
+  /* transform: translateY(-50%); */
+  width: 17.05px;
+  height: 17.06px;
 }
 
 
@@ -636,21 +647,12 @@
 }
 
 .address-list {
-  max-height: 310px;
+  max-height: 40vh;
   /* Set the maximum height for the list */
-
-  padding-right: 10px;
+  padding-left: 60px;
   overflow-y: auto;
-  padding-top: 15px !important;
+  /* padding-top: 15px !important; */
 }
-
-.address-list-container {
-  height: 400px;
-  overflow-y: auto;
-  border: 1px solid #ddd;
-  padding: 10px;
-}
-
 
 
 .checkbox {
