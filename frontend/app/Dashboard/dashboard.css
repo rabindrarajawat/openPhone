@@ -17,24 +17,25 @@
 
 .content-with-border-right {
   border-right: 2px solid #e8e8e8;
-  padding-right: 8px;
-  height: 85vh;
+  padding-right: 13px;
+  height: 82vh;
 
 }
 
 .information {
-  margin-top: 53px;
-  margin-left: 124px;
   color: #5a657b;
   font-weight: 600;
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+  margin-left: 5rem !important;
+
 }
 
-.status {
+/* .status {
   margin-left: 133px;
   margin-top: 36px;
-
-
-}
+} */
 
 .dropdown-menu {
   min-width: 160px;
@@ -49,40 +50,15 @@
   /* Remove padding */
 }
 
-.logo {
-  width: 14.01px;
-  height: 9px;
-}
-
-.type {
-  margin-left: 133px;
-
-  margin-top: 35px;
-}
-
-.dropdown-type {
-  min-width: 148px;
-  margin-left: -19px;
-  margin-top: 11px;
-}
-
 .Date {
   margin-left: 142px;
   margin-top: 50px;
 }
 
-
-.dropdown-Date {
-  margin-left: -16px;
-  margin-top: 6px;
-}
-
 .custom-date-dropdown {
   width: 251px;
-  margin-top: -3px;
   padding: 10px;
   margin-left: -101px;
-  /* Adjust width as needed */
 }
 
 .custom-date-dropdown input[type="date"] {
@@ -99,18 +75,15 @@
   padding: 1px;
 }
 
-.todate {
-  margin-left: 18px;
-}
 
 
 .set-date {
-  width: 100px !important;
-  height: 24px;
-  padding: 10px 2px 11px 18px;
+  /* width: 60% !important; */
+  /* height: 24px; */
+  padding: 2px 1px 1px 2px;
+
   border-radius: 18px;
   background: linear-gradient(#fff, #fff) padding-box,
-    /* Inner background */
     linear-gradient(90deg, #bce6c3 0%, #88a0f3 100%) border-box;
   border: 2px solid transparent;
   font-size: 10px;
@@ -124,9 +97,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
   padding: 20px 0;
-  /* Control vertical space */
 }
 
 .heading {
@@ -142,17 +113,14 @@
   color: #4d5e80;
 }
 
-.logos-row-msg1 {
+/* .logos-row-msg1 {
   display: flex;
   justify-content: left;
   align-items: left;
-  /* margin-left: -10px; */
   margin-top: 15px;
   gap: 48px;
   padding-bottom: 0;
-  /* Reduce bottom padding */
-
-}
+} */
 
 .round-input1 {
 
@@ -187,17 +155,14 @@
 }
 
 .nav-msg1 {
-  /* text-align: center; */
   display: flex;
-  /* flex-direction: column; */
   align-items: center;
 }
 
 .message1 {
-  width: 300px;
-  height: 60px;
+  width: 18.5vw;
+  height: 100%;
   border-radius: 5px 0px 0px 0px;
-  /* opacity: 0px; */
   background: linear-gradient(90deg, #ffffff 0%, #e5d4fc 100%);
   box-shadow: 0px 2px 5px 0px #26334d08;
   margin-top: 5px;
@@ -247,14 +212,12 @@
 }
 
 .main-search {
-  margin-top: 2vh;
-  /* margin-left: -120px; */
-  /* padding-left: 14px; */
-  padding-right: 10px;
+  /* margin-top: 2vh; */
+  /* padding-right: 10px; */
   border: 3px solid #D7F5DC;
   border-radius: 6px;
-  height: 585px;
-  /* width: 300px; */
+  height: 65vh;
+  width: 21vw;
 }
 
 
@@ -363,32 +326,23 @@
 
 }
 
-.logos-row-msg {
-  display: flex;
-  justify-content: left;
-  align-items: left;
-  margin-left: 15px;
-  gap: 70px;
-}
-
 .nav-msg {
   display: flex;
   align-items: center;
 }
 
 .message {
-  width: 205px;
-  height: 39px;
+  width: 12.7vw;
+  /* height: 100%; */
   border: 2px solid grey;
   border-radius: 3.27px;
-  /* opacity: 0px; */
   margin-top: 5px;
   display: flex;
   padding: 10px;
   align-items: center;
   border-left: 2px solid #6e2fcd;
   font-family: "Roboto", sans-serif;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 900;
   line-height: 20px;
   text-align: left;
@@ -411,8 +365,8 @@
 }
 
 .input-msg {
-  width: 980px;
-  height: 470px;
+  width: 53.2vw;
+  height: 48vh;
   margin-top: 10px;
   /* margin-left: -541px; */
   border-radius: 5px 0px 0px 0px;
@@ -450,11 +404,10 @@
   margin-top: -35px;
   position: absolute;
   z-index: 2;
-  margin-left: 60%;
+  margin-left: 53%;
   border-radius: 30px;
-  /* padding: 10px; */
   height: 35px;
-  width: 164px;
+  width: 150px;
   background: linear-gradient(white, white) padding-box,
     linear-gradient(102.59deg, #D7F5DC -59.65%, #DEEFFF 71.41%) border-box;
   border: 2px solid transparent;
@@ -497,8 +450,6 @@
 .pagination-container .pagination {
   display: flex;
   justify-content: center;
-  /* margin-top: 235px; */
-
 }
 
 
@@ -623,8 +574,8 @@
 
 
 .conversation {
-  width: 350px;
-  height: 310px;
+  /* width: 350px; */
+  /* height: 310px; */
   margin-top: 3vh;
   margin-left: 5vh;
 }
@@ -634,11 +585,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  /* Ensure the items are aligned to the left */
-  width: 100%;
-  /* Make sure the div takes full width */
   gap: 10px;
-  /* Remove any padding or margin */
 }
 
 .message-date-right {
@@ -675,10 +622,6 @@
   cursor: pointer;
 }
 
-.ms-4 {
-  cursor: pointer;
-}
-
 .todate {
   margin-left: 19px !important;
 }
@@ -687,33 +630,25 @@
   margin-left: -30px !important;
 }
 
-.reset-button {
-  margin-left: 75px !important;
-  width: 80px !important;
-}
 
 .selected-address .setaddress {
   color: #007bff;
 }
 
 .address-list {
-  margin-top: 20px;
+  max-height: 310px;
+  /* Set the maximum height for the list */
+
   padding-right: 10px;
   overflow-y: auto;
-  height: 450px;
-  /* width: 250px; */
-
+  padding-top: 15px !important;
 }
 
 .address-list-container {
   height: 400px;
-  /* Set this to the maximum height you want the address list to occupy */
   overflow-y: auto;
-  /* Enable vertical scrolling if the content exceeds the height */
   border: 1px solid #ddd;
-  /* Optional: Add a border to define the container */
   padding: 10px;
-  /* Optional: Add padding inside the container */
 }
 
 
@@ -740,12 +675,12 @@
   color: #17A505;
 }
 
-.main-content {
+/* .main-content {
   margin-left: 15px;
   display: flex;
   flex-direction: column;
+} */
 
-}
 
 .dataa {
   margin-left: -25px;
@@ -759,85 +694,14 @@
 
 }
 
-@media (max-width: 367px) {
-  .main-container {
-    flex-direction: column;
-    padding: 5px;
-    /* Reduce padding */
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    /* Ensure full width */
-    overflow-x: hidden;
-    /* Prevent horizontal overflow */
-  }
 
-  .content-with-border-right {
-    border-right: none;
-    padding-right: 6px;
-    width: 100%;
-  }
-
-  .openphone,
-  .information,
-  .status,
-  .type,
-  .Date {
-    margin: 5px 0;
-    /* Reduce margins */
-    width: 100%;
-    text-align: center;
-  }
-
-  .custom-date-dropdown {
-    width: 100%;
-    padding: 5px;
-  }
-
-  .message1,
-  .message {
-    width: 100%;
-    font-size: 14px;
-    /* Adjust font size */
-    text-align: center;
-    padding: 5px;
-  }
-
-  .search-box input {
-    width: 100%;
-    padding: 8px 10px;
-    /* Reduce padding */
-    box-sizing: border-box;
-    /* Ensure padding doesn't affect width */
-  }
-
-  /* Ensure other elements are within the screen width */
-  .main-Address,
-  .main-search,
-  .search-wrapper,
-  .input-msg,
-  .screenshot-msg,
-  .bookmark-container,
-  .redo-container {
-    width: 100%;
-    padding: 5px;
-    margin: 0;
-    /* Eliminate margins that may push content */
-  }
-
-  .pagination-container {
-    width: 100%;
-    /* margin-top: 20px; */
-    text-align: center;
-  }
-}
 
 .analytic-chat {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   /* Align content to the start (left) */
-  width: 100%;
+  /* width: 100%; */
   /* Make sure the container takes the full width */
 
 }

@@ -52,7 +52,7 @@ const SideBar = () => {
           </li>
         </div>
 
-        <div className="log">
+        <div className="log d-flex justify-content-start">
           <div onClick={handleLogout}>Log out</div>
         </div>
       </ul>
