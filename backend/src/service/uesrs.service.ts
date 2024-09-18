@@ -101,7 +101,7 @@ export class UsersService {
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role.name,name:user.name }, // Ensure role has a name property
       this.jwtSecret,
-      { expiresIn: '1h' } // Token expiration time
+      { expiresIn: '8h' } // Token expiration time
     );
 
     return { token };
