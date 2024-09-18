@@ -4,7 +4,7 @@
 .sidebar {
     position: absolute;
     background: #D7F5DC;
-    height: 89vh;
+    height: 87vh;
 }
 
 .nav {
@@ -28,7 +28,7 @@
     color: #7D8FB3;
     cursor: pointer;
     /* margin-top: 800%; */
-    margin-top: 25rem;
+    margin-top: 18rem;
     margin-left: -5px;
 
 }
