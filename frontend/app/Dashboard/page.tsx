@@ -1143,7 +1143,7 @@ const Dashboard = () => {
                     </div>
                   </div>
                   <div>
-                    <ul className="address-list ">
+                    <ul className="address-list p-1 ">
                       <div className="search-wrapper-add">
                         {results.length > 0 && (
                           <SearchResultList results={results} onSelect={handleSelectAddress} />
@@ -1157,7 +1157,7 @@ const Dashboard = () => {
                               }`}
                             onClick={() => handleAddressSelect(address.displayAddress, address.id)}
                           >
-                            <div className="setaddress d-flex align-items-center gap-3">
+                            <div className="setaddress d-flex align-items-start gap-3">
                               <i
                                 className={`bi ${address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
                                   } clickable-icon`}
@@ -1168,7 +1168,7 @@ const Dashboard = () => {
                                 onClick={() => handleBookmarkClick(address.id)}
                               ></i>
 
-                              <span className="ml-2 scroll">
+                              <span className="text-start scroll">
                                 {address.displayAddress || address.fullAddress}
                                 {address.notificationCount > 0 && (
                                   <span className="notification-count ml-2">
