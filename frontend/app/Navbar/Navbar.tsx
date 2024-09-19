@@ -153,14 +153,21 @@ const Navbar: React.FC = () => {
   return (
     <nav className="navbar">
       <div className="container-fluid">
-        <Image
-          src="/line.svg"
-          alt="Logo"
-          className="logo1"
-          width={50}
-          height={50}
-          onClick={() => { }}
-        />
+        <div className="logo-openphone">
+
+          <Image
+            src="/line.svg"
+            alt="Logo"
+            className="logo1"
+            width={50}
+            height={50}
+            onClick={() => { }}
+          />
+          <div className="openphone">
+            <span className="border-bottom pb-3">OpenPhone</span>
+          </div>
+        </div>
+
         <div className='nav-list'>
           <div className='profileicon'>
             <Image src="/account_circle.svg" alt="Profile" className='profile' width={50} height={50} />
