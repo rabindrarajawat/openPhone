@@ -8,6 +8,15 @@
     margin-right: 60px;
 }
 
+.logo-openphone {
+    display: flex;
+    align-items: center;
+}
+
+.logo-openphone .openphone {
+    margin-left: 25px;
+    margin-top: 1px;
+}
 
 
 .dashboard {
@@ -49,10 +58,6 @@
 
 .tracking {
     cursor: pointer;
-}
-
-.d-flex {
-    margin-left: 40%;
 }
 
 .search-icon {

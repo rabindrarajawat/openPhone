@@ -26,8 +26,9 @@
   color: #5a657b;
   font-weight: 600;
   display: flex;
-  justify-content: center;
+  justify-content: left;
   margin-top: 15px;
+  /* width: 155px; */
   margin-left: 5rem !important;
 
 }
@@ -70,7 +71,7 @@
   display: block;
   width: 29%;
   height: 28px;
-  margin-left: 165px;
+  margin-left: 25px;
   border-radius: 12px;
   padding: 1px;
 }
@@ -78,10 +79,9 @@
 
 
 .set-date {
-  /* width: 60% !important; */
+  width: 30% !important;
   /* height: 24px; */
   padding: 2px 1px 1px 2px;
-
   border-radius: 18px;
   background: linear-gradient(#fff, #fff) padding-box,
     linear-gradient(90deg, #bce6c3 0%, #88a0f3 100%) border-box;
@@ -160,7 +160,7 @@
 }
 
 .message1 {
-  width: 18vw;
+  width: 18.7vw;
   height: 100%;
   border-radius: 5px 0px 0px 0px;
   background: linear-gradient(90deg, #ffffff 0%, #e5d4fc 100%);
@@ -216,7 +216,7 @@
   /* padding-right: 10px; */
   border: 3px solid #D7F5DC;
   border-radius: 6px;
-  height: 60vh;
+  height: 62vh;
   width: 19vw;
 }
 
@@ -249,7 +249,7 @@
 .search-icon {
   position: absolute;
   left: 12px;
-  top: 2px;
+  top: 0px;
   pointer-events: none;
 
 }
@@ -333,7 +333,7 @@
 }
 
 .message {
-  width: 12vw;
+  width: 13.2vw;
   /* height: 100%; */
   border: 2px solid grey;
   border-radius: 3.27px;
@@ -366,15 +366,15 @@
 }
 
 .input-msg {
-  width: 51.2vw;
-  height: 46vh;
+  width: 55.97vw;
+  height: 42.5vh;
   margin-top: 10px;
   /* margin-left: -541px; */
   border-radius: 5px 0px 0px 0px;
   border: 3px solid #D7F5DC;
   position: relative;
   z-index: 1;
-  margin-right: 40px;
+  /* margin-right: 40px; */
   overflow-y: auto;
 
 }
@@ -405,7 +405,7 @@
   margin-top: -30px;
   position: absolute;
   z-index: 2;
-  margin-left: 50%;
+  margin-left: 55%;
   border-radius: 30px;
   height: 35px;
   width: 16%;
@@ -418,8 +418,8 @@
   content: url('/icon.svg');
   position: absolute;
   left: 14px;
-  top: 37%;
-  /* transform: translateY(-50%); */
+  top: 35%;
+  transform: translateY(-50%);
   width: 17.05px;
   height: 17.06px;
 }
@@ -454,7 +454,7 @@
 
 
 .list-group-item {
-  margin-left: -188px;
+  /* margin-left: -188px; */
   margin-top: 10%;
 }
 
@@ -585,10 +585,10 @@
 
 
 .conversation {
-  /* width: 350px; */
-  /* height: 310px; */
   margin-top: 3vh;
   margin-left: 5vh;
+  padding-right: 0px;
+
 }
 
 .conversation-chat {

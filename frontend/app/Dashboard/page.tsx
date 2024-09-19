@@ -867,208 +867,206 @@ const Dashboard = () => {
 
 
   return (
-    <div>
+    <div className="w-100 m-0">
       <Navbar />
 
       {isSidebarVisible && <SideBar />}
       <div className="container row">
         <div className="main-container col-12">
           <div className="content-with-border-right">
-            <div className="openphone">
-              <span className="border-bottom pb-3">OpenPhone</span>
-            </div>
-            <div className="">
-              <div className="information">Message and Calls</div>
-              <div className="d-flex flex-column justify-content-left">
-                <div className="container mb-1">
-                  <div className="me-4">
-                    Status
-                    {/* <span className=""> */}
-                    <button
-                      className="btn"
-                      type="button"
-                      onClick={handleToggle}
-                      aria-expanded={isType}
-                    >
-                      <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
-                    </button>
 
-                    <div className={` ms-4${isType ? "show" : ""}`}>
-                      <li className="dropdown-item">
-                        <input type="checkbox"
-                          checked={deliveredChecked}
-                          onChange={handleDeliveredChange}
-                        />
-                        <label className="ms-2">Delivered</label>
-                      </li>
-                      <li className="dropdown-item pt-2">
-                        <input type="checkbox" checked={receivedChecked}
-                          onChange={handleReceivedChange}
-                          id="notDelivered" />
-                        <label className="ms-2" htmlFor="notDelivered">
-                          Received
-                        </label>
-                      </li>
-                    </div>
-                    {/* </span> */}
-                  </div>
-                  <div className="me-4 ">
-                    Type
-                    {/* <span className=""> */}
-                    <button
-                      className="btn"
-                      type="button"
-                      onClick={handleToggle1}
-                      aria-expanded={isType}
-                    >
-                      <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
-                    </button>
+            {/* <div className=""> */}
+            <div className="information">Message and Calls</div>
+            <div className="d-flex flex-column ms-5">
+              <div className="container mb-1 ms-5">
+                <div className="">
+                  Status
+                  {/* <span className=""> */}
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={handleToggle}
+                    aria-expanded={isType}
+                  >
+                    <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
+                  </button>
 
-                    <div className={`ms-4${isType ? "show" : ""}`}>
-                      <li className="dropdown-item">
-                        <input
-                          type="checkbox"
-                          className="checkbox"
-                          id="case"
-                          onChange={() => handleCheckboxChange(3)}
-                        />
-                        <label className="ms-2">Case</label>
-                      </li>
-                      <li className="dropdown-item pt-2">
-                        <input
-                          type="checkbox"
-                          className="checkbox"
-                          id="auction"
-                          onChange={() => handleCheckboxChange(1)}
-                        />
-                        <label className="ms-2" htmlFor="auction">
-                          Auction
-                        </label>
-                      </li>
-                      <li className="dropdown-item pt-2">
-                        <input
-                          type="checkbox"
-                          className="checkbox"
-                          id="taxDeed"
-                          onChange={() => handleCheckboxChange(2)}
-                        />
-                        <label className="ms-2" htmlFor="taxDeed">
-                          Tax deed
-                        </label>
-                      </li>
-                    </div>
-                    {/* </span> */}
-                  </div>
-                  <div className="me-4 ">
-                    Date
-                    {/* <span className="ms-2 mb-2"> */}
-                    <button
-                      className="btn"
-                      type="button"
-                      onClick={handleToggle1}
-                      aria-expanded={isType}
-                    >
-                      <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
-                    </button>
-
-                    <div className={`ms-4 dropdown-Date ${isType ? "show" : ""}`}>
-                      <li className="dropdown-item">
-                        <input
-                          type="checkbox"
-                          id="weekly"
-                          className="checkbox"
-                          onChange={() =>
-                            setSelectedDateFilter(
-                              selectedDateFilter === "weekly" ? "all" : "weekly"
-                            )
-                          }
-                        />
-                        <label className="ms-2" htmlFor="weekly">
-                          Weekly{" "}
-                        </label>
-                      </li>
-                      <li className="dropdown-item pt-2">
-                        <input
-                          type="checkbox"
-                          id="monthly"
-                          className="checkbox"
-                          onChange={() =>
-                            setSelectedDateFilter(
-                              selectedDateFilter === "monthly" ? "all" : "monthly"
-                            )
-                          }
-                        />
-                        <label className="ms-2" htmlFor="monthly">
-                          Monthly{" "}
-                        </label>
-                      </li>
-
-                    </div>
-                    {/* </span> */}
-                  </div>
-                  <div className="me-4 ">
-                    <li className="dropdown-item ">
-                      <label className="" htmlFor="pending">
-                        Custom
-                        <button
-                          className="btn ms-2"
-                          type="button"
-                          onClick={handleCustomDateToggle}
-                          aria-expanded={isCustomDateOpen}
-                        >
-                          <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
-                        </button>
+                  <div className={` ms-4${isType ? "show" : ""}`}>
+                    <li className="dropdown-item">
+                      <input type="checkbox"
+                        checked={deliveredChecked}
+                        onChange={handleDeliveredChange}
+                      />
+                      <label className="ms-2">Delivered</label>
+                    </li>
+                    <li className="dropdown-item pt-2">
+                      <input type="checkbox" checked={receivedChecked}
+                        onChange={handleReceivedChange}
+                        id="notDelivered" />
+                      <label className="ms-2" htmlFor="notDelivered">
+                        Received
                       </label>
-
-                      {isCustomDateOpen && (
-                        <div className="custom-date-dropdown borderless">
-                          <div className="d-flex align-items-center">
-                            <label htmlFor="fromDate" className="me-2">
-                              From:
-                            </label>
-                            <input
-                              type="date"
-                              id="fromDate"
-                              className="set-date  me-2"
-                              value={fromDate}
-                              onChange={(e) => setFromDate(e.target.value)}
-                            />
-                          </div>
-                          <div className="d-flex align-items-center mt-2">
-                            <label htmlFor="toDate" className="me-2">
-                              To:
-                            </label>
-                            <input
-                              type="date"
-                              id="toDate"
-                              className="set-date me-2 todate"
-                              value={toDate}
-                              onChange={(e) => setToDate(e.target.value)}
-                            />
-                          </div>
-                          <div className="">
-                            <button
-                              className="btn btn-primary px-2 mt-2 "
-                              type="button"
-                              onClick={handleReset}
-                            >
-                              Reset
-                            </button>
-                          </div>
-                        </div>
-                      )}
                     </li>
                   </div>
+                  {/* </span> */}
+                </div>
+                <div className="">
+                  Type
+                  {/* <span className=""> */}
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={handleToggle1}
+                    aria-expanded={isType}
+                  >
+                    <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
+                  </button>
+
+                  <div className={`ms-4${isType ? "show" : ""}`}>
+                    <li className="dropdown-item">
+                      <input
+                        type="checkbox"
+                        className="checkbox"
+                        id="case"
+                        onChange={() => handleCheckboxChange(3)}
+                      />
+                      <label className="ms-2">Case</label>
+                    </li>
+                    <li className="dropdown-item pt-2">
+                      <input
+                        type="checkbox"
+                        className="checkbox"
+                        id="auction"
+                        onChange={() => handleCheckboxChange(1)}
+                      />
+                      <label className="ms-2" htmlFor="auction">
+                        Auction
+                      </label>
+                    </li>
+                    <li className="dropdown-item pt-2">
+                      <input
+                        type="checkbox"
+                        className="checkbox"
+                        id="taxDeed"
+                        onChange={() => handleCheckboxChange(2)}
+                      />
+                      <label className="ms-2" htmlFor="taxDeed">
+                        Tax deed
+                      </label>
+                    </li>
+                  </div>
+                  {/* </span> */}
+                </div>
+                <div className=" ">
+                  Date
+                  {/* <span className="ms-2 mb-2"> */}
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={handleToggle1}
+                    aria-expanded={isType}
+                  >
+                    <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
+                  </button>
+
+                  <div className={`ms-4 dropdown-Date ${isType ? "show" : ""}`}>
+                    <li className="dropdown-item">
+                      <input
+                        type="checkbox"
+                        id="weekly"
+                        className="checkbox"
+                        onChange={() =>
+                          setSelectedDateFilter(
+                            selectedDateFilter === "weekly" ? "all" : "weekly"
+                          )
+                        }
+                      />
+                      <label className="ms-2" htmlFor="weekly">
+                        Weekly{" "}
+                      </label>
+                    </li>
+                    <li className="dropdown-item pt-2">
+                      <input
+                        type="checkbox"
+                        id="monthly"
+                        className="checkbox"
+                        onChange={() =>
+                          setSelectedDateFilter(
+                            selectedDateFilter === "monthly" ? "all" : "monthly"
+                          )
+                        }
+                      />
+                      <label className="ms-2" htmlFor="monthly">
+                        Monthly{" "}
+                      </label>
+                    </li>
+
+                  </div>
+                  {/* </span> */}
+                </div>
+                <div className="">
+                  <li className="dropdown-item ">
+                    <label className="" htmlFor="pending">
+                      Custom
+                      <button
+                        className="btn ms-2"
+                        type="button"
+                        onClick={handleCustomDateToggle}
+                        aria-expanded={isCustomDateOpen}
+                      >
+                        <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
+                      </button>
+                    </label>
+
+                    {isCustomDateOpen && (
+                      <div className="custom-date-dropdown ms-1 borderless">
+                        <div className="d-flex align-items-center">
+                          <label htmlFor="fromDate" className="me-2">
+                            From:
+                          </label>
+                          <input
+                            type="date"
+                            id="fromDate"
+                            className="set-date  me-2"
+                            value={fromDate}
+                            onChange={(e) => setFromDate(e.target.value)}
+                          />
+                        </div>
+                        <div className="d-flex align-items-center mt-2">
+                          <label htmlFor="toDate" className="me-2">
+                            To:
+                          </label>
+                          <input
+                            type="date"
+                            id="toDate"
+                            className="set-date me-2 todate"
+                            value={toDate}
+                            onChange={(e) => setToDate(e.target.value)}
+                          />
+                        </div>
+                        <div className="">
+                          <button
+                            className="btn btn-primary px-2 mt-2 "
+                            type="button"
+                            onClick={handleReset}
+                          >
+                            Reset
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </li>
                 </div>
               </div>
             </div>
+            {/* </div> */}
           </div>
 
-          <div className="container">
+          <div className="container-fluid w-100 m-0">
             <div className="heading">
               <Image src="/Done.svg" alt="" width={24} height={24} /> Comprehensive view of Address
             </div>
-            <div className="d-flex  gap-3 mt-2 container">
+            <div className="d-flex  gap-3 mt-2 w-100 m-0">
               <div className="nav-msg1">
                 <div className="message1">Message Delivered</div>
                 <input
