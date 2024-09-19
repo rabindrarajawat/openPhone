@@ -17,8 +17,8 @@
 
 .content-with-border-right {
   border-right: 2px solid #e8e8e8;
-  padding-right: 13px;
-  height: 82vh;
+  height: 84vh;
+  width: 22.5%;
 
 }
 
@@ -293,7 +293,6 @@
 
 .main-message {
   margin-left: 36px;
-  margin-top: 9px;
   color: #4d5e80;
   font-weight: 900;
   font-size: 10.71px;
@@ -647,11 +646,8 @@
 }
 
 .address-list {
-  max-height: 40vh;
-  /* Set the maximum height for the list */
-  padding-left: 60px;
+  max-height: 44vh;
   overflow-y: auto;
-  /* padding-top: 15px !important; */
 }
 
 

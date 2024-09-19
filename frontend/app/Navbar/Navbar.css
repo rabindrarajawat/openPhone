@@ -5,7 +5,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-right: 60px;
+    /* margin-right: 60px; */
 }
 
 .logo-openphone {
@@ -115,13 +115,11 @@
     font-size: 13px;
     font-weight: 700;
     line-height: 25px;
-    margin-right: 30px;
+    margin-right: 5px;
     color: #6B7A99;
-    /* margin-top: 2px; */
     width: 48px;
     height: 25px;
     top: 34px;
-    left: 1271px;
 
 }
 
@@ -133,13 +131,11 @@
 .profile {
     width: 30px;
     height: 30px;
-    left: 1231px;
     padding: 5px 0px 0px 0px;
 }
 
 .dashboard {
     font-size: 14px;
-    /* Adjust size as needed */
     display: flex;
     align-items: center;
 }
