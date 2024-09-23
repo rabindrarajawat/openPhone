@@ -146,26 +146,24 @@ const Navbar: React.FC = () => {
 
   const formatCount = (count: number) => {
     if (count >= 1000000) {
-      return (count / 1000000).toFixed(1) + 'M'; // Convert to millions
+      return (count / 1000000).toFixed(1) + 'M';
     } else if (count >= 1000) {
-      return (count / 1000).toFixed(1) + 'K'; // Convert to thousands
+      return (count / 1000).toFixed(1) + 'K'; 
     }
-    return count; // Return the original count if it's less than 1000
+    return count;
   };
 
 
   return (
     <nav className="navbar">
       <div className="container-fluid">
-        <Image
-          src="/line.svg"
-          alt="Logo"
-          className="logo1"
-          width={50}
-          height={50}
-          onClick={() => { }}
-        />
+      <div className="d-flex justify-content-center align-items-center  m-2 p-2 rounded-circle">
+                <span className="navbar-toggler-icon"></span>
+              </div>
+              
+             
         <div className='nav-list'>
+          
           <div className='profileicon'>
             <Image src="/account_circle.svg" alt="Profile" className='profile' width={50} height={50} />
           </div>

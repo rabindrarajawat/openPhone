@@ -28,7 +28,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
   if (endPage - startPage < pageRange - 1) {
     startPage = Math.max(1, endPage - pageRange + 1);
   }
-
+  
   return (
     <nav className="pagination-container">
       <ul className="pagination setPagination">
