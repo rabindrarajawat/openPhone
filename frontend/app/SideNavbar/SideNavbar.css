@@ -1,11 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap');
 
+/* General styling for the sidebar */
 .sidebar {
-    position: absolute;
-    background: #D7F5DC;
-    height: 87vh;
+    position: fixed;
+    height: 100vh;
+    background-color: #D7F5DC;
+    overflow-y: auto;
+    z-index: 1000;
 }
+
+@media screen and (-webkit-min-device-pixel-ratio: 1.5),
+screen and (min-resolution: 144dpi) {
+    .sidebar {
+        height: 100vh;
+    }
+}
+
 
 .nav {
     width: 50px;
