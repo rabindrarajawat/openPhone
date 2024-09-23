@@ -93,12 +93,7 @@
   margin-left: -7px;
 }
 
-.main-Address {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 20px 0;
-}
+
 
 .heading {
   /* width: 92%; */
@@ -200,7 +195,6 @@
 
 .Analyticdata {
   margin-top: 19px;
-  margin-left: 52px;
   font-weight: 600;
   font-size: 20px;
   font-family: "Roboto", sans-serif;
@@ -211,14 +205,40 @@
   margin-top: 1%;
 }
 
-.main-search {
-  /* margin-top: 2vh; */
-  /* padding-right: 10px; */
+/* .main-search {
   border: 3px solid #D7F5DC;
   border-radius: 6px;
   height: 62vh;
   width: 19vw;
+} */
+
+.main-search {
+  position: fixed;
+  margin-top: 45px;
+  width: 19vw;
+  height: 95vh;
+  border: 3px solid #D7F5DC;
+  border-radius: 6px;
+  background-color: #fff;
+  z-index: 999;
+  box-sizing: border-box;
 }
+
+/* Media query for smaller screens if needed */
+@media (max-height: 700px) {
+  .main-search {
+    height: 65vh;
+    /* Slightly reduce the height for very short screens */
+  }
+}
+
+@media (max-height: 500px) {
+  .main-search {
+    height: 90vh;
+    /* Further reduce the height for extremely small screens */
+  }
+}
+
 
 
 .search-box {
@@ -255,8 +275,10 @@
 }
 
 .icon-labels {
-  align-items: center;
-  margin-left: 140px;
+  align-items: right;
+  justify-content: end;
+  justify-items: right;
+  margin-right: 5%;
   margin-top: -30px;
   display: flex;
 }
@@ -266,7 +288,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-left: -13px;
   z-index: 2;
 }
 
@@ -281,7 +302,7 @@
 
 .redo-container img {
   width: 11px;
-  height: 11px;
+  height: 12px;
 }
 
 .bookmark-container i {
@@ -292,7 +313,7 @@
 }
 
 .main-message {
-  margin-left: 36px;
+  /* margin-left: 36px; */
   color: #4d5e80;
   font-weight: 900;
   font-size: 10.71px;
@@ -366,17 +387,18 @@
 
 .input-msg {
   width: 55.97vw;
-  height: 42.5vh;
+  height: 43.5vh;
   margin-top: 10px;
-  /* margin-left: -541px; */
   border-radius: 5px 0px 0px 0px;
   border: 3px solid #D7F5DC;
   position: relative;
   z-index: 1;
-  /* margin-right: 40px; */
   overflow-y: auto;
+  box-sizing: border-box;
 
 }
+
+
 
 .screenshot-msg {
   width: 97%;
@@ -455,6 +477,7 @@
 .list-group-item {
   /* margin-left: -188px; */
   margin-top: 10%;
+  cursor: pointer;
 }
 
 .pagination-container .pagination {
@@ -563,6 +586,10 @@
   margin-left: -14px;
 }
 
+.select {
+  cursor: pointer;
+}
+
 .read-more-btn-right,
 .read-less-btn-right {
   color: #4E4E4E;
@@ -584,10 +611,8 @@
 
 
 .conversation {
+  position: relative;
   margin-top: 3vh;
-  margin-left: 5vh;
-  padding-right: 0px;
-
 }
 
 .conversation-chat {
@@ -680,27 +705,11 @@
 } */
 
 
-.dataa {
-  margin-left: -25px;
-}
-
 .main-main {
   display: flex;
   position: relative;
   justify-content: flex-start;
   /* Align items at the start */
-
-}
-
-
-
-.analytic-chat {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  /* Align content to the start (left) */
-  /* width: 100%; */
-  /* Make sure the container takes the full width */
 
 }
 

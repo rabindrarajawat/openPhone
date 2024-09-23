@@ -179,7 +179,6 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-
       // Retrieve Token
       const token = localStorage.getItem('authToken');
       const config = {
@@ -197,7 +196,7 @@ const Dashboard = () => {
           `${Base_Url}address/getalladdress`,
           config
         );
-        console.log("Config for address API:", config);
+
         const formattedAddresses = addressResponse.data.map((item: any) => ({
           id: item.id,
           displayAddress: item.address,
@@ -207,20 +206,14 @@ const Dashboard = () => {
           notificationCount: 0,
           address: item.address,
         }));
+
         setAddresses2(formattedAddresses);
         setFilteredAddresses2(formattedAddresses);
-        console.log("Formatted addresses:", formattedAddresses);
 
         // Fetch unread notifications with the token in the headers
-
-        console.log("Config before notifications:", config);
         const notificationResponse = await axios.get(
           `${Base_Url}notifications`, config
         );
-        console.log("Config for address API:", config);
-
-
-        console.log("Notification API Response:", notificationResponse); // Log the response to check what’s returned
 
         const unreadNotifications = notificationResponse.data.filter(
           (notification: any) => !notification.is_read
@@ -239,10 +232,15 @@ const Dashboard = () => {
 
         setAddresses1(addressNotificationCounts);
 
-        // Set default selected address
-        if (addressNotificationCounts.length > 0) {
-          setSelectedAddress(addressNotificationCounts[0].displayAddress);
-          setSelectedAddressId(addressNotificationCounts[0].id);
+        // Sort addresses by created_at to get the latest one
+        const sortedAddresses = addressNotificationCounts.sort((a: { created_at: string | number | Date; }, b: { created_at: string | number | Date; }) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+
+        // Set default selected address as the latest created address
+        if (sortedAddresses.length > 0) {
+          setSelectedAddress(sortedAddresses[0].displayAddress);
+          setSelectedAddressId(sortedAddresses[0].id);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -251,6 +249,7 @@ const Dashboard = () => {
 
     fetchData();
   }, [Base_Url]);
+
 
 
 
@@ -1105,104 +1104,106 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="main-main">
-              <div className="main-Address ">
+            <div className="d-flex  justify-content-between w-100 gap-5">
+              <div className="d-flex flex-column  w-100 mb-4">
                 <div className="add-icon">
                   <Image src="/User.svg" alt="users" width={24} height={24} className="person-icon" />
 
                   <div className="Address">Address</div>
-                </div>
-                <div className="main-search">
-                  <div className="search-box ">
-                    <span className="icon">
-                      <Image src="/Icon.svg" alt="icon" width={24} height={24} />
-                    </span>
-                    <input
-                      type="text"
-                      placeholder="Search"
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                    ></input>
-                  </div>
+                  <div className="main-search ">
+                    <div className="search-box ">
+                      <span className="icon">
+                        <Image src="/Icon.svg" alt="icon" width={24} height={24} />
+                      </span>
+                      <input
+                        type="text"
+                        placeholder="Search"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                      ></input>
+                    </div>
 
-                  <div className="icon-labels">
-                    <div
-                      className={`bookmark-container text-center ${filterOption === "bookmarked" ? "active-filter" : ""
-                        }`}
-                      onClick={() => handleFilterChange("bookmarked")}
-                    >
-                      <i className="bi bi-bookmark ms-4"></i>
-                      <div className="ms-4">Select all</div>
-                    </div>
-                    <div
-                      className="redo-container text-center"
-                      onClick={handleDefaultClick}
-                    >
-                      <Image src="/redo.svg" alt="redo" width={24} height={24} className="ms-3" />
-                      <div>Default</div>
-                    </div>
-                  </div>
-                  <div>
-                    <ul className="address-list p-1 ">
-                      <div className="search-wrapper-add">
-                        {results.length > 0 && (
-                          <SearchResultList results={results} onSelect={handleSelectAddress} />
-                        )}
+                    <div className="icon-labels">
+                      <div
+                        className={`bookmark-container text-center ${filterOption === "bookmarked" ? "active-filter" : ""
+                          }`}
+                        onClick={() => handleFilterChange("bookmarked")}
+                      >
+                        <i className="bi bi-bookmark ms-4 select"></i>
+                        <div className="ms-4">Select all</div>
                       </div>
-                      {currentAddresses.length > 0 ? (
-                        currentAddresses.map((address) => (
-                          <li
-                            key={address.id}
-                            className={`list-group-item justify-content-between ${selectedAddressId === address.id ? "selected-address" : ""
-                              }`}
-                            onClick={() => handleAddressSelect(address.displayAddress, address.id)}
-                          >
-                            <div className="setaddress d-flex align-items-start gap-3">
-                              <i
-                                className={`bi ${address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
-                                  } clickable-icon`}
-                                style={{
-                                  cursor: "pointer",
-                                  color: address.is_bookmarked ? "blue" : "grey",
-                                }}
-                                onClick={() => handleBookmarkClick(address.id)}
-                              ></i>
+                      <div
+                        className="redo-container text-center "
+                        onClick={handleDefaultClick}
+                      >
+                        <Image src="/redo.svg" alt="redo" width={30} height={30} className="ms-3" />
+                        <div>Default</div>
+                      </div>
+                    </div>
+                    <div>
+                      <ul className="address-list  p-1 ">
+                        <div className="search-wrapper-add">
+                          {results.length > 0 && (
+                            <SearchResultList results={results} onSelect={handleSelectAddress} />
+                          )}
+                        </div>
+                        {currentAddresses.length > 0 ? (
+                          currentAddresses.map((address) => (
+                            <li
+                              key={address.id}
+                              className={`list-group-item justify-content-between ${selectedAddressId === address.id ? "selected-address" : ""
+                                }`}
+                              onClick={() => handleAddressSelect(address.displayAddress, address.id)}
+                            >
+                              <div className="setaddress d-flex align-items-start gap-3">
+                                <i
+                                  className={`bi ${address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
+                                    } clickable-icon`}
+                                  style={{
+                                    cursor: "pointer",
+                                    color: address.is_bookmarked ? "blue" : "grey",
+                                  }}
+                                  onClick={() => handleBookmarkClick(address.id)}
+                                ></i>
 
-                              <span className="text-start scroll">
-                                {address.displayAddress || address.fullAddress}
-                                {address.notificationCount > 0 && (
-                                  <span className="notification-count ml-2">
-                                    ({address.notificationCount})
-                                  </span>
-                                )}
-                              </span>
-                            </div>
-
-                            {address.fullAddress && (
-                              <div className="filtered-address">
-                                {address.fullAddress}
+                                <span className="text-start scroll">
+                                  {address.displayAddress || address.fullAddress}
+                                  {address.notificationCount > 0 && (
+                                    <span className="notification-count ml-2">
+                                      ({address.notificationCount})
+                                    </span>
+                                  )}
+                                </span>
                               </div>
-                            )}
-                          </li>
-                        ))
-                      ) : (
-                        <p>No addresses found.</p>
-                      )}
-                    </ul>
 
+                              {address.fullAddress && (
+                                <div className="filtered-address">
+                                  {address.fullAddress}
+                                </div>
+                              )}
+                            </li>
+                          ))
+                        ) : (
+                          <p>No addresses found.</p>
+                        )}
+                      </ul>
+
+                    </div>
+
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                    />
                   </div>
-
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                  />
                 </div>
+
+
 
 
               </div>
 
-              <div className="analytic-chat">
+              <div className="d-flex flex-column w-100  w-md-50 align-items-start align-items-md-end mb-4">
                 <div className="dataa">
                   <div className="Analyticdata ">
                     <span>
@@ -1211,7 +1212,7 @@ const Dashboard = () => {
                     <span className="ms-4">Analytic Data of Selected Address</span>
                   </div>
                   <div className=" main-message">
-                    <div className="d-flex justify-content-between ms-3 gap-4">
+                    <div className="d-flex justify-content-between gap-4">
                       <div className="nav-msg">
                         <div className="message Delivered">Message Delivered</div>
                         <input
