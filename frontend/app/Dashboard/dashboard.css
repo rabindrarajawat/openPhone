@@ -9,8 +9,6 @@
 }
 
 .openphone {
-  margin-top: -43px;
-  margin-left: 121px;
   font-weight: 700;
   font-size: 23px;
 }
@@ -23,18 +21,11 @@
 }
 
 .information {
-  margin-top: 53px;
-  margin-left: 124px;
   color: #5a657b;
   font-weight: 600;
 }
 
-.status {
-  margin-left: 133px;
-  margin-top: 36px;
 
-
-}
 
 .dropdown-menu {
   min-width: 160px;
@@ -46,7 +37,6 @@
 
 .btn.p-0 {
   padding: 0;
-  /* Remove padding */
 }
 
 .logo {
@@ -54,11 +44,7 @@
   height: 9px;
 }
 
-.type {
-  margin-left: 133px;
 
-  margin-top: 35px;
-}
 
 .dropdown-type {
   min-width: 148px;
@@ -66,10 +52,7 @@
   margin-top: 11px;
 }
 
-.Date {
-  margin-left: 142px;
-  margin-top: 50px;
-}
+
 
 
 .dropdown-Date {
@@ -82,7 +65,6 @@
   margin-top: -3px;
   padding: 10px;
   margin-left: -101px;
-  /* Adjust width as needed */
 }
 
 .custom-date-dropdown input[type="date"] {
@@ -99,9 +81,7 @@
   padding: 1px;
 }
 
-.todate {
-  margin-left: 18px;
-}
+
 
 
 .set-date {
@@ -122,14 +102,10 @@
 
 .main-Address {
   display: flex;
-  margin-left: -1389px;
 }
 
 .heading {
-  width: 92%;
-  height: 20px;
-  margin-top: -22px;
-  margin-left: -10px;
+  
   font-family: "Roboto", sans-serif;
   font-size: 20px;
   font-weight: 800;
@@ -142,8 +118,6 @@
   display: flex;
   justify-content: left;
   align-items: left;
-  margin-left: -10px;
-  margin-top: 15px;
   gap: 48px;
 }
 
@@ -161,39 +135,19 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 600px) {
-  .round-input1 {
-    width: 40px;
-    /* Adjust for smaller screens */
-    height: 40px;
-    font-size: 12px;
-    /* Smaller font size for smaller screens */
-  }
-}
 
-@media (max-width: 600px) {
-  .round-input {
-    width: 40px;
-    height: 40px;
-    font-size: 1px;
-  }
-}
 
 .nav-msg1 {
-  /* text-align: center; */
   display: flex;
-  /* flex-direction: column; */
   align-items: center;
 }
 
 .message1 {
-  width: 300px;
-  height: 60px;
+  width: 18vw;
+  height: 7.5vh;
   border-radius: 5px 0px 0px 0px;
-  /* opacity: 0px; */
   background: linear-gradient(90deg, #ffffff 0%, #e5d4fc 100%);
   box-shadow: 0px 2px 5px 0px #26334d08;
-  margin-top: 5px;
   display: flex;
   padding: 10px;
   align-items: center;
@@ -223,12 +177,10 @@
 .Address {
   font-weight: 600;
   font-size: 20px;
-  margin-top: 161px;
+  
 }
 
 .Analyticdata {
-  margin-top: 161px;
-  margin-left: 52px;
   font-weight: 600;
   font-size: 20px;
   font-family: "Roboto", sans-serif;
@@ -236,13 +188,9 @@
 
 .person-icon {
   font-size: x-large;
-  margin-top: 161px;
 }
 
 .main-search {
-  margin-top: 201px;
-  margin-left: -120px;
-  padding-left: 14px;
   padding-right: 10px;
   border: 3px solid #D7F5DC;
   border-radius: 6px;
@@ -285,8 +233,8 @@
 
 .icon-labels {
   align-items: center;
-  margin-left: 192px;
-  margin-top: -33px;
+
+ 
   display: flex;
 }
 
@@ -295,7 +243,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-left: -13px;
   z-index: 2;
 }
 
@@ -305,7 +252,6 @@
   font-size: 8px;
   /* color: #333; */
   font-weight: 700;
-  margin-left: 21px;
 }
 
 .redo-container img {
@@ -321,7 +267,6 @@
 }
 
 .main-message {
-  margin-left: 36px;
   margin-top: 9px;
   color: #4d5e80;
   font-weight: 900;
@@ -360,8 +305,6 @@
   display: flex;
   justify-content: left;
   align-items: left;
-  margin-left: 15px;
-  margin-top: -3px;
   gap: 63px;
 }
 
@@ -371,8 +314,8 @@
 }
 
 .message {
-  width: 205px;
-  height: 39px;
+  width: 12vw;
+  height: 4vh;
   border: 2px solid grey;
   border-radius: 3.27px;
   /* opacity: 0px; */
@@ -383,7 +326,7 @@
   border-left: 2px solid #6e2fcd;
   font-family: "Roboto", sans-serif;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 900; 
   line-height: 20px;
   text-align: left;
 }
@@ -736,9 +679,7 @@
   margin-left: 25px;
 }
 
-.dataa {
-  margin-left: -25px;
-}
+
 
 .main-main {
   display: flex;
@@ -746,75 +687,3 @@
   margin-left: 40px;
 }
 
-@media (max-width: 367px) {
-  .main-container {
-    flex-direction: column;
-    padding: 5px;
-    /* Reduce padding */
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    /* Ensure full width */
-    overflow-x: hidden;
-    /* Prevent horizontal overflow */
-  }
-
-  .content-with-border-right {
-    border-right: none;
-    padding-right: 6px;
-    width: 100%;
-  }
-
-  .openphone,
-  .information,
-  .status,
-  .type,
-  .Date {
-    margin: 5px 0;
-    /* Reduce margins */
-    width: 100%;
-    text-align: center;
-  }
-
-  .custom-date-dropdown {
-    width: 100%;
-    padding: 5px;
-  }
-
-  .message1,
-  .message {
-    width: 100%;
-    font-size: 14px;
-    /* Adjust font size */
-    text-align: center;
-    padding: 5px;
-  }
-
-  .search-box input {
-    width: 100%;
-    padding: 8px 10px;
-    /* Reduce padding */
-    box-sizing: border-box;
-    /* Ensure padding doesn't affect width */
-  }
-
-  /* Ensure other elements are within the screen width */
-  .main-Address,
-  .main-search,
-  .search-wrapper,
-  .input-msg,
-  .screenshot-msg,
-  .bookmark-container,
-  .redo-container {
-    width: 100%;
-    padding: 5px;
-    margin: 0;
-    /* Eliminate margins that may push content */
-  }
-
-  .pagination-container {
-    width: 100%;
-    margin-top: 20px;
-    text-align: center;
-  }
-}

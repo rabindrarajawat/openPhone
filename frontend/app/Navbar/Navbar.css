@@ -85,15 +85,7 @@
     height: 17.06px;
 }
 
-/* .search-wrapper::after {
-    content: url('/next.svg');
-    position: absolute;
-    left: 85%;
-    top: 44%;
-    transform: translateY(-50%);
-    width: 17.05px;
-    height: 17.06px;
-} */
+
 
 .search::placeholder {
     font-family: Roboto;

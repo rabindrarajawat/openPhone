@@ -4,8 +4,8 @@
 .sidebar {
     position: absolute;
     background: #D7F5DC;
-    width: 90px;
-    height: 755px;
+    width: 5vw;
+    height: 90vh;
     top: 76px;
     z-index: 2;
 }
@@ -15,9 +15,7 @@
     margin-top: 50%;
     height: 50px;
     top: 323px;
-    /* left: -10px !important; */
     gap: 0px;
-    /* opacity: 0px; */
 }
 
 .logo2 {
