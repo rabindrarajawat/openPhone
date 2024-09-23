@@ -11,6 +11,11 @@ import { useRouter } from "next/navigation";
 import { SearchResultList } from "../SearchResultList/SearchResultList";
 import { config } from "process";
 import Pagination from "../Pagination/pagination";
+import { jwtDecode } from "jwt-decode";
+
+interface DecodedToken {
+  exp: number; // Expiration time in seconds since Unix epoch
+}
 
 interface Address {
   fullAddress: string;
@@ -90,6 +95,35 @@ interface EventItem {
 
 const Dashboard = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
+
+  const checkTokenExpiration = () => {
+    const token = localStorage.getItem("authToken");
+
+    if (token) {
+      try {
+        const decoded: DecodedToken = jwtDecode(token);
+        const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds since Unix epoch
+
+        if (decoded.exp < currentTime) {
+          // Token has expired
+          localStorage.removeItem("authToken"); // Clear the expired token
+          router.push("/"); // Redirect to login page
+        }
+      } catch (error) {
+        console.error("Error decoding token", error);
+        localStorage.removeItem("authToken"); // Clear the token and redirect
+        router.push("/"); // Redirect to login page
+      }
+    } else {
+      // No token found, redirect to login page
+      router.push("/");
+    }
+  };
+
+  useEffect(() => {
+    checkTokenExpiration(); // Check token expiration when component mounts
+  }, []);
+
 
   const [selectedAddress, setSelectedAddress] = useState("Search Address");
   const [eventData, setEventData] = useState<EventItem[]>([]);
