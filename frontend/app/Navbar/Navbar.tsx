@@ -5,6 +5,7 @@ import axios from 'axios';
 import './Navbar.css';
 import NotificationItem from '../msgnotificationiItem';
 import CallNotificationItem from '../callnotificationitem';
+import Sidebar from '../SideNavbar/sideNavbar';
 
 
 
@@ -155,6 +156,9 @@ const Navbar: React.FC = () => {
 
 
   return (
+    <>
+    <Sidebar />
+    
     <nav className="navbar">
       <div className="container-fluid">
         <div className="logo-openphone">
@@ -168,7 +172,7 @@ const Navbar: React.FC = () => {
             onClick={() => { }}
           />
           <div className="openphone">
-            <span className="border-bottom pb-3">OpenPhone</span>
+            <span className="border-bottom pb-3 ms-5">OpenPhone</span>
           </div>
         </div>
 
@@ -236,6 +240,7 @@ const Navbar: React.FC = () => {
         </div>
       </div>
     </nav>
+    </>
   );
 };
 

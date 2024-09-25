@@ -1,0 +1,62 @@
+
+
+.address {
+    max-height: 69vh;
+    overflow-y: auto;
+  }
+  
+  .chatBox {
+    background-color: #d7f5dc;
+    height: 50vh;
+    overflow-y: auto;
+  }
+  .comprenshiveAddress {
+    color: #4d5e80;
+    font-weight: 800;
+  }
+  
+  .messageDelivered {
+    background: linear-gradient(90deg, #ffffff 0%, #e5d4fc 100%);
+    border-left: 3px solid #8833ff; /* Set the border width and purple color */
+    border-radius: 12px;
+    
+  }
+  
+  .messageResponse {
+    background: linear-gradient(90deg, #ffffff 0%, #d7f1fd 100%);
+    border-left: #33bfff 3px solid;
+    border-radius: 12px;
+  }
+  
+  .call {
+    background: linear-gradient(90deg, #ffffff 0%, #fff0c2 100%);
+    border-left: #ffcb33 3px solid;
+    border-radius: 12px;
+  }
+  .callResponse {
+    background: linear-gradient(90deg, #ffffff 0%, #cbffd0 100%);
+    border-left: #29cc39 3px solid;
+    border-radius: 12px;
+  }
+  
+  .AnlyDelivered {
+    border: 2px solid #e5d4fc;
+    border-left: 3px solid #8833ff;
+    border-radius: 12px;
+  }
+  .AnlyResponse {
+    border: 2px solid #d7f1fd;
+    border-left: 3px solid #33bfff;
+    border-radius: 12px;
+  }
+  .anlyCall {
+    border: 2px solid #fff0c2;
+    border-left: 3px solid #ffcb33;
+    border-radius: 12px;
+  }
+  .AnlyCallRes {
+    border: 2px solid #cbffd0;
+    border-left: 3px solid #29cc39;
+    border-radius: 12px;
+  }
+  

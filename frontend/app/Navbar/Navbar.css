@@ -14,8 +14,11 @@
 }
 
 .logo-openphone .openphone {
-    margin-left: 25px;
     margin-top: 1px;
+    color:#4D5E80;
+    font-weight: 600;
+    font-size:x-large;
+
 }
 
 
