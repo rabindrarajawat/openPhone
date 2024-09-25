@@ -7,6 +7,14 @@ import Popup from '../popup/popup';
 import styles from './page.module.css';
 import SideBar from '../SideNavbar/sideNavbar';
 import Navbar from '../Navbar/Navbar';
+import { useRouter } from "next/navigation";
+import { jwtDecode } from 'jwt-decode';
+
+
+interface DecodedToken {
+  exp: number; // Expiration time in seconds since Unix epoch
+}
+
 
 type ConversationRecord = {
   conversation_id: string;
@@ -28,6 +36,38 @@ const ConversationTable = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const recordsPerPage = 5; // Set records per page to 5
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const router = useRouter();
+
+
+
+  const checkTokenExpiration = () => {
+    const token = localStorage.getItem("authToken");
+
+    if (token) {
+      try {
+        const decoded: DecodedToken = jwtDecode(token);
+        const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds since Unix epoch
+
+        if (decoded.exp < currentTime) {
+          // Token has expired
+          localStorage.removeItem("authToken"); // Clear the expired token
+          router.push("/"); // Redirect to login page
+        }
+      } catch (error) {
+        console.error("Error decoding token", error);
+        localStorage.removeItem("authToken"); // Clear the token and redirect
+        router.push("/"); // Redirect to login page
+      }
+    } else {
+      // No token found, redirect to login page
+      router.push("/");
+    }
+  };
+
+  useEffect(() => {
+    checkTokenExpiration(); // Check token expiration when component mounts
+  }, []);
+
 
   useEffect(() => {
 
