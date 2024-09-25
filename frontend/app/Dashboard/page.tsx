@@ -11,6 +11,11 @@ import { useRouter } from "next/navigation";
 import { SearchResultList } from "../SearchResultList/SearchResultList";
 import { config } from "process";
 import Pagination from "../Pagination/pagination";
+import { jwtDecode } from "jwt-decode";
+
+interface DecodedToken {
+  exp: number; // Expiration time in seconds since Unix epoch
+}
 
 interface Address {
   fullAddress: string;
@@ -91,6 +96,35 @@ interface EventItem {
 const Dashboard = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
 
+  const checkTokenExpiration = () => {
+    const token = localStorage.getItem("authToken");
+
+    if (token) {
+      try {
+        const decoded: DecodedToken = jwtDecode(token);
+        const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds since Unix epoch
+
+        if (decoded.exp < currentTime) {
+          // Token has expired
+          localStorage.removeItem("authToken"); // Clear the expired token
+          router.push("/"); // Redirect to login page
+        }
+      } catch (error) {
+        console.error("Error decoding token", error);
+        localStorage.removeItem("authToken"); // Clear the token and redirect
+        router.push("/"); // Redirect to login page
+      }
+    } else {
+      // No token found, redirect to login page
+      router.push("/");
+    }
+  };
+
+  useEffect(() => {
+    checkTokenExpiration(); // Check token expiration when component mounts
+  }, []);
+
+
   const [selectedAddress, setSelectedAddress] = useState("Search Address");
   const [eventData, setEventData] = useState<EventItem[]>([]);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -154,7 +188,10 @@ const Dashboard = () => {
   const [filteredAddresses2, setFilteredAddresses2] = useState<Address1[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTo, setSearchTo] = useState(""); // State to hold search input
-  const addressesPerPage = 9;
+  const addressesPerPage = 10;
+
+  const [notificationCount, setNotificationCount] = useState(0);
+
 
   useEffect(() => {
     const storedPins = localStorage.getItem("pinnedConversations");
@@ -176,7 +213,6 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-
       // Retrieve Token
       const token = localStorage.getItem('authToken');
       const config = {
@@ -194,7 +230,7 @@ const Dashboard = () => {
           `${Base_Url}address/getalladdress`,
           config
         );
-        console.log("Config for address API:", config);
+
         const formattedAddresses = addressResponse.data.map((item: any) => ({
           id: item.id,
           displayAddress: item.address,
@@ -204,20 +240,14 @@ const Dashboard = () => {
           notificationCount: 0,
           address: item.address,
         }));
+
         setAddresses2(formattedAddresses);
         setFilteredAddresses2(formattedAddresses);
-        console.log("Formatted addresses:", formattedAddresses);
 
         // Fetch unread notifications with the token in the headers
-
-        console.log("Config before notifications:", config);
         const notificationResponse = await axios.get(
           `${Base_Url}notifications`, config
         );
-        console.log("Config for address API:", config);
-
-
-        console.log("Notification API Response:", notificationResponse); // Log the response to check what’s returned
 
         const unreadNotifications = notificationResponse.data.filter(
           (notification: any) => !notification.is_read
@@ -236,10 +266,15 @@ const Dashboard = () => {
 
         setAddresses1(addressNotificationCounts);
 
-        // Set default selected address
-        if (addressNotificationCounts.length > 0) {
-          setSelectedAddress(addressNotificationCounts[0].displayAddress);
-          setSelectedAddressId(addressNotificationCounts[0].id);
+        // Sort addresses by created_at to get the latest one
+        const sortedAddresses = addressNotificationCounts.sort((a: { created_at: string | number | Date; }, b: { created_at: string | number | Date; }) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+
+        // Set default selected address as the latest created address
+        if (sortedAddresses.length > 0) {
+          setSelectedAddress(sortedAddresses[0].displayAddress);
+          setSelectedAddressId(sortedAddresses[0].id);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -248,6 +283,7 @@ const Dashboard = () => {
 
     fetchData();
   }, [Base_Url]);
+
 
 
 
@@ -476,29 +512,56 @@ const Dashboard = () => {
     return date >= oneMonthAgo;
   };
 
-  const filteredAddresses = addresses1.filter((address) => {
+  // const filteredAddresses = addresses1.filter((address) => {
 
-    const matchesAuctionType = selectedAuctionTypes.length === 0 || selectedAuctionTypes.includes(address.auction_event_id);
-    const matchesBookmark = filterOption === 'all' || (filterOption === 'bookmarked' && address.is_bookmarked) || (filterOption === 'default');
-    const matchesDateFilter = selectedDateFilter === 'all' ||
-      (selectedDateFilter === 'weekly' && isWithinLastWeek(address.created_at)) ||
-      (selectedDateFilter === 'monthly' && isWithinLastMonth(address.created_at));
-    const matchesCustomDateFilter = (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
-      (!toDate || new Date(address.created_at) <= new Date(toDate));
+  //   const matchesAuctionType = selectedAuctionTypes.length === 0 || selectedAuctionTypes.includes(address.auction_event_id);
+  //   const matchesBookmark = filterOption === 'all' || (filterOption === 'bookmarked' && address.is_bookmarked) || (filterOption === 'default');
+  //   const matchesDateFilter = selectedDateFilter === 'all' ||
+  //     (selectedDateFilter === 'weekly' && isWithinLastWeek(address.created_at)) ||
+  //     (selectedDateFilter === 'monthly' && isWithinLastMonth(address.created_at));
+  //   const matchesCustomDateFilter = (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
+  //     (!toDate || new Date(address.created_at) <= new Date(toDate));
 
-    // Apply the search filter
-    const matchesSearch = address.displayAddress
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+  //   // Apply the search filter
+  //   const matchesSearch = address.displayAddress
+  //     .toLowerCase()
+  //     .includes(searchQuery.toLowerCase());
 
-    return (
-      matchesAuctionType &&
-      matchesBookmark &&
-      matchesDateFilter &&
-      matchesCustomDateFilter &&
-      matchesSearch
-    );
-  });
+  //   return (
+  //     matchesAuctionType &&
+  //     matchesBookmark &&
+  //     matchesDateFilter &&
+  //     matchesCustomDateFilter &&
+  //     matchesSearch
+  //   );
+  // });
+
+  // Now filter and sort the addresses
+  const filteredAddresses = addresses1
+    .filter((address) => {
+      // Apply your existing filter logic
+      const matchesAuctionType = selectedAuctionTypes.length === 0 || selectedAuctionTypes.includes(address.auction_event_id);
+      const matchesBookmark = filterOption === 'all' || (filterOption === 'bookmarked' && address.is_bookmarked) || (filterOption === 'default');
+      const matchesDateFilter = selectedDateFilter === 'all' ||
+        (selectedDateFilter === 'weekly' && isWithinLastWeek(address.created_at)) ||
+        (selectedDateFilter === 'monthly' && isWithinLastMonth(address.created_at));
+      const matchesCustomDateFilter = (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
+        (!toDate || new Date(address.created_at) <= new Date(toDate));
+      const matchesSearch = address.displayAddress.toLowerCase().includes(searchQuery.toLowerCase());
+
+      return (
+        matchesAuctionType &&
+        matchesBookmark &&
+        matchesDateFilter &&
+        matchesCustomDateFilter &&
+        matchesSearch
+      );
+    })
+    .sort((a: Address1, b: Address1) => {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+
+
 
 
 
@@ -686,11 +749,64 @@ const Dashboard = () => {
 
 
 
-  const handleAddressSelect = (address: string, addressId: number) => {
+  // const handleAddressSelect = (address: string, addressId: number) => {
+  //   setSelectedAddress(address);
+  //   setSelectedAddressId(addressId);
+  //   setEventData([]);
+  // };
+
+  const handleAddressSelect = async (address: string, addressId: number) => {
     setSelectedAddress(address);
     setSelectedAddressId(addressId);
     setEventData([]);
+
+    const token = localStorage.getItem('authToken');
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    if (!token) {
+      console.error('Authorization token is missing');
+      return;
+    }
+
+    console.log('Token being used:', token);
+
+    try {
+      const response = await fetch(`${Base_Url}notifications/${addressId}/read?addressId=${addressId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+
+        },
+
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to mark notifications as read');
+      }
+
+      const result = await response.json();
+      console.log(result.message); // Optional: handle success message
+
+      // Update notification count in state
+      setAddresses1(prevAddresses =>
+        prevAddresses.map(address =>
+          address.id === addressId
+            ? { ...address, notificationCount: 0 }
+            : address
+        )
+      );
+
+    } catch (error) {
+      console.error('Error marking notifications as read:', error);
+    }
   };
+
+
+
 
 
   const handleAddressSelect1 = (address: Address) => {
@@ -784,24 +900,21 @@ const Dashboard = () => {
 
 
   return (
-    <>
-      <Navbar
-      // toggleSidebar={toggleSidebar}
-      // onSelectAddress={handleAddressSelect1}
-      />
+    <div className="w-100 m-0">
+      <Navbar />
+
       {isSidebarVisible && <SideBar />}
-      <div className="container-fluid d-flex ms-5">
+      <div className="container row">
+        <div className="main-container col-12">
+          <div className="content-with-border-right">
 
-
-
-
-
-          <div className="border-end pe-3">
-            <div className="information ms-5">Message and Calls</div>
-            <div className="">
-              <div className="ms-5">
-                Status
-                <span className="ms-2 mb-2 ">
+            {/* <div className=""> */}
+            <div className="information">Message and Calls</div>
+            <div className="d-flex flex-column ms-5">
+              <div className="container mb-1 ms-5">
+                <div className="">
+                  Status
+                  {/* <span className=""> */}
                   <button
                     className="btn"
                     type="button"
@@ -811,7 +924,7 @@ const Dashboard = () => {
                     <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
                   </button>
 
-                  <ul className={`dropdown-type ${isType ? "show" : ""}`}>
+                  <div className={` ms-4${isType ? "show" : ""}`}>
                     <li className="dropdown-item">
                       <input type="checkbox"
                         checked={deliveredChecked}
@@ -827,172 +940,168 @@ const Dashboard = () => {
                         Received
                       </label>
                     </li>
-                  </ul>
-                </span>
-              </div>
-            </div>
-            <div className="ms-5">
-              Type
-              <span className="ms-2 mb-2 ">
-                <button
-                  className="btn"
-                  type="button"
-                  onClick={handleToggle1}
-                  aria-expanded={isType}
-                >
-                  <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
-                </button>
+                  </div>
+                  {/* </span> */}
+                </div>
+                <div className="">
+                  Type
+                  {/* <span className=""> */}
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={handleToggle1}
+                    aria-expanded={isType}
+                  >
+                    <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
+                  </button>
 
-                <ul className={`dropdown-type ${isType ? "show" : ""}`}>
-                  <li className="dropdown-item">
-                    <input
-                      type="checkbox"
-                      className="checkbox"
-                      id="case"
-                      onChange={() => handleCheckboxChange(3)}
-                    />
-                    <label className="ms-2">Case</label>
-                  </li>
-                  <li className="dropdown-item pt-2">
-                    <input
-                      type="checkbox"
-                      className="checkbox"
-                      id="auction"
-                      onChange={() => handleCheckboxChange(1)}
-                    />
-                    <label className="ms-2" htmlFor="auction">
-                      Auction
-                    </label>
-                  </li>
-                  <li className="dropdown-item pt-2">
-                    <input
-                      type="checkbox"
-                      className="checkbox"
-                      id="taxDeed"
-                      onChange={() => handleCheckboxChange(2)}
-                    />
-                    <label className="ms-2" htmlFor="taxDeed">
-                      Tax deed
-                    </label>
-                  </li>
-                </ul>
-              </span>
-            </div>
-            <div className="ms-5">
-              Date
-              <span className="ms-2 mb-2">
-                <button
-                  className="btn"
-                  type="button"
-                  onClick={handleToggle1}
-                  aria-expanded={isType}
-                >
-                  <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
-                </button>
-
-                <ul className={`dropdown-Date ${isType ? "show" : ""}`}>
-                  <li className="dropdown-item">
-                    <input
-                      type="checkbox"
-                      id="weekly"
-                      className="checkbox"
-                      onChange={() =>
-                        setSelectedDateFilter(
-                          selectedDateFilter === "weekly" ? "all" : "weekly"
-                        )
-                      }
-                    />
-                    <label className="ms-2" htmlFor="weekly">
-                      Weekly{" "}
-                    </label>
-                  </li>
-                  <li className="dropdown-item pt-2">
-                    <input
-                      type="checkbox"
-                      id="monthly"
-                      className="checkbox"
-                      onChange={() =>
-                        setSelectedDateFilter(
-                          selectedDateFilter === "monthly" ? "all" : "monthly"
-                        )
-                      }
-                    />
-                    <label className="ms-2" htmlFor="monthly">
-                      Monthly{" "}
-                    </label>
-                  </li>
-                  <div className="custom">
+                  <div className={`ms-4${isType ? "show" : ""}`}>
+                    <li className="dropdown-item">
+                      <input
+                        type="checkbox"
+                        className="checkbox"
+                        id="case"
+                        onChange={() => handleCheckboxChange(3)}
+                      />
+                      <label className="ms-2">Case</label>
+                    </li>
                     <li className="dropdown-item pt-2">
-                      <label className="custom" htmlFor="pending">
-                        custom
-                        <button
-                          className="btn ms-2"
-                          type="button"
-                          onClick={handleCustomDateToggle}
-                          aria-expanded={isCustomDateOpen}
-                        >
-                          <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
-                        </button>
+                      <input
+                        type="checkbox"
+                        className="checkbox"
+                        id="auction"
+                        onChange={() => handleCheckboxChange(1)}
+                      />
+                      <label className="ms-2" htmlFor="auction">
+                        Auction
                       </label>
-
-                      {isCustomDateOpen && (
-                        <div className="custom-date-dropdown borderless">
-                          <div className="d-flex align-items-center">
-                            <label htmlFor="fromDate" className="me-2">
-                              From:
-                            </label>
-                            <input
-                              type="date"
-                              id="fromDate"
-                              className="set-date  me-2"
-                              // placeholder="08/08/24"
-                              value={fromDate}
-                              onChange={(e) => setFromDate(e.target.value)}
-                            />
-                          </div>
-                          <div className="d-flex align-items-center mt-2">
-                            <label htmlFor="toDate" className="me-2">
-                              To:
-                            </label>
-                            <input
-                              type="date"
-                              id="toDate"
-                              className="set-date me-2 todate"
-                              value={toDate}
-                              onChange={(e) => setToDate(e.target.value)}
-                            />
-                          </div>
-                          <div className="d-flex align-items-center mt-2 gap-2">
-
-                            <button
-                              className="btn btn-primary btn btn-primary reset-button"
-                              type="button"
-                              onClick={handleReset}
-                            >
-                              Reset
-                            </button>
-                          </div>
-                        </div>
-                      )}
+                    </li>
+                    <li className="dropdown-item pt-2">
+                      <input
+                        type="checkbox"
+                        className="checkbox"
+                        id="taxDeed"
+                        onChange={() => handleCheckboxChange(2)}
+                      />
+                      <label className="ms-2" htmlFor="taxDeed">
+                        Tax deed
+                      </label>
                     </li>
                   </div>
-                </ul>
-              </span>
-            </div>
-</div>
-
-<div className="">
-
-
-         
-            <div className="heading ms-4">
-              <Image src="/Done.svg" alt="" width={24} height={24}/> Comprehensive view of Address
-            </div>
-            <div className="logos-row-msg1  ms-3 mt-3">
-              <div className="nav-msg1">
-                <div className="message1">Message Delivered
-
+                  {/* </span> */}
                 </div>
+                <div className=" ">
+                  Date
+                  {/* <span className="ms-2 mb-2"> */}
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={handleToggle1}
+                    aria-expanded={isType}
+                  >
+                    <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
+                  </button>
+
+                  <div className={`ms-4 dropdown-Date ${isType ? "show" : ""}`}>
+                    <li className="dropdown-item">
+                      <input
+                        type="checkbox"
+                        id="weekly"
+                        className="checkbox"
+                        onChange={() =>
+                          setSelectedDateFilter(
+                            selectedDateFilter === "weekly" ? "all" : "weekly"
+                          )
+                        }
+                      />
+                      <label className="ms-2" htmlFor="weekly">
+                        Weekly{" "}
+                      </label>
+                    </li>
+                    <li className="dropdown-item pt-2">
+                      <input
+                        type="checkbox"
+                        id="monthly"
+                        className="checkbox"
+                        onChange={() =>
+                          setSelectedDateFilter(
+                            selectedDateFilter === "monthly" ? "all" : "monthly"
+                          )
+                        }
+                      />
+                      <label className="ms-2" htmlFor="monthly">
+                        Monthly{" "}
+                      </label>
+                    </li>
+
+                  </div>
+                  {/* </span> */}
+                </div>
+                <div className="">
+                  <li className="dropdown-item ">
+                    <label className="" htmlFor="pending">
+                      Custom
+                      <button
+                        className="btn ms-2"
+                        type="button"
+                        onClick={handleCustomDateToggle}
+                        aria-expanded={isCustomDateOpen}
+                      >
+                        <Image src="/dropdownicon.svg" alt="Dropdown Icon" width={12} height={12} />
+                      </button>
+                    </label>
+
+                    {isCustomDateOpen && (
+                      <div className="custom-date-dropdown ms-1 borderless">
+                        <div className="d-flex align-items-center">
+                          <label htmlFor="fromDate" className="me-2">
+                            From:
+                          </label>
+                          <input
+                            type="date"
+                            id="fromDate"
+                            className="set-date  me-2"
+                            value={fromDate}
+                            onChange={(e) => setFromDate(e.target.value)}
+                          />
+                        </div>
+                        <div className="d-flex align-items-center mt-2">
+                          <label htmlFor="toDate" className="me-2">
+                            To:
+                          </label>
+                          <input
+                            type="date"
+                            id="toDate"
+                            className="set-date me-2 todate"
+                            value={toDate}
+                            onChange={(e) => setToDate(e.target.value)}
+                          />
+                        </div>
+                        <div className="">
+                          <button
+                            className="btn btn-primary px-2 mt-2 "
+                            type="button"
+                            onClick={handleReset}
+                          >
+                            Reset
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </li>
+                </div>
+              </div>
+            </div>
+            {/* </div> */}
+          </div>
+
+          <div className="container-fluid w-100 m-0">
+            <div className="heading">
+              <Image src="/Done.svg" alt="" width={24} height={24} /> Comprehensive view of Address
+            </div>
+            <div className="d-flex  gap-3 mt-2 w-100 m-0">
+              <div className="nav-msg1">
+                <div className="message1">Message Delivered</div>
                 <input
                   type="text"
                   className="round-input1"
@@ -1000,7 +1109,6 @@ const Dashboard = () => {
                   readOnly
                 />
               </div>
-     
               <div className="nav-msg1">
                 <div className="message1 response ">Message Response</div>
                 <input
@@ -1029,342 +1137,344 @@ const Dashboard = () => {
                 />
               </div>
             </div>
-       
-            <div className="mt-3 ">
-          
-            <div className="ms-5">
-                {" "}
-                <Image src="/User.svg" alt="users" width={24} height={24} className="person-icon" />
-               
-               <span className="Address ms-3 mt-3">Address</span>
-               </div>
-              
-              <div className="container d-flex ms-5">
 
-             
-              <div className="main-search mt-3 ">
-                <div className="search-box d-flex">
-                  <span className="icon"> 
-                    <Image src="/Icon.svg" alt="icon" width={24} height={24} />
-                  </span>
-                  <input
-                    type="text"
-                    placeholder="Search Address"
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                  ></input>
-               
+            <div className="d-flex  justify-content-between gap-2  w-100">
+              <div className="d-flex flex-column  mb-4 justify-content-start flex-grow-1 "  >
+                <div className="add-icon">
+                  <div className="d-flex align-items-center gap-2 mt-3">
 
-                <div className="icon-labels">
-                  <div
-                    className={`bookmark-container text-center ${filterOption === "bookmarked" ? "active-filter" : ""
-                      }`}
-                    onClick={() => handleFilterChange("bookmarked")}
-                  >
-                    <i className="bi bi-bookmark ms-2"></i>
-                    <div className="ms-2">Select all</div>
+                    <Image src="/User.svg" alt="users" width={24} height={24} className="person-icon" />
+
+                    <div className="Address">Address</div>
                   </div>
-                  <div
-                    className="redo-container text-center"
-                    onClick={handleDefaultClick}
-                  >
-                    <Image src="/redo.svg" alt="redo" width={24} height={24} className="ms-3" />
-                    <div className="ms-3">Default</div>
-                  </div>
-                </div>
-                </div>
-                <div>
-                  <ul className="address-list">
-                    <div className="search-wrapper-add">
-                      {results.length > 0 && (
-                        <SearchResultList results={results} onSelect={handleSelectAddress} />
-                      )}
+                  <div className="main-search ">
+                    <div className="search-box ">
+                      <span className="icon">
+                        <Image src="/Icon.svg" alt="icon" width={24} height={24} />
+                      </span>
+                      <input
+                        type="text"
+                        placeholder="Search"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                      ></input>
                     </div>
-                    {currentAddresses.length > 0 ? (
-                      currentAddresses.map((address) => (
-                        <li
-                          key={address.id}
-                          className={`list-group-item justify-content-between ${selectedAddressId === address.id ? "selected-address" : ""
-                            }`}
-                          onClick={() => handleAddressSelect(address.displayAddress, address.id)}
-                        >
-                          <div className="setaddress d-flex align-items-center gap-3">
-                            <i
-                              className={`bi ${address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
-                                } clickable-icon`}
-                              style={{
-                                cursor: "pointer",
-                                color: address.is_bookmarked ? "blue" : "grey",
-                              }}
-                              onClick={() => handleBookmarkClick(address.id)}
-                            ></i>
 
-                            <span className="ml-2">
-                              {address.displayAddress || address.fullAddress}
-                              {address.notificationCount > 0 && (
-                                <span className="notification-count ml-2">
-                                  ({address.notificationCount})
-                                </span>
-                              )}
-                            </span>
-                          </div>
-
-                          {address.fullAddress && (
-                            <div className="filtered-address">
-                              {address.fullAddress}
-                            </div>
+                    <div className="icon-labels">
+                      <div
+                        className={`bookmark-container text-center ${filterOption === "bookmarked" ? "active-filter" : ""
+                          }`}
+                        onClick={() => handleFilterChange("bookmarked")}
+                      >
+                        <i className="bi bi-bookmark ms-4 select"></i>
+                        <div className="ms-4">Select all</div>
+                      </div>
+                      <div
+                        className="redo-container text-center "
+                        onClick={handleDefaultClick}
+                      >
+                        <Image src="/redo.svg" alt="redo" width={30} height={30} className="ms-3" />
+                        <div>Default</div>
+                      </div>
+                    </div>
+                    <div>
+                      <ul className="address-list  p-1 ">
+                        <div className="search-wrapper-add">
+                          {results.length > 0 && (
+                            <SearchResultList results={results} onSelect={handleSelectAddress} />
                           )}
-                        </li>
-                      ))
-                    ) : (
-                      <p>No addresses found.</p>
-                    )}
-                  </ul>
-
-                </div>
-                <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-              </div>
-              <div className="">
-
-              <div className="Analyticdata ms-4">
-                <span>
-                  <i className="bi bi-bar-chart-line-fill"></i>
-                </span>
-                <span className="ms-4">Analytic Data of Selected Address</span>
-              </div>
-              <div className="main-message ms-4">
-                <div className="logos-row-msg">
-                  <div className="nav-msg">
-                    <div className="message Delivered">Message Delivered</div>
-                    <input
-                      type="text"
-                      className="round-input"
-                      value={formatCount(messageDelivered)}
-                      readOnly
-                    />
-                  </div>
-                  <div className="nav-msg">
-                    <div className="message response1 ">Message Response</div>
-                    <input
-                      type="text"
-                      className="round-input"
-                      value={formatCount(messageResponse)}
-                      readOnly
-                    />
-                  </div>
-                  <div className="nav-msg">
-                    <div className="message call-1">Call </div>
-                    <input
-                      type="text"
-                      className="round-input"
-                      value={formatCount(call)}
-                      readOnly
-                    />
-                  </div>
-                  <div className="nav-msg">
-                    <div className="message call-response-1">Call Response</div>
-                    <input
-                      type="text"
-                      className="round-input"
-                      value={formatCount(callResponse)}
-                      readOnly
-                    />
-                  </div>
-                </div>
-              </div>
-              </div>
-</div>
-             
-            </div>
-           
-              
-              </div>
-
-            
-           
-
-
-{/* 
-            <div className="conversation">
-              {selectedAddress && (
-                <div className="conversation-chat">
-                  <Image src="converstation.svg" alt="" width={24} height={24} />{" "}
-                  Conversation From{" "}
-                  {uniqueFromNumbers.length > 0 && (
-                    <select
-                      value={fromNumber}
-                      onChange={(e) => setFromNumber(e.target.value)} // Update fromNumber on selection
-                    >
-                      {uniqueFromNumbers.map((number, index) => (
-                        <option key={index} value={number}>
-                          {number}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                </div>
-              )}
-
-              <div className="search-wrapper">
-                <input
-                  className="search"
-                  type="search"
-                  placeholder="Search To"
-                  value={searchTo} // Bind input value to search state
-                  onChange={handleSearchToChange} // Update search state on input change
-                />
-              </div>
-
-              <div className="input-msg">
-                <div className="screenshot-msg">
-                  <div className="inbox-chat">
-                    {events.length > 0
-                      ? filteredMessages.length > 0
-                        ? filteredMessages.map((conversationId) => {
-                          const isStop = updatedMessages[conversationId].some(
-                            (message) => message.is_stop
-                          );
-                          return (
-                            <div key={conversationId}>
-                              <div className="to-line">.</div>
-                              <div className="to-value">
-                                <strong>To </strong>
-                                <span
-                                  style={{
-                                    color: isStop ? "red" : "inherit",
-                                  }}
-                                >
-                                  {updatedMessages[conversationId][0].to}
-                                </span>
-
+                        </div>
+                        {currentAddresses.length > 0 ? (
+                          currentAddresses.map((address) => (
+                            <li
+                              key={address.id}
+                              className={`list-group-item justify-content-between ${selectedAddressId === address.id ? "selected-address" : ""
+                                }`}
+                              onClick={() => handleAddressSelect(address.displayAddress, address.id)}
+                            >
+                              <div className="setaddress d-flex align-items-start gap-3">
                                 <i
-                                  className={`bi pinnumber ${pinnedConversations.has(conversationId)
-                                    ? "bi-pin-fill text-primary"
-                                    : "bi-pin"
-                                    }`}
-                                  onClick={() => handlePinNumber(conversationId)}
+                                  className={`bi ${address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
+                                    } clickable-icon`}
+                                  style={{
+                                    cursor: "pointer",
+                                    color: address.is_bookmarked ? "blue" : "grey",
+                                  }}
+                                  onClick={() => handleBookmarkClick(address.id)}
                                 ></i>
+
+                                <span className="text-start scroll">
+                                  {address.displayAddress || address.fullAddress}
+                                  {address.notificationCount > 0 && (
+                                    <span className="notification-count ml-2">
+                                      ({address.notificationCount})
+                                    </span>
+                                  )}
+                                </span>
                               </div>
 
-                              {updatedMessages[conversationId].map(
-                                (message, index) => (
-                                  <div key={index}>
-                                    <div
-                                      className={
-                                        message.event_type_id === 1
-                                          ? "chat-message-right"
-                                          : "chat-message-left"
-                                      }
-                                    >
-                                      <div className="message-body-1">
-                                        {expandedMessages.has(index) ? (
-                                          <div>
-                                            {message.body}
-                                            <button
-                                              onClick={() =>
-                                                toggleMessageExpansion(index)
-                                              }
-                                              className={`read-less-btn ${message.event_type_id === 1
-                                                ? "read-less-btn-right"
-                                                : "read-less-btn-left"
-                                                }`}
-                                            >
-                                              Read Less
-                                            </button>
-
-                                            <i
-                                              className={`bi ${message.is_message_pinned
-                                                ? "bi-star-fill text-warning"
-                                                : "bi-star"
-                                                } star-icon`}
-                                              onClick={() =>
-                                                toggleMessagePin(
-                                                  message.id,
-                                                  conversationId
-                                                )
-                                              }
-                                            ></i>
-                                          </div>
-                                        ) : (
-                                          <div>
-                                            {message.body &&
-                                              message.body.length > 100 ? (
-                                              <>
-                                                {message.body.substring(0, 100)}
-                                                ...
-                                                <button
-                                                  onClick={() =>
-                                                    toggleMessageExpansion(index)
-                                                  }
-                                                  className={`read-more-btn ${message.event_type_id === 1
-                                                    ? "read-more-btn-right"
-                                                    : "read-more-btn-left"
-                                                    }`}
-                                                >
-                                                  Read More
-                                                </button>
-                                                <i
-                                                  style={{ cursor: "pointer" }}
-                                                  className={`bi ${message.is_message_pinned
-                                                    ? "bi-star-fill text-warning"
-                                                    : "bi-star"
-                                                    } star-icon cursor-pointer`}
-                                                  onClick={() =>
-                                                    toggleMessagePin(
-                                                      message.id,
-                                                      conversationId
-                                                    )
-                                                  }
-                                                ></i>
-                                              </>
-                                            ) : (
-                                              <>
-                                                {message.body}{" "}
-                                                <i
-                                                  className={`bi ${message.is_message_pinned
-                                                    ? "bi-star-fill text-warning"
-                                                    : "bi-star"
-                                                    } star-icon`}
-                                                  onClick={() =>
-                                                    toggleMessagePin(
-                                                      message.id,
-                                                      conversationId
-                                                    )
-                                                  }
-                                                ></i>
-                                              </>
-                                            )}
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
-                                    <div
-                                      className={
-                                        message.event_type_id === 1
-                                          ? "message-date message-date-right"
-                                          : "message-date message-date-left"
-                                      }
-                                    >
-                                      {new Date(
-                                        message.created_at
-                                      ).toLocaleDateString()}
-                                    </div>
-                                  </div>
-                                )
+                              {address.fullAddress && (
+                                <div className="filtered-address">
+                                  {address.fullAddress}
+                                </div>
                               )}
-                            </div>
-                          );
-                        })
-                        : "No chats found for this number"
-                      : "Loading..."}
+                            </li>
+                          ))
+                        ) : (
+                          <p>No addresses found.</p>
+                        )}
+                      </ul>
+
+                    </div>
+
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                    />
                   </div>
                 </div>
+
+
+
+
               </div>
-            </div> */}
+
+              <div className="d-flex flex-column  align-items-end ">
+                <div className="dataa">
+                  <div className="Analyticdata ">
+                    <span>
+                      <i className="bi bi-bar-chart-line-fill"></i>
+                    </span>
+                    <span className="ms-4">Analytic Data of Selected Address</span>
+                  </div>
+                  <div className=" main-message">
+                    <div className="d-flex justify-content-between gap-4">
+                      <div className="nav-msg">
+                        <div className="message Delivered">Message Delivered</div>
+                        <input
+                          type="text"
+                          className="round-input"
+                          value={formatCount(messageDelivered)}
+                          readOnly
+                        />
+                      </div>
+                      <div className="nav-msg">
+                        <div className="message response1 ">Message Response</div>
+                        <input
+                          type="text"
+                          className="round-input"
+                          value={formatCount(messageResponse)}
+                          readOnly
+                        />
+                      </div>
+                      <div className="nav-msg">
+                        <div className="message call-1">Call </div>
+                        <input
+                          type="text"
+                          className="round-input"
+                          value={formatCount(call)}
+                          readOnly
+                        />
+                      </div>
+                      <div className="nav-msg">
+                        <div className="message call-response-1">Call Response</div>
+                        <input
+                          type="text"
+                          className="round-input"
+                          value={formatCount(callResponse)}
+                          readOnly
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="conversation">
+                    {selectedAddress && (
+                      <div className="conversation-chat">
+                        <Image src="converstation.svg" alt="" width={24} height={24} />{" "}
+                        Conversation From{" "}
+                        {uniqueFromNumbers.length > 0 && (
+                          <select
+                            value={fromNumber}
+                            onChange={(e) => setFromNumber(e.target.value)} // Update fromNumber on selection
+                          >
+                            {uniqueFromNumbers.map((number, index) => (
+                              <option key={index} value={number}>
+                                {number}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="search-wrapper">
+                      <input
+                        className="search"
+                        type="search"
+                        placeholder="Search To"
+                        value={searchTo} // Bind input value to search state
+                        onChange={handleSearchToChange} // Update search state on input change
+                      />
+                    </div>
+
+                    <div className="input-msg">
+                      <div className="screenshot-msg">
+                        <div className="inbox-chat">
+                          {events.length > 0
+                            ? filteredMessages.length > 0
+                              ? filteredMessages.map((conversationId) => {
+                                const isStop = updatedMessages[conversationId].some(
+                                  (message) => message.is_stop
+                                );
+                                return (
+                                  <div key={conversationId}>
+                                    <div className="to-line">.</div>
+                                    <div className="to-value">
+                                      <strong>To </strong>
+                                      <span
+                                        style={{
+                                          color: isStop ? "red" : "inherit",
+                                        }}
+                                      >
+                                        {updatedMessages[conversationId][0].to}
+                                      </span>
+
+                                      <i
+                                        className={`bi pinnumber ${pinnedConversations.has(conversationId)
+                                          ? "bi-pin-fill text-primary"
+                                          : "bi-pin"
+                                          }`}
+                                        onClick={() => handlePinNumber(conversationId)}
+                                      ></i>
+                                    </div>
+
+                                    {updatedMessages[conversationId].map(
+                                      (message, index) => (
+                                        <div key={index}>
+                                          <div
+                                            className={
+                                              message.event_type_id === 1
+                                                ? "chat-message-right"
+                                                : "chat-message-left"
+                                            }
+                                          >
+                                            <div className="message-body-1">
+                                              {expandedMessages.has(index) ? (
+                                                <div>
+                                                  {message.body}
+                                                  <button
+                                                    onClick={() =>
+                                                      toggleMessageExpansion(index)
+                                                    }
+                                                    className={`read-less-btn ${message.event_type_id === 1
+                                                      ? "read-less-btn-right"
+                                                      : "read-less-btn-left"
+                                                      }`}
+                                                  >
+                                                    Read Less
+                                                  </button>
+
+                                                  <i
+                                                    className={`bi ${message.is_message_pinned
+                                                      ? "bi-star-fill text-warning"
+                                                      : "bi-star"
+                                                      } star-icon`}
+                                                    onClick={() =>
+                                                      toggleMessagePin(
+                                                        message.id,
+                                                        conversationId
+                                                      )
+                                                    }
+                                                  ></i>
+                                                </div>
+                                              ) : (
+                                                <div>
+                                                  {message.body &&
+                                                    message.body.length > 100 ? (
+                                                    <>
+                                                      {message.body.substring(0, 100)}
+                                                      ...
+                                                      <button
+                                                        onClick={() =>
+                                                          toggleMessageExpansion(index)
+                                                        }
+                                                        className={`read-more-btn ${message.event_type_id === 1
+                                                          ? "read-more-btn-right"
+                                                          : "read-more-btn-left"
+                                                          }`}
+                                                      >
+                                                        Read More
+                                                      </button>
+                                                      <i
+                                                        style={{ cursor: "pointer" }}
+                                                        className={`bi ${message.is_message_pinned
+                                                          ? "bi-star-fill text-warning"
+                                                          : "bi-star"
+                                                          } star-icon cursor-pointer`}
+                                                        onClick={() =>
+                                                          toggleMessagePin(
+                                                            message.id,
+                                                            conversationId
+                                                          )
+                                                        }
+                                                      ></i>
+                                                    </>
+                                                  ) : (
+                                                    <>
+                                                      {message.body}{" "}
+                                                      <i
+                                                        className={`bi ${message.is_message_pinned
+                                                          ? "bi-star-fill text-warning"
+                                                          : "bi-star"
+                                                          } star-icon`}
+                                                        onClick={() =>
+                                                          toggleMessagePin(
+                                                            message.id,
+                                                            conversationId
+                                                          )
+                                                        }
+                                                      ></i>
+                                                    </>
+                                                  )}
+                                                </div>
+                                              )}
+                                            </div>
+                                          </div>
+                                          <div
+                                            className={
+                                              message.event_type_id === 1
+                                                ? "message-date message-date-right"
+                                                : "message-date message-date-left"
+                                            }
+                                          >
+                                            {new Date(
+                                              message.created_at
+                                            ).toLocaleDateString()}
+                                          </div>
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                );
+                              })
+                              : "No chats found for this number"
+                            : "Loading..."}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
 
     </div>
     </>   

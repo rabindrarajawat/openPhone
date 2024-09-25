@@ -34,11 +34,6 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
       <ul className="pagination setPagination">
         <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
           <button className="page-link" onClick={handlePrevious}>
-            &lt;&lt;
-          </button>
-        </li>
-        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-          <button className="page-link" onClick={handlePrevious}>
             &lt;
           </button>
         </li>
@@ -92,11 +87,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
             &gt;
           </button>
         </li>
-        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-          <button className="page-link" onClick={handleNext}>
-            &gt;&gt;
-          </button>
-        </li>
+
       </ul>
     </nav>
   );

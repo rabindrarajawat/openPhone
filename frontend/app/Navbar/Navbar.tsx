@@ -157,11 +157,21 @@ const Navbar: React.FC = () => {
   return (
     <nav className="navbar">
       <div className="container-fluid">
-      <div className="d-flex justify-content-center align-items-center  m-2 p-2 rounded-circle">
-                <span className="navbar-toggler-icon"></span>
-              </div>
-              
-             
+        <div className="logo-openphone">
+
+          <Image
+            src="/line.svg"
+            alt="Logo"
+            className="logo1"
+            width={50}
+            height={50}
+            onClick={() => { }}
+          />
+          <div className="openphone">
+            <span className="border-bottom pb-3">OpenPhone</span>
+          </div>
+        </div>
+
         <div className='nav-list'>
           
           <div className='profileicon'>

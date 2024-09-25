@@ -1,8 +1,9 @@
 /* pagination.css */
 .pagination-container {
   position: relative;
-  margin-top: 1rem;
-  margin-bottom: 14px;
+  margin-top: 3rem;
+  margin-left: 18rem;
+
 }
 
 .pagination {

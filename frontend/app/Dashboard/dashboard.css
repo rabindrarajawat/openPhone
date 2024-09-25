@@ -15,16 +15,26 @@
 
 .content-with-border-right {
   border-right: 2px solid #e8e8e8;
-  padding-right: 8px;
-  height: 85vh;
+  height: 84vh;
+  width: 22.5%;
 
 }
 
 .information {
   color: #5a657b;
   font-weight: 600;
+  display: flex;
+  justify-content: left;
+  margin-top: 15px;
+  /* width: 155px; */
+  margin-left: 5rem !important;
+
 }
 
+/* .status {
+  margin-left: 133px;
+  margin-top: 36px;
+} */
 
 
 .dropdown-menu {
@@ -52,6 +62,10 @@
   margin-top: 11px;
 }
 
+.Date {
+  margin-left: 142px;
+  margin-top: 50px;
+}
 
 
 
@@ -62,7 +76,6 @@
 
 .custom-date-dropdown {
   width: 251px;
-  margin-top: -3px;
   padding: 10px;
   margin-left: -101px;
 }
@@ -76,21 +89,43 @@
   display: block;
   width: 29%;
   height: 28px;
-  margin-left: 165px;
+  margin-left: 25px;
   border-radius: 12px;
   padding: 1px;
 }
 
 
+@media (max-width: 1200px) {
+  .d-flex {
+    gap: 1.5rem;
+  }
+}
 
+@media (max-width: 768px) {
+  .d-flex {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+
+.code {
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+.ban {
+  min-width: 50%;
+}
 
 .set-date {
-  width: 100px !important;
-  height: 24px;
-  padding: 10px 2px 11px 18px;
+  width: 30% !important;
+  /* height: 24px; */
+  padding: 2px 1px 1px 2px;
   border-radius: 18px;
   background: linear-gradient(#fff, #fff) padding-box,
-    /* Inner background */
     linear-gradient(90deg, #bce6c3 0%, #88a0f3 100%) border-box;
   border: 2px solid transparent;
   font-size: 10px;
@@ -100,11 +135,16 @@
   margin-left: -7px;
 }
 
+
 .main-Address {
   display: flex;
 }
 
 .heading {
+  /* width: 92%; */
+  height: 20px;
+  /* margin-top: -22px; */
+  /* margin-left: -10px; */
   
   font-family: "Roboto", sans-serif;
   font-size: 20px;
@@ -114,12 +154,14 @@
   color: #4d5e80;
 }
 
-.logos-row-msg1 {
+/* .logos-row-msg1 {
   display: flex;
   justify-content: left;
   align-items: left;
+  margin-top: 15px;
   gap: 48px;
-}
+  padding-bottom: 0;
+} */
 
 .round-input1 {
 
@@ -194,39 +236,57 @@
   padding-right: 10px;
   border: 3px solid #D7F5DC;
   border-radius: 6px;
-  height: 585px;
-  width: 300px;
+  background-color: #fff;
+  z-index: 999;
+  box-sizing: border-box;
 }
+
+/* Media query for smaller screens if needed */
+@media (max-height: 700px) {
+  .main-search {
+    height: 61vh;
+    /* Slightly reduce the height for very short screens */
+  }
+}
+
+@media (max-height: 500px) {
+  .main-search {
+    height: 71vh;
+    /* Further reduce the height for extremely small screens */
+  }
+}
+
 
 
 .search-box {
   display: inline-table;
-  margin-left: 16px;
+  margin-left: 5px;
   margin-top: 17px;
   position: relative;
   width: 100%;
 }
 
 .search-box input {
-  height: 39px;
-  width: 178px;
+  height: 30px;
+  width: 55%;
   padding: 10px 15px 10px 40px;
   border: 2px solid #aad5bb;
   border-radius: 76px;
   outline: none;
 }
 
+
 .search-box .icon {
   position: absolute;
   top: 50%;
-  left: 10px;
+  left: 5px;
   transform: translateY(-50%);
 }
 
 .search-icon {
   position: absolute;
   left: 12px;
-  top: 2px;
+  top: 0px;
   pointer-events: none;
 
 }
@@ -256,7 +316,7 @@
 
 .redo-container img {
   width: 11px;
-  height: 11px;
+  height: 12px;
 }
 
 .bookmark-container i {
@@ -318,7 +378,6 @@
   height: 4vh;
   border: 2px solid grey;
   border-radius: 3.27px;
-  /* opacity: 0px; */
   margin-top: 5px;
   display: flex;
   padding: 10px;
@@ -329,6 +388,7 @@
   font-weight: 900; 
   line-height: 20px;
   text-align: left;
+  padding-right: 2px;
 }
 
 .Delivered {
@@ -348,19 +408,44 @@
 }
 
 .input-msg {
-  width: 980px;
-  height: 470px;
-  margin-top: 8%;
-  margin-top: -255px;
-  margin-left: -541px;
+  width: 58vw;
+  height: 59vh;
+  margin-top: 10px;
   border-radius: 5px 0px 0px 0px;
   border: 3px solid #D7F5DC;
   position: relative;
-  z-index: 1;
-  margin-right: 40px;
+  z-index: 999;
   overflow-y: auto;
+  box-sizing: border-box;
 
 }
+
+/* Media query for smaller screens */
+@media (max-height: 700px) {
+  .input-msg {
+    height: 43vh;
+  }
+}
+
+@media (max-height: 500px) {
+  .input-msg {
+    height: 50.4vh;
+  }
+}
+
+@media (max-width: 700px) {
+  .input-msg {
+    width: 50vw;
+  }
+}
+
+@media (max-width: 500px) {
+  .input-msg {
+    width: 50vw;
+  }
+}
+
+
 
 .screenshot-msg {
   width: 97%;
@@ -385,17 +470,26 @@
 }
 
 .search-wrapper {
-  margin-top: -316px;
+  margin-top: -30px;
   position: absolute;
   z-index: 2;
-  margin-left: 16%;
+  margin-left: 46%;
   border-radius: 30px;
-  /* padding: 10px; */
   height: 35px;
-  width: 164px;
+  width: 12%;
   background: linear-gradient(white, white) padding-box,
     linear-gradient(102.59deg, #D7F5DC -59.65%, #DEEFFF 71.41%) border-box;
   border: 2px solid transparent;
+}
+
+.search-wrapper::before {
+  content: url('/icon.svg');
+  position: absolute;
+  left: 14px;
+  top: 35%;
+  transform: translateY(-50%);
+  width: 17.05px;
+  height: 17.06px;
 }
 
 
@@ -428,15 +522,14 @@
 
 
 .list-group-item {
-  margin-left: -188px;
+  /* margin-left: -188px; */
   margin-top: 10%;
+  cursor: pointer;
 }
 
 .pagination-container .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 235px;
-
 }
 
 
@@ -540,6 +633,10 @@
   margin-left: -14px;
 }
 
+.select {
+  cursor: pointer;
+}
+
 .read-more-btn-right,
 .read-less-btn-right {
   color: #4E4E4E;
@@ -560,20 +657,17 @@
 }
 
 
+
 .conversation {
-  width: 350px;
-  height: 310px;
-  margin-top: 30px;
-  margin-left: -435px;
-  display: flexs;
+  /* position: relative; */
+  margin-top: 3vh;
 }
 
 .conversation-chat {
-  /* display: flex; */
-  margin-top: 230px;
-  margin-left: -541px;
-  width: 350px;
-  height: 310px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
 }
 
 .message-date-right {
@@ -610,10 +704,6 @@
   cursor: pointer;
 }
 
-.ms-4 {
-  cursor: pointer;
-}
-
 .todate {
   margin-left: 19px !important;
 }
@@ -622,35 +712,30 @@
   margin-left: -30px !important;
 }
 
-.reset-button {
-  margin-left: 75px !important;
-  width: 80px !important;
-}
 
 .selected-address .setaddress {
   color: #007bff;
 }
 
 .address-list {
-  margin-top: 20px;
-  padding-right: 10px;
+  max-height: 58vh;
   overflow-y: auto;
-  height: 450px;
-  /* width: 250px; */
-
 }
 
-.address-list-container {
-  height: 400px;
-  /* Set this to the maximum height you want the address list to occupy */
-  overflow-y: auto;
-  /* Enable vertical scrolling if the content exceeds the height */
-  border: 1px solid #ddd;
-  /* Optional: Add a border to define the container */
-  padding: 10px;
-  /* Optional: Add padding inside the container */
+/* Media query for smaller screens if needed */
+@media (max-height: 700px) {
+  .address-list {
+    max-height: 42vh;
+    /* Slightly duce the height for very short screens */
+  }
 }
 
+@media (max-height: 500px) {
+  .address-list {
+    max-height: 47vh;
+    /* Further reduce the height for extremely small screens */
+  }
+}
 
 
 .checkbox {
