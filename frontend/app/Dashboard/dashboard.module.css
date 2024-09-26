@@ -1,8 +1,16 @@
 
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;800&family=Inter:wght@400;800&display=swap")
+;
 
-.address {
-    max-height: 69vh;
+.addressBox {
+    height: 69vh;
+    border: #D7F5DC solid 3px;
+  }
+  .addressList{
+    max-height: 57vh;
     overflow-y: auto;
+    cursor: pointer;
+
   }
   
   .chatBox {
@@ -59,4 +67,136 @@
     border-left: 3px solid #29cc39;
     border-radius: 12px;
   }
-  
+
+    /* Address list */
+    .address{
+        font-weight: 600;
+        color: #5A657B;
+        font-size:x-large;
+        
+    }
+    .checkBox{
+        cursor: pointer;
+    }
+  .bookmarkIcon {
+    cursor: pointer;
+    color: grey;
+  }
+  .bookmarked {
+    color: blue;
+  }
+  .selectedAdd{
+    color:#007bff;
+  }
+  .seachAdd{
+    min-width:20%;
+    border-radius: 4rem;
+    border: 2px solid #aad5bb;
+  }
+  .iconBlue{
+    filter: brightness(0) saturate(100%) invert(27%) sepia(94%) saturate(2662%) hue-rotate(198deg) brightness(88%) contrast(108%);
+
+  }
+  .addFilter{
+    font-size: 10px;
+
+  }
+
+  .chatMessageRight,
+.chatMessageLeft {
+  text-align: left;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 10px;
+  max-width: 60%;
+  font-family: 'Roboto', sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 20.46px;
+  position: relative;
+  word-wrap: break-word;
+}
+
+.chatMessageRight {
+  margin-left: auto;
+  background: #D0D9FA73;
+  color: #4E4E4E;
+}
+
+.chatMessageLeft {
+  background-color: #0d6efd;
+  color: white;
+  margin-right: auto;
+}
+/* Ensuring the button appears right after the message */
+.readMoreBtn,
+.readLessBtn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 13.5px;
+  display: inline-block;
+  margin-left: 5px;
+  color: inherit;
+  /* Inherits the text color from the parent */
+}
+.readMoreBtnRight,
+.readLessBtnRight {
+  color: #4E4E4E;
+}
+
+.readMoreBtnLeft,
+.readLessBtnLeft {
+  color: white;
+}
+
+/* Removing float and ensuring the button stays inline with the text */
+.chat-message-right .read-more-btn,
+.chat-message-left .read-more-btn,
+.chat-message-right .read-less-btn,
+.chat-message-left .read-less-btn {
+  display: inline;
+  position: relative;
+}
+
+.messageDateRight{
+    text-align: right;
+    color: #4E4E4E;
+    font-family: 'Roboto', sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    line-height: 20.46px;
+}
+.messageDateLeft{
+    text-align: left;
+    color: #4E4E4E;
+    font-family: 'Roboto', sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    line-height: 20.46px;
+    margin-left: 6px;
+}
+.toLine{
+
+
+}
+.toValue{
+    font-weight: bold;
+  font-size: 16px;
+ 
+
+  color: #3361FF;
+
+}
+
+.setDate{
+  padding: 2px 1px 1px 2px;
+  border-radius: 18px;
+  background: linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(90deg, #bce6c3 0%, #88a0f3 100%) border-box;
+  border: 2px solid transparent;
+  font-size: 10px;
+}
+.toDate{
+    margin-left: 19px;
+}

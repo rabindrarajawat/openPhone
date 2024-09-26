@@ -30,7 +30,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
   }
   
   return (
-    <nav className="pagination-container">
+    <nav className={`pagination-container`}>
       <ul className="pagination setPagination">
         <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
           <button className="page-link" onClick={handlePrevious}>
