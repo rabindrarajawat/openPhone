@@ -27,27 +27,7 @@ export class OpenPhoneEventService {
     private addressService: AddressService,
     private auctionService: AuctionEventService,
     private notificationService: NotificationService
-  ) { }
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  ) {}
 
   // async create(payload: OpenPhoneEventDto) {
   //   try {
@@ -155,7 +135,6 @@ export class OpenPhoneEventService {
   //       openPhoneEvent.address_id = addressId;
   //     }
 
-
   //     openPhoneEvent.event_direction_id = this.getEventDirectionId(messageData.direction);
   //     openPhoneEvent.from = messageData.from;
   //     openPhoneEvent.to = messageData.to;
@@ -229,18 +208,83 @@ export class OpenPhoneEventService {
   //   }
   // }
 
+  //Works well when we dont have the comma seperated address in payload
+  // private extractInformation(message: string) {
+  //   // Refined regex to capture a more precise address format and exclude dates
+  //   const addressRegex = /\b(?:house at|at)\s+([\d]+\s+\w+\s+\w+\s+\w+.*?)(?:\s*(?:,|\s+for|\.|on\s+\d{1,2}\/\d{1,2}))/i;
+  //   const auctionTypeRegex = /(tax auction|auction|foreclosure)/i;
+  //   const nameRegex = /Hello\s+(.*?)\./i;
+  //   const dateRegex = /\b(\d{1,2}\/\d{1,2})\b/i;
+
+  //   const addressMatch = message.match(addressRegex);
+  //   const auctionTypeMatch = message.match(auctionTypeRegex);
+  //   const nameMatch = message.match(nameRegex);
+  //   const dateMatch = message.match(dateRegex);
+
+  //   return {
+  //     address: addressMatch ? addressMatch[1].trim() : null,
+  //     auction_type: auctionTypeMatch ? auctionTypeMatch[1].toLowerCase() : null,
+  //     name: nameMatch ? nameMatch[1].trim() : null,
+  //     date: dateMatch ? new Date(dateMatch[1]) : null,
+  //   };
+  // }
+
+  //work well when we have the comma seperated address in payload
+  // private extractInformation(message: string) {
+  //   // Refined regex to capture only the specific address format
+  //   const addressRegex = /\b(?:house at|at)\s+([\d]+\s+[^,]+(?:,\s*[^,]+)*?(?:,\s*[A-Z]{2}))\b/i;
+  //   const auctionTypeRegex = /(tax auction|auction|foreclosure)/i;
+  //   const nameRegex = /Hello\s+(.*?)\./i;
+  //   const dateRegex = /\b(\d{1,2}\/\d{1,2})\b/i;
+
+  //   const addressMatch = message.match(addressRegex);
+  //   const auctionTypeMatch = message.match(auctionTypeRegex);
+  //   const nameMatch = message.match(nameRegex);
+  //   const dateMatch = message.match(dateRegex);
+
+  //   return {
+  //     address: addressMatch ? addressMatch[1].trim() : null,
+  //     auction_type: auctionTypeMatch ? auctionTypeMatch[1].toLowerCase() : null,
+  //     name: nameMatch ? nameMatch[1].trim() : null,
+  //     date: dateMatch ? new Date(dateMatch[1]) : null,
+  //   };
+  // }
+
   private extractInformation(message: string) {
-    // Refined regex to capture a more precise address format and exclude dates
-    const addressRegex = /\b(?:house at|at)\s+([\d]+\s+\w+\s+\w+\s+\w+.*?)(?:\s*(?:,|\s+for|\.|on\s+\d{1,2}\/\d{1,2}))/i;
+    // Broad pattern to capture the initial address segment
+    const preliminaryAddressRegex =
+      /\b(?:house at|at)\s+([\d]+\s+\w.*?)(?:\s*(?:for|\.|on\s+\d{1,2}\/\d{1,2}))/i;
+
+    // Extract potential address segment first
+    const preliminaryAddressMatch = message.match(preliminaryAddressRegex);
+    const preliminaryAddress = preliminaryAddressMatch
+      ? preliminaryAddressMatch[1].trim()
+      : "";
+
+    // Check if the preliminary address segment has a comma
+    const isCommaSeparated = /,/.test(preliminaryAddress);
+
+    // Refined address regex patterns for different scenarios
+    const nonCommaSeparatedAddressRegex =
+      /\b(?:house at|at)\s+([\d]+\s+\w+\s+\w+\s+\w+.*?)(?:\s*(?:,|\s+for|\.|on\s+\d{1,2}\/\d{1,2}))/i;
+    const commaSeparatedAddressRegex =
+      /\b(?:house at|at)\s+([\d]+\s+[^,]+(?:,\s*[^,]+)*?(?:,\s*[A-Z]{2}))\b/i;
+
+    // Other regex patterns
     const auctionTypeRegex = /(tax auction|auction|foreclosure)/i;
     const nameRegex = /Hello\s+(.*?)\./i;
     const dateRegex = /\b(\d{1,2}\/\d{1,2})\b/i;
-  
-    const addressMatch = message.match(addressRegex);
+
+    // Select the correct address pattern based on the `isCommaSeparated` check
+    const addressMatch = message.match(
+      isCommaSeparated
+        ? commaSeparatedAddressRegex
+        : nonCommaSeparatedAddressRegex
+    );
     const auctionTypeMatch = message.match(auctionTypeRegex);
     const nameMatch = message.match(nameRegex);
     const dateMatch = message.match(dateRegex);
-   
+
     return {
       address: addressMatch ? addressMatch[1].trim() : null,
       auction_type: auctionTypeMatch ? auctionTypeMatch[1].toLowerCase() : null,
@@ -248,43 +292,87 @@ export class OpenPhoneEventService {
       date: dateMatch ? new Date(dateMatch[1]) : null,
     };
   }
-  
 
+  //taking till on
+  // private extractInformation(message: string) {
+  //   // Refined regex for address extraction
+  //   const addressRegex = /\b(?:house at|at)\s+((\d+[\w\s.]+)(?:(?:,\s*)?([A-Za-z\s]+),?\s*([A-Z]{2})\s*(\d{5,})?))/i;
 
+  //   const auctionTypeRegex = /(tax auction|auction|foreclosure)/i;
+  //   const nameRegex = /Hello\s+(.*?)\./i;
+  //   const dateRegex = /\b(\d{1,2}\/\d{1,2})\b/i;
+
+  //   const addressMatch = message.match(addressRegex);
+  //   const auctionTypeMatch = message.match(auctionTypeRegex);
+  //   const nameMatch = message.match(nameRegex);
+  //   const dateMatch = message.match(dateRegex);
+
+  //   let address = null;
+  //   if (addressMatch) {
+  //     let [_, fullAddress, streetAddress, city, state, zipCode] = addressMatch;
+  //     address = fullAddress.trim();
+
+  //     // Clean up the address
+  //     address = address.replace(/\s+/g, ' '); // Remove extra spaces
+  //     address = address.replace(/(\d{5})\d+/, '$1'); // Keep only first 5 digits of zip code
+
+  //     // If city, state, or zip code is missing, try to reconstruct the address
+  //     if (!city || !state || !zipCode) {
+  //       const parts = address.split(/\s+/);
+  //       const stateIndex = parts.findIndex(part => /^[A-Z]{2}$/.test(part));
+  //       if (stateIndex !== -1) {
+  //         state = parts[stateIndex];
+  //         city = parts.slice(0, stateIndex).join(' ');
+  //         zipCode = parts[stateIndex + 1] || '';
+  //         // address = `${streetAddress} ${city}, ${state} ${zipCode}`.trim();
+  //       }
+  //     }
+  //   }
+
+  //   return {
+  //     address: address,
+  //     auction_type: auctionTypeMatch ? auctionTypeMatch[1].toLowerCase() : null,
+  //     name: nameMatch ? nameMatch[1].trim() : null,
+  //     date: dateMatch ? new Date(dateMatch[1]) : null,
+  //   };
+  // }
 
   async create(payload: OpenPhoneEventDto) {
     try {
       if (!payload || !payload.data || !payload.data.object) {
         return { openPhoneEvent: null, addressCreated: false };
       }
-  
+
       const messageData = payload.data.object;
       const body = messageData.body || null;
       const existingEvent = await this.openPhoneEventRepository.findOne({
         where: { conversation_id: messageData.conversationId },
       });
-  
+
       const eventTypeId = this.getEventTypeId(payload.type);
       if (eventTypeId === null || eventTypeId === undefined) {
         throw new BadRequestException(`Invalid event type: ${payload.type}`);
       }
-  
+
       let addressId = null;
       let addressCreated = false;
       let auctionTypeId = null;
-  
+
       if (body) {
         const extractedInfo = this.extractInformation(body);
-        console.log("🚀 ~ OpenPhoneEventService ~ create ~ extractedInfo:", extractedInfo)
-  
+        console.log(
+          "🚀 ~ OpenPhoneEventService ~ create ~ extractedInfo:",
+          extractedInfo
+        );
+
         auctionTypeId = this.auctionTypeId(extractedInfo.auction_type);
-  
+
         // Only try to save the address if it's not null
         if (extractedInfo.address) {
           const existingAddress = await this.addressRepository.findOne({
             where: { address: extractedInfo.address },
           });
-  
+
           if (!existingAddress) {
             const addressDto: AddressDto = {
               address: extractedInfo.address,
@@ -294,7 +382,7 @@ export class OpenPhoneEventService {
               is_bookmarked: false,
               auction_event_id: auctionTypeId,
             };
-  
+
             const addressErrors = await validate(addressDto);
             if (addressErrors.length > 0) {
               const errorMessages = addressErrors
@@ -304,12 +392,16 @@ export class OpenPhoneEventService {
                 `Invalid address data: ${errorMessages.join(", ")}`
               );
             }
-  
-            if (addressDto.auction_event_id === null || addressDto.auction_event_id === undefined) {
+
+            if (
+              addressDto.auction_event_id === null ||
+              addressDto.auction_event_id === undefined
+            ) {
               throw new BadRequestException("Invalid auction_event_id");
             }
-  
-            const savedAddress = await this.addressService.createAddress(addressDto);
+
+            const savedAddress =
+              await this.addressService.createAddress(addressDto);
             addressId = savedAddress.id;
             addressCreated = true;
           } else {
@@ -317,13 +409,16 @@ export class OpenPhoneEventService {
           }
         }
       }
-  
+
       // Creating the event regardless of the address presence
       const openPhoneEvent = new OpenPhoneEventEntity();
       openPhoneEvent.event_type_id = eventTypeId;
-      openPhoneEvent.address_id = addressId || existingEvent?.address_id || null; // Keep null if no address
+      openPhoneEvent.address_id =
+        addressId || existingEvent?.address_id || null; // Keep null if no address
       openPhoneEvent.auction_event_id = !existingEvent ? auctionTypeId : null;
-      openPhoneEvent.event_direction_id = this.getEventDirectionId(messageData.direction);
+      openPhoneEvent.event_direction_id = this.getEventDirectionId(
+        messageData.direction
+      );
       openPhoneEvent.from = messageData.from;
       openPhoneEvent.to = messageData.to;
       openPhoneEvent.body = body;
@@ -339,23 +434,26 @@ export class OpenPhoneEventService {
       openPhoneEvent.created_by = "Admin";
       openPhoneEvent.phone_number_id = messageData.phoneNumberId;
       openPhoneEvent.user_id = messageData.userId;
-  
+
       const eventErrors = await validate(openPhoneEvent);
       if (eventErrors.length > 0) {
         const errorMessages = eventErrors
           .map((error) => Object.values(error.constraints))
           .flat();
-        throw new BadRequestException(`Invalid open phone event data: ${errorMessages.join(", ")}`);
+        throw new BadRequestException(
+          `Invalid open phone event data: ${errorMessages.join(", ")}`
+        );
       }
-  
-      const savedOpenPhoneEvent = await this.openPhoneEventRepository.save(openPhoneEvent);
+
+      const savedOpenPhoneEvent =
+        await this.openPhoneEventRepository.save(openPhoneEvent);
       await this.notificationService.createNotification(savedOpenPhoneEvent.id);
-  
+
       const auctionEventDto: AuctionEventDto = {
         event_id: savedOpenPhoneEvent.id,
         created_by: "Ram",
       };
-  
+
       const auctionErrors = await validate(auctionEventDto);
       if (auctionErrors.length > 0) {
         const errorMessages = auctionErrors
@@ -365,9 +463,9 @@ export class OpenPhoneEventService {
           `Invalid auction event data: ${errorMessages.join(", ")}`
         );
       }
-  
+
       await this.auctionService.create(auctionEventDto);
-  
+
       return { openPhoneEvent: savedOpenPhoneEvent, addressCreated };
     } catch (error) {
       console.error("Error in create method:", error);
@@ -385,14 +483,6 @@ export class OpenPhoneEventService {
       throw new InternalServerErrorException("An unknown error occurred");
     }
   }
-  
-
-
-
-
-
-
-
 
   async findAll() {
     return this.openPhoneEventRepository.find();
@@ -436,13 +526,6 @@ export class OpenPhoneEventService {
         return null;
     }
   }
-
-
-
-
- 
-
-
 
   async findOpenPhoneEventsByAddress(address: string): Promise<{
     events: Partial<OpenPhoneEventEntity>[];
