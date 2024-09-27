@@ -20,7 +20,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
     }
   };
 
-  const pageRange = 2; // Number of pages to show around the current page
+  const pageRange = 1; // Number of pages to show around the current page
   let startPage = Math.max(1, currentPage - Math.floor(pageRange / 2));
   let endPage = Math.min(totalPages, startPage + pageRange - 1);
 
