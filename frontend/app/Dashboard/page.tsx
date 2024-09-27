@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo,useCallback } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import Navbar from "../Navbar/Navbar";
 import SideBar from "../SideNavbar/sideNavbar";
 import Image from "next/image";
@@ -88,7 +88,7 @@ interface EventItem {
 const Dashboard = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
 
- 
+
 
   const [selectedAddress, setSelectedAddress] = useState("Search Address");
   const [eventData, setEventData] = useState<EventItem[]>([]);
@@ -162,12 +162,12 @@ const Dashboard = () => {
 
   const checkTokenExpiration = useCallback(() => {
     const token = localStorage.getItem("authToken");
-  
+
     if (token) {
       try {
         const decoded: DecodedToken = jwtDecode(token);
         const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds since Unix epoch
-  
+
         if (decoded.exp < currentTime) {
           // Token has expired
           localStorage.removeItem("authToken"); // Clear the expired token
@@ -183,10 +183,10 @@ const Dashboard = () => {
       router.push("/");
     }
   }, [router]); // Ensure that 'router' is included in dependencies
-  
+
   useEffect(() => {
     checkTokenExpiration(); // Check token expiration when the component mounts
-  }, [checkTokenExpiration]); 
+  }, [checkTokenExpiration]);
 
   useEffect(() => {
     const storedPins = localStorage.getItem("pinnedConversations");
@@ -551,10 +551,10 @@ const Dashboard = () => {
   const addressesToShow =
     filteredAddresses.length > 0 // If there are any filtered addresses
       ? filteredAddresses.filter((address) =>
-          filteredAddresses2.some(
-            (filteredAddress) => filteredAddress.address === address.address
-          )
+        filteredAddresses2.some(
+          (filteredAddress) => filteredAddress.address === address.address
         )
+      )
       : [];
 
   const currentAddresses = addressesToShow.slice(
@@ -824,10 +824,10 @@ const Dashboard = () => {
   // Filter messages based on the search query
   const filteredMessages = searchTo
     ? Object.keys(updatedMessages).filter((conversationId) =>
-        updatedMessages[conversationId].some((message) =>
-          message.to.toLowerCase().includes(searchTo.toLowerCase())
-        )
+      updatedMessages[conversationId].some((message) =>
+        message.to.toLowerCase().includes(searchTo.toLowerCase())
       )
+    )
     : Object.keys(updatedMessages);
 
   // Function to format the count
@@ -1084,7 +1084,7 @@ const Dashboard = () => {
               {/* First column: Message Delivered */}
               <div className="col-lg-3 col-md-6 col-sm-12">
                 <div
-                  className={`d-flex justify-content-between align-items-center p-3 ${styles.messageDelivered}`}
+                  className={`d-flex justify-content-between align-items-center p-1 ${styles.messageDelivered}`}
                 >
                   <span>Message Delivered</span>
                   <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
@@ -1096,7 +1096,7 @@ const Dashboard = () => {
               {/* Second column: Message Response */}
               <div className="col-lg-3 col-md-6 col-sm-12">
                 <div
-                  className={`d-flex justify-content-between align-items-center p-3 ${styles.messageResponse}`}
+                  className={`d-flex justify-content-between align-items-center p-1 ${styles.messageResponse}`}
                 >
                   <span>Message Response</span>
                   <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
@@ -1108,7 +1108,7 @@ const Dashboard = () => {
               {/* Third column: Call */}
               <div className="col-lg-3 col-md-6 col-sm-12">
                 <div
-                  className={`d-flex justify-content-between align-items-center p-3 text-left ${styles.call}`}
+                  className={`d-flex justify-content-between align-items-center p-1 text-left ${styles.call}`}
                 >
                   <span>Call</span>
                   <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
@@ -1120,7 +1120,7 @@ const Dashboard = () => {
               {/* Fourth column: Call Response */}
               <div className="col-lg-3 col-md-6 col-sm-12">
                 <div
-                  className={`d-flex justify-content-between align-items-center p-3 text-left ${styles.callResponse}`}
+                  className={`d-flex justify-content-between align-items-center p-2 text-left ${styles.callResponse}`}
                 >
                   <span>Call Response</span>
                   <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
@@ -1158,11 +1158,10 @@ const Dashboard = () => {
 
                           <div className="d-flex">
                             <div
-                              className={` ${
-                                filterOption === "bookmarked"
-                                  ? "active-filter"
-                                  : ""
-                              }`}
+                              className={` ${filterOption === "bookmarked"
+                                ? "active-filter"
+                                : ""
+                                }`}
                               onClick={() => handleFilterChange("bookmarked")}
                             >
                               <Image
@@ -1170,11 +1169,10 @@ const Dashboard = () => {
                                 width={15}
                                 height={15}
                                 src="/bookmark.png"
-                                className={`ms-2 ${
-                                  filterOption === "bookmarked"
-                                    ? styles.iconBlue
-                                    : ""
-                                }`}
+                                className={`ms-2 ${filterOption === "bookmarked"
+                                  ? styles.iconBlue
+                                  : ""
+                                  }`}
                               />{" "}
                               <div className={`me-2 ${styles.addFilter}`}>
                                 Select
@@ -1190,11 +1188,10 @@ const Dashboard = () => {
                                 alt="redo"
                                 width={15}
                                 height={15}
-                                className={`ms-2 ${
-                                  filterOption === "default"
-                                    ? styles.iconBlue
-                                    : ""
-                                }`}
+                                className={`ms-2 ${filterOption === "default"
+                                  ? styles.iconBlue
+                                  : ""
+                                  }`}
                               />
                               <div className={styles.addFilter}>Default</div>
                             </div>
@@ -1213,11 +1210,10 @@ const Dashboard = () => {
                             currentAddresses.map((address) => (
                               <li
                                 key={address.id}
-                                className={`d-flex align-items-left   mt-4 me-3 ${
-                                  selectedAddressId === address.id
-                                    ? styles.selectedAdd
-                                    : ""
-                                }`}
+                                className={`d-flex align-items-left   mt-4 me-3 ${selectedAddressId === address.id
+                                  ? styles.selectedAdd
+                                  : ""
+                                  }`}
                                 onClick={() =>
                                   handleAddressSelect(
                                     address.displayAddress,
@@ -1227,15 +1223,13 @@ const Dashboard = () => {
                               >
                                 <div className="setaddress d-flex align-items-start gap-3">
                                   <i
-                                    className={`bi ${
-                                      address.is_bookmarked
-                                        ? "bi-bookmark-fill"
-                                        : "bi-bookmark"
-                                    } ${
-                                      address.is_bookmarked
+                                    className={`bi ${address.is_bookmarked
+                                      ? "bi-bookmark-fill"
+                                      : "bi-bookmark"
+                                      } ${address.is_bookmarked
                                         ? styles.bookmarked
                                         : styles.bookmarkIcon
-                                    }`}
+                                      }`}
                                     onClick={() =>
                                       handleBookmarkClick(address.id)
                                     }
@@ -1276,17 +1270,14 @@ const Dashboard = () => {
 
                   <div className="col">
                     <p className={`mt-4 ${styles.address}`}>
-                    <i className="bi bi-bar-chart me-3"></i>
+                      <i className="bi bi-bar-chart me-3"></i>
                       Analytic data of selected Address
                     </p>
                     <div className="">
                       <div className="">
-                        <div
-                          className={`d-flex flex-wrap ${styles.comprenshiveAddress}`}
-                        >
+                        <div className={`d-flex flex-wrap  ${styles.comprenshiveAddress}`}>
                           <div
-                            className={`d-flex col-12 col-md-5 col-lg-3
-                        justify-content-between align-items-center   px-1 py-2  mb-4 text-left ${styles.AnlyDelivered}`}
+                            className={`d-flex col-12 col-md-6 col-lg-3 justify-content-between align-items-center p-1 mb-4 text-left ${styles.AnlyDelivered}`}
                           >
                             <span>Message Delivered</span>
                             <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
@@ -1294,7 +1285,7 @@ const Dashboard = () => {
                             </span>
                           </div>
                           <div
-                            className={`d-flex col-12 col-md-5 col-lg-3 justify-content-between align-items-center  p-3 mb-4 text-left ${styles.AnlyResponse}`}
+                            className={`d-flex col-12 col-md-6 col-lg-3 justify-content-between align-items-center  p-1 mb-4 text-left ${styles.AnlyResponse}`}
                           >
                             <span>Message Response</span>
                             <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-2">
@@ -1302,7 +1293,7 @@ const Dashboard = () => {
                             </span>
                           </div>
                           <div
-                            className={`d-flex col-12 col-md-5 col-lg-3 justify-content-between align-items-center  p-3 mb-4 text-left ${styles.anlyCall}`}
+                            className={`d-flex col-12 col-md-6 col-lg-3 justify-content-between align-items-center  p-1 mb-4 text-left ${styles.anlyCall}`}
                           >
                             <span>Call</span>
                             <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-2">
@@ -1310,10 +1301,10 @@ const Dashboard = () => {
                             </span>
                           </div>
                           <div
-                            className={`d-flex col-12 col-md-5 col-lg-3 justify-content-between align-items-center  p-3 mb-4 text-left ${styles.AnlyCallRes}`}
+                            className={`d-flex col-12 col-md-6 col-lg-3 justify-content-between align-items-center p-1  mb-4 text-left ${styles.AnlyCallRes}`}
                           >
                             <span>Call Response</span>
-                            <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-2">
+                            <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center ">
                               {formatCount(callResponse)}
                             </span>
                           </div>
@@ -1366,183 +1357,175 @@ const Dashboard = () => {
                                 {events.length > 0
                                   ? filteredMessages.length > 0
                                     ? filteredMessages.map((conversationId) => {
-                                        const isStop = updatedMessages[
-                                          conversationId
-                                        ].some((message) => message.is_stop);
-                                        return (
-                                          <div key={conversationId}>
-                                            <div
-                                              className={`${styles.toLine}`}
-                                            ></div>
-                                            <div
-                                              className={` ${styles.toValue} text-center`}
+                                      const isStop = updatedMessages[
+                                        conversationId
+                                      ].some((message) => message.is_stop);
+                                      return (
+                                        <div key={conversationId}>
+                                          <div
+                                            className={`${styles.toLine}`}
+                                          ></div>
+                                          <div
+                                            className={` ${styles.toValue} text-center`}
+                                          >
+                                            <span className="text-dark">
+                                              To{" "}
+                                            </span>
+                                            <span
+                                              style={{
+                                                color: isStop
+                                                  ? "red"
+                                                  : "inherit",
+                                              }}
                                             >
-                                              <span className="text-dark">
-                                                To{" "}
-                                              </span>
-                                              <span
-                                                style={{
-                                                  color: isStop
-                                                    ? "red"
-                                                    : "inherit",
-                                                }}
-                                              >
-                                                {
-                                                  updatedMessages[
-                                                    conversationId
-                                                  ][0].to
-                                                }
-                                              </span>
+                                              {
+                                                updatedMessages[
+                                                  conversationId
+                                                ][0].to
+                                              }
+                                            </span>
 
-                                              <i
-                                                className={`bi pinnumber text-secondary ${
-                                                  pinnedConversations.has(
-                                                    conversationId
-                                                  )
-                                                    ? "bi-pin-fill"
-                                                    : "bi-pin"
+                                            <i
+                                              className={`bi pinnumber text-secondary ${pinnedConversations.has(
+                                                conversationId
+                                              )
+                                                ? "bi-pin-fill"
+                                                : "bi-pin"
                                                 }`}
-                                                onClick={() =>
-                                                  handlePinNumber(
-                                                    conversationId
-                                                  )
+                                              onClick={() =>
+                                                handlePinNumber(
+                                                  conversationId
+                                                )
+                                              }
+                                            ></i>
+                                          </div>
+
+                                          {updatedMessages[
+                                            conversationId
+                                          ].map((message, index) => (
+                                            <div key={index}>
+                                              <div
+                                                className={
+                                                  message.event_type_id === 1
+                                                    ? styles.chatMessageRight
+                                                    : styles.chatMessageLeft
                                                 }
-                                              ></i>
-                                            </div>
-
-                                            {updatedMessages[
-                                              conversationId
-                                            ].map((message, index) => (
-                                              <div key={index}>
-                                                <div
-                                                  className={
-                                                    message.event_type_id === 1
-                                                      ? styles.chatMessageRight
-                                                      : styles.chatMessageLeft
-                                                  }
-                                                >
-                                                  <div className="message-body-1">
-                                                    {expandedMessages.has(
-                                                      index
-                                                    ) ? (
-                                                      <div>
-                                                        {message.body}
-                                                        <button
-                                                          onClick={() =>
-                                                            toggleMessageExpansion(
-                                                              index
-                                                            )
-                                                          }
-                                                          className={`${
-                                                            styles.readLessBtn
-                                                          } ${
-                                                            message.event_type_id ===
+                                              >
+                                                <div className="message-body-1">
+                                                  {expandedMessages.has(
+                                                    index
+                                                  ) ? (
+                                                    <div>
+                                                      {message.body}
+                                                      <button
+                                                        onClick={() =>
+                                                          toggleMessageExpansion(
+                                                            index
+                                                          )
+                                                        }
+                                                        className={`${styles.readLessBtn
+                                                          } ${message.event_type_id ===
                                                             1
-                                                              ? styles.readLessBtnRight
-                                                              : styles.readLessBtnLeft
+                                                            ? styles.readLessBtnRight
+                                                            : styles.readLessBtnLeft
                                                           }`}
-                                                        >
-                                                          Read Less
-                                                        </button>
+                                                      >
+                                                        Read Less
+                                                      </button>
 
-                                                        <i
-                                                          className={`bi ${
-                                                            message.is_message_pinned
+                                                      <i
+                                                        className={`bi ${message.is_message_pinned
+                                                          ? "bi-star-fill text-warning"
+                                                          : "bi-star"
+                                                          } star-icon`}
+                                                        onClick={() =>
+                                                          toggleMessagePin(
+                                                            message.id,
+                                                            conversationId
+                                                          )
+                                                        }
+                                                      ></i>
+                                                    </div>
+                                                  ) : (
+                                                    <div>
+                                                      {message.body &&
+                                                        message.body.length >
+                                                        100 ? (
+                                                        <>
+                                                          {message.body.substring(
+                                                            0,
+                                                            100
+                                                          )}
+                                                          ...
+                                                          <button
+                                                            onClick={() =>
+                                                              toggleMessageExpansion(
+                                                                index
+                                                              )
+                                                            }
+                                                            className={`${styles.readMoreBtn
+                                                              } ${message.event_type_id ===
+                                                                1
+                                                                ? styles.readMoreBtnRight
+                                                                : styles.readMoreBtnLeft
+                                                              }`}
+                                                          >
+                                                            Read More
+                                                          </button>
+                                                          <i
+                                                            style={{
+                                                              cursor:
+                                                                "pointer",
+                                                            }}
+                                                            className={`bi ${message.is_message_pinned
                                                               ? "bi-star-fill text-warning"
                                                               : "bi-star"
-                                                          } star-icon`}
-                                                          onClick={() =>
-                                                            toggleMessagePin(
-                                                              message.id,
-                                                              conversationId
-                                                            )
-                                                          }
-                                                        ></i>
-                                                      </div>
-                                                    ) : (
-                                                      <div>
-                                                        {message.body &&
-                                                        message.body.length >
-                                                          100 ? (
-                                                          <>
-                                                            {message.body.substring(
-                                                              0,
-                                                              100
-                                                            )}
-                                                            ...
-                                                            <button
-                                                              onClick={() =>
-                                                                toggleMessageExpansion(
-                                                                  index
-                                                                )
-                                                              }
-                                                              className={`${
-                                                                styles.readMoreBtn
-                                                              } ${
-                                                                message.event_type_id ===
-                                                                1
-                                                                  ? styles.readMoreBtnRight
-                                                                  : styles.readMoreBtnLeft
-                                                              }`}
-                                                            >
-                                                              Read More
-                                                            </button>
-                                                            <i
-                                                              style={{
-                                                                cursor:
-                                                                  "pointer",
-                                                              }}
-                                                              className={`bi ${
-                                                                message.is_message_pinned
-                                                                  ? "bi-star-fill text-warning"
-                                                                  : "bi-star"
                                                               } star-icon cursor-pointer`}
-                                                              onClick={() =>
-                                                                toggleMessagePin(
-                                                                  message.id,
-                                                                  conversationId
-                                                                )
-                                                              }
-                                                            ></i>
-                                                          </>
-                                                        ) : (
-                                                          <>
-                                                            {message.body}{" "}
-                                                            <i
-                                                              className={`bi ${
-                                                                message.is_message_pinned
-                                                                  ? "bi-star-fill text-warning"
-                                                                  : "bi-star"
+                                                            onClick={() =>
+                                                              toggleMessagePin(
+                                                                message.id,
+                                                                conversationId
+                                                              )
+                                                            }
+                                                          ></i>
+                                                        </>
+                                                      ) : (
+                                                        <>
+                                                          {message.body}{" "}
+                                                          <i
+                                                            className={`bi ${message.is_message_pinned
+                                                              ? "bi-star-fill text-warning"
+                                                              : "bi-star"
                                                               } star-icon`}
-                                                              onClick={() =>
-                                                                toggleMessagePin(
-                                                                  message.id,
-                                                                  conversationId
-                                                                )
-                                                              }
-                                                            ></i>
-                                                          </>
-                                                        )}
-                                                      </div>
-                                                    )}
-                                                  </div>
-                                                </div>
-                                                <div
-                                                  className={
-                                                    message.event_type_id === 1
-                                                      ? styles.messageDateRight
-                                                      : styles.messageDateLeft
-                                                  }
-                                                >
-                                                  {new Date(
-                                                    message.created_at
-                                                  ).toLocaleDateString()}
+                                                            onClick={() =>
+                                                              toggleMessagePin(
+                                                                message.id,
+                                                                conversationId
+                                                              )
+                                                            }
+                                                          ></i>
+                                                        </>
+                                                      )}
+                                                    </div>
+                                                  )}
                                                 </div>
                                               </div>
-                                            ))}
-                                          </div>
-                                        );
-                                      })
+                                              <div
+                                                className={
+                                                  message.event_type_id === 1
+                                                    ? styles.messageDateRight
+                                                    : styles.messageDateLeft
+                                                }
+                                              >
+                                                {new Date(
+                                                  message.created_at
+                                                ).toLocaleDateString()}
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      );
+                                    })
                                     : "No chats found for this number"
                                   : "Loading..."}
                               </div>
