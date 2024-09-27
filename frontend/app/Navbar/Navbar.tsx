@@ -172,7 +172,7 @@ const Navbar: React.FC = () => {
             onClick={() => { }}
           />
           <div className="openphone">
-            <span className="border-bottom pb-3 ms-5">OpenPhone</span>
+            <span className="border-bottom pb-3 ms-5 fs-4">OpenPhone</span>
           </div>
         </div>
 

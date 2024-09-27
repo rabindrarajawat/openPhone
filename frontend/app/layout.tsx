@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Roboto } from "next/font/google"; // Import Roboto instead of Inter
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+// Configure Roboto font with valid weights
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["400", "700"], // Use "400" and "700" instead of "800"
+});
 
 export const metadata: Metadata = {
   title: "openPhone",
@@ -19,7 +23,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      {/* Apply Roboto font globally by setting the className */}
+      <body className={roboto.className}>{children}</body>
     </html>
   );
 }
