@@ -153,7 +153,7 @@ const Dashboard = () => {
   const [filteredAddresses2, setFilteredAddresses2] = useState<Address1[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTo, setSearchTo] = useState(""); // State to hold search input
-  const addressesPerPage = 1;
+  const addressesPerPage = 10;
 
   const [notificationCount, setNotificationCount] = useState(0);
   const router = useRouter();
