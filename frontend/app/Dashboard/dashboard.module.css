@@ -1,108 +1,184 @@
-
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;800&family=Inter:wght@400;800&display=swap")
-;
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;800&family=Inter:wght@400;800&display=swap");
 
 .addressBox {
-    height: 69vh;
-    border: #D7F5DC solid 3px;
-  }
-  .addressList{
-    max-height: 57vh;
-    overflow-y: auto;
-    cursor: pointer;
+  height: 67vh;
+  border: #D7F5DC solid 3px;
+  z-index: 999;
+  box-sizing: border-box;
+}
 
+
+.main-search {
+  /* position: fixed; */
+  margin-top: 5px;
+  width: 19vw;
+  height: 72vh;
+  border: 3px solid #D7F5DC;
+  border-radius: 6px;
+  background-color: #fff;
+  z-index: 999;
+  box-sizing: border-box;
+}
+
+/* Media query for smaller screens if needed */
+@media (max-height: 700px) {
+  .addressBox {
+    height: 58vh;
+    /* Slightly reduce the height for very short screens */
   }
-  
+}
+
+@media (max-height: 500px) {
+  .addressBox {
+    height: 71vh;
+    /* Further reduce the height for extremely small screens */
+  }
+}
+
+
+
+
+.addressList {
+  max-height: 55vh;
+  overflow-y: auto;
+  cursor: pointer;
+  margin-top: 5px;
+
+}
+
+.chatBox {
+  background-color: #d7f5dc;
+  height: 44vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  z-index: 999;
+
+
+}
+
+/* Media query for smaller screens */
+@media (max-height: 700px) {
   .chatBox {
-    background-color: #d7f5dc;
-    height: 50vh;
-    overflow-y: auto;
+    height: 43vh;
   }
-  .comprenshiveAddress {
-    color: #4d5e80;
-    font-weight: 800;
-  }
-  
-  .messageDelivered {
-    background: linear-gradient(90deg, #ffffff 0%, #e5d4fc 100%);
-    border-left: 3px solid #8833ff; /* Set the border width and purple color */
-    border-radius: 12px;
-    
-  }
-  
-  .messageResponse {
-    background: linear-gradient(90deg, #ffffff 0%, #d7f1fd 100%);
-    border-left: #33bfff 3px solid;
-    border-radius: 12px;
-  }
-  
-  .call {
-    background: linear-gradient(90deg, #ffffff 0%, #fff0c2 100%);
-    border-left: #ffcb33 3px solid;
-    border-radius: 12px;
-  }
-  .callResponse {
-    background: linear-gradient(90deg, #ffffff 0%, #cbffd0 100%);
-    border-left: #29cc39 3px solid;
-    border-radius: 12px;
-  }
-  
-  .AnlyDelivered {
-    border: 2px solid #e5d4fc;
-    border-left: 3px solid #8833ff;
-    border-radius: 12px;
-  }
-  .AnlyResponse {
-    border: 2px solid #d7f1fd;
-    border-left: 3px solid #33bfff;
-    border-radius: 12px;
-  }
-  .anlyCall {
-    border: 2px solid #fff0c2;
-    border-left: 3px solid #ffcb33;
-    border-radius: 12px;
-  }
-  .AnlyCallRes {
-    border: 2px solid #cbffd0;
-    border-left: 3px solid #29cc39;
-    border-radius: 12px;
-  }
+}
 
-    /* Address list */
-    .address{
-        font-weight: 600;
-        color: #5A657B;
-        font-size:x-large;
-        
-    }
-    .checkBox{
-        cursor: pointer;
-    }
-  .bookmarkIcon {
-    cursor: pointer;
-    color: grey;
+@media (max-height: 500px) {
+  .chatBox {
+    height: 50.4vh;
   }
-  .bookmarked {
-    color: blue;
-  }
-  .selectedAdd{
-    color:#007bff;
-  }
-  .seachAdd{
-    min-width:20%;
-    border-radius: 4rem;
-    border: 2px solid #aad5bb;
-  }
-  .iconBlue{
-    filter: brightness(0) saturate(100%) invert(27%) sepia(94%) saturate(2662%) hue-rotate(198deg) brightness(88%) contrast(108%);
+}
 
+@media (max-width: 700px) {
+  .chatBox {
+    width: 50vw;
   }
-  .addFilter{
-    font-size: 10px;
+}
 
+@media (max-width: 500px) {
+  .chatBox {
+    width: 50vw;
   }
+}
 
-  .chatMessageRight,
+
+.comprenshiveAddress {
+  color: #4d5e80;
+  font-weight: 800;
+}
+
+.messageDelivered {
+  background: linear-gradient(90deg, #ffffff 0%, #e5d4fc 100%);
+  border-left: 3px solid #8833ff;
+  /* Set the border width and purple color */
+  border-radius: 12px;
+
+}
+
+.messageResponse {
+  background: linear-gradient(90deg, #ffffff 0%, #d7f1fd 100%);
+  border-left: #33bfff 3px solid;
+  border-radius: 12px;
+}
+
+.call {
+  background: linear-gradient(90deg, #ffffff 0%, #fff0c2 100%);
+  border-left: #ffcb33 3px solid;
+  border-radius: 12px;
+}
+
+.callResponse {
+  background: linear-gradient(90deg, #ffffff 0%, #cbffd0 100%);
+  border-left: #29cc39 3px solid;
+  border-radius: 12px;
+}
+
+.AnlyDelivered {
+  border: 2px solid #e5d4fc;
+  border-left: 3px solid #8833ff;
+  border-radius: 12px;
+}
+
+.AnlyResponse {
+  border: 2px solid #d7f1fd;
+  border-left: 3px solid #33bfff;
+  border-radius: 12px;
+}
+
+.anlyCall {
+  border: 2px solid #fff0c2;
+  border-left: 3px solid #ffcb33;
+  border-radius: 12px;
+}
+
+.AnlyCallRes {
+  border: 2px solid #cbffd0;
+  border-left: 3px solid #29cc39;
+  border-radius: 12px;
+}
+
+/* Address list */
+.address {
+  font-weight: 600;
+  color: #5A657B;
+  font-size: x-large;
+
+}
+
+.checkBox {
+  cursor: pointer;
+}
+
+.bookmarkIcon {
+  cursor: pointer;
+  color: grey;
+}
+
+.bookmarked {
+  color: blue;
+}
+
+.selectedAdd {
+  color: #007bff;
+}
+
+.seachAdd {
+  min-width: 20%;
+  border-radius: 4rem;
+  border: 2px solid #aad5bb;
+}
+
+.iconBlue {
+  filter: brightness(0) saturate(100%) invert(27%) sepia(94%) saturate(2662%) hue-rotate(198deg) brightness(88%) contrast(108%);
+
+}
+
+.addFilter {
+  font-size: 10px;
+
+}
+
+.chatMessageRight,
 .chatMessageLeft {
   text-align: left;
   padding: 10px;
@@ -128,6 +204,7 @@
   color: white;
   margin-right: auto;
 }
+
 /* Ensuring the button appears right after the message */
 .readMoreBtn,
 .readLessBtn {
@@ -140,6 +217,7 @@
   color: inherit;
   /* Inherits the text color from the parent */
 }
+
 .readMoreBtnRight,
 .readLessBtnRight {
   color: #4E4E4E;
@@ -159,37 +237,37 @@
   position: relative;
 }
 
-.messageDateRight{
-    text-align: right;
-    color: #4E4E4E;
-    font-family: 'Roboto', sans-serif;
-    font-size: 9px;
-    font-weight: 400;
-    line-height: 20.46px;
+.messageDateRight {
+  text-align: right;
+  color: #4E4E4E;
+  font-family: 'Roboto', sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 20.46px;
 }
-.messageDateLeft{
-    text-align: left;
-    color: #4E4E4E;
-    font-family: 'Roboto', sans-serif;
-    font-size: 9px;
-    font-weight: 400;
-    line-height: 20.46px;
-    margin-left: 6px;
-}
-.toLine{
 
-
+.messageDateLeft {
+  text-align: left;
+  color: #4E4E4E;
+  font-family: 'Roboto', sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 20.46px;
+  margin-left: 6px;
 }
-.toValue{
-    font-weight: bold;
+
+.toLine {}
+
+.toValue {
+  font-weight: bold;
   font-size: 16px;
- 
+
 
   color: #3361FF;
 
 }
 
-.setDate{
+.setDate {
   padding: 2px 1px 1px 2px;
   border-radius: 18px;
   background: linear-gradient(#fff, #fff) padding-box,
@@ -197,6 +275,7 @@
   border: 2px solid transparent;
   font-size: 10px;
 }
-.toDate{
-    margin-left: 19px;
+
+.toDate {
+  margin-left: 19px;
 }
