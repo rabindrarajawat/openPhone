@@ -236,6 +236,15 @@
   margin-left: 6px;
 }
 
+.toLine {
+  border: 1px solid #A2A2A23d;
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  margin: 0 auto; 
+}
+
+
 .toValue {
   font-weight: bold;
   font-size: 16px;

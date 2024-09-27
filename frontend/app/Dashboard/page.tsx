@@ -1358,7 +1358,7 @@ const Dashboard = () => {
                                       ].some((message) => message.is_stop);
                                       return (
                                         <div key={conversationId}>
-                                          <div className={styles.toLine}></div>
+                                          <div className={`${styles.toLine}`}></div>
                                           <div className={` ${styles.toValue} text-center`}>
                                             <span className="text-dark">To </span>
                                             <span
