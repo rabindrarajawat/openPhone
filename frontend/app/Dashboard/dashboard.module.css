@@ -13,8 +13,8 @@
 /* Media query for smaller screens if needed */
 @media (max-height: 700px) {
   .addressBox {
-    height: 58vh;
-    /* Slightly reduce the height for very short screens */
+    height: 80vh;
+    width: 17vw;
   }
 }
 
@@ -235,8 +235,6 @@
   line-height: 20.46px;
   margin-left: 6px;
 }
-
-.toLine {}
 
 .toValue {
   font-weight: bold;
