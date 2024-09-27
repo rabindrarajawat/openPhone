@@ -206,10 +206,11 @@
 .main-notification {
     margin-left: 192px;
     margin-top: 13px;
+    cursor: pointer;
 
 }
 
-.notification-info {
+.notificationInfo {
     background-color: white;
     color: green;
     border: 2px solid green;
@@ -222,6 +223,20 @@
     font-size: 12px;
     border-color: green;
 }
+.notificationInfo2
+{
+    background-color: white;
+    color: green;
+    
+    padding: 0px 6px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    cursor: pointer;
+    margin-left: 0px;
+    font-size: 12px;
+    border-color: green;
+}
+
 
 .call-icon {
     margin-right: 5px;
@@ -281,7 +296,7 @@
 
 .event-from1 {
 
-    margin-left: -103px;
+    margin-left: 38px;
     color: #5A657B;
     font-size: -127px;
     font-weight: 500;
@@ -305,7 +320,6 @@
     border-radius: 20px;
     padding: 0px 6px;
     margin-bottom: 0px;
-    /* margin-top: -67px; */
     cursor: pointer;
     margin-left: 20px;
     font-size: 12px;

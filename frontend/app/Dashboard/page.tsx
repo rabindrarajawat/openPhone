@@ -842,7 +842,7 @@ const Dashboard = () => {
 
       <div className="container-fluid">
         <div className="ms-5  d-flex">
-          <div className="">
+          <div className="border-end pe-2">
             <div className="mb-5 ms-5 fs-6 mt-2">
               <div>
                 Message and Calls
@@ -1230,16 +1230,16 @@ const Dashboard = () => {
                                     }
                                   ></i>
 
-                                  <span className="text-start scroll">
-                                    {address.displayAddress ||
-                                      address.fullAddress}
-                                    {address.notificationCount > 0 && (
-                                      <span className="notification-count ml-2">
-                                        ({address.notificationCount})
-                                      </span>
-                                    )}
-                                  </span>
-                                </div>
+                                    <span className="text-start scroll">
+                                      {address.displayAddress ||
+                                        address.fullAddress}
+                                      {address.notificationCount > 0 && (
+                                        <span className="notification-count ml-2 text-success ms-1">
+                                          ({address.notificationCount})
+                                        </span>
+                                      )}
+                                    </span>
+                                  </div>
 
                                 {address.fullAddress && (
                                   <div className="filtered-address">

@@ -57,15 +57,15 @@ const NotificationItem: React.FC<Notification> = ({ event, is_read, event_id, ha
             ? event.body || 'No content available'
             : `${event.body.slice(0, maxContentLength)}.. `}
           {event.body && event.body.length > maxContentLength && (
-            <button onClick={toggleReadMore} className='read-more-btn text-success'>
+            <span onClick={toggleReadMore} className='text-success notificationInfo2'>
               {isExpanded ? '..Read Less' : 'Read More'}
-            </button>
+            </span>
           )}
           <div>
             {!is_read && (
               <button
                 onClick={() => handleMarkAsRead(event_id)}
-                className='notification-info'
+                className='notificationInfo'
               >
                 Mark as Read
               </button>

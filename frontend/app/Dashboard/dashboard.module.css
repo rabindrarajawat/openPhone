@@ -8,17 +8,7 @@
 }
 
 
-.main-search {
-  /* position: fixed; */
-  margin-top: 5px;
-  width: 19vw;
-  height: 72vh;
-  border: 3px solid #D7F5DC;
-  border-radius: 6px;
-  background-color: #fff;
-  z-index: 999;
-  box-sizing: border-box;
-}
+
 
 /* Media query for smaller screens if needed */
 @media (max-height: 700px) {
@@ -48,7 +38,7 @@
 
 .chatBox {
   background-color: #d7f5dc;
-  height: 44vh;
+  height: 48vh;
   overflow-y: auto;
   box-sizing: border-box;
   z-index: 999;
@@ -65,21 +55,11 @@
 
 @media (max-height: 500px) {
   .chatBox {
-    height: 50.4vh;
+    height: 55.4vh;
   }
 }
 
-@media (max-width: 700px) {
-  .chatBox {
-    width: 50vw;
-  }
-}
 
-@media (max-width: 500px) {
-  .chatBox {
-    width: 50vw;
-  }
-}
 
 
 .comprenshiveAddress {

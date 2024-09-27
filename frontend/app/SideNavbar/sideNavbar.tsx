@@ -6,8 +6,12 @@ function Sidebar() {
   const handleLogout = () => {
     console.log("Logout clicked"); // Debugging line
     localStorage.removeItem("authToken");
-    window.location.href = "/"
+    window.location.href = "/";
   };
+  const handleConversation = () => {
+    window.location.href = "/conversationmapping"
+  };
+
   return (
     <>
       <nav className={`navbar position-fixed vh-100 p-2 d-flex flex-column ${styles.bgCustom}`}>
@@ -23,13 +27,17 @@ function Sidebar() {
             <a className="nav-link mb-4">Dashboard</a>
           </Link>
 
-          <Image
-            src="/mapingi.svg"
-            alt="Logo"
-            className="logo2 mt-4"
-            width={50}
-            height={50}onClick={handleLogout}
-          />
+          <li className="nav" onClick={handleConversation}>
+          <a className="nav-link">
+              <Image
+                src="/mapingi.svg"
+                alt="Map Address"
+                className="logo2 mt-4"
+                width={50}
+                height={50}
+              />
+            </a>
+          </li>
 
           <Link href="/conversationmapping" legacyBehavior>
             <a className="nav-link">Map Address</a>
@@ -37,11 +45,10 @@ function Sidebar() {
         </div>
 
         <div className="d-flex flex-column justify-content-end align-items-end flex-grow-1 mb-4 fs-6">
-  <button className="btn btn-link p-0 text-decoration-none" onClick={handleLogout}>
-    Logout
-  </button>
-</div>
-
+          <button className="btn btn-link p-0 text-decoration-none text-dark" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
       </nav>
     </>
   );
