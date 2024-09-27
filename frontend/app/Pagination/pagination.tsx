@@ -28,9 +28,9 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
   if (endPage - startPage < pageRange - 1) {
     startPage = Math.max(1, endPage - pageRange + 1);
   }
-  
+
   return (
-    <nav className={`pagination-container d-flex justify-content-center align-item-center mt-0`}>
+    <nav className="pagination-container d-flex justify-content-center align-item-center mt-0">
       <ul className="pagination setPagination">
         <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
           <button className="page-link" onClick={handlePrevious}>
@@ -58,10 +58,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
             key={startPage + index}
             className={`page-item ${startPage + index === currentPage ? 'active' : ''}`}
           >
-            <button
-              className="page-link"
-              onClick={() => onPageChange(startPage + index)}
-            >
+            <button className="page-link" onClick={() => onPageChange(startPage + index)}>
               {startPage + index}
             </button>
           </li>
@@ -87,7 +84,6 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
             &gt;
           </button>
         </li>
-
       </ul>
     </nav>
   );
