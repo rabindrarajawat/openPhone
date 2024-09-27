@@ -1320,6 +1320,7 @@ const Dashboard = () => {
                               Conversation From{" "}
                               {uniqueFromNumbers.length > 0 && (
                                 <select
+                                className={styles.conversationFrom}
                                   value={fromNumber}
                                   onChange={(e) =>
                                     setFromNumber(e.target.value)
@@ -1337,7 +1338,7 @@ const Dashboard = () => {
 
                           <div className="text-center me-2">
                             <input
-                              className={`form-control border-radius mb-1 text-center ${styles.seachAdd}`}
+                              className={`mb-1 text-center ${styles.seachAdd}`}
                               type="search"
                               placeholder="Search To"
                               value={searchTo} // Bind input value to search state
