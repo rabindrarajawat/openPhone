@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo,useCallback } from "react";
 import Navbar from "../Navbar/Navbar";
 import SideBar from "../SideNavbar/sideNavbar";
 import Image from "next/image";
@@ -88,33 +88,7 @@ interface EventItem {
 const Dashboard = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
 
-  const checkTokenExpiration = () => {
-    const token = localStorage.getItem("authToken");
-
-    if (token) {
-      try {
-        const decoded: DecodedToken = jwtDecode(token);
-        const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds since Unix epoch
-
-        if (decoded.exp < currentTime) {
-          // Token has expired
-          localStorage.removeItem("authToken"); // Clear the expired token
-          router.push("/"); // Redirect to login page
-        }
-      } catch (error) {
-        console.error("Error decoding token", error);
-        localStorage.removeItem("authToken"); // Clear the token and redirect
-        router.push("/"); // Redirect to login page
-      }
-    } else {
-      // No token found, redirect to login page
-      router.push("/");
-    }
-  };
-
-  useEffect(() => {
-    checkTokenExpiration(); // Check token expiration when component mounts
-  }, []);
+ 
 
   const [selectedAddress, setSelectedAddress] = useState("Search Address");
   const [eventData, setEventData] = useState<EventItem[]>([]);
@@ -182,6 +156,37 @@ const Dashboard = () => {
   const addressesPerPage = 10;
 
   const [notificationCount, setNotificationCount] = useState(0);
+  const router = useRouter();
+
+
+
+  const checkTokenExpiration = useCallback(() => {
+    const token = localStorage.getItem("authToken");
+  
+    if (token) {
+      try {
+        const decoded: DecodedToken = jwtDecode(token);
+        const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds since Unix epoch
+  
+        if (decoded.exp < currentTime) {
+          // Token has expired
+          localStorage.removeItem("authToken"); // Clear the expired token
+          router.push("/"); // Redirect to login page
+        }
+      } catch (error) {
+        console.error("Error decoding token", error);
+        localStorage.removeItem("authToken"); // Clear the token and redirect
+        router.push("/"); // Redirect to login page
+      }
+    } else {
+      // No token found, redirect to login page
+      router.push("/");
+    }
+  }, [router]); // Ensure that 'router' is included in dependencies
+  
+  useEffect(() => {
+    checkTokenExpiration(); // Check token expiration when the component mounts
+  }, [checkTokenExpiration]); 
 
   useEffect(() => {
     const storedPins = localStorage.getItem("pinnedConversations");
@@ -190,7 +195,6 @@ const Dashboard = () => {
     }
   }, []);
 
-  const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
