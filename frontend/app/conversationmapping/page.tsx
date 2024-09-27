@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import { Table, Container } from 'react-bootstrap';
 import axios from 'axios';
 import ReactPaginate from 'react-paginate';
@@ -40,14 +40,14 @@ const ConversationTable = () => {
 
 
 
-  const checkTokenExpiration = () => {
+  const checkTokenExpiration = useCallback(() => {
     const token = localStorage.getItem("authToken");
-
+  
     if (token) {
       try {
         const decoded: DecodedToken = jwtDecode(token);
         const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds since Unix epoch
-
+  
         if (decoded.exp < currentTime) {
           // Token has expired
           localStorage.removeItem("authToken"); // Clear the expired token
@@ -62,11 +62,12 @@ const ConversationTable = () => {
       // No token found, redirect to login page
       router.push("/");
     }
-  };
-
+  }, [router]); // Add 'router' as a dependency
+  
   useEffect(() => {
     checkTokenExpiration(); // Check token expiration when component mounts
-  }, []);
+  }, [checkTokenExpiration]); // Memoized function in useCallback
+  
 
 
   useEffect(() => {
