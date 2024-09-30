@@ -475,6 +475,13 @@ const Dashboard = () => {
   //   setUpdatedMessages(groupedMessages);
   // }, [groupedMessages]);
 
+  useEffect(() => {
+    // Only update if groupedMessages is different
+    if (JSON.stringify(groupedMessages) !== JSON.stringify(updatedMessages)) {
+      setUpdatedMessages(groupedMessages);
+    }
+  }, [groupedMessages, updatedMessages]);
+
   const handleDefaultClick = () => {
     setFilterOption("all");
   };
