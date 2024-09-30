@@ -171,18 +171,6 @@ const Dashboard = () => {
   );
 
   const [updatedMessages, setUpdatedMessages] = useState(groupedMessages);
-
-  // useEffect(() => {
-  //   setUpdatedMessages(groupedMessages);
-  // }, [groupedMessages]);
-  
-  useEffect(() => {
-    // Only update if groupedMessages is different
-    if (JSON.stringify(groupedMessages) !== JSON.stringify(updatedMessages)) {
-      setUpdatedMessages(groupedMessages);
-    }
-  }, [groupedMessages, updatedMessages]);
-
   const checkTokenExpiration = useCallback(() => {
     const token = localStorage.getItem("authToken");
 
@@ -483,7 +471,9 @@ const Dashboard = () => {
   }, [selectedAddressId, fromNumber, Base_Url]);
 
 
-
+  // useEffect(() => {
+  //   setUpdatedMessages(groupedMessages);
+  // }, [groupedMessages]);
 
   const handleDefaultClick = () => {
     setFilterOption("all");
