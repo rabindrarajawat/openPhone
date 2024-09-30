@@ -1153,12 +1153,12 @@ const Dashboard = () => {
                             placeholder="Search Address"
                             value={searchQuery}
                             onChange={handleSearchChange}
-                            className={` text-center bi bi-search p-2 ${styles.seachAdd}`}
+                            className={` ps-4 bi bi-search  px-0 py-1 ${styles.seachAdd}`}
                           ></input>
 
                           <div className="d-flex">
                             <div
-                              className={` ${filterOption === "bookmarked"
+                              className={`me-2 ${filterOption === "bookmarked"
                                 ? "active-filter"
                                 : ""
                                 }`}
@@ -1174,13 +1174,13 @@ const Dashboard = () => {
                                   : ""
                                   }`}
                               />{" "}
-                              <div className={`me-2 ${styles.addFilter}`}>
+                              <div className={`me- ${styles.addFilter}`}>
                                 Select
                               </div>
                             </div>
 
                             <div
-                              className={`${filterOption === "default"}`}
+                              className={`${filterOption === "default"} me-4`}
                               onClick={() => handleDefaultClick()}
                             >
                               <Image
@@ -1193,7 +1193,7 @@ const Dashboard = () => {
                                   : ""
                                   }`}
                               />
-                              <div className={styles.addFilter}>Default</div>
+                              <div className={`${styles.addFilter}`}>Default</div>
                             </div>
                           </div>
                         </div>
@@ -1356,9 +1356,9 @@ const Dashboard = () => {
                             </div>
                           )}
 
-                          <div className="text-center me-2 mt-4">
+                          <div className="me-2 mt-4">
                             <input
-                              className={`mb-1 text-center ${styles.seachAdd}`}
+                              className={`mb-1 text-left ps-4 py-1 ${styles.seachAdd}`}
                               type="search"
                               placeholder="Search To"
                               value={searchTo} // Bind input value to search state
