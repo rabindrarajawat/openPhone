@@ -1273,43 +1273,60 @@ const Dashboard = () => {
                       <i className="bi bi-bar-chart me-3"></i>
                       Analytic data of selected Address
                     </p>
-                    <div className="">
-                      <div className="">
-                        <div className={`d-flex flex-wrap  ${styles.comprenshiveAddress}`}>
-                          <div
-                            className={`d-flex col-12 col-md-6 col-lg-3 justify-content-between align-items-center p-1 mb-4 text-left ${styles.AnlyDelivered}`}
-                          >
-                            <span>Message Delivered</span>
-                            <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
-                              {formatCount(messageDelivered)}
-                            </span>
-                          </div>
-                          <div
-                            className={`d-flex col-12 col-md-6 col-lg-3 justify-content-between align-items-center  p-1 mb-4 text-left ${styles.AnlyResponse}`}
-                          >
-                            <span>Message Response</span>
-                            <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-2">
-                              {formatCount(messageResponse)}
-                            </span>
-                          </div>
-                          <div
-                            className={`d-flex col-12 col-md-6 col-lg-3 justify-content-between align-items-center  p-1 mb-4 text-left ${styles.anlyCall}`}
-                          >
-                            <span>Call</span>
-                            <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-2">
-                              {formatCount(call)}
-                            </span>
-                          </div>
-                          <div
-                            className={`d-flex col-12 col-md-6 col-lg-3 justify-content-between align-items-center p-1  mb-4 text-left ${styles.AnlyCallRes}`}
-                          >
-                            <span>Call Response</span>
-                            <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center ">
-                              {formatCount(callResponse)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
+                    <div className=""> 
+                    <div className={`row g-3 ${styles.comprenshiveAddress}`}>
+             
+
+              {/* First column: Message Delivered */}
+              <div className="col-lg-3 col-md-6 col-sm-12">
+                <div
+                  className={`d-flex justify-content-between align-items-center p-1 ${styles.AnlyDelivered}`}
+                >
+                  <span>Message Delivered</span>
+                  <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
+                    {formatCount(messageDelivered)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Second column: Message Response */}
+              <div className="col-lg-3 col-md-6 col-sm-12">
+                <div
+                  className={`d-flex justify-content-between align-items-center p-1 ${styles.AnlyResponse}`}
+                >
+                  <span>Message Response</span>
+                  <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
+                    {formatCount(messageResponse)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Third column: Call */}
+              <div className="col-lg-3 col-md-6 col-sm-12">
+                <div
+                  className={`d-flex justify-content-between align-items-center p-1 text-left ${styles.AnlyCall}`}
+                >
+                  <span>Call</span>
+                  <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
+                    {formatCount(call)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Fourth column: Call Response */}
+              <div className="col-lg-3 col-md-6 col-sm-12">
+                <div
+                  className={`d-flex justify-content-between align-items-center p-1 text-left ${styles.AnlyCallRes}`}
+                >
+                  <span>Call Response</span>
+                  <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
+                  {formatCount(callResponse)}
+                  </span>
+                </div>
+              </div>
+            </div>
+                    
+
                       <div className="conversation">
                         <div className="d-flex gap-3 justify-content-between align-items-center">
                           {selectedAddress && (
@@ -1339,7 +1356,7 @@ const Dashboard = () => {
                             </div>
                           )}
 
-                          <div className="text-center me-2">
+                          <div className="text-center me-2 mt-4">
                             <input
                               className={`mb-1 text-center ${styles.seachAdd}`}
                               type="search"

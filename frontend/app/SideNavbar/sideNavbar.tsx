@@ -8,9 +8,7 @@ function Sidebar() {
     localStorage.removeItem("authToken");
     window.location.href = "/";
   };
-  const handleConversation = () => {
-    window.location.href = "/conversationmapping"
-  };
+
 
   return (
     <>
@@ -27,8 +25,6 @@ function Sidebar() {
             <a className="nav-link mb-4">Dashboard</a>
           </Link>
 
-          <li className="nav" onClick={handleConversation}>
-          <a className="nav-link">
               <Image
                 src="/mapingi.svg"
                 alt="Map Address"
@@ -36,8 +32,8 @@ function Sidebar() {
                 width={50}
                 height={50}
               />
-            </a>
-          </li>
+            
+          
 
           <Link href="/conversationmapping" legacyBehavior>
             <a className="nav-link">Map Address</a>
