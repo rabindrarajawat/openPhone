@@ -159,7 +159,18 @@ const Dashboard = () => {
   const router = useRouter();
 
 
+  const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>(
+    (acc, message) => {
+      if (!acc[message.conversation_id]) {
+        acc[message.conversation_id] = [];
+      }
+      acc[message.conversation_id].push(message);
+      return acc;
+    },
+    {}
+  );
 
+  const [updatedMessages, setUpdatedMessages] = useState(groupedMessages);
   const checkTokenExpiration = useCallback(() => {
     const token = localStorage.getItem("authToken");
 
@@ -183,6 +194,7 @@ const Dashboard = () => {
       router.push("/");
     }
   }, [router]); // Ensure that 'router' is included in dependencies
+
 
   useEffect(() => {
     checkTokenExpiration(); // Check token expiration when the component mounts
@@ -458,21 +470,10 @@ const Dashboard = () => {
     return () => clearTimeout(timer);
   }, [selectedAddressId, fromNumber, Base_Url]);
 
-  const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>(
-    (acc, message) => {
-      if (!acc[message.conversation_id]) {
-        acc[message.conversation_id] = [];
-      }
-      acc[message.conversation_id].push(message);
-      return acc;
-    },
-    {}
-  );
 
-  const [updatedMessages, setUpdatedMessages] = useState(groupedMessages);
-  useEffect(() => {
-    setUpdatedMessages(groupedMessages);
-  }, [events, Base_Url, groupedMessages]);
+  // useEffect(() => {
+  //   setUpdatedMessages(groupedMessages);
+  // }, [groupedMessages]);
 
   const handleDefaultClick = () => {
     setFilterOption("all");

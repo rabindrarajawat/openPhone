@@ -6,46 +6,45 @@ function Sidebar() {
   const handleLogout = () => {
     console.log("Logout clicked"); // Debugging line
     localStorage.removeItem("authToken");
-    window.location.href = "/";
   };
-  const handleConversation = () => {
-    window.location.href = "/conversationmapping"
-  };
+ 
 
   return (
     <>
-      <nav className={`navbar position-fixed vh-100 p-2 d-flex flex-column ${styles.bgCustom}`}>
+     <nav className={`navbar  position-fixed vh-100 p-2 d-flex flex-column ${styles.bgCustom}`}>
         <div className="d-flex flex-column justify-content-center align-items-center flex-grow-1 mt-4">
-          <Image
-            src="/upicon.svg"
-            alt="Logo"
-            className="logo2"
-            width={50}
-            height={50}
-          />
-          <Link href="/Dashboard" legacyBehavior>
-            <a className="nav-link mb-4">Dashboard</a>
-          </Link>
+          <div>
+            <Link href="/Dashboard" legacyBehavior>
+            <a className="d-flex flex-column align-items-center mt-4">
 
-          <li className="nav" onClick={handleConversation}>
-          <a className="nav-link">
+            <Image
+              src="/upicon.svg"
+              alt="Logo"
+              className="logo2"
+              width={50}
+              height={50}
+            />
+              <span className="nav-link">Dashboard</span>
+              </a>
+            </Link>
+          </div>
+
+          <Link href="/conversationmapping" legacyBehavior>
+            <a className="d-flex flex-column align-items-center mt-4">
               <Image
                 src="/mapingi.svg"
                 alt="Map Address"
-                className="logo2 mt-4"
+                className="logo2"
                 width={50}
                 height={50}
               />
+              <span className="nav-link">Map Address</span>
             </a>
-          </li>
-
-          <Link href="/conversationmapping" legacyBehavior>
-            <a className="nav-link">Map Address</a>
           </Link>
         </div>
 
         <div className="d-flex flex-column justify-content-end align-items-end flex-grow-1 mb-4 fs-6">
-          <button className="btn btn-link p-0 text-decoration-none text-dark" onClick={handleLogout}>
+          <button className="btn btn-link p-0 text-decoration-none" onClick={handleLogout}>
             Logout
           </button>
         </div>
