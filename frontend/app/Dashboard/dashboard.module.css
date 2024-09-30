@@ -142,9 +142,9 @@
 }
 
 .seachAdd {
-  min-width: 20%;
-  border-radius: 4rem;
+  border-radius: 2rem;
   border: 2px solid #aad5bb;
+
 }
 
 .iconBlue {
@@ -154,6 +154,7 @@
 
 .addFilter {
   font-size: 10px;
+  
 
 }
 
