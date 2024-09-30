@@ -250,50 +250,7 @@ export class OpenPhoneEventService {
   //   };
   // }
 
-  private extractInformation(message: string) {
-    // Broad pattern to capture the initial address segment
-    const preliminaryAddressRegex =
-      /\b(?:house at|at)\s+([\d]+\s+\w.*?)(?:\s*(?:for|\.|on\s+\d{1,2}\/\d{1,2}))/i;
-
-    // Extract potential address segment first
-    const preliminaryAddressMatch = message.match(preliminaryAddressRegex);
-    const preliminaryAddress = preliminaryAddressMatch
-      ? preliminaryAddressMatch[1].trim()
-      : "";
-
-    // Check if the preliminary address segment has a comma
-    const isCommaSeparated = /,/.test(preliminaryAddress);
-
-    // Refined address regex patterns for different scenarios
-    const nonCommaSeparatedAddressRegex =
-      /\b(?:house at|at)\s+([\d]+\s+\w+\s+\w+\s+\w+.*?)(?:\s*(?:,|\s+for|\.|on\s+\d{1,2}\/\d{1,2}))/i;
-    const commaSeparatedAddressRegex =
-      /\b(?:house at|at)\s+([\d]+\s+[^,]+(?:,\s*[^,]+)*?(?:,\s*[A-Z]{2}))\b/i;
-
-    // Other regex patterns
-    const auctionTypeRegex = /(tax auction|auction|foreclosure)/i;
-    const nameRegex = /Hello\s+(.*?)\./i;
-    const dateRegex = /\b(\d{1,2}\/\d{1,2})\b/i;
-
-    // Select the correct address pattern based on the `isCommaSeparated` check
-    const addressMatch = message.match(
-      isCommaSeparated
-        ? commaSeparatedAddressRegex
-        : nonCommaSeparatedAddressRegex
-    );
-    const auctionTypeMatch = message.match(auctionTypeRegex);
-    const nameMatch = message.match(nameRegex);
-    const dateMatch = message.match(dateRegex);
-
-    return {
-      address: addressMatch ? addressMatch[1].trim() : null,
-      auction_type: auctionTypeMatch ? auctionTypeMatch[1].toLowerCase() : null,
-      name: nameMatch ? nameMatch[1].trim() : null,
-      date: dateMatch ? new Date(dateMatch[1]) : null,
-    };
-  }
-
-  //taking till on
+ //taking till on
   // private extractInformation(message: string) {
   //   // Refined regex for address extraction
   //   const addressRegex = /\b(?:house at|at)\s+((\d+[\w\s.]+)(?:(?:,\s*)?([A-Za-z\s]+),?\s*([A-Z]{2})\s*(\d{5,})?))/i;
@@ -337,6 +294,58 @@ export class OpenPhoneEventService {
   //   };
   // }
 
+
+  //not working for the comma seperated addresses 
+  // private extractInformation(message: string) {
+  //   // Enhanced regex pattern to capture addresses up to the ZIP code, handling cases like "#" or irregular symbols
+  //   const addressRegex = /\b(?:house at|at)\s+([\d]+\s+[A-Za-z0-9#\s]+[A-Z]{2}\s+\d{5})(?=\b\s*[^a-zA-Z]|$)/i;
+  
+  //   // Other regex patterns remain unchanged
+  //   const auctionTypeRegex = /(tax auction|auction|foreclosure)/i;
+  //   const nameRegex = /Hello\s+(.*?)\./i;
+  //   const dateRegex = /\b(\d{1,2}\/\d{1,2})\b/i;
+  
+  //   // Match the message against the refined address pattern
+  //   const addressMatch = message.match(addressRegex);
+  //   const auctionTypeMatch = message.match(auctionTypeRegex);
+  //   const nameMatch = message.match(nameRegex);
+  //   const dateMatch = message.match(dateRegex);
+  
+  //   return {
+  //     address: addressMatch ? addressMatch[1].trim() : null,
+  //     auction_type: auctionTypeMatch ? auctionTypeMatch[1].toLowerCase() : null,
+  //     name: nameMatch ? nameMatch[1].trim() : null,
+  //     date: dateMatch ? new Date(dateMatch[1]) : null,
+  //   };
+  // }
+
+private extractInformation(message: string) {
+  // Updated regex pattern to match both comma-separated and space-separated addresses
+  const addressRegex = /\b(?:house at|at)\s+([\d]+\s+[A-Za-z0-9#\s]+,\s*[A-Za-z\s]+,\s*[A-Z]{2}(?:\s+\d{5})?)(?=\b\s*[^a-zA-Z]|$)|\b(?:house at|at)\s+([\d]+\s+[A-Za-z0-9#\s]+[A-Z]{2}\s+\d{5})(?=\b\s*[^a-zA-Z]|$)/i;
+
+  // Other regex patterns remain unchanged
+  const auctionTypeRegex = /(tax auction|auction|foreclosure)/i;
+  const nameRegex = /Hello\s+(.*?)\./i;
+  const dateRegex = /\b(\d{1,2}\/\d{1,2})\b/i;
+
+  // Match the message against the refined address pattern
+  const addressMatch = message.match(addressRegex);
+  const auctionTypeMatch = message.match(auctionTypeRegex);
+  const nameMatch = message.match(nameRegex);
+  const dateMatch = message.match(dateRegex);
+
+  // Extract the address correctly from either of the matched groups
+  const extractedAddress = addressMatch ? (addressMatch[1] || addressMatch[2]).trim() : null;
+
+  return {
+    address: extractedAddress,
+    auction_type: auctionTypeMatch ? auctionTypeMatch[1].toLowerCase() : null,
+    name: nameMatch ? nameMatch[1].trim() : null,
+    date: dateMatch ? new Date(dateMatch[1]) : null,
+  };
+}
+
+  
   async create(payload: OpenPhoneEventDto) {
     try {
       if (!payload || !payload.data || !payload.data.object) {
