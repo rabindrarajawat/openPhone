@@ -472,7 +472,7 @@ const Dashboard = () => {
   const [updatedMessages, setUpdatedMessages] = useState(groupedMessages);
   useEffect(() => {
     setUpdatedMessages(groupedMessages);
-  }, [events, Base_Url, groupedMessages]);
+  }, [events]);
 
   const handleDefaultClick = () => {
     setFilterOption("all");
