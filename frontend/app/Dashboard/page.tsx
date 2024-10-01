@@ -471,9 +471,9 @@ const Dashboard = () => {
   }, [selectedAddressId, fromNumber, Base_Url]);
 
 
-  // useEffect(() => {
-  //   setUpdatedMessages(groupedMessages);
-  // }, [groupedMessages]);
+  useEffect(() => {
+    setUpdatedMessages(groupedMessages);
+  }, [groupedMessages]);
 
   const handleDefaultClick = () => {
     setFilterOption("all");
