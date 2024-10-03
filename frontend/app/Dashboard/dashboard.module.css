@@ -142,7 +142,7 @@
 }
 
 .seachAdd {
-  border-radius: 2rem;
+  border-radius: 0.25rem;
   border: 2px solid #aad5bb;
 
 }
@@ -262,7 +262,7 @@
 
 .setDate {
   padding: 2px 1px 1px 2px;
-  border-radius: 18px;
+  border-radius: 5px;
   background: linear-gradient(#fff, #fff) padding-box,
     linear-gradient(90deg, #bce6c3 0%, #88a0f3 100%) border-box;
   border: 2px solid transparent;
