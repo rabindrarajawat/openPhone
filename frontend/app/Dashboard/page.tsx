@@ -471,9 +471,16 @@ const Dashboard = () => {
   }, [selectedAddressId, fromNumber, Base_Url]);
 
 
+  // useEffect(() => {
+  //   setUpdatedMessages(groupedMessages);
+  // }, [groupedMessages]);
+  
   useEffect(() => {
-    setUpdatedMessages(groupedMessages);
-  }, [groupedMessages]);
+    // Only update if groupedMessages is different
+    if (JSON.stringify(groupedMessages) !== JSON.stringify(updatedMessages)) {
+      setUpdatedMessages(groupedMessages);
+    }
+  }, [groupedMessages, updatedMessages]);
 
   const handleDefaultClick = () => {
     setFilterOption("all");
