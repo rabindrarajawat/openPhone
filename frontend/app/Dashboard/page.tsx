@@ -477,6 +477,8 @@ const Dashboard = () => {
   
 
 
+
+
   const handleDefaultClick = () => {
     setFilterOption("all");
   };
@@ -1027,7 +1029,7 @@ const Dashboard = () => {
                             <div className="d-flex align-items-center">
                               <label
                                 htmlFor="fromDate"
-                                className="me-2 border-radius"
+                                className="me-2"
                               >
                                 From:
                               </label>
