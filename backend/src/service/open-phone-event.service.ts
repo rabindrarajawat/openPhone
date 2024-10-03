@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
@@ -15,6 +16,7 @@ import { AuctionEventDto } from "src/dto/auction-event.dto";
 import { validate } from "class-validator";
 import { OpenPhoneEventDto } from "../dto/open-phone-event.dto";
 import { NotificationService } from "./notification.service";
+import { createHmac } from "crypto";
 @Injectable()
 export class OpenPhoneEventService {
   constructor(
@@ -25,25 +27,337 @@ export class OpenPhoneEventService {
     private addressService: AddressService,
     private auctionService: AuctionEventService,
     private notificationService: NotificationService
-  ) { }
+  ) {}
 
+  // async create(payload: OpenPhoneEventDto) {
+  //   try {
+  //     // Handle null or empty payload
+  //     if (!payload || !payload.data || !payload.data.object) {
+  //       return { openPhoneEvent: null, addressCreated: false };
+  //     }
+
+  //     // Validate the payload
+  //     // const errors = await validate(payload);
+  //     // if (errors.length > 0) {
+  //     //   const errorMessages = errors
+  //     //     .map((error) => Object.values(error.constraints))
+  //     //     .flat();
+  //     //   throw new BadRequestException(`Invalid payload: ${errorMessages.join(", ")}`);
+  //     // }
+
+  //     const messageData = payload.data.object;
+  //     const body = messageData.body || null; // Handle the case where body might be null
+  //     const existingEvent = await this.openPhoneEventRepository.findOne({
+  //       where: { conversation_id: messageData.conversationId },
+  //     });
+  //     // Check event type
+  //     const eventTypeId = this.getEventTypeId(payload.type);
+  //     if (eventTypeId === null || eventTypeId === undefined) {
+  //       throw new BadRequestException(`Invalid event type: ${payload.type}`);
+  //     }
+
+  //     let addressId = null;
+  //     let addressCreated = false;
+  //     let auctionTypeId = null;
+
+  //     // Extract address from body if body is not null and save it
+  //     if (body) {
+  //       const extractedInfo = this.extractInformation(body);
+  //       console.log("🚀 ~ OpenPhoneEventService ~ create ~ extractedInfo:", extractedInfo)
+
+  //       auctionTypeId = this.auctionTypeId(extractedInfo.auction_type);
+  //       if (
+  //         !extractedInfo.address &&
+  //         payload.data.object.status === "outgoing"
+  //       ) {
+  //         throw new BadRequestException("Extracted address is null or empty");
+  //       }
+
+  //       // Check if the address already exists
+  //       const existingAddress = await this.addressRepository.findOne({
+  //         where: { address: extractedInfo.address },
+  //       });
+
+  //       if (!existingAddress) {
+  //         const addressDto: AddressDto = {
+  //           address: extractedInfo.address,
+  //           date: extractedInfo.date || new Date(),
+  //           created_by: "Ram",
+  //           is_active: true,
+  //           is_bookmarked: false,
+  //           auction_event_id: auctionTypeId,
+  //         };
+
+  //         // Validate the addressDto
+  //         const addressErrors = await validate(addressDto);
+  //         if (addressErrors.length > 0) {
+  //           const errorMessages = addressErrors
+  //             .map((error) => Object.values(error.constraints))
+  //             .flat();
+  //           throw new BadRequestException(
+  //             `Invalid address data: ${errorMessages.join(", ")}`
+  //           );
+  //         }
+  //         if (
+  //           addressDto.auction_event_id === null ||
+  //           addressDto.auction_event_id === undefined
+  //         ) {
+  //           throw new BadRequestException("Invalid auction_event_id");
+  //         }
+
+  //         const savedAddress = await this.addressService.createAddress(addressDto);
+  //         addressId = savedAddress.id;
+  //         addressCreated = true;
+  //       } else {
+  //         addressId = existingAddress.id;
+  //       }
+  //     }
+  //     const openPhoneEvent = new OpenPhoneEventEntity();
+  //     openPhoneEvent.event_type_id = eventTypeId;
+  //     openPhoneEvent.address_id =
+  //       messageData.status === "delivered"
+  //         ? existingEvent?.address_id
+  //         : addressId;
+  //     openPhoneEvent.auction_event_id = !existingEvent ? auctionTypeId : null;
+  //     if (existingEvent !== null) {
+  //       if (
+  //         existingEvent.conversation_id === messageData.conversationId &&
+  //         messageData.status === "received" &&
+  //         existingEvent.to !== messageData.from
+  //       ) {
+  //         openPhoneEvent.address_id = null;
+  //       } else if (messageData.status === "delivered" && messageData.direction === "outgoing") {
+  //         // For delivered outgoing messages, assign the correct address_id
+  //         openPhoneEvent.address_id = addressId || existingEvent.address_id;
+  //       }
+  //     } else {
+  //       // If no existing event, assign the newly created address_id
+  //       openPhoneEvent.address_id = addressId;
+  //     }
+
+  //     openPhoneEvent.event_direction_id = this.getEventDirectionId(messageData.direction);
+  //     openPhoneEvent.from = messageData.from;
+  //     openPhoneEvent.to = messageData.to;
+  //     openPhoneEvent.body = body;
+  //     openPhoneEvent.url =
+  //       messageData.media && messageData.media.length > 0
+  //         ? messageData.media[0].url
+  //         : "url";
+  //     openPhoneEvent.url_type =
+  //       messageData.media && messageData.media.length > 0
+  //         ? messageData.media[0].type
+  //         : "image";
+  //     openPhoneEvent.conversation_id = messageData.conversationId;
+  //     openPhoneEvent.created_at = messageData.createdAt;
+  //     openPhoneEvent.received_at = payload.createdAt;
+  //     openPhoneEvent.contact_established = "NA";
+  //     openPhoneEvent.dead = "No";
+  //     openPhoneEvent.keep_an_eye = "Yes";
+  //     openPhoneEvent.is_stop = messageData.body === "Stop" ? true : false;
+  //     openPhoneEvent.created_by = "Admin";
+  //     openPhoneEvent.phone_number_id = messageData.phoneNumberId;
+  //     openPhoneEvent.user_id = messageData.userId;
+
+  //     // Validate the openPhoneEvent
+  //     const eventErrors = await validate(openPhoneEvent);
+  //     if (eventErrors.length > 0) {
+  //       const errorMessages = eventErrors
+  //         .map((error) => Object.values(error.constraints))
+  //         .flat();
+  //       throw new BadRequestException(
+  //         `Invalid open phone event data: ${errorMessages.join(", ")}`
+  //       );
+  //     }
+
+  //     const savedOpenPhoneEvent = await this.openPhoneEventRepository.save(openPhoneEvent);
+  //     await this.notificationService.createNotification(savedOpenPhoneEvent.id);
+  //     const auctionEventDto: AuctionEventDto = {
+  //       event_id: savedOpenPhoneEvent.id,
+  //       created_by: "Ram",
+  //     };
+
+  //     // Validate the auctionEventDto
+  //     const auctionErrors = await validate(auctionEventDto);
+  //     if (auctionErrors.length > 0) {
+  //       const errorMessages = auctionErrors
+  //         .map((error) => Object.values(error.constraints))
+  //         .flat();
+  //       throw new BadRequestException(
+  //         `Invalid auction event data: ${errorMessages.join(", ")}`
+  //       );
+  //     }
+
+  //     const saveEventId = await this.auctionService.create(auctionEventDto);
+
+  //     return { openPhoneEvent: savedOpenPhoneEvent, addressCreated };
+  //   } catch (error) {
+  //     console.error("Error in create method:", error);
+  //     if (error instanceof BadRequestException) {
+  //       throw error;
+  //     }
+  //     if (error instanceof Error) {
+  //       // Check if the error is a database constraint violation
+  //       if (error.message.includes("violates not-null constraint")) {
+  //         throw new BadRequestException(`Invalid data: ${error.message}`);
+  //       }
+  //       throw new InternalServerErrorException(
+  //         `Error saving open phone event: ${error.message}`
+  //       );
+  //     }
+  //     throw new InternalServerErrorException("An unknown error occurred");
+  //   }
+  // }
+
+  //Works well when we dont have the comma seperated address in payload
+  // private extractInformation(message: string) {
+  //   // Refined regex to capture a more precise address format and exclude dates
+  //   const addressRegex = /\b(?:house at|at)\s+([\d]+\s+\w+\s+\w+\s+\w+.*?)(?:\s*(?:,|\s+for|\.|on\s+\d{1,2}\/\d{1,2}))/i;
+  //   const auctionTypeRegex = /(tax auction|auction|foreclosure)/i;
+  //   const nameRegex = /Hello\s+(.*?)\./i;
+  //   const dateRegex = /\b(\d{1,2}\/\d{1,2})\b/i;
+
+  //   const addressMatch = message.match(addressRegex);
+  //   const auctionTypeMatch = message.match(auctionTypeRegex);
+  //   const nameMatch = message.match(nameRegex);
+  //   const dateMatch = message.match(dateRegex);
+
+  //   return {
+  //     address: addressMatch ? addressMatch[1].trim() : null,
+  //     auction_type: auctionTypeMatch ? auctionTypeMatch[1].toLowerCase() : null,
+  //     name: nameMatch ? nameMatch[1].trim() : null,
+  //     date: dateMatch ? new Date(dateMatch[1]) : null,
+  //   };
+  // }
+
+  //work well when we have the comma seperated address in payload
+  // private extractInformation(message: string) {
+  //   // Refined regex to capture only the specific address format
+  //   const addressRegex = /\b(?:house at|at)\s+([\d]+\s+[^,]+(?:,\s*[^,]+)*?(?:,\s*[A-Z]{2}))\b/i;
+  //   const auctionTypeRegex = /(tax auction|auction|foreclosure)/i;
+  //   const nameRegex = /Hello\s+(.*?)\./i;
+  //   const dateRegex = /\b(\d{1,2}\/\d{1,2})\b/i;
+
+  //   const addressMatch = message.match(addressRegex);
+  //   const auctionTypeMatch = message.match(auctionTypeRegex);
+  //   const nameMatch = message.match(nameRegex);
+  //   const dateMatch = message.match(dateRegex);
+
+  //   return {
+  //     address: addressMatch ? addressMatch[1].trim() : null,
+  //     auction_type: auctionTypeMatch ? auctionTypeMatch[1].toLowerCase() : null,
+  //     name: nameMatch ? nameMatch[1].trim() : null,
+  //     date: dateMatch ? new Date(dateMatch[1]) : null,
+  //   };
+  // }
+
+ //taking till on
+  // private extractInformation(message: string) {
+  //   // Refined regex for address extraction
+  //   const addressRegex = /\b(?:house at|at)\s+((\d+[\w\s.]+)(?:(?:,\s*)?([A-Za-z\s]+),?\s*([A-Z]{2})\s*(\d{5,})?))/i;
+
+  //   const auctionTypeRegex = /(tax auction|auction|foreclosure)/i;
+  //   const nameRegex = /Hello\s+(.*?)\./i;
+  //   const dateRegex = /\b(\d{1,2}\/\d{1,2})\b/i;
+
+  //   const addressMatch = message.match(addressRegex);
+  //   const auctionTypeMatch = message.match(auctionTypeRegex);
+  //   const nameMatch = message.match(nameRegex);
+  //   const dateMatch = message.match(dateRegex);
+
+  //   let address = null;
+  //   if (addressMatch) {
+  //     let [_, fullAddress, streetAddress, city, state, zipCode] = addressMatch;
+  //     address = fullAddress.trim();
+
+  //     // Clean up the address
+  //     address = address.replace(/\s+/g, ' '); // Remove extra spaces
+  //     address = address.replace(/(\d{5})\d+/, '$1'); // Keep only first 5 digits of zip code
+
+  //     // If city, state, or zip code is missing, try to reconstruct the address
+  //     if (!city || !state || !zipCode) {
+  //       const parts = address.split(/\s+/);
+  //       const stateIndex = parts.findIndex(part => /^[A-Z]{2}$/.test(part));
+  //       if (stateIndex !== -1) {
+  //         state = parts[stateIndex];
+  //         city = parts.slice(0, stateIndex).join(' ');
+  //         zipCode = parts[stateIndex + 1] || '';
+  //         // address = `${streetAddress} ${city}, ${state} ${zipCode}`.trim();
+  //       }
+  //     }
+  //   }
+
+  //   return {
+  //     address: address,
+  //     auction_type: auctionTypeMatch ? auctionTypeMatch[1].toLowerCase() : null,
+  //     name: nameMatch ? nameMatch[1].trim() : null,
+  //     date: dateMatch ? new Date(dateMatch[1]) : null,
+  //   };
+  // }
+
+
+  //not working for the comma seperated addresses 
+  // private extractInformation(message: string) {
+  //   // Enhanced regex pattern to capture addresses up to the ZIP code, handling cases like "#" or irregular symbols
+  //   const addressRegex = /\b(?:house at|at)\s+([\d]+\s+[A-Za-z0-9#\s]+[A-Z]{2}\s+\d{5})(?=\b\s*[^a-zA-Z]|$)/i;
+  
+  //   // Other regex patterns remain unchanged
+  //   const auctionTypeRegex = /(tax auction|auction|foreclosure)/i;
+  //   const nameRegex = /Hello\s+(.*?)\./i;
+  //   const dateRegex = /\b(\d{1,2}\/\d{1,2})\b/i;
+  
+  //   // Match the message against the refined address pattern
+  //   const addressMatch = message.match(addressRegex);
+  //   const auctionTypeMatch = message.match(auctionTypeRegex);
+  //   const nameMatch = message.match(nameRegex);
+  //   const dateMatch = message.match(dateRegex);
+  
+  //   return {
+  //     address: addressMatch ? addressMatch[1].trim() : null,
+  //     auction_type: auctionTypeMatch ? auctionTypeMatch[1].toLowerCase() : null,
+  //     name: nameMatch ? nameMatch[1].trim() : null,
+  //     date: dateMatch ? new Date(dateMatch[1]) : null,
+  //   };
+  // }
+
+private extractInformation(message: string) {
+  // Updated regex pattern to match both comma-separated and space-separated addresses
+  const addressRegex = /\b(?:house at|at)\s+([\d]+\s+[A-Za-z0-9#\s]+,\s*[A-Za-z\s]+,\s*[A-Z]{2}(?:\s+\d{5})?)(?=\b\s*[^a-zA-Z]|$)|\b(?:house at|at)\s+([\d]+\s+[A-Za-z0-9#\s]+[A-Z]{2}\s+\d{5})(?=\b\s*[^a-zA-Z]|$)/i;
+
+  // Other regex patterns remain unchanged
+  const auctionTypeRegex = /(tax auction|auction|foreclosure)/i;
+  const nameRegex = /Hello\s+(.*?)\./i;
+  const dateRegex = /\b(\d{1,2}\/\d{1,2})\b/i;
+
+  // Match the message against the refined address pattern
+  const addressMatch = message.match(addressRegex);
+  const auctionTypeMatch = message.match(auctionTypeRegex);
+  const nameMatch = message.match(nameRegex);
+  const dateMatch = message.match(dateRegex);
+
+  // Extract the address correctly from either of the matched groups
+  const extractedAddress = addressMatch ? (addressMatch[1] || addressMatch[2]).trim() : null;
+
+  return {
+    address: extractedAddress,
+    auction_type: auctionTypeMatch ? auctionTypeMatch[1].toLowerCase() : null,
+    name: nameMatch ? nameMatch[1].trim() : null,
+    date: dateMatch ? new Date(dateMatch[1]) : null,
+  };
+}
+
+  
   async create(payload: OpenPhoneEventDto) {
     try {
-      // Validate the payload
-      const errors = await validate(payload);
-      if (errors.length > 0) {
-        const errorMessages = errors
-          .map((error) => Object.values(error.constraints))
-          .flat();
-        throw new BadRequestException(
-          `Invalid payload: ${errorMessages.join(", ")}`
-        );
+      if (!payload || !payload.data || !payload.data.object) {
+        return { openPhoneEvent: null, addressCreated: false };
       }
 
       const messageData = payload.data.object;
-      const body = messageData.body || null; // Handle the case where body might be null
+      const body = messageData.body || null;
+      const existingEvent = await this.openPhoneEventRepository.findOne({
+        where: { conversation_id: messageData.conversationId },
+      });
 
-      // Check event type
       const eventTypeId = this.getEventTypeId(payload.type);
       if (eventTypeId === null || eventTypeId === undefined) {
         throw new BadRequestException(`Invalid event type: ${payload.type}`);
@@ -53,95 +367,72 @@ export class OpenPhoneEventService {
       let addressCreated = false;
       let auctionTypeId = null;
 
-      // Extract address from body if body is not null and save it
       if (body) {
         const extractedInfo = this.extractInformation(body);
+        console.log(
+          "🚀 ~ OpenPhoneEventService ~ create ~ extractedInfo:",
+          extractedInfo
+        );
 
         auctionTypeId = this.auctionTypeId(extractedInfo.auction_type);
-        if (
-          !extractedInfo.address &&
-          payload.data.object.status === "outgoing"
-        ) {
-          throw new BadRequestException("Extracted address is null or empty");
-        }
 
-        // Check if the address already exists
-        const existingAddress = await this.addressRepository.findOne({
-          where: { address: extractedInfo.address },
-        });
+        // Only try to save the address if it's not null
+        if (extractedInfo.address) {
+          const existingAddress = await this.addressRepository.findOne({
+            where: { address: extractedInfo.address },
+          });
 
-        if (!existingAddress) {
-          const addressDto: AddressDto = {
-            address: extractedInfo.address,
-            date: extractedInfo.date || new Date(),
-            created_by: "Ram",
-            is_active: true,
-            is_bookmarked: false,
-            auction_event_id: auctionTypeId,
-          };
+          if (!existingAddress) {
+            const addressDto: AddressDto = {
+              address: extractedInfo.address,
+              date: extractedInfo.date || new Date(),
+              created_by: "Ram",
+              is_active: true,
+              is_bookmarked: false,
+              auction_event_id: auctionTypeId,
+            };
 
-          // Validate the addressDto
-          const addressErrors = await validate(addressDto);
-          if (addressErrors.length > 0) {
-            const errorMessages = addressErrors
-              .map((error) => Object.values(error.constraints))
-              .flat();
-            throw new BadRequestException(
-              `Invalid address data: ${errorMessages.join(", ")}`
-            );
+            const addressErrors = await validate(addressDto);
+            if (addressErrors.length > 0) {
+              const errorMessages = addressErrors
+                .map((error) => Object.values(error.constraints))
+                .flat();
+              throw new BadRequestException(
+                `Invalid address data: ${errorMessages.join(", ")}`
+              );
+            }
+
+            if (
+              addressDto.auction_event_id === null ||
+              addressDto.auction_event_id === undefined
+            ) {
+              throw new BadRequestException("Invalid auction_event_id");
+            }
+
+            const savedAddress =
+              await this.addressService.createAddress(addressDto);
+            addressId = savedAddress.id;
+            addressCreated = true;
+          } else {
+            addressId = existingAddress.id;
           }
-          if (
-            addressDto.auction_event_id === null ||
-            addressDto.auction_event_id === undefined
-          ) {
-            throw new BadRequestException("Invalid auction_event_id");
-          }
-
-          const savedAddress =
-            await this.addressService.createAddress(addressDto);
-
-          addressId = savedAddress.id;
-          addressCreated = true;
-        } else {
-          addressId = existingAddress.id;
         }
       }
 
-      const existingEvent = await this.openPhoneEventRepository.findOne({
-        where: { conversation_id: messageData.conversationId },
-      });
-
+      // Creating the event regardless of the address presence
       const openPhoneEvent = new OpenPhoneEventEntity();
       openPhoneEvent.event_type_id = eventTypeId;
       openPhoneEvent.address_id =
-        messageData.status === "delivered"
-          ? existingEvent?.address_id
-          : addressId;
+        addressId || existingEvent?.address_id || null; // Keep null if no address
       openPhoneEvent.auction_event_id = !existingEvent ? auctionTypeId : null;
-      if (existingEvent !== null) {
-        if (
-          existingEvent.conversation_id === messageData.conversationId &&
-          messageData.status === "received" &&
-          existingEvent.to !== messageData.from
-        ) {
-          openPhoneEvent.address_id = null;
-        }
-      }
-
       openPhoneEvent.event_direction_id = this.getEventDirectionId(
         messageData.direction
       );
       openPhoneEvent.from = messageData.from;
       openPhoneEvent.to = messageData.to;
       openPhoneEvent.body = body;
-      openPhoneEvent.url =
-        messageData.media && messageData.media.length > 0
-          ? messageData.media[0].url
-          : "url";
-      openPhoneEvent.url_type =
-        messageData.media && messageData.media.length > 0
-          ? messageData.media[0].type
-          : "image";
+      openPhoneEvent.url = messageData.media?.[0]?.url || "url";
+      openPhoneEvent.url_type = messageData.media?.[0]?.type || "image";
       openPhoneEvent.conversation_id = messageData.conversationId;
       openPhoneEvent.created_at = messageData.createdAt;
       openPhoneEvent.received_at = payload.createdAt;
@@ -149,11 +440,10 @@ export class OpenPhoneEventService {
       openPhoneEvent.dead = "No";
       openPhoneEvent.keep_an_eye = "Yes";
       openPhoneEvent.is_stop = messageData.body === "Stop" ? true : false;
-      openPhoneEvent.created_by = "Ram";
+      openPhoneEvent.created_by = "Admin";
       openPhoneEvent.phone_number_id = messageData.phoneNumberId;
       openPhoneEvent.user_id = messageData.userId;
 
-      // Validate the openPhoneEvent
       const eventErrors = await validate(openPhoneEvent);
       if (eventErrors.length > 0) {
         const errorMessages = eventErrors
@@ -167,12 +457,12 @@ export class OpenPhoneEventService {
       const savedOpenPhoneEvent =
         await this.openPhoneEventRepository.save(openPhoneEvent);
       await this.notificationService.createNotification(savedOpenPhoneEvent.id);
+
       const auctionEventDto: AuctionEventDto = {
         event_id: savedOpenPhoneEvent.id,
         created_by: "Ram",
       };
 
-      // Validate the auctionEventDto
       const auctionErrors = await validate(auctionEventDto);
       if (auctionErrors.length > 0) {
         const errorMessages = auctionErrors
@@ -183,7 +473,7 @@ export class OpenPhoneEventService {
         );
       }
 
-      const saveEventId = await this.auctionService.create(auctionEventDto);
+      await this.auctionService.create(auctionEventDto);
 
       return { openPhoneEvent: savedOpenPhoneEvent, addressCreated };
     } catch (error) {
@@ -192,7 +482,6 @@ export class OpenPhoneEventService {
         throw error;
       }
       if (error instanceof Error) {
-        // Check if the error is a database constraint violation
         if (error.message.includes("violates not-null constraint")) {
           throw new BadRequestException(`Invalid data: ${error.message}`);
         }
@@ -243,27 +532,8 @@ export class OpenPhoneEventService {
       case "foreclosure":
         return 3;
       default:
-        return null; // Add a default case
+        return null;
     }
-  }
-
-  private extractInformation(message: string) {
-    const addressRegex = /(?:house at|house at |at)\s+(.*?)(?:,|\s+for|\.)/i;
-    const auctionTypeRegex = /(tax auction|auction|foreclosure)/i;
-    const nameRegex = /Hello\s+(.*?)\./i;
-    const dateRegex = /\b(\d{1,2}\/\d{1,2})\b/i;
-
-    const addressMatch = message.match(addressRegex);
-    const auctionTypeMatch = message.match(auctionTypeRegex);
-    const nameMatch = message.match(nameRegex);
-    const dateMatch = message.match(dateRegex);
-
-    return {
-      address: addressMatch ? addressMatch[1].trim() : null,
-      auction_type: auctionTypeMatch ? auctionTypeMatch[1].toLowerCase() : null,
-      name: nameMatch ? nameMatch[1].trim() : null,
-      date: dateMatch ? new Date(dateMatch[1]) : null,
-    };
   }
 
   async findOpenPhoneEventsByAddress(address: string): Promise<{
@@ -348,7 +618,6 @@ export class OpenPhoneEventService {
     addressId: number,
     fromNumber?: string
   ) {
-
     // if (isNaN(addressId)) {
     //   throw new BadRequestException('Invalid addressId: not a number.');
     // }
