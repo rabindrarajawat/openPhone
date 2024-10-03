@@ -1,47 +1,9 @@
 
+.bgCustom{    
+    background-color: #D7F5DC !important;
+    color:#7D8FB3;
+    font-family: Roboto;
+    font-size: 12px;
+    
 
-.sidebar {
-    position: absolute;
-    background: #D7F5DC;
-    width: 5vw;
-    min-height: 92vh;
-    top: 6.5vh;
-    z-index: 2;
-}
-
-.nav {
-    width: 50px;
-    margin-top: 50%;
-    height: 50px;
-    top: 323px;
-    gap: 0px;
-}
-
-.logo2 {
-    margin-left: -16px;
-    cursor: pointer;
-}
-
-.log {
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 15.73px;
-    text-align: left;
-    color: #7D8FB3;
-    cursor: pointer;
-    margin-top: 900%;
-    margin-left: -5px;
-}
-
-.dash {
-    color: #7D8FB3;
-    font-family: 'Inter', sans-serif;
-    font-size: 9px;
-    font-weight: 400;
-    line-height: 14.52px;
-    width: 62px;
-    height: 15px;
-    margin-left: -15px;
-    cursor: pointer;
 }

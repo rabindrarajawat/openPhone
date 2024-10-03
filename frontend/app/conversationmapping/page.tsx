@@ -1,20 +1,11 @@
 'use client';
-import React, { useState, useEffect,useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, Container } from 'react-bootstrap';
 import axios from 'axios';
 import ReactPaginate from 'react-paginate';
 import Popup from '../popup/popup';
 import styles from './page.module.css';
-import SideBar from '../SideNavbar/sideNavbar';
 import Navbar from '../Navbar/Navbar';
-import { useRouter } from "next/navigation";
-import { jwtDecode } from 'jwt-decode';
-
-
-interface DecodedToken {
-  exp: number; // Expiration time in seconds since Unix epoch
-}
-
 
 type ConversationRecord = {
   conversation_id: string;
@@ -36,39 +27,6 @@ const ConversationTable = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const recordsPerPage = 5; // Set records per page to 5
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
-  const router = useRouter();
-
-
-
-  const checkTokenExpiration = useCallback(() => {
-    const token = localStorage.getItem("authToken");
-  
-    if (token) {
-      try {
-        const decoded: DecodedToken = jwtDecode(token);
-        const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds since Unix epoch
-  
-        if (decoded.exp < currentTime) {
-          // Token has expired
-          localStorage.removeItem("authToken"); // Clear the expired token
-          router.push("/"); // Redirect to login page
-        }
-      } catch (error) {
-        console.error("Error decoding token", error);
-        localStorage.removeItem("authToken"); // Clear the token and redirect
-        router.push("/"); // Redirect to login page
-      }
-    } else {
-      // No token found, redirect to login page
-      router.push("/");
-    }
-  }, [router]); // Add 'router' as a dependency
-  
-  useEffect(() => {
-    checkTokenExpiration(); // Check token expiration when component mounts
-  }, [checkTokenExpiration]); // Memoized function in useCallback
-  
-
 
   useEffect(() => {
 
@@ -154,10 +112,9 @@ const ConversationTable = () => {
   return (
     <div>
       <Navbar
-      // toggleSidebar={toggleSidebar} onSelectAddress={handleAddressSelect1}
       />
-      {isSidebarVisible && <SideBar />}
-      <div className={`${styles.mainContainer} ${isSidebarVisible ? styles.sidebarVisible : ''}`}>
+      
+      <div className={`container ${styles.mainContainer} ${isSidebarVisible ? styles.sidebarVisible : ''}`}>
         <Container className={styles.container}>
           <h2 className={styles.tableHeading}>Conversation Mapping</h2>
           <Table bordered hover className={styles.conversationTable}>
