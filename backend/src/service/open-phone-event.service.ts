@@ -386,10 +386,11 @@ private extractInformation(message: string) {
             const addressDto: AddressDto = {
               address: extractedInfo.address,
               date: extractedInfo.date || new Date(),
-              created_by: "Ram",
+              created_by: "Admin",
               is_active: true,
               is_bookmarked: false,
               auction_event_id: auctionTypeId,
+              modified_at: new Date(),
             };
 
             const addressErrors = await validate(addressDto);
@@ -414,11 +415,24 @@ private extractInformation(message: string) {
             addressId = savedAddress.id;
             addressCreated = true;
           } else {
+            await this.addressRepository.update(
+              { id: existingAddress.id },
+              { modified_at: new Date() }
+            );
             addressId = existingAddress.id;
           }
         }
       }
-
+  //  Message related to existing conversation
+  
+  // else if (existingEvent?.address_id) {
+  //   await this.addressRepository.update(
+  //     { id: existingEvent.address_id },
+  //     { modified_at: new Date() }
+  //   );
+  //   addressId = existingEvent.address_id;
+  // }
+  
       // Creating the event regardless of the address presence
       const openPhoneEvent = new OpenPhoneEventEntity();
       openPhoneEvent.event_type_id = eventTypeId;
@@ -456,11 +470,17 @@ private extractInformation(message: string) {
 
       const savedOpenPhoneEvent =
         await this.openPhoneEventRepository.save(openPhoneEvent);
-      await this.notificationService.createNotification(savedOpenPhoneEvent.id);
 
+        if (savedOpenPhoneEvent.address_id) {
+          await this.addressRepository.update(
+            { id: savedOpenPhoneEvent.address_id },
+            { modified_at: new Date() }
+          );
+        }
+      await this.notificationService.createNotification(savedOpenPhoneEvent.id);
       const auctionEventDto: AuctionEventDto = {
         event_id: savedOpenPhoneEvent.id,
-        created_by: "Ram",
+        created_by: "Admin",
       };
 
       const auctionErrors = await validate(auctionEventDto);
