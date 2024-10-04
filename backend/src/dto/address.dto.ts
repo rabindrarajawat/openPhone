@@ -17,4 +17,6 @@ export class AddressDto {
   date: Date;
   created_by: string;
   is_active: boolean;
+  modified_at: Date;
+
 }

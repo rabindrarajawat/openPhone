@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   OneToMany,
+  UpdateDateColumn,
 } from "typeorm";
 import { CommonEntity } from "./common-columns.entity";
 import { OpenPhoneEventEntity } from "./open-phone-event.entity";
@@ -21,6 +22,7 @@ export class AddressEntity extends CommonEntity {
   @Column({ default: false })
   is_bookmarked: boolean;
 
+  
   @Column({ nullable: true })
   auction_event_id: number;
 

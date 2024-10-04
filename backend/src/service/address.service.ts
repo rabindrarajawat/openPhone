@@ -92,7 +92,7 @@ export class AddressService {
       const address = this.addressRepository.create({
         address: addressDto.address,
         date: addressDto.date,
-        created_by: "Ram",
+        created_by: "Admin",
         is_active: true,
         auction_event_id: addressDto.auction_event_id,
       });
