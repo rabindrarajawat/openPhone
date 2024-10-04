@@ -877,7 +877,7 @@ const Dashboard = () => {
                       <button
                         className="btn"
                         type="button"
-                        onClick={handleToggle}
+                        // onClick={handleToggle}
                         aria-expanded={isType}
                       >
                         <Image
@@ -918,7 +918,7 @@ const Dashboard = () => {
                       <button
                         className="btn"
                         type="button"
-                        onClick={handleToggle1}
+                        // onClick={handleToggle1}
                         aria-expanded={isType}
                       >
                         <Image
@@ -969,7 +969,7 @@ const Dashboard = () => {
                       <button
                         className="btn"
                         type="button"
-                        onClick={handleToggle1}
+                        // onClick={handleToggle1}
                         aria-expanded={isType}
                       >
                         <Image
@@ -1026,7 +1026,7 @@ const Dashboard = () => {
                           <button
                             className="btn ms-2"
                             type="button"
-                            onClick={handleCustomDateToggle}
+                            // onClick={handleCustomDateToggle}
                             aria-expanded={isCustomDateOpen}
                           >
                             <Image
@@ -1166,7 +1166,7 @@ const Dashboard = () => {
                     </div>
                     <div className="me-4 mt-2">
                       <div className={`${styles.addressBox} p-2`}>
-                        <div className="d-flex align-items-center mt-1 gap-3">
+                        <div className="d-flex align-items-center mt-1 gap-1">
                           <input
                             type="text"
                             placeholder="Search Address"
@@ -1199,7 +1199,7 @@ const Dashboard = () => {
                             </div>
 
                             <div
-                              className={`${filterOption === "default"} me-4`}
+                              className={`${filterOption === "default"}`}
                               onClick={() => handleDefaultClick()}
                             >
                               <Image
