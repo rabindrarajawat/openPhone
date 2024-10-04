@@ -301,15 +301,15 @@ const Dashboard = () => {
         Authorization: `Bearer ${token}`,
       },
     };
-
+  
     console.log("Token being used:", token);
-
+  
     const fetchFilteredAddresses = async () => {
-      let deliveredAddresses = [];
-      let receivedAddresses = [];
-
+      let deliveredAddresses: any[] = [];
+      let receivedAddresses: any[] = [];
+  
+      // Fetch delivered addresses if deliveredChecked is true
       if (deliveredChecked) {
-        // Fetch delivered addresses
         const deliveredResponse = await axios.get(
           `${Base_Url}openPhoneEventData?filter=delivered`,
           config
@@ -320,9 +320,9 @@ const Dashboard = () => {
           )
           .map((event: { address: any }) => event.address);
       }
-
+  
+      // Fetch received addresses if receivedChecked is true
       if (receivedChecked) {
-        // Fetch received addresses
         const receivedResponse = await axios.get(
           `${Base_Url}openPhoneEventData?filter=received`,
           config
@@ -331,22 +331,36 @@ const Dashboard = () => {
           (event: { address: any }) => event.address
         );
       }
-
-      // Combine both delivered and received addresses
+  
+      // Combine delivered and received addresses
       const combinedAddresses = [
         ...new Set([...deliveredAddresses, ...receivedAddresses]),
       ];
-
-      // Filter the addresses based on the combined addresses
-      const filtered = addresses2.filter((addressObj: { address: any }) =>
-        combinedAddresses.includes(addressObj.address)
-      );
-      console.log("Filtered Addresses:", filtered); // Log filtered addresses
-      setFilteredAddresses2(filtered.length > 0 ? filtered : addresses2);
+  
+      if (deliveredChecked || receivedChecked) {
+        // If a filter is applied and no addresses are found, show "No address found"
+        if (combinedAddresses.length === 0) {
+          console.log("No address found for the selected filters.");
+          setFilteredAddresses2([]); // Show "No address found" in UI
+          return;
+        }
+  
+        // Filter the addresses based on combinedAddresses
+        const filtered = addresses2.filter((addressObj: { address: any }) =>
+          combinedAddresses.includes(addressObj.address)
+        );
+        console.log("Filtered Addresses:", filtered);
+        setFilteredAddresses2(filtered);
+      } else {
+        // Show all addresses by default when no filters are applied
+        setFilteredAddresses2(addresses2);
+      }
     };
-
+  
     fetchFilteredAddresses();
   }, [deliveredChecked, receivedChecked, addresses2, Base_Url]);
+  
+  
 
   useEffect(() => {
     // Retrieve Token
