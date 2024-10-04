@@ -224,9 +224,9 @@ const Dashboard = () => {
           Authorization: `Bearer ${token}`,
         },
       };
-
+  
       console.log("Token being used:", token);
-
+  
       try {
         // Fetch all addresses with the token in the headers
         console.log("Config before getalladdress:", config);
@@ -234,31 +234,31 @@ const Dashboard = () => {
           `${Base_Url}address/getalladdress`,
           config
         );
-
+  
         const formattedAddresses = addressResponse.data.map((item: any) => ({
           id: item.id,
           displayAddress: item.address,
           is_bookmarked: item.is_bookmarked,
           auction_event_id: item.auction_event_id,
-          created_at: item.created_at,
+          modified_at: item.modified_at,
           notificationCount: 0,
           address: item.address,
         }));
-
+  
         setAddresses2(formattedAddresses);
         setFilteredAddresses2(formattedAddresses);
-
+  
         // Fetch unread notifications with the token in the headers
         const notificationResponse = await axios.get(
           `${Base_Url}notifications`,
           config
         );
-
+  
         const unreadNotifications = notificationResponse.data.filter(
           (notification: any) => !notification.is_read
         );
         setNotifications(unreadNotifications);
-
+  
         // Calculate notification counts
         const addressNotificationCounts = formattedAddresses.map(
           (address: any) => {
@@ -268,30 +268,32 @@ const Dashboard = () => {
             return { ...address, notificationCount: count };
           }
         );
-
+  
         setAddresses1(addressNotificationCounts);
-
-        // Sort addresses by created_at to get the latest one
+  
+        // Sort addresses by modified_at to get the latest modified address
         const sortedAddresses = addressNotificationCounts.sort(
-          (
-            a: { created_at: string | number | Date },
-            b: { created_at: string | number | Date }
-          ) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          (a: { modified_at: string | number | Date }, b: { modified_at: string | number | Date }) => {
+            const dateA = new Date(a.modified_at).getTime();
+            const dateB = new Date(b.modified_at).getTime();
+            return dateB - dateA;
+          }
         );
-
-        // Set default selected address as the latest created address
+  
+        // Set default selected address as the latest modified address
         if (sortedAddresses.length > 0) {
           setSelectedAddress(sortedAddresses[0].displayAddress);
           setSelectedAddressId(sortedAddresses[0].id);
         }
+  
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-
+  
     fetchData();
   }, [Base_Url]);
+  
 
   useEffect(() => {
     // Retrieve Token
