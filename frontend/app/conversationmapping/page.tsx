@@ -37,16 +37,13 @@ const ConversationTable = () => {
       },
     };
 
-    console.log('Token being used:', token);
-
+ 
     const fetchData = async () => {
       try {
         const response = await axios.get(`${Base_Url}openPhoneEventData/getConversationsWithoutAddress`, config);
-        console.log('API response:', response);
-
+ 
         const data = response.data.data; // Adjusted to match your response structure
-        console.log('Data:', data);
-
+ 
         if (Array.isArray(data)) {
           setRecords(data);
         } else {
