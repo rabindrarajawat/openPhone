@@ -225,12 +225,10 @@ const Dashboard = () => {
         },
       };
   
-      console.log("Token being used:", token);
-  
+   
       try {
         // Fetch all addresses with the token in the headers
-        console.log("Config before getalladdress:", config);
-        const addressResponse = await axios.get(
+         const addressResponse = await axios.get(
           `${Base_Url}address/getalladdress`,
           config
         );
@@ -304,8 +302,7 @@ const Dashboard = () => {
       },
     };
   
-    console.log("Token being used:", token);
-  
+   
     const fetchFilteredAddresses = async () => {
       let deliveredAddresses: any[] = [];
       let receivedAddresses: any[] = [];
@@ -351,8 +348,7 @@ const Dashboard = () => {
         const filtered = addresses2.filter((addressObj: { address: any }) =>
           combinedAddresses.includes(addressObj.address)
         );
-        console.log("Filtered Addresses:", filtered);
-        setFilteredAddresses2(filtered);
+         setFilteredAddresses2(filtered);
       } else {
         // Show all addresses by default when no filters are applied
         setFilteredAddresses2(addresses2);
@@ -373,8 +369,7 @@ const Dashboard = () => {
       },
     };
 
-    console.log("Token being used:", token);
-
+ 
     const fetchEventCounts = async () => {
       try {
         const response = await fetch(
@@ -404,8 +399,7 @@ const Dashboard = () => {
       },
     };
 
-    console.log("Token being used:", token);
-
+ 
     if (selectedAddress && selectedAddress !== "Search Address") {
       axios
         .get(
@@ -460,22 +454,34 @@ const Dashboard = () => {
         Authorization: `Bearer ${token}`,
       },
     };
-    console.log("Token being used:", token);
-
+ 
     const timer = setTimeout(async () => {
       async function fetchEvents() {
         try {
-          const response = await axios.get(
-            `${Base_Url}openPhoneEventData/events-by-address-and-from`,
-            {
-              params: {
-                address_id: selectedAddressId,
-                from_number: fromNumber,
-              },
-              ...config, // Pass fromNumber directly
-            }
-          );
-          setEvents(response.data.data);
+          if(selectedAddressId&&fromNumber){
+            const response = await axios.get(
+              `${Base_Url}openPhoneEventData/events-by-address-and-from`,
+              {
+                params: {
+                  address_id: selectedAddressId,
+                  from_number: fromNumber,
+                },
+                ...config, // Pass fromNumber directly
+              }
+            );
+            setEvents(response.data.data);
+          }
+          // const response = await axios.get(
+          //   `${Base_Url}openPhoneEventData/events-by-address-and-from`,
+          //   {
+          //     params: {
+          //       address_id: selectedAddressId,
+          //       from_number: fromNumber,
+          //     },
+          //     ...config, // Pass fromNumber directly
+          //   }
+          // );
+          // setEvents(response.data.data);
         } catch (error) {
         } finally {
         }
@@ -589,8 +595,7 @@ const Dashboard = () => {
     setCurrentPage(page);
   };
 
-  // console.log("addressesToShow", addressesToShow);
-
+ 
   const handleToggle = () => {
     setIsType(!isType);
   };
@@ -640,11 +645,6 @@ const Dashboard = () => {
     if (!address) return;
 
     const newIsBookmarked = !address.is_bookmarked;
-
-    console.log(
-      `Toggling bookmark status for address ID ${addressId} to ${newIsBookmarked}`
-    );
-
     axios
       .post(
         `${Base_Url}bookmarks/${addressId}`,
@@ -743,8 +743,7 @@ const Dashboard = () => {
       return;
     }
 
-    console.log("Token being used:", token);
-
+ 
     try {
       const response = await fetch(
         `${Base_Url}notifications/${addressId}/read?addressId=${addressId}`,
@@ -762,8 +761,7 @@ const Dashboard = () => {
       }
 
       const result = await response.json();
-      console.log(result.message); // Optional: handle success message
-
+ 
       // Update notification count in state
       setAddresses1((prevAddresses) =>
         prevAddresses.map((address) =>
@@ -808,8 +806,7 @@ const Dashboard = () => {
       },
     };
 
-    console.log("Token being used:", token);
-
+ 
     try {
       await axios.post(
         `${Base_Url}openPhoneEventData/toggle-message-pin/${messageId}`,
