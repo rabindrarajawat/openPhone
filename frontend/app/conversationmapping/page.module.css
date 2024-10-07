@@ -20,8 +20,9 @@
   /* Align the heading to the left */
   margin-bottom: 20px;
   font-size: 24px;
-  margin-left:80px;
+  margin-left: 92px;
   color: #333;
+  margin-top: 7px;
 }
 
 .conversationTable {
