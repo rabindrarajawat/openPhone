@@ -5,7 +5,7 @@
 .tableContainer {
   max-height: 400px; /* Adjust the height as needed */
   overflow-y: auto; 
-  
+  margin-left: 82px;
   /* Enable vertical scrolling */
 }
 
@@ -15,11 +15,12 @@
 }
 
 
+
 .tableHeading {
-  align-self: flex-start;
   /* Align the heading to the left */
   margin-bottom: 20px;
   font-size: 24px;
+  margin-left:80px;
   color: #333;
 }
 

@@ -114,7 +114,7 @@ const ConversationTable = () => {
       <Navbar
       />
 
-      <div className={`container`}>
+      <div className={`container-fluid ${styles.converstaionMapping}`}>
       <h2 className={styles.tableHeading}>Conversation Mapping</h2>
 
     <div className={`table-responsive ${styles.tableContainer}`}>
