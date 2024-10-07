@@ -1,30 +1,25 @@
 /* src/components/page.module.css */
 
 .mainContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+ 
   /* Center horizontally */
-  min-height: 100vh;
-  background: #f8f9fa;
-  transition: margin-left 0.1s ease;
+
+  /* background: #f8f9fa; */
 
 }
 
-.mainContainer.sidebar-visible {
-  margin-left: 90px;
-  /* Adjust as needed */
+.tableContainer {
+  max-height: 400px; /* Adjust the height as needed */
+  overflow-y: auto; 
+  
+  /* Enable vertical scrolling */
 }
 
 
-.container {
-  width: 80%;
-  background-color: #fff;
-  padding: 20px;
-  margin-top: 7%;
-  border-radius: 10px;
-  /* Optional: For rounded corners around the container */
+.customTable{
+  width: 100%;
 }
+
 
 .tableHeading {
   align-self: flex-start;
@@ -35,7 +30,6 @@
 }
 
 .conversationTable {
-  width: 100%;
   background-color: white;
   border-collapse: collapse;
   /* Collapse borders to avoid double borders */
@@ -82,6 +76,16 @@
   transition: backdrop-filter 0.3s;
 }
 
+.tableContainer {
+  min-height: 700px; /* Adjust according to your layout */
+  margin-bottom: 20px; /* Space for pagination */
+}
+
+.paginationContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: auto; /* Push it to the bottom */
+}
 .pagination {
   display: flex;
   justify-content: center;
@@ -103,9 +107,7 @@
   text-decoration: none;
 }
 
-/* .pagination li a:hover {
-  background-color: #e9ecef;
-} */
+
 
 .pagination .active a {
   background-color: #3361FF;
