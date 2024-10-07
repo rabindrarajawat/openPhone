@@ -36,12 +36,10 @@ export class UsersService {
     roleName: string;
   }> {
     try {
-      console.log('Received DTO:', createUserDto); // Debugging line
-  
+   
       const { roleid, password, ...rest } = createUserDto;
       
-      console.log('Extracted password:', password); // Debugging line
-  
+   
       if (!password) {
         throw new HttpException('Password is required', HttpStatus.BAD_REQUEST);
       }
@@ -54,8 +52,7 @@ export class UsersService {
   
       const hashedPassword = await bcrypt.hash(password, 10); // Hash the password with a salt
   
-      console.log('Hashed password:', hashedPassword); // Debugging line
-  
+   
       const newUser = this.usersRepository.create({
         ...rest,
         password: hashedPassword,
