@@ -16,11 +16,11 @@ function Sidebar() {
               <Image
                 src="/upicon.svg"
                 alt="Logo"
-                className=""
+                className="ms-1"
                 width={50}
                 height={50}
               />
-              <p className={`${styles.dash}`}>Dashboard</p>
+              <p className={`${styles.dash} `}>Dashboard</p>
             </Link>
 
             <Link href={'/conversationmapping'}>
@@ -28,7 +28,7 @@ function Sidebar() {
             <Image
               src="/mapingi.svg"
               alt="Logo"
-              className={styles.logo2}
+              className="ms-2"
               width={50}
               height={50}
             />
