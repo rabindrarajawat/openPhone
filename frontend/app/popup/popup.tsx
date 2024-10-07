@@ -31,12 +31,10 @@ const Popup =
           Authorization: `Bearer ${token}`,
         },
       };
-      console.log('Token being used:', token);
-      const fetchAddresses = async () => {
+       const fetchAddresses = async () => {
         try {
           const response = await axios.get(`${Base_Url}address/getalladdress`, config);
-          console.log('API response:', response.data);
-
+ 
           if (Array.isArray(response.data)) {
             const addressesArray = response.data.map((item: any) => item.address);
             setAddresses(addressesArray);
@@ -67,9 +65,7 @@ const Popup =
           Authorization: `Bearer ${token}`,
         },
       };
-      console.log('Token being used:', token);
-      console.log('Save button clicked'); // Debug line
-      if (!selectedAddress) {
+       if (!selectedAddress) {
         toast.error('Please select an address before saving.');
         return;
       }
