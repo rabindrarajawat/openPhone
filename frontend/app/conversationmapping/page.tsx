@@ -25,7 +25,7 @@ const ConversationTable = () => {
   const [selectedRecord, setSelectedRecord] = useState<ConversationRecord | null>(null);
   const [selectedAddress, setSelectedAddress] = useState('Search Address');
   const [currentPage, setCurrentPage] = useState(0);
-  const recordsPerPage = 5; // Set records per page to 5
+  const recordsPerPage = 10; // Set records per page to 5
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
   useEffect(() => {
@@ -113,57 +113,64 @@ const ConversationTable = () => {
     <div>
       <Navbar
       />
-      
-      <div className={`container ${styles.mainContainer} ${isSidebarVisible ? styles.sidebarVisible : ''}`}>
-        <Container className={styles.container}>
-          <h2 className={styles.tableHeading}>Conversation Mapping</h2>
-          <Table bordered hover className={styles.conversationTable}>
-            <thead>
-              <tr>
-                <th>Conversation ID</th>
-                <th>From Number</th>
-                <th>To Number</th>
-                <th>Messages</th>
+
+      <div className={`container`}>
+      <h2 className={styles.tableHeading}>Conversation Mapping</h2>
+
+    <div className={`table-responsive ${styles.tableContainer}`}>
+      <table className={`table table-bordered table-hover ${styles.customTable}`}>
+        <thead>
+          <tr>
+            <th>Conversation ID</th>
+            <th>From Number</th>
+            <th>To Number</th>
+            <th>Messages</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentPageData.length > 0 ? (
+            currentPageData.map((record, index) => (
+              <tr key={index} onClick={() => handleRowClick(record)}>
+                <td>{record.conversation_id}</td>
+                <td>{record.from}</td>
+                <td>{record.to}</td>
+                <td>{record.body}</td>
               </tr>
-            </thead>
-            <tbody>
-              {currentPageData.length > 0 ? (
-                currentPageData.map((record, index) => (
-                  <tr key={index} onClick={() => handleRowClick(record)}>
-                    <td>{record.conversation_id}</td>
-                    <td>{record.from}</td>
-                    <td>{record.to}</td>
-                    <td>{record.body}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4}>No records found</td>
-                </tr>
-              )}
-            </tbody>
-          </Table>
-          <ReactPaginate
-            previousLabel={'<'}
-            nextLabel={'>'}
-            breakLabel={'...'}
-            pageCount={pageCount}
-            marginPagesDisplayed={2}
-            pageRangeDisplayed={3}
-            onPageChange={handlePageClick}
-            containerClassName={styles.pagination}
-            activeClassName={styles.active}
-          />
-          {selectedRecord && (
-            <Popup
-              show={showPopup}
-              onHide={handlePopupClose}
-              conversationId={selectedRecord.conversation_id}
-              onSaveSuccess={fetchData} // Pass the fetchData function to Popup
-            />
+            ))
+          ) : (
+            <tr>
+              <td colSpan={4}>No records found</td>
+            </tr>
           )}
-        </Container>
-      </div>
+        </tbody>
+      </table>
+    </div>
+
+    {selectedRecord && (
+      <Popup
+        show={showPopup}
+        onHide={handlePopupClose}
+        conversationId={selectedRecord.conversation_id}
+        onSaveSuccess={fetchData}
+      />
+    )}
+
+    
+</div>
+<div className={styles.paginationContainer}>
+      <ReactPaginate
+        previousLabel={'<'}
+        nextLabel={'>'}
+        breakLabel={'...'}
+        pageCount={pageCount}
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={3}
+        onPageChange={handlePageClick}
+        containerClassName={styles.pagination}
+        activeClassName={styles.active}
+      />
+    </div>
+
     </div>
   );
 };
