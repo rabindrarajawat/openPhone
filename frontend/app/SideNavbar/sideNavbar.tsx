@@ -4,8 +4,7 @@ import Link from 'next/link'; // Import Link from Next.js
 
 function Sidebar() {
   const handleLogout = () => {
-    console.log("Logout clicked"); // Debugging line
-    localStorage.removeItem("authToken");
+     localStorage.removeItem("authToken");
     window.location.href = "/"
   };
   return (
