@@ -889,7 +889,7 @@ const Dashboard = () => {
                           height={12}
                         />
                       </button>
-                      <div className={` ms-4${isType ? "show" : ""}`}>
+                      <div className={`ms-4 ${isType ? "show" : ""}`}>
                         <li className="dropdown-item">
                           <input
                             type="checkbox"
@@ -930,7 +930,7 @@ const Dashboard = () => {
                           height={12}
                         />
                       </button>
-                      <div className={`ms-4${isType ? "show" : ""}`}>
+                      <div className={`ms-4 ${isType ? "show" : ""}`}>
                         <li className="dropdown-item">
                           <input
                             type="checkbox"
@@ -960,6 +960,17 @@ const Dashboard = () => {
                           />
                           <label className="ms-2" htmlFor="taxDeed">
                             Tax deed
+                          </label>
+                        </li>
+                        <li className="dropdown-item pt-2">
+                          <input
+                            type="checkbox"
+                            className={styles.checkBox}
+                            id="taxDeed"
+                            onChange={() => handleCheckboxChange(4)}
+                          />
+                          <label className="ms-2" htmlFor="taxDeed">
+                            Tax disaster
                           </label>
                         </li>
                       </div>

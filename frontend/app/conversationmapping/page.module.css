@@ -5,13 +5,14 @@
 .tableContainer {
   max-height: 400px; /* Adjust the height as needed */
   overflow-y: auto; 
-  margin-left: 82px;
+  margin-left: 93px;
   /* Enable vertical scrolling */
 }
 
 
 .customTable{
   width: 100%;
+  cursor: pointer;
 }
 
 
@@ -33,7 +34,7 @@
   border-radius: 10px;
   /* Add border-radius */
   overflow: hidden;
-  cursor: pointer;
+  cursor:pointer;
 }
 
 .conversationTable th,
