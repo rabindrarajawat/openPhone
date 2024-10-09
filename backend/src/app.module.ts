@@ -28,8 +28,7 @@ import { BookmarkEntity } from "./entities/bookmark.entity";
 import { NotificationEntity } from "./entities/notification.entity";
 import { BookmarkModule } from "./module/bookmark.module";
 import { NotificationModule } from "./module/notification.module";
-import { AuthGuard } from "./authguard/auth.guard";
-import { JwtModule } from "@nestjs/jwt";
+ import { TemplatesExpressionsEntity } from "./entities/template-expressions.entity";
  
 @Module({
   imports: [
@@ -51,9 +50,9 @@ import { JwtModule } from "@nestjs/jwt";
           OpenPhoneEventDirectionEntity,
           CaseEventEntity,
           TaxDeadEntity,
-          MessageMasterEntity, MessageMasterEntity, AddressMappingEntity, UserEntity, RoleEntity, conversationmapping,BookmarkEntity,NotificationEntity
+          MessageMasterEntity, MessageMasterEntity, AddressMappingEntity, UserEntity, RoleEntity, conversationmapping,BookmarkEntity,NotificationEntity,TemplatesExpressionsEntity
         ],
-        synchronize: true,
+        synchronize: false,
         migrations: [__dirname + "/migrations/**/*{.ts,.js}"],
         migrationsRun: true,
       }),
