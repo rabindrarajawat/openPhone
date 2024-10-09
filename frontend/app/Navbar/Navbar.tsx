@@ -53,7 +53,9 @@ const Navbar: React.FC = () => {
     if (token) {
       try {
         const decodedToken: any = jwtDecode(token);
-        setUserName(decodedToken.name);
+        const fullName = decodedToken.name;
+        const firstName = fullName.split(' ')[0]; // Get only the first name
+        setUserName(firstName);
       } catch (error) {
         console.error("Failed to decode token:", error);
       }

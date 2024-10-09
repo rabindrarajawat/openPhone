@@ -112,7 +112,7 @@ const Popup =
               </button>
               {isDropdownOpen && (
                 <div className={styles.dropdownMenu}>
-                  <Form.Control
+                  <input
                     type="text"
                     placeholder="Search Address"
                     value={searchTerm}

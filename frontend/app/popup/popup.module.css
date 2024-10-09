@@ -10,9 +10,8 @@
 .searchInput {
     border: 3px solid #D7F5DC;
     margin-left: 5px;
-    border-radius: 20px;
-    width: 50%;
-
+    /* border-radius: 20px; */
+    width: 61%;
 }
 
 .dropdownItem {
