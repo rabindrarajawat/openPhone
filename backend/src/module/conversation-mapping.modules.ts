@@ -29,10 +29,11 @@ import { NotificationEntity } from "src/entities/notification.entity";
 import { NotificationGateway } from "src/gateways/notification.gateway";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
+import { TemplatesExpressionsEntity } from "src/entities/template-expressions.entity";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([AddressEntity, conversationmapping, OpenPhoneEventEntity, AuctionEventEntity,NotificationGateway,NotificationEntity])
+        TypeOrmModule.forFeature([AddressEntity, conversationmapping, OpenPhoneEventEntity, AuctionEventEntity,NotificationGateway,NotificationEntity,TemplatesExpressionsEntity])
     ],
     controllers: [ConversationMapingController],
     providers: [ConversationMapingService, OpenPhoneEventService, AddressService, AuctionEventService,NotificationService,NotificationGateway,JwtService,ConfigService],
