@@ -91,41 +91,19 @@ export class AddressController {
     }
   }
 
-  // @Get("getalladdress")
-  // async getAllAddressData() {
-  //   try {
-  //     const addressData = await this.addressService.findAll();
-  //     const filteredAddresses = addressData.filter(
-  //       (address) => address?.is_active === true
-  //     );
-  //     return filteredAddresses;
-  //   } catch (error) {
-  //     console.error("Error in getAllAddressData:", error);
-  //     throw new InternalServerErrorException("Failed to get all address data");
-  //   }
-  // }
-
   @Get("getalladdress")
-  async getAllAddressData(@Query("page") page: number, @Query("limit") limit: number) {
+  async getAllAddressData() {
     try {
-      // Set default values for pagination if not provided
-      page = page && page > 0 ? page : 1;
-      limit = limit && limit > 0 ? limit : 10;
-
-      const { data, totalCount } = await this.addressService.findAll(page, limit);
-      return {
-        data,
-        totalCount,
-        currentPage: page,
-        totalPages: Math.ceil(totalCount / limit),
-      };
+      const addressData = await this.addressService.findAll();
+      const filteredAddresses = addressData.filter(
+        (address) => address?.is_active === true
+      );
+      return filteredAddresses;
     } catch (error) {
       console.error("Error in getAllAddressData:", error);
       throw new InternalServerErrorException("Failed to get all address data");
     }
   }
-
-
 
   @Get("search")
   async searchAddresses(@Query("address") searchTerm: string) {
