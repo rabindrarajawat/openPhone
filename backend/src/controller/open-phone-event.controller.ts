@@ -20,12 +20,15 @@ export class OpenPhoneEventController {
   constructor(
     private readonly openPhoneEventService: OpenPhoneEventService,
     private readonly addressService: AddressService
-  ) { }
+  ) {}
 
   @Post()
   async createOpenPhoneEvent(@Body() payload: any) {
     try {
-      console.log("🚀 ~ OpenPhoneEventController ~ createOpenPhoneEvent ~ payload:", payload);
+      console.log(
+        "🚀 ~ OpenPhoneEventController ~ createOpenPhoneEvent ~ payload:",
+        payload
+      );
 
       // Check for empty or null payload
       if (!payload || Object.keys(payload).length === 0) {
@@ -33,8 +36,8 @@ export class OpenPhoneEventController {
       }
 
       // Proceed with creating the event
-      const { openPhoneEvent, addressCreated } = await this.openPhoneEventService.create(payload);
-
+      const { openPhoneEvent, addressCreated } =
+        await this.openPhoneEventService.create(payload);
 
       // If no entry was created in openPhoneEvent
       if (!openPhoneEvent || !openPhoneEvent.id) {
@@ -53,13 +56,11 @@ export class OpenPhoneEventController {
       };
     } catch (error) {
       console.error("Error in createOpenPhoneEvent:", error);
-      throw new InternalServerErrorException("Failed to create open phone event");
+      throw new InternalServerErrorException(
+        "Failed to create open phone event"
+      );
     }
   }
-
-
-
-
 
   // @Post()
   // async createOpenPhoneEvent(
@@ -96,12 +97,6 @@ export class OpenPhoneEventController {
   //     throw new InternalServerErrorException("Failed to create open phone event");
   //   }
   // }
-
-
-
-
-
-
 
   @Get("events")
   @UseGuards(AuthGuard)
@@ -164,42 +159,15 @@ export class OpenPhoneEventController {
     }
   }
 
-  // @Get("getConversationsWithoutAddress")
-  // @UseGuards(AuthGuard)
-  // async getConversationsWithoutAddress() {
-  //   try {
-  //     const conversationIds =
-  //       await this.openPhoneEventService.findConversationsWithoutAddress();
-  //     return {
-  //       message: "Conversations without address IDs fetched successfully.",
-  //       data: conversationIds,
-  //     };
-  //   } catch (error) {
-  //     console.error("Error in getConversationsWithoutAddress:", error);
-  //     throw new InternalServerErrorException(
-  //       "Failed to fetch conversations without address"
-  //     );
-  //   }
-  // }
-
-
   @Get("getConversationsWithoutAddress")
   @UseGuards(AuthGuard)
-  async getConversationsWithoutAddress(
-    @Query("limit") limit: number = 10,  // Default to 10 if not provided
-    @Query("page") page: number = 1       // Default to page 1 if not provided
-  ) {
+  async getConversationsWithoutAddress() {
     try {
-      // Call the service method with pagination parameters
-      const { data, totalCount, totalPages, currentPage } =
-        await this.openPhoneEventService.findConversationsWithoutAddress(page,limit);
-  
+      const conversationIds =
+        await this.openPhoneEventService.findConversationsWithoutAddress();
       return {
         message: "Conversations without address IDs fetched successfully.",
-        data,
-        totalCount,  // Total number of conversations without address
-        totalPages,  // Total pages based on limit and totalCount
-        currentPage, // The current page being viewed
+        data: conversationIds,
       };
     } catch (error) {
       console.error("Error in getConversationsWithoutAddress:", error);
@@ -208,8 +176,6 @@ export class OpenPhoneEventController {
       );
     }
   }
-  
-
 
   @Get()
   @UseGuards(AuthGuard)

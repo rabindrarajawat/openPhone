@@ -220,7 +220,7 @@ export class OpenPhoneEventService {
       openPhoneEvent.contact_established = "NA";
       openPhoneEvent.dead = "No";
       openPhoneEvent.keep_an_eye = "Yes";
-      openPhoneEvent.is_stop = messageData.body === "Stop" ? true : false;
+      openPhoneEvent.is_stop = messageData.body.toUpperCase() === "STOP" ? true : false;
       openPhoneEvent.created_by = "Admin";
       openPhoneEvent.phone_number_id = messageData.phoneNumberId;
       openPhoneEvent.user_id = messageData.userId;
@@ -493,92 +493,92 @@ export class OpenPhoneEventService {
     };
   }
 
-  // async findConversationsWithoutAddress(): Promise<any[]> {
-  //   const subQuery = this.openPhoneEventRepository
-  //     .createQueryBuilder("sub_event")
-  //     .select("sub_event.conversation_id")
-  //     .where("sub_event.address_id IS NOT NULL");
-
-  //   const openPhoneEvents = await this.openPhoneEventRepository
-  //     .createQueryBuilder("event")
-  //     .select(["event.conversation_id", "event.from", "event.to", "event.body"])
-  //     .where("event.address_id IS NULL")
-  //     .andWhere("event.conversation_id NOT IN (" + subQuery.getQuery() + ")")
-  //     .distinct(true)
-  //     .getRawMany();
-
-  //   return openPhoneEvents.map((event) => ({
-  //     conversation_id: event.event_conversation_id,
-  //     from: event.event_from,
-  //     to: event.event_to,
-  //     body: event.event_body,
-  //   }));
-  // }
-
-  async findConversationsWithoutAddress(
-    page: number = 1, // Default to 1 if not provided
-    limit: number = 10 // Default to 10 if not provided
-  ): Promise<{
-    data: any[];
-    totalCount: number;
-    currentPage: number;
-    totalPages: number;
-  }> {
-    // Validate that page and limit are numbers
-    if (isNaN(page) || page <= 0) {
-      page = 1;
-    }
-    if (isNaN(limit) || limit <= 0) {
-      limit = 10;
-    }
-
+  async findConversationsWithoutAddress(): Promise<any[]> {
     const subQuery = this.openPhoneEventRepository
       .createQueryBuilder("sub_event")
       .select("sub_event.conversation_id")
       .where("sub_event.address_id IS NOT NULL");
 
-    // Calculate the offset for pagination
-    const offset = (page - 1) * limit;
+    const openPhoneEvents = await this.openPhoneEventRepository
+      .createQueryBuilder("event")
+      .select(["event.conversation_id", "event.from", "event.to", "event.body"])
+      .where("event.address_id IS NULL")
+      .andWhere("event.conversation_id NOT IN (" + subQuery.getQuery() + ")")
+      .distinct(true)
+      .getRawMany();
 
-    console.log(`Page: ${page}, Limit: ${limit}, Offset: ${offset}`);
+    return openPhoneEvents.map((event) => ({
+      conversation_id: event.event_conversation_id,
+      from: event.event_from,
+      to: event.event_to,
+      body: event.event_body,
+    }));
+  }
 
-    try {
-      const [openPhoneEvents, totalCount] = await this.openPhoneEventRepository
-        .createQueryBuilder("event")
-        .select([
-          "event.conversation_id",
-          "event.from",
-          "event.to",
-          "event.body",
-        ])
-        .where("event.address_id IS NULL")
-        .andWhere("event.conversation_id NOT IN (" + subQuery.getQuery() + ")")
-        .distinct(true)
-        .skip(offset) // Ensure `offset` is a valid number
-        .take(limit)
-        .getManyAndCount();
+  // async findConversationsWithoutAddress(
+  //   page: number = 1, // Default to 1 if not provided
+  //   limit: number = 10 // Default to 10 if not provided
+  // ): Promise<{
+  //   data: any[];
+  //   totalCount: number;
+  //   currentPage: number;
+  //   totalPages: number;
+  // }> {
+  //   // Validate that page and limit are numbers
+  //   if (isNaN(page) || page <= 0) {
+  //     page = 1;
+  //   }
+  //   if (isNaN(limit) || limit <= 0) {
+  //     limit = 10;
+  //   }
+
+  //   const subQuery = this.openPhoneEventRepository
+  //     .createQueryBuilder("sub_event")
+  //     .select("sub_event.conversation_id")
+  //     .where("sub_event.address_id IS NOT NULL");
+
+  //   // Calculate the offset for pagination
+  //   const offset = (page - 1) * limit;
+
+  //   // console.log(`Page: ${page}, Limit: ${limit}, Offset: ${offset}`);
+
+  //   try {
+  //     const [openPhoneEvents, totalCount] = await this.openPhoneEventRepository
+  //       .createQueryBuilder("event")
+  //       .select([
+  //         "event.conversation_id",
+  //         "event.from",
+  //         "event.to",
+  //         "event.body",
+  //       ])
+  //       .where("event.address_id IS NULL")
+  //       .andWhere("event.conversation_id NOT IN (" + subQuery.getQuery() + ")")
+  //       .distinct(true)
+  //       .skip(offset) // Ensure `offset` is a valid number
+  //       .take(limit)
+  //       .getManyAndCount();
 
  
-      const data = openPhoneEvents.map((event) => ({
-        conversation_id: event.conversation_id,
-        from: event.from,
-        to: event.to,
-        body: event.body,
-      }));
+  //     const data = openPhoneEvents.map((event) => ({
+  //       conversation_id: event.conversation_id,
+  //       from: event.from,
+  //       to: event.to,
+  //       body: event.body,
+  //     }));
 
-      return {
-        data,
-        totalCount,
-        currentPage: page,
-        totalPages: Math.ceil(totalCount / limit),
-      };
-    } catch (error) {
-      console.error("Error in findConversationsWithoutAddress:", error);
-      throw new InternalServerErrorException(
-        `Error fetching conversations: ${error.message}`
-      );
-    }
-  }
+  //     return {
+  //       data,
+  //       totalCount,
+  //       currentPage: page,
+  //       totalPages: Math.ceil(totalCount / limit),
+  //     };
+  //   } catch (error) {
+  //     console.error("Error in findConversationsWithoutAddress:", error);
+  //     throw new InternalServerErrorException(
+  //       `Error fetching conversations: ${error.message}`
+  //     );
+  //   }
+  // }
 
   async findAllFiltered(filter?: "delivered" | "received") {
     const query = this.openPhoneEventRepository
