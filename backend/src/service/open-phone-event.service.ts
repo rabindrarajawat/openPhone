@@ -220,7 +220,7 @@ export class OpenPhoneEventService {
       openPhoneEvent.contact_established = "NA";
       openPhoneEvent.dead = "No";
       openPhoneEvent.keep_an_eye = "Yes";
-      openPhoneEvent.is_stop = messageData.body === "Stop" ? true : false;
+      openPhoneEvent.is_stop = messageData.body.toUpperCase() === "STOP" ? true : false;
       openPhoneEvent.created_by = "Admin";
       openPhoneEvent.phone_number_id = messageData.phoneNumberId;
       openPhoneEvent.user_id = messageData.userId;
@@ -515,7 +515,15 @@ export class OpenPhoneEventService {
   //   }));
   // }
 
-  async findConversationsWithoutAddress(
+
+
+
+ 
+
+
+
+
+ async findConversationsWithoutAddress(
     page: number = 1, // Default to 1 if not provided
     limit: number = 10 // Default to 10 if not provided
   ): Promise<{
@@ -540,7 +548,7 @@ export class OpenPhoneEventService {
     // Calculate the offset for pagination
     const offset = (page - 1) * limit;
 
-    console.log(`Page: ${page}, Limit: ${limit}, Offset: ${offset}`);
+    // console.log(`Page: ${page}, Limit: ${limit}, Offset: ${offset}`);
 
     try {
       const [openPhoneEvents, totalCount] = await this.openPhoneEventRepository
@@ -578,7 +586,10 @@ export class OpenPhoneEventService {
         `Error fetching conversations: ${error.message}`
       );
     }
-  }
+  } 
+
+
+
 
   async findAllFiltered(filter?: "delivered" | "received") {
     const query = this.openPhoneEventRepository
@@ -666,3 +677,7 @@ export class OpenPhoneEventService {
     });
   }
 }
+
+
+
+
