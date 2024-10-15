@@ -30,86 +30,91 @@ export class OpenPhoneEventService {
     private openPhoneEventRepository: Repository<OpenPhoneEventEntity>,
     @InjectRepository(AddressEntity)
     @InjectRepository(TemplatesExpressionsEntity)
-
     private addressRepository: Repository<AddressEntity>,
     private addressService: AddressService,
     private auctionService: AuctionEventService,
     private notificationService: NotificationService,
     @InjectRepository(TemplatesExpressionsEntity)
-    private templateExpressionsRepository: Repository<TemplatesExpressionsEntity>,
-  ) {
-   }
+    private templateExpressionsRepository: Repository<TemplatesExpressionsEntity>
+  ) {}
 
-private extractInformation(message: string, templates: any[]) {
-  // Use the first template since we're storing all expressions in one record
-  const template = templates[0];
-  
-  const createRegExp = (pattern: string) => {
-    if (!pattern) return null;
-    pattern = pattern.replace(/;$/, ''); // Remove trailing semicolon if present
-    const lastSlashIndex = pattern.lastIndexOf('/');
-    if (lastSlashIndex === -1) {
-      // If the pattern doesn't include slashes, wrap it with slashes and add 'i' flag
-      return new RegExp(pattern, 'i');
+  private extractInformation(message: string, templates: any[]) {
+    // Use the first template since we're storing all expressions in one record
+    const template = templates[0];
+
+    const createRegExp = (pattern: string) => {
+      if (!pattern) return null;
+      pattern = pattern.replace(/;$/, ""); // Remove trailing semicolon if present
+      const lastSlashIndex = pattern.lastIndexOf("/");
+      if (lastSlashIndex === -1) {
+        // If the pattern doesn't include slashes, wrap it with slashes and add 'i' flag
+        return new RegExp(pattern, "i");
+      }
+      const flags = pattern.slice(lastSlashIndex + 1); // Extract flags
+      const patternBody = pattern.slice(1, lastSlashIndex); // Extract pattern
+      return new RegExp(patternBody, flags);
+    };
+
+    // Extract regex patterns from the template
+    const addressRegex = createRegExp(template.address_expression);
+    const auctionTypeRegex = createRegExp(template.type_expression);
+    const disasterAssistanceRegex = createRegExp(
+      template.disaster_assistance_expression
+    );
+    const nameRegex = createRegExp(template.name_regex);
+    const dateRegex = createRegExp(template.date_regex);
+
+    // Match the message against all patterns
+    const addressMatch = addressRegex ? message.match(addressRegex) : null;
+    const auctionTypeMatch = auctionTypeRegex
+      ? message.match(auctionTypeRegex)
+      : null;
+    const disasterAssistanceMatch = disasterAssistanceRegex
+      ? message.match(disasterAssistanceRegex)
+      : null;
+    const nameMatch = nameRegex ? message.match(nameRegex) : null;
+    const dateMatch = dateRegex ? message.match(dateRegex) : null;
+
+    // Extract the address correctly from either of the matched groups
+    const extractedAddress = addressMatch
+      ? (addressMatch[1] || addressMatch[2])?.trim()
+      : null;
+
+    // Determine the auction type based on the message content
+    let auctionType = null;
+
+    if (disasterAssistanceMatch) {
+      auctionType = "disaster assistance";
+    } else if (auctionTypeMatch) {
+      auctionType = auctionTypeMatch[1]?.toLowerCase();
     }
-    const flags = pattern.slice(lastSlashIndex + 1); // Extract flags
-    const patternBody = pattern.slice(1, lastSlashIndex); // Extract pattern
-    return new RegExp(patternBody, flags);
-  };
 
-  // Extract regex patterns from the template
-  const addressRegex = createRegExp(template.address_expression);
-  const auctionTypeRegex = createRegExp(template.type_expression);
-  const disasterAssistanceRegex = createRegExp(template.disaster_assistance_expression);
-  const nameRegex = createRegExp(template.name_regex);
-  const dateRegex = createRegExp(template.date_regex);
+    // Helper function to parse date string to Date object
+    const parseDate = (dateString: string): Date | null => {
+      try {
+        const [month, day] = dateString.split("/").map(Number);
+        if (month && day) {
+          const currentYear = new Date().getFullYear();
+          const date = new Date(currentYear, month - 1, day + 1);
+          return isNaN(date.getTime()) ? null : date;
+        }
+        return null;
+      } catch {
+        return null;
+      }
+    };
 
-  // Match the message against all patterns
-  const addressMatch = addressRegex ? message.match(addressRegex) : null;
-  const auctionTypeMatch = auctionTypeRegex ? message.match(auctionTypeRegex) : null;
-  const disasterAssistanceMatch = disasterAssistanceRegex ? message.match(disasterAssistanceRegex) : null;
-  const nameMatch = nameRegex ? message.match(nameRegex) : null;
-  const dateMatch = dateRegex ? message.match(dateRegex) : null;
-
-  // Extract the address correctly from either of the matched groups
-  const extractedAddress = addressMatch ? (addressMatch[1] || addressMatch[2])?.trim() : null;
-
-  // Determine the auction type based on the message content
-  let auctionType = null;
-
-  if (disasterAssistanceMatch) {
-    auctionType = 'disaster assistance';
-  } else if (auctionTypeMatch) {
-    auctionType = auctionTypeMatch[1]?.toLowerCase();
+    return {
+      address: extractedAddress,
+      auction_type: auctionType,
+      name: nameMatch ? nameMatch[1]?.trim() : null,
+      date: dateMatch ? parseDate(dateMatch[1]) : null,
+    };
   }
 
-  // Helper function to parse date string to Date object
-  const parseDate = (dateString: string): Date | null => {
+  async create(payload: OpenPhoneEventDto) {
+    const templates = await this.templateExpressionsRepository.find();
     try {
-      const [month, day] = dateString.split('/').map(Number);
-      if (month && day) {
-        const currentYear = new Date().getFullYear();
-        const date = new Date(currentYear, month-1, day+1);
-        return isNaN(date.getTime()) ? null : date;
-      }
-      return null;
-    } catch {
-      return null;
-    }
-  };
-
-  return {
-    address: extractedAddress,
-    auction_type: auctionType,
-    name: nameMatch ? nameMatch[1]?.trim() : null,
-    date: dateMatch ? parseDate(dateMatch[1]) : null,
-  };
-}
-
-
-async create(payload: OpenPhoneEventDto) {
-  const templates = await this.templateExpressionsRepository.find();
-     try {
       if (!payload || !payload.data || !payload.data.object) {
         return { openPhoneEvent: null, addressCreated: false };
       }
@@ -131,10 +136,13 @@ async create(payload: OpenPhoneEventDto) {
 
       if (body) {
         const extractedInfo = this.extractInformation(body, templates);
-        console.log("🚀 ~ OpenPhoneEventService ~ create ~ extractedInfo:", extractedInfo);
+        console.log(
+          "🚀 ~ OpenPhoneEventService ~ create ~ extractedInfo:",
+          extractedInfo
+        );
 
         auctionTypeId = this.auctionTypeId(extractedInfo.auction_type);
- 
+
         // Only try to save the address if it's not null
         if (extractedInfo.address) {
           const existingAddress = await this.addressRepository.findOne({
@@ -182,22 +190,22 @@ async create(payload: OpenPhoneEventDto) {
           }
         }
       }
-  //  Message related to existing conversation
-  
-  // else if (existingEvent?.address_id) {
-  //   await this.addressRepository.update(
-  //     { id: existingEvent.address_id },
-  //     { modified_at: new Date() }
-  //   );
-  //   addressId = existingEvent.address_id;
-  // }
-  
+      //  Message related to existing conversation
+
+      // else if (existingEvent?.address_id) {
+      //   await this.addressRepository.update(
+      //     { id: existingEvent.address_id },
+      //     { modified_at: new Date() }
+      //   );
+      //   addressId = existingEvent.address_id;
+      // }
+
       // Creating the event regardless of the address presence
       const openPhoneEvent = new OpenPhoneEventEntity();
       openPhoneEvent.event_type_id = eventTypeId;
       openPhoneEvent.address_id =
         addressId || existingEvent?.address_id || null; // Keep null if no address
-      openPhoneEvent.auction_event_id = !existingEvent ?  auctionTypeId:null;
+      openPhoneEvent.auction_event_id = !existingEvent ? auctionTypeId : null;
       openPhoneEvent.event_direction_id = this.getEventDirectionId(
         messageData.direction
       );
@@ -230,12 +238,12 @@ async create(payload: OpenPhoneEventDto) {
       const savedOpenPhoneEvent =
         await this.openPhoneEventRepository.save(openPhoneEvent);
 
-        if (savedOpenPhoneEvent.address_id) {
-          await this.addressRepository.update(
-            { id: savedOpenPhoneEvent.address_id },
-            { modified_at: new Date() }
-          );
-        }
+      if (savedOpenPhoneEvent.address_id) {
+        await this.addressRepository.update(
+          { id: savedOpenPhoneEvent.address_id },
+          { modified_at: new Date() }
+        );
+      }
       await this.notificationService.createNotification(savedOpenPhoneEvent.id);
       const auctionEventDto: AuctionEventDto = {
         event_id: savedOpenPhoneEvent.id,
@@ -270,7 +278,7 @@ async create(payload: OpenPhoneEventDto) {
       }
       throw new InternalServerErrorException("An unknown error occurred");
     }
-}
+  }
 
   async findAll() {
     return this.openPhoneEventRepository.find();
@@ -306,12 +314,12 @@ async create(payload: OpenPhoneEventDto) {
     switch (type?.toLowerCase()) {
       case "auction":
         return 1;
-      case "tax auction"://tax dead
+      case "tax auction": //tax dead
         return 2;
       case "foreclosure": //case
         return 3;
       case "disaster assistance":
-        return 4;  
+        return 4;
       default:
         return null;
     }
@@ -485,26 +493,91 @@ async create(payload: OpenPhoneEventDto) {
     };
   }
 
-  async findConversationsWithoutAddress(): Promise<any[]> {
+  // async findConversationsWithoutAddress(): Promise<any[]> {
+  //   const subQuery = this.openPhoneEventRepository
+  //     .createQueryBuilder("sub_event")
+  //     .select("sub_event.conversation_id")
+  //     .where("sub_event.address_id IS NOT NULL");
+
+  //   const openPhoneEvents = await this.openPhoneEventRepository
+  //     .createQueryBuilder("event")
+  //     .select(["event.conversation_id", "event.from", "event.to", "event.body"])
+  //     .where("event.address_id IS NULL")
+  //     .andWhere("event.conversation_id NOT IN (" + subQuery.getQuery() + ")")
+  //     .distinct(true)
+  //     .getRawMany();
+
+  //   return openPhoneEvents.map((event) => ({
+  //     conversation_id: event.event_conversation_id,
+  //     from: event.event_from,
+  //     to: event.event_to,
+  //     body: event.event_body,
+  //   }));
+  // }
+
+  async findConversationsWithoutAddress(
+    page: number = 1, // Default to 1 if not provided
+    limit: number = 10 // Default to 10 if not provided
+  ): Promise<{
+    data: any[];
+    totalCount: number;
+    currentPage: number;
+    totalPages: number;
+  }> {
+    // Validate that page and limit are numbers
+    if (isNaN(page) || page <= 0) {
+      page = 1;
+    }
+    if (isNaN(limit) || limit <= 0) {
+      limit = 10;
+    }
+
     const subQuery = this.openPhoneEventRepository
       .createQueryBuilder("sub_event")
       .select("sub_event.conversation_id")
       .where("sub_event.address_id IS NOT NULL");
 
-    const openPhoneEvents = await this.openPhoneEventRepository
-      .createQueryBuilder("event")
-      .select(["event.conversation_id", "event.from", "event.to", "event.body"])
-      .where("event.address_id IS NULL")
-      .andWhere("event.conversation_id NOT IN (" + subQuery.getQuery() + ")")
-      .distinct(true)
-      .getRawMany();
+    // Calculate the offset for pagination
+    const offset = (page - 1) * limit;
 
-    return openPhoneEvents.map((event) => ({
-      conversation_id: event.event_conversation_id,
-      from: event.event_from,
-      to: event.event_to,
-      body: event.event_body,
-    }));
+    console.log(`Page: ${page}, Limit: ${limit}, Offset: ${offset}`);
+
+    try {
+      const [openPhoneEvents, totalCount] = await this.openPhoneEventRepository
+        .createQueryBuilder("event")
+        .select([
+          "event.conversation_id",
+          "event.from",
+          "event.to",
+          "event.body",
+        ])
+        .where("event.address_id IS NULL")
+        .andWhere("event.conversation_id NOT IN (" + subQuery.getQuery() + ")")
+        .distinct(true)
+        .skip(offset) // Ensure `offset` is a valid number
+        .take(limit)
+        .getManyAndCount();
+
+ 
+      const data = openPhoneEvents.map((event) => ({
+        conversation_id: event.conversation_id,
+        from: event.from,
+        to: event.to,
+        body: event.body,
+      }));
+
+      return {
+        data,
+        totalCount,
+        currentPage: page,
+        totalPages: Math.ceil(totalCount / limit),
+      };
+    } catch (error) {
+      console.error("Error in findConversationsWithoutAddress:", error);
+      throw new InternalServerErrorException(
+        `Error fetching conversations: ${error.message}`
+      );
+    }
   }
 
   async findAllFiltered(filter?: "delivered" | "received") {
