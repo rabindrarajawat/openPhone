@@ -159,15 +159,41 @@ export class OpenPhoneEventController {
     }
   }
 
-  @Get("getConversationsWithoutAddress")
+  // @Get("getConversationsWithoutAddress")
+  // @UseGuards(AuthGuard)
+  // async getConversationsWithoutAddress() {
+  //   try {
+  //     const conversationIds =
+  //       await this.openPhoneEventService.findConversationsWithoutAddress();
+  //     return {
+  //       message: "Conversations without address IDs fetched successfully.",
+  //       data: conversationIds,
+  //     };
+  //   } catch (error) {
+  //     console.error("Error in getConversationsWithoutAddress:", error);
+  //     throw new InternalServerErrorException(
+  //       "Failed to fetch conversations without address"
+  //     );
+  //   }
+  // }
+
+@Get("getConversationsWithoutAddress")
   @UseGuards(AuthGuard)
-  async getConversationsWithoutAddress() {
+  async getConversationsWithoutAddress(
+    @Query("limit") limit: number = 10,  // Default to 10 if not provided
+    @Query("page") page: number = 1       // Default to page 1 if not provided
+  ) {
     try {
-      const conversationIds =
-        await this.openPhoneEventService.findConversationsWithoutAddress();
+      // Call the service method with pagination parameters
+      const { data, totalCount, totalPages, currentPage } =
+        await this.openPhoneEventService.findConversationsWithoutAddress(page,limit);
+  
       return {
         message: "Conversations without address IDs fetched successfully.",
-        data: conversationIds,
+        data,
+        totalCount,  // Total number of conversations without address
+        totalPages,  // Total pages based on limit and totalCount
+        currentPage, // The current page being viewed
       };
     } catch (error) {
       console.error("Error in getConversationsWithoutAddress:", error);
@@ -176,6 +202,12 @@ export class OpenPhoneEventController {
       );
     }
   }
+   
+
+
+
+
+
 
   @Get()
   @UseGuards(AuthGuard)
