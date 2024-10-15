@@ -1,91 +1,163 @@
 import React from 'react';
-import './pagination.css'; // Import your CSS file
 
 interface PaginationProps {
   currentPage: number;
-  totalPages: number;
+  itemsPerPage: number;
+  totalItems: number;
   onPageChange: (page: number) => void;
 }
 
-const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
+const Pagination: React.FC<PaginationProps> = ({
+  currentPage,
+  itemsPerPage,
+  totalItems,
+  onPageChange,
+}) => {
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  // Handler for Previous button
   const handlePrevious = () => {
     if (currentPage > 1) {
       onPageChange(currentPage - 1);
     }
   };
 
+  // Handler for Next button
   const handleNext = () => {
     if (currentPage < totalPages) {
       onPageChange(currentPage + 1);
-    }
+    };
   };
 
-  const pageRange = 1; // Number of pages to show around the current page
-  let startPage = Math.max(1, currentPage - Math.floor(pageRange / 2));
-  let endPage = Math.min(totalPages, startPage + pageRange - 1);
+  // Function to generate the range of page numbers to display
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxAdjacentPages = 2; // Number of pages to show on each side of the current page
 
-  // Adjust startPage if endPage is too close to totalPages
-  if (endPage - startPage < pageRange - 1) {
-    startPage = Math.max(1, endPage - pageRange + 1);
-  }
+    // Always show first and last pages
+    const firstPage = 1;
+    const lastPage = totalPages;
+
+    // Determine start and end pages
+    let startPage = Math.max(currentPage - maxAdjacentPages, firstPage);
+    let endPage = Math.min(currentPage + maxAdjacentPages, lastPage);
+
+    // Adjust if near the start
+    if (currentPage <= maxAdjacentPages + 1) {
+      startPage = firstPage;
+      endPage = Math.min(5, lastPage);
+    }
+
+    // Adjust if near the end
+    if (currentPage >= lastPage - maxAdjacentPages) {
+      startPage = Math.max(lastPage - 4, firstPage);
+      endPage = lastPage;
+    }
+
+    // Add first page
+    if (firstPage < startPage) {
+      pageNumbers.push(
+        <button
+          key={firstPage}
+          onClick={() => onPageChange(firstPage)}
+          style={buttonStyle(firstPage === currentPage)}
+        >
+          {firstPage}
+        </button>
+      );
+
+      if (startPage > firstPage + 1) {
+        pageNumbers.push(
+          <span key="start-ellipsis" style={{ margin: '0 5px' }}>
+            ...
+          </span>
+        );
+      }
+    }
+
+    // Add middle pages
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(
+        <button
+          key={i}
+          onClick={() => onPageChange(i)}
+          disabled={i === currentPage}
+          style={buttonStyle(i === currentPage)}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    // Add last page
+    if (endPage < lastPage) {
+      if (endPage < lastPage - 1) {
+        pageNumbers.push(
+          <span key="end-ellipsis" style={{ margin: '0 5px' }}>
+            ...
+          </span>
+        );
+      }
+
+      pageNumbers.push(
+        <button
+          key={lastPage}
+          onClick={() => onPageChange(lastPage)}
+          style={buttonStyle(lastPage === currentPage)}
+        >
+          {lastPage}
+        </button>
+      );
+    }
+
+    return pageNumbers;
+  };
+
+  // Helper function for button styles
+  const buttonStyle = (isActive: boolean) => ({
+    margin: '0 5px',
+    padding: '5px 10px',
+    backgroundColor: isActive ? '#007bff' : '#fff',
+    color: isActive ? '#fff' : '#000',
+    border: '1px solid #007bff',
+    borderRadius: '3px',
+    cursor: isActive ? 'default' : 'pointer',
+    disabled: isActive,
+  });
 
   return (
-    <nav className="pagination-container d-flex justify-content-center align-item-center mt-0">
-      <ul className="pagination setPagination">
-        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-          <button className="page-link" onClick={handlePrevious}>
-            &lt;
-          </button>
-        </li>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: '20px',
+      }}
+    >
+      {/* Previous Button */}
+      <button
+        onClick={handlePrevious}
+        disabled={currentPage === 1}
+        style={{ marginRight: '10px' }}
+      >prev
+      </button>
 
-        {startPage > 1 && (
-          <>
-            <li className="page-item">
-              <button className="page-link" onClick={() => onPageChange(1)}>
-                1
-              </button>
-            </li>
-            {startPage > 2 && (
-              <li className="page-item disabled">
-                <span className="page-link">...</span>
-              </li>
-            )}
-          </>
-        )}
+      {/* Page Summary */}
+      <span style={{ marginRight: '10px' }}>
+        Page {currentPage} of {totalPages}
+      </span>
 
-        {[...Array(endPage - startPage + 1)].map((_, index) => (
-          <li
-            key={startPage + index}
-            className={`page-item ${startPage + index === currentPage ? 'active' : ''}`}
-          >
-            <button className="page-link" onClick={() => onPageChange(startPage + index)}>
-              {startPage + index}
-            </button>
-          </li>
-        ))}
+      {/* Page Numbers */}
 
-        {endPage < totalPages && (
-          <>
-            {endPage < totalPages - 1 && (
-              <li className="page-item disabled">
-                <span className="page-link">...</span>
-              </li>
-            )}
-            <li className="page-item">
-              <button className="page-link" onClick={() => onPageChange(totalPages)}>
-                {totalPages}
-              </button>
-            </li>
-          </>
-        )}
-
-        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-          <button className="page-link" onClick={handleNext}>
-            &gt;
-          </button>
-        </li>
-      </ul>
-    </nav>
+      {/* Next Button */}
+      <button
+        onClick={handleNext}
+        disabled={currentPage === totalPages}
+        style={{ marginLeft: '10px' }}
+      >
+        Next
+      </button>
+    </div>
   );
 };
 

@@ -1,76 +1,9 @@
-// import { AddressDto } from "../dto/address.dto";
-// import { AddressEntity } from "../entities/address.entity";
 
-// import { Injectable, NotFoundException } from "@nestjs/common";
-// import { InjectRepository } from "@nestjs/typeorm";
-// import { ILike, Repository } from "typeorm";
-
-// @Injectable()
-// export class AddressService {
-//   constructor(
-//     @InjectRepository(AddressEntity)
-//     private addressRepository: Repository<AddressEntity>
-//   ) {}
-
-//   async createAddress(addressDto: {
-//     address: string;
-//     date: Date;
-//     auction_event_id: number;
-//   }) {
-//     try {
-//       const address = this.addressRepository.create({
-//         address: addressDto.address,
-//         date: addressDto.date,
-//         created_by: "Ram", // assuming 'Ram' is the user creating this entry
-//         is_active: true,
-//         auction_event_id: addressDto.auction_event_id,
-//       });
-
-//       return await this.addressRepository.save(address);
-//     } catch (error) {
-//       console.error("Error saving address:", error);
-//       throw new Error("Error saving address");
-//     }
-//   }
-
-//   async findAll(): Promise<AddressEntity[]> {
-//     return this.addressRepository.find();
-//   }
-
-//   async searchAddresses(searchTerm: string): Promise<AddressEntity[]> {
-//     return this.addressRepository.find({
-//       where: [
-//         { address: ILike(`%${searchTerm}%`) },
-//         { created_by: ILike(`%${searchTerm}%`) },
-//       ],
-//       take: 10,
-//     });
-//   }
-
-//   async getAddressIdByAddress(address: string): Promise<number | null> {
-//     const foundAddress = await this.addressRepository.findOne({
-//       where: { address },
-//       select: ["id"],
-//     });
-
-//     return foundAddress ? foundAddress.id : null;
-//   }
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import { Injectable, NotFoundException, InternalServerErrorException } from "@nestjs/common";
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ILike, Repository } from "typeorm";
 import { AddressDto } from "../dto/address.dto";
@@ -104,9 +37,34 @@ export class AddressService {
     }
   }
 
-  async findAll(): Promise<AddressEntity[]> {
+  // async findAll(): Promise<AddressEntity[]> {
+  //   try {
+  //     return this.addressRepository.find();
+  //   } catch (error) {
+  //     console.error("Error finding all addresses:", error);
+  //     throw new InternalServerErrorException("Error finding all addresses");
+  //   }
+  // }
+
+  async findAll(
+    page: number = 1,
+    limit: number = 10
+  ): Promise<{ data: AddressEntity[]; totalCount: number }> {
+    if (isNaN(page) || page <= 0) {
+      page = 1;
+    }
+    if (isNaN(limit) || limit <= 0) {
+      limit = 10;
+    }
     try {
-      return this.addressRepository.find();
+      const [data, totalCount] = await this.addressRepository.findAndCount({
+        where: { is_active: true },
+        order: { created_at: "DESC" },
+        skip: (page - 1) * limit,
+        take: limit,
+      });
+
+      return { data, totalCount };
     } catch (error) {
       console.error("Error finding all addresses:", error);
       throw new InternalServerErrorException("Error finding all addresses");

@@ -1,6 +1,6 @@
-'use client';
+"use client"
 import React, { useState, useEffect } from 'react';
-import { Table, Container } from 'react-bootstrap';
+import { Table, Container, Dropdown } from 'react-bootstrap';
 import axios from 'axios';
 import ReactPaginate from 'react-paginate';
 import Popup from '../popup/popup';
@@ -25,11 +25,12 @@ const ConversationTable = () => {
   const [selectedRecord, setSelectedRecord] = useState<ConversationRecord | null>(null);
   const [selectedAddress, setSelectedAddress] = useState('Search Address');
   const [currentPage, setCurrentPage] = useState(0);
-  const recordsPerPage = 10; // Set records per page to 5
+  const [recordsPerPage, setRecordsPerPage] = useState(20); // Default set to 20 records per page
+  const [totalRecords, setTotalRecords] = useState(0); // Track the total records count for pagination
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
-  useEffect(() => {
-
+  // Fetch data when page or page size changes
+  const fetchData = async () => {
     const token = localStorage.getItem('authToken');
     const config = {
       headers: {
@@ -37,25 +38,30 @@ const ConversationTable = () => {
       },
     };
 
- 
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${Base_Url}openPhoneEventData/getConversationsWithoutAddress`, config);
- 
-        const data = response.data.data; // Adjusted to match your response structure
- 
-        if (Array.isArray(data)) {
-          setRecords(data);
-        } else {
-          console.error('API response is not an array:', data);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-    fetchData();
-  }, [Base_Url]); // Dependency on config to re-fetch if token changes
+    try {
+      const response = await axios.get(`${Base_Url}openPhoneEventData/getConversationsWithoutAddress`, {
+        params: {
+          page: currentPage + 1, // API might be 1-indexed
+          limit: recordsPerPage,
+        },
+        headers: config.headers,
+      });
 
+      const data = response.data.data;
+      setTotalRecords(response.data.totalCount); // Assuming your API returns total count
+      if (Array.isArray(data)) {
+        setRecords(data);
+      } else {
+        console.error('API response is not an array:', data);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [Base_Url, currentPage, recordsPerPage]);
 
   const handleRowClick = (record: ConversationRecord) => {
     setSelectedRecord(record);
@@ -65,6 +71,7 @@ const ConversationTable = () => {
   const handlePopupClose = () => {
     setShowPopup(false);
     setSelectedRecord(null);
+    fetchData(); // Re-fetch the data after the popup is closed
   };
 
   const handleAddressSelect1 = (address: Address) => {
@@ -75,101 +82,90 @@ const ConversationTable = () => {
     setCurrentPage(selectedItem.selected);
   };
 
-  const offset = currentPage * recordsPerPage;
-  const currentPageData = records.slice(offset, offset + recordsPerPage);
-  const pageCount = Math.ceil(records.length / recordsPerPage);
-
-  const toggleSidebar = () => {
-    setIsSidebarVisible(prevState => !prevState);
+  const handleRecordsPerPageChange = (newLimit: number) => {
+    setRecordsPerPage(newLimit); // Change the records per page
+    setCurrentPage(0); // Reset to first page
   };
 
-  function fetchData(): void {
-    const token = localStorage.getItem('authToken');
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
-    axios.get(`${Base_Url}openPhoneEventData/getConversationsWithoutAddress`, config)
-      .then((response) => {
-        const data = response.data.data; // Adjust to your actual response structure
-        if (Array.isArray(data)) {
-          setRecords(data);
-        } else {
-          console.error('API response is not an array:', data);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  }
-
+  const pageCount = Math.ceil(totalRecords / recordsPerPage); // Calculate the page count based on total records and per-page records
 
   return (
     <div>
-      <Navbar
-      />
+      <Navbar />
 
       <div className={`container-fluid ${styles.converstaionMapping}`}>
-      <h2 className={styles.tableHeading}>Conversation Mapping</h2>
+        <h2 className={styles.tableHeading}>Conversation Mapping</h2>
 
-    <div className={`table-responsive ${styles.tableContainer}`}>
-      <table className={`table table-bordered table-hover ${styles.customTable}`}>
-        <thead>
-          <tr>
-            <th>Conversation ID</th>
-            <th>From Number</th>
-            <th>To Number</th>
-            <th>Messages</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentPageData.length > 0 ? (
-            currentPageData.map((record, index) => (
-              <tr key={index} onClick={() => handleRowClick(record)}>
-                <td>{record.conversation_id}</td>
-                <td>{record.from}</td>
-                <td>{record.to}</td>
-                <td>{record.body}</td>
+        <div className="d-flex justify-content-end mb-3">
+          <Dropdown>
+            <Dropdown.Toggle variant="success" id="dropdown-basic">
+              {recordsPerPage} records per page
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={() => handleRecordsPerPageChange(2)}>2</Dropdown.Item>
+              <Dropdown.Item onClick={() => handleRecordsPerPageChange(5)}>5</Dropdown.Item>
+              <Dropdown.Item onClick={() => handleRecordsPerPageChange(10)}>10</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+
+        <div className={`table-responsive ${styles.tableContainer}`}>
+          <table className={`table table-bordered table-hover ${styles.customTable}`}>
+            <thead>
+              <tr>
+                <th>Conversation ID</th>
+                <th>From Number</th>
+                <th>To Number</th>
+                <th>Messages</th>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={4}>No records found</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+            </thead>
+            <tbody>
+              {records.length > 0 ? (
+                records.map((record, index) => (
+                  <tr key={index} onClick={() => handleRowClick(record)}>
+                    <td>{record.conversation_id}</td>
+                    <td>{record.from}</td>
+                    <td>{record.to}</td>
+                    <td>{record.body}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4}>No records found</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-    {selectedRecord && (
-      <Popup
-        show={showPopup}
-        onHide={handlePopupClose}
-        conversationId={selectedRecord.conversation_id}
-        onSaveSuccess={fetchData}
-      />
-    )}
+        {selectedRecord && (
+          <Popup
+            show={showPopup}
+            onHide={handlePopupClose}
+            conversationId={selectedRecord.conversation_id} onSaveSuccess={function (): void {
+              throw new Error('Function not implemented.');
+            } }            // Pass any other necessary props here
+          />
+        )}
 
-    
-</div>
-<div className={styles.paginationContainer}>
-      <ReactPaginate
-        previousLabel={'<'}
-        nextLabel={'>'}
-        breakLabel={'...'}
-        pageCount={pageCount}
-        marginPagesDisplayed={2}
-        pageRangeDisplayed={3}
-        onPageChange={handlePageClick}
-        containerClassName={styles.pagination}
-        activeClassName={styles.active}
-      />
-    </div>
-
+        <div className={styles.paginationContainer}>
+          <ReactPaginate
+            previousLabel={'<'}
+            nextLabel={'>'}
+            breakLabel={'...'}
+            pageCount={pageCount}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={3}
+            onPageChange={handlePageClick}
+            containerClassName={styles.pagination}
+            activeClassName={styles.active}
+          />
+        </div>
+      </div>
     </div>
   );
 };
 
 export default ConversationTable;
+

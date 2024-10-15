@@ -4,6 +4,10 @@
   border: #D7F5DC solid 3px;
   z-index: 999;
   box-sizing: border-box;
+  resize: both; /* Allows resizing in both directions */
+  overflow: auto; /* Prevents overflow */
+  max-width: 100%; /* Limits the maximum width */
+
 }
 
 
