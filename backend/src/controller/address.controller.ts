@@ -105,47 +105,11 @@ export class AddressController {
   //   }
   // }
 
-
-
-
-// With server side pagination
-  @Get("getalladdress")
-  async getAllAddressData(
-    @Query("page") page: number,
-    @Query("limit") limit: number
-  ) {
-    try {
-      // Set default values for pagination if not provided
-      page = page && page > 0 ? page : 1;
-      limit = limit && limit > 0 ? limit : 10;
-
-      const { data, totalCount } = await this.addressService.findAll(
-        page,
-        limit
-      );
-      return {
-        data,
-        totalCount,
-        currentPage: page,
-        totalPages: Math.ceil(totalCount / limit),
-      };
-    } catch (error) {
-      console.error("Error in getAllAddressData:", error);
-      throw new InternalServerErrorException("Failed to get all address data");
-    }
-  }
-
-
-
-
-//Working filter for auction type id 
+  // With server side pagination
   // @Get("getalladdress")
   // async getAllAddressData(
   //   @Query("page") page: number,
-  //   @Query("limit") limit: number,
-  //   @Query("auctionEventId") auctionEventId: number, // Now using event ID instead of text
-  //   @Query("date") date: string,
-  //   @Query("address") address: string
+  //   @Query("limit") limit: number
   // ) {
   //   try {
   //     // Set default values for pagination if not provided
@@ -154,10 +118,7 @@ export class AddressController {
 
   //     const { data, totalCount } = await this.addressService.findAll(
   //       page,
-  //       limit,
-  //       auctionEventId,
-  //       date,
-  //       address
+  //       limit
   //     );
   //     return {
   //       data,
@@ -171,48 +132,275 @@ export class AddressController {
   //   }
   // }
 
+ 
 
 
 
 
-  @Get("with-responses")
-  async getAddressesWithResponses() {
-    const data = await this.addressService.getAddressesWithResponses();
-    // const mappedData = data.map((item) => {
-    //   const {
-    //     modified_at,
-    //     created_by,
-    //     modified_by,
-    //     is_active,
-    //     is_bookmarked,
-    //     events,
-    //     ...rest
-    //   } = item;
-    //   return rest;
-    // });
-    return { Count: data.length, data: data };
+
+
+
+// for all cases its working 
+  // @Get("getalladdress")
+  // async getAllAddressData(
+  //   @Query("page") page: number,
+  //   @Query("limit") limit: number,
+  //   @Query("auctionEventId") auctionEventId?: number,
+  //   @Query("filterType") filterType?: string, // 'weekly', 'monthly', or 'custom'
+  //   @Query("fromDate") fromDate?: string, // for custom date range
+  //   @Query("toDate") toDate?: string // for custom date range
+  // ) {
+  //   try {
+  //     // Set default values for pagination if not provided
+  //     page = page && page > 0 ? page : 1;
+  //     limit = limit && limit > 0 ? limit : 10;
+  //     // Call service to get filtered data
+  //     const { data, totalCount } = await this.addressService.findAll(
+  //       page,
+  //       limit,
+  //       auctionEventId,
+  //       filterType,
+  //       fromDate,
+  //       toDate
+  //     );
+
+  //     // If no data found, return a "No results found" message
+  //     if (data.length === 0) {
+  //       return {
+  //         message: "No results found",
+  //         data: [],
+  //         totalCount: 0,
+  //         currentPage: page,
+  //         totalPages: 0,
+  //       };
+  //     }
+
+  //     // Return the filtered and paginated data
+  //     return {
+  //       message: "Success",
+  //       data,
+  //       totalCount,
+  //       currentPage: page,
+  //       totalPages: Math.ceil(totalCount / limit),
+  //     };
+  //   } catch (error) {
+  //     console.error("Error in getAllAddressData:", error);
+  //     throw new InternalServerErrorException("Failed to get all address data");
+  //   }
+  // }
+
+
+//without modify sorting 
+  // @Get("getalladdress")
+  // async getAllAddressData(
+  //   @Query("page") page: number,
+  //   @Query("limit") limit: number,
+  //   @Query("auctionEventId") auctionEventId?: number,
+  //   @Query("filterType") filterType?: string,
+  //   @Query("fromDate") fromDate?: string,
+  //   @Query("toDate") toDate?: string,
+  //   @Query("withResponses") withResponses?: boolean,
+  //   @Query("withStopResponses") withStopResponses?: boolean
+  // ) {
+  //   try {
+  //     page = page && page > 0 ? page : 1;
+  //     limit = limit && limit > 0 ? limit : 10;
+
+  //     const { data, totalCount } = await this.addressService.findAll(
+  //       page,
+  //       limit,
+  //       auctionEventId,
+  //       filterType,
+  //       fromDate,
+  //       toDate,
+  //       withResponses,
+  //       withStopResponses
+  //     );
+
+  //     if (data.length === 0) {
+  //       return {
+  //         message: "No results found",
+  //         data: [],
+  //         totalCount: 0,
+  //         currentPage: page,
+  //         totalPages: 0,
+  //       };
+  //     }
+
+  //     return {
+  //       message: "Success",
+  //       data,
+  //       totalCount,
+  //       currentPage: page,
+  //       totalPages: Math.ceil(totalCount / limit),
+  //     };
+  //   } catch (error) {
+  //     console.error("Error in getAllAddressData:", error);
+  //     throw new InternalServerErrorException("Failed to get all address data");
+  //   }
+  // }
+
+
+//with modified working filter 
+  // @Get("getalladdress")
+  // async getAllAddressData(
+  //   @Query("page") page: number,
+  //   @Query("limit") limit: number,
+  //   @Query("auctionEventId") auctionEventId?: number,
+  //   @Query("filterType") filterType?: string,
+  //   @Query("fromDate") fromDate?: string,
+  //   @Query("toDate") toDate?: string,
+  //   @Query("withResponses") withResponses?: boolean,
+  //   @Query("withStopResponses") withStopResponses?: boolean,
+  //   @Query("sortBy") sortBy: string = "modified_at",
+  //   @Query("sortOrder") sortOrder: 'ASC' | 'DESC' = 'DESC'
+  // ) {
+  //   try {
+  //     page = page && page > 0 ? page : 1;
+  //     limit = limit && limit > 0 ? limit : 10;
+
+  //     const { data, totalCount } = await this.addressService.findAll(
+  //       page,
+  //       limit,
+  //       auctionEventId,
+  //       filterType,
+  //       fromDate,
+  //       toDate,
+  //       withResponses,
+  //       withStopResponses,
+  //       sortBy,
+  //       sortOrder
+  //     );
+
+  //     if (data.length === 0) {
+  //       return {
+  //         message: "No results found",
+  //         data: [],
+  //         totalCount: 0,
+  //         currentPage: page,
+  //         totalPages: 0,
+  //       };
+  //     }
+
+  //     return {
+  //       message: "Success",
+  //       data,
+  //       totalCount,
+  //       currentPage: page,
+  //       totalPages: Math.ceil(totalCount / limit),
+  //     };
+  //   } catch (error) {
+  //     console.error("Error in getAllAddressData:", error);
+  //     throw new InternalServerErrorException("Failed to get all address data");
+  //   }
+  // }
+
+
+  //with recieved and delivered
+  @Get("getalladdress")
+  async getAllAddressData(
+    @Query("page") page: number,
+    @Query("limit") limit: number,
+    @Query("auctionEventId") auctionEventId?: number,
+    @Query("filterType") filterType?: string,
+    @Query("fromDate") fromDate?: string,
+    @Query("toDate") toDate?: string,
+    @Query("withResponses") withResponses?: boolean,
+    @Query("withStopResponses") withStopResponses?: boolean,
+    @Query("sortBy") sortBy: string = "modified_at",
+    @Query("sortOrder") sortOrder: 'ASC' | 'DESC' = 'DESC',
+    @Query("eventTypeId") eventTypeId?: number
+  ) {
+    try {
+      page = page && page > 0 ? page : 1;
+      limit = limit && limit > 0 ? limit : 10;
+
+      const { data, totalCount } = await this.addressService.findAll(
+        page,
+        limit,
+        auctionEventId,
+        filterType,
+        fromDate,
+        toDate,
+        withResponses,
+        withStopResponses,
+        sortBy,
+        sortOrder,
+        eventTypeId
+      );
+
+      if (data.length === 0) {
+        return {
+          message: "No results found",
+          data: [],
+          totalCount: 0,
+          currentPage: page,
+          totalPages: 0,
+        };
+      }
+
+      return {
+        message: "Success",
+        data,
+        totalCount,
+        currentPage: page,
+        totalPages: Math.ceil(totalCount / limit),
+      };
+    } catch (error) {
+      console.error("Error in getAllAddressData:", error);
+      throw new InternalServerErrorException("Failed to get all address data");
+    }
   }
 
-  @Get("with-stop-responses")
-  async getAddressesWithStopResponses() {
-    const stopRes = await this.addressService.getAddressesWithStopResponses();
 
-    // const res = stopRes.map((item) => {
-    //   const {
-    //     created_at,
-    //     created_by,
-    //     modified_at,
-    //     modified_by,
-    //     is_active,
-    //     is_bookmarked,
-    //     date,
-    //     events,
-    //     ...rest
-    //   } = item;
-    //   return rest;
-    // });
-    return stopRes;
-  }
+
+  // @Get("with-responses")
+  // async getAddressesWithResponses(
+  //   @Query("page") page: number = 1, // Default page is 1
+  //   @Query("limit") limit: number = 10 // Default limit is 10
+  // ) {
+  //   // Set default values for pagination if not provided
+  //   page = page && page > 0 ? page : 1;
+  //   limit = limit && limit > 0 ? limit : 10;
+
+  //   const [data, totalCount] =
+  //     await this.addressService.getAddressesWithResponses(page, limit);
+
+  //   return {
+  //     totalCount, // Total number of entries
+  //     currentPage: page,
+  //     totalPages: Math.ceil(totalCount / limit),
+  //     data, // Paginated data
+  //   };
+  // }
+
+  // @Get("with-stop-responses")
+  // async getAddressesWithStopResponses(
+  //   @Query("page") page: number = 1, // Default page is 1
+  //   @Query("limit") limit: number = 10 // Default limit is 10
+  // ) {
+  //   // Ensure valid page and limit values
+  //   page = page && page > 0 ? page : 1;
+  //   limit = limit && limit > 0 ? limit : 10;
+
+  //   try {
+  //     const [data, totalCount] =
+  //       await this.addressService.getAddressesWithStopResponses(page, limit);
+
+  //     return {
+  //       totalCount, // Total number of entries
+  //       currentPage: page, // Current page
+  //       totalPages: Math.ceil(totalCount / limit), // Calculate total pages
+  //       data, // Paginated data
+  //     };
+  //   } catch (error) {
+  //     return {
+  //       statusCode: 500,
+  //       message: "An error occurred while fetching the data.",
+  //       error: error.message || "Internal Server Error",
+  //     };
+  //   }
+  // }
 
   @Get("search")
   async searchAddresses(@Query("address") searchTerm: string) {
