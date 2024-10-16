@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState, useEffect } from 'react';
 import { Table, Container, Dropdown } from 'react-bootstrap';
 import axios from 'axios';
@@ -20,13 +20,22 @@ interface Address {
 
 const ConversationTable = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
+  
+  // Initialize recordsPerPage from localStorage or default to 20
+  const [recordsPerPage, setRecordsPerPage] = useState<number>(() => {
+    const saved = localStorage.getItem('recordsPerPage');
+    return saved ? parseInt(saved, 10) : 20;
+  });
+  
   const [records, setRecords] = useState<ConversationRecord[]>([]);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<ConversationRecord | null>(null);
   const [selectedAddress, setSelectedAddress] = useState('Search Address');
-  const [currentPage, setCurrentPage] = useState(0);
-  const [recordsPerPage, setRecordsPerPage] = useState(20); // Default set to 20 records per page
-  const [totalRecords, setTotalRecords] = useState(0); // Track the total records count for pagination
+  const [currentPage, setCurrentPage] = useState<number>(() => {
+    const savedPage = localStorage.getItem('currentPage');
+    return savedPage ? parseInt(savedPage, 10) : 0;
+  });
+  const [totalRecords, setTotalRecords] = useState(0);
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
   // Fetch data when page or page size changes
@@ -62,6 +71,16 @@ const ConversationTable = () => {
   useEffect(() => {
     fetchData();
   }, [Base_Url, currentPage, recordsPerPage]);
+
+  // Save recordsPerPage to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('recordsPerPage', recordsPerPage.toString());
+  }, [recordsPerPage]);
+
+  // Optional: Save currentPage to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('currentPage', currentPage.toString());
+  }, [currentPage]);
 
   const handleRowClick = (record: ConversationRecord) => {
     setSelectedRecord(record);
@@ -103,9 +122,31 @@ const ConversationTable = () => {
             </Dropdown.Toggle>
 
             <Dropdown.Menu>
-              <Dropdown.Item onClick={() => handleRecordsPerPageChange(2)}>2</Dropdown.Item>
-              <Dropdown.Item onClick={() => handleRecordsPerPageChange(5)}>5</Dropdown.Item>
-              <Dropdown.Item onClick={() => handleRecordsPerPageChange(10)}>10</Dropdown.Item>
+              <Dropdown.Item 
+                active={recordsPerPage === 2}
+                onClick={() => handleRecordsPerPageChange(2)}
+              >
+                20
+              </Dropdown.Item>
+              <Dropdown.Item 
+                active={recordsPerPage === 5}
+                onClick={() => handleRecordsPerPageChange(5)}
+              >
+                50
+              </Dropdown.Item>
+              <Dropdown.Item 
+                active={recordsPerPage === 10}
+                onClick={() => handleRecordsPerPageChange(10)}
+              >
+                100
+              </Dropdown.Item>
+              <Dropdown.Item 
+                active={recordsPerPage === 20}
+                onClick={() => handleRecordsPerPageChange(20)}
+              >
+                20
+              </Dropdown.Item>
+              {/* Add more options if needed */}
             </Dropdown.Menu>
           </Dropdown>
         </div>
@@ -143,9 +184,10 @@ const ConversationTable = () => {
           <Popup
             show={showPopup}
             onHide={handlePopupClose}
-            conversationId={selectedRecord.conversation_id} onSaveSuccess={function (): void {
+            conversationId={selectedRecord.conversation_id}
+            onSaveSuccess={function (): void {
               throw new Error('Function not implemented.');
-            } }            // Pass any other necessary props here
+            }} // Pass any other necessary props here
           />
         )}
 
@@ -160,6 +202,7 @@ const ConversationTable = () => {
             onPageChange={handlePageClick}
             containerClassName={styles.pagination}
             activeClassName={styles.active}
+            forcePage={currentPage} // Ensure the current page is highlighted correctly
           />
         </div>
       </div>
@@ -168,4 +211,3 @@ const ConversationTable = () => {
 };
 
 export default ConversationTable;
-
