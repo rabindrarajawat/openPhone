@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect, useState, useMemo, useCallback } from "react";
@@ -47,7 +46,6 @@ interface AddressResponseItem {
   is_active: boolean;
   date: string;
   notificationCount: number; // Add this field
-
 }
 interface AddressApiResponse {
   data: AddressResponseItem[];
@@ -113,8 +111,6 @@ const Dashboard = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
   const [auctionEventId, setAuctionEventId] = useState<number | null>(null);
 
-
-
   const [selectedAddress, setSelectedAddress] = useState("Search Address");
   const [eventData, setEventData] = useState<EventItem[]>([]);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -160,20 +156,19 @@ const Dashboard = () => {
   const [timeFilter, setTimeFilter] = useState<"all" | "weekly" | "monthly">(
     "all"
   );
+ 
   const [showAllAddresses, setShowAllAddresses] = useState<boolean>(true);
   const [selectedDateFilter, setSelectedDateFilter] = useState<
-  "all" | "weekly" | "monthly"
+    "all" | "weekly" | "monthly"
   >("all");
-  console.log("🚀 ~ Dashboard ~ selectedDateFilter:", selectedDateFilter)
 
   const [fromDate, setFromDate] = useState("");
-  console.log("🚀 ~ Dashboard ~ fromDate:", fromDate)
   const [toDate, setToDate] = useState("");
-  console.log("🚀 ~ Dashboard ~ toDate:", toDate)
 
   const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(
     new Set<string>()
-  );  const [eventTypeId, setEventTypeId] = useState<number | null>(null); // Accepts either a number or null
+  );
+  const [eventTypeId, setEventTypeId] = useState<number | null>(null); // Accepts either a number or null
 
   const [searchQuery, setSearchQuery] = useState("");
   const [deliveredChecked, setDeliveredChecked] = useState(false);
@@ -198,10 +193,8 @@ const Dashboard = () => {
   const [withResponses, setWithResponses] = useState(false);
   const [withStopResponses, setWithStopResponses] = useState(false);
 
-
   const [notificationCount, setNotificationCount] = useState(0);
   const router = useRouter();
-
 
   const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>(
     (acc, message) => {
@@ -239,7 +232,6 @@ const Dashboard = () => {
     }
   }, [router]); // Ensure that 'router' is included in dependencies
 
-
   useEffect(() => {
     checkTokenExpiration(); // Check token expiration when the component mounts
   }, [checkTokenExpiration]);
@@ -250,7 +242,6 @@ const Dashboard = () => {
       setPinnedConversations(new Set<string>(JSON.parse(storedPins)));
     }
   }, []);
-
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -268,77 +259,67 @@ const Dashboard = () => {
           Authorization: `Bearer ${token}`,
         },
       };
-  
-   
+
       try {
         // Fetch all addresses with the token in the headers
-        const addressResponse: AxiosResponse<AddressApiResponse> = await axios.get(
-          `${Base_Url}address/getalladdress`,
-          {
+        const addressResponse: AxiosResponse<AddressApiResponse> =
+          await axios.get(`${Base_Url}address/getalladdress`, {
             ...config,
-            params:{
+            params: {
               page: currentPage,
               limit: itemsPerPage,
-              auctionEventId:auctionEventId,
-              filterType:selectedDateFilter !=="all"?selectedDateFilter:null,
-              fromDate:fromDate&&toDate?fromDate:null,
-              toDate:toDate&&fromDate?toDate:null,
-              withResponses: withResponses ? 'true' : null,
-              withStopResponses: withStopResponses ? 'true' : null,
-              eventTypeId: eventTypeId ? eventTypeId : null, 
-        // isDelivered: deliveredChecked ? 'true' : 'false', 
+              auctionEventId: auctionEventId,
+              filterType:
+                selectedDateFilter !== "all" ? selectedDateFilter : null,
+              fromDate: fromDate && toDate ? fromDate : null,
+              toDate: toDate && fromDate ? toDate : null,
+              withResponses: withStopResponses ? "true" : null,
+              withStopResponses: withResponses ? "true" : null,
+              eventTypeId: eventTypeId ? eventTypeId : null,
+              // isDelivered: deliveredChecked ? 'true' : 'false',
+            },
+          });
 
-            }
-          }
+        // Extract the addresses array from the response
+        const addressesArray = addressResponse.data.data;
+
+        // Ensure addressesArray is indeed an array
+        if (!Array.isArray(addressesArray)) {
+          throw new Error("Expected data.data to be an array.");
+        }
+
+        // Map the API response to Address1 format
+        const formattedAddresses: Address1[] = addressesArray.map(
+          (item: AddressResponseItem) => ({
+            id: item.id,
+            displayAddress: item.address,
+            is_bookmarked: item.is_bookmarked,
+            auction_event_id: item.auction_event_id,
+            modified_at: item.modified_at,
+            notificationCount: 0, // Initialize with 0, will be updated later
+            address: item.address,
+            created_at: item.created_at,
+            fullAddress: item.address, // Assigning 'address' to 'fullAddress'
+          })
         );
-  
 
-        console.log("Full addressResponse:", addressResponse);
-        console.log("addressResponse.data:", addressResponse.data);
-
-                // Extract the addresses array from the response
-                const addressesArray = addressResponse.data.data;
-
-
-       // Ensure addressesArray is indeed an array
-       if (!Array.isArray(addressesArray)) {
-        throw new Error("Expected data.data to be an array.");
-      }
-
-      // Map the API response to Address1 format
-      const formattedAddresses: Address1[] = addressesArray.map((item: AddressResponseItem) => ({
-        id: item.id,
-        displayAddress: item.address,
-        is_bookmarked: item.is_bookmarked,
-        auction_event_id: item.auction_event_id,
-        modified_at: item.modified_at,
-        notificationCount: 0, // Initialize with 0, will be updated later
-        address: item.address,
-        created_at: item.created_at,
-        fullAddress: item.address, // Assigning 'address' to 'fullAddress'
-      }));
-      
-        console.log("formattedAddress",formattedAddresses)
-  
+ 
         setAddresses2(formattedAddresses);
         setFilteredAddresses2(formattedAddresses);
         setTotalItems(addressResponse.data.totalCount);
-  
+
         // Fetch unread notifications with the token in the headers
         const notificationResponse = await axios.get(
           `${Base_Url}notifications`,
           config
         );
-  
+
         const unreadNotifications = notificationResponse.data.filter(
           (notification: any) => !notification.is_read
         );
         setNotifications(unreadNotifications);
 
-        console.log("unreadNotifications",unreadNotifications)
 
-        
-  
         // Calculate notification counts
         const addressNotificationCounts = formattedAddresses.map(
           (address: any) => {
@@ -348,32 +329,49 @@ const Dashboard = () => {
             return { ...address, notificationCount: count };
           }
         );
-  
+
         setAddresses1(addressNotificationCounts);
-        console.log("addressNotificationCounts",addressNotificationCounts)
-  
+   
         // Sort addresses by modified_at to get the latest modified address
-        const sortedAddresses = addressNotificationCounts.sort(
-          (a: { modified_at: string | number | Date }, b: { modified_at: string | number | Date }) => {
-            const dateA = new Date(a.modified_at).getTime();
-            const dateB = new Date(b.modified_at).getTime();
-            return dateB - dateA;
-          }
-        );
-  
-        // Set default selected address as the latest modified address
-        if (sortedAddresses.length > 0) {
-          setSelectedAddress(sortedAddresses[0].displayAddress);
-          setSelectedAddressId(sortedAddresses[0].id);
+        // const sortedAddresses = addressNotificationCounts.sort(
+        //   (a: { modified_at: string | number | Date }, b: { modified_at: string | number | Date }) => {
+        //     const dateA = new Date(a.modified_at).getTime();
+        //     const dateB = new Date(b.modified_at).getTime();
+        //     console.log("🚀 ~ fetchData ~ dateB:",dateA, dateB)
+        //     return dateB - dateA;
+        //   }
+        // );
+        // console.log("🚀 ~ fetchData ~ sortedAddresses:", sortedAddresses)
+
+        // // Set default selected address as the latest modified address
+        // if (sortedAddresses.length > 0) {
+        //   setSelectedAddress(sortedAddresses[0].displayAddress);
+        //   setSelectedAddressId(sortedAddresses[0].id);
+        // }
+
+        if (addressNotificationCounts.length > 0) {
+          setSelectedAddress(addressNotificationCounts[0].displayAddress);
+          setSelectedAddressId(addressNotificationCounts[0].id);
         }
-  
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-  
+
     fetchData();
-  }, [currentPage,itemsPerPage,auctionEventId,selectedDateFilter,toDate,fromDate,withResponses,withStopResponses,receivedChecked , deliveredChecked,eventTypeId]);
+  }, [
+    currentPage,
+    itemsPerPage,
+    auctionEventId,
+    selectedDateFilter,
+    toDate,
+    fromDate,
+    withResponses,
+    withStopResponses,
+    receivedChecked,
+    deliveredChecked,
+    eventTypeId,
+  ]);
 
   // Handle items per page change (reset page to 1)
 const handleItemsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -393,11 +391,7 @@ useEffect(() => {
   localStorage.setItem('currentPage', currentPage.toString());
 }, [currentPage]);
 
-// Handle page change (update currentPage state)
-
-
-    
-  
+  // Handle page change (update currentPage state)
 
   // useEffect(() => {
   //   // Retrieve Token
@@ -407,12 +401,11 @@ useEffect(() => {
   //       Authorization: `Bearer ${token}`,
   //     },
   //   };
-  
-   
+
   //   const fetchFilteredAddresses = async () => {
   //     let deliveredAddresses: any[] = [];
   //     let receivedAddresses: any[] = [];
-  
+
   //     // Fetch delivered addresses if deliveredChecked is true
   //     if (deliveredChecked) {
   //       const deliveredResponse = await axios.get(
@@ -425,7 +418,7 @@ useEffect(() => {
   //         )
   //         .map((event: { address: any }) => event.address);
   //     }
-  
+
   //     // Fetch received addresses if receivedChecked is true
   //     if (receivedChecked) {
   //       const receivedResponse = await axios.get(
@@ -436,12 +429,12 @@ useEffect(() => {
   //         (event: { address: any }) => event.address
   //       );
   //     }
-  
+
   //     // Combine delivered and received addresses
   //     const combinedAddresses = [
   //       ...new Set([...deliveredAddresses, ...receivedAddresses]),
   //     ];
-  
+
   //     if (deliveredChecked || receivedChecked) {
   //       // If a filter is applied and no addresses are found, show "No address found"
   //       if (combinedAddresses.length === 0) {
@@ -449,7 +442,7 @@ useEffect(() => {
   //         setFilteredAddresses2([]); // Show "No address found" in UI
   //         return;
   //       }
-  
+
   //       // Filter the addresses based on combinedAddresses
   //       const filtered = addresses2.filter((addressObj: { address: any }) =>
   //         combinedAddresses.includes(addressObj.address)
@@ -460,11 +453,9 @@ useEffect(() => {
   //       setFilteredAddresses2(addresses2);
   //     }
   //   };
-  
+
   //   fetchFilteredAddresses();
   // }, [deliveredChecked, receivedChecked, addresses2, Base_Url]);
-  
-  
 
   useEffect(() => {
     // Retrieve Token
@@ -475,7 +466,6 @@ useEffect(() => {
       },
     };
 
- 
     const fetchEventCounts = async () => {
       try {
         const response = await fetch(
@@ -505,7 +495,6 @@ useEffect(() => {
       },
     };
 
- 
     if (selectedAddress && selectedAddress !== "Search Address") {
       axios
         .get(
@@ -560,11 +549,11 @@ useEffect(() => {
         Authorization: `Bearer ${token}`,
       },
     };
- 
+
     const timer = setTimeout(async () => {
       async function fetchEvents() {
         try {
-          if(selectedAddressId&&fromNumber){
+          if (selectedAddressId && fromNumber) {
             const response = await axios.get(
               `${Base_Url}openPhoneEventData/events-by-address-and-from`,
               {
@@ -598,22 +587,17 @@ useEffect(() => {
     return () => clearTimeout(timer);
   }, [selectedAddressId, fromNumber, Base_Url]);
 
-
   useEffect(() => {
     setUpdatedMessages(groupedMessages);
   }, [events]);
-  
-
 
   useEffect(() => {
     updateEventTypeId();
-  }, [receivedChecked, deliveredChecked, eventTypeId,
-]);
-
+  }, [receivedChecked, deliveredChecked, eventTypeId]);
 
   const updateEventTypeId = () => {
     if (receivedChecked && deliveredChecked) {
-      setEventTypeId(2); // Both received and delivered checked
+      setEventTypeId(1); // Both received and delivered checked
     } else if (receivedChecked) {
       setEventTypeId(1); // Only received checked
     } else if (deliveredChecked) {
@@ -623,13 +607,11 @@ useEffect(() => {
     }
   };
 
-
   const handleDefaultClick = () => {
     setFilterOption("all");
   };
 
   const handleCheckboxChange = (typeId: number) => {
-    console.log("🚀 ~ handleCheckboxChange ~ typeId:", typeId)
     // setSelectedAuctionTypes((prevSelected) => {
     //   if (prevSelected.includes(typeId)) {
     //     // Remove the filter if already selected
@@ -638,7 +620,7 @@ useEffect(() => {
     //     return [...prevSelected, typeId];
     //   }
     // });
-    setAuctionEventId(typeId)
+    setAuctionEventId(typeId);
   };
 
   // Helper function to check if a date is within the last week
@@ -660,66 +642,65 @@ useEffect(() => {
   };
 
   // Now filter and sort the addresses
-  const filteredAddresses = addresses1
-    .filter((address) => {
-      // Apply your existing filter logic
-      const matchesAuctionType =
-        selectedAuctionTypes.length === 0 ||
-        selectedAuctionTypes.includes(address.auction_event_id);
-      const matchesBookmark =
-        filterOption === "all" ||
-        (filterOption === "bookmarked" && address.is_bookmarked) ||
-        filterOption === "default";
-      const matchesDateFilter =
-        selectedDateFilter === "all" ||
-        (selectedDateFilter === "weekly" &&
-          isWithinLastWeek(address.created_at)) ||
-        (selectedDateFilter === "monthly" &&
-          isWithinLastMonth(address.created_at));
-      const matchesCustomDateFilter =
-        (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
-        (!toDate || new Date(address.created_at) <= new Date(toDate));
-      const matchesSearch = address.displayAddress
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
+  // const filteredAddresses = addresses1
+  //   .filter((address) => {
+  //     // Apply your existing filter logic
+  //     const matchesAuctionType =
+  //       selectedAuctionTypes.length === 0 ||
+  //       selectedAuctionTypes.includes(address.auction_event_id);
+  //     const matchesBookmark =
+  //       filterOption === "all" ||
+  //       (filterOption === "bookmarked" && address.is_bookmarked) ||
+  //       filterOption === "default";
+  //     const matchesDateFilter =
+  //       selectedDateFilter === "all" ||
+  //       (selectedDateFilter === "weekly" &&
+  //         isWithinLastWeek(address.created_at)) ||
+  //       (selectedDateFilter === "monthly" &&
+  //         isWithinLastMonth(address.created_at));
+  //     const matchesCustomDateFilter =
+  //       (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
+  //       (!toDate || new Date(address.created_at) <= new Date(toDate));
+  //     const matchesSearch = address.displayAddress
+  //       .toLowerCase()
+  //       .includes(searchQuery.toLowerCase());
 
-      return (
-        matchesAuctionType &&
-        matchesBookmark &&
-        matchesDateFilter &&
-        matchesCustomDateFilter &&
-        matchesSearch
-      );
-    })
-    .sort((a: Address1, b: Address1) => {
-      return (
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
-    });
+  //     return (
+  //       matchesAuctionType &&
+  //       matchesBookmark &&
+  //       matchesDateFilter &&
+  //       matchesCustomDateFilter &&
+  //       matchesSearch
+  //     );
+  //   })
+  //   .sort((a: Address1, b: Address1) => {
+  //     return (
+  //       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  //     );
+  //   });
 
   // const indexOfLastAddress = currentPage * addressesPerPage;
   // const indexOfFirstAddress = indexOfLastAddress - addressesPerPage;
 
-  const addressesToShow =
-    filteredAddresses.length > 0 // If there are any filtered addresses
-      ? filteredAddresses.filter((address) =>
-        filteredAddresses2.some(
-          (filteredAddress) => filteredAddress.address === address.address
-        )
-      )
-      : [];
+  // const addressesToShow =
+  //   filteredAddresses.length > 0 // If there are any filtered addresses
+  //     ? filteredAddresses.filter((address) =>
+  //       filteredAddresses2.some(
+  //         (filteredAddress) => filteredAddress.address === address.address
+  //       )
+  //     )
+  //     : [];
 
-  const currentAddresses = addressesToShow.slice(
-  
-  );
+  // const currentAddresses = addressesToShow.slice(
 
-  const totalPages = Math.ceil(addressesToShow.length / addressesPerPage);
+  // );
+
+  // const totalPages = Math.ceil(addressesToShow.length / addressesPerPage);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
- 
   const handleToggle = () => {
     setIsType(!isType);
   };
@@ -867,7 +848,6 @@ useEffect(() => {
       return;
     }
 
- 
     try {
       const response = await fetch(
         `${Base_Url}notifications/${addressId}/read?addressId=${addressId}`,
@@ -885,7 +865,7 @@ useEffect(() => {
       }
 
       const result = await response.json();
- 
+
       // Update notification count in state
       setAddresses1((prevAddresses) =>
         prevAddresses.map((address) =>
@@ -930,7 +910,6 @@ useEffect(() => {
       },
     };
 
- 
     try {
       await axios.post(
         `${Base_Url}openPhoneEventData/toggle-message-pin/${messageId}`,
@@ -966,10 +945,10 @@ useEffect(() => {
   // Filter messages based on the search query
   const filteredMessages = searchTo
     ? Object.keys(updatedMessages).filter((conversationId) =>
-      updatedMessages[conversationId].some((message) =>
-        message.to.toLowerCase().includes(searchTo.toLowerCase())
+        updatedMessages[conversationId].some((message) =>
+          message.to.toLowerCase().includes(searchTo.toLowerCase())
+        )
       )
-    )
     : Object.keys(updatedMessages);
 
   // Function to format the count
@@ -1017,7 +996,9 @@ useEffect(() => {
                             // checked={deliveredChecked}
                             // onChange={handleDeliveredChange}
                             checked={deliveredChecked}
-            onChange={() => setDeliveredChecked(!deliveredChecked)}
+                            onChange={() =>
+                              setDeliveredChecked(!deliveredChecked)
+                            }
                             className={styles.checkBox}
                           />
                           <label className="ms-2">Delivered</label>
@@ -1029,7 +1010,9 @@ useEffect(() => {
                             // onChange={handleReceivedChange}
 
                             checked={receivedChecked}
-                            onChange={() => setReceivedChecked(!receivedChecked)}
+                            onChange={() =>
+                              setReceivedChecked(!receivedChecked)
+                            }
                             id="notDelivered"
                             className={styles.checkBox}
                           />
@@ -1180,10 +1163,7 @@ useEffect(() => {
                         {isCustomDateOpen && (
                           <div className="custom-date-dropdown ms-1 ">
                             <div className="d-flex align-items-center">
-                              <label
-                                htmlFor="fromDate"
-                                className="me-2"
-                              >
+                              <label htmlFor="fromDate" className="me-2">
                                 From:
                               </label>
                               <input
@@ -1242,10 +1222,10 @@ useEffect(() => {
                             // checked={deliveredChecked}
                             // onChange={handleDeliveredChange}
                             checked={withResponses}
-            onChange={() => setWithResponses(!withResponses)}
+                            onChange={() => setWithResponses(!withResponses)}
                             className={styles.checkBox}
                           />
-                          <label className="ms-2">Stop </label>
+                          <label className="ms-2">Stop Response</label>
                         </li>
                         <li className="dropdown-item pt-2">
                           <input
@@ -1253,12 +1233,14 @@ useEffect(() => {
                             // checked={receivedChecked}
                             // onChange={handleReceivedChange}
                             checked={withStopResponses}
-            onChange={() => setWithStopResponses(!withStopResponses)}
+                            onChange={() =>
+                              setWithStopResponses(!withStopResponses)
+                            }
                             id="notDelivered"
                             className={styles.checkBox}
                           />
                           <label className="ms-2" htmlFor="notDelivered">
-                            AddressByResponse
+                            Address By Response
                           </label>
                         </li>
                       </div>
@@ -1356,10 +1338,11 @@ useEffect(() => {
 
                           <div className="d-flex">
                             <div
-                              className={`me-2 ${filterOption === "bookmarked"
-                                ? "active-filter"
-                                : ""
-                                }`}
+                              className={`me-2 ${
+                                filterOption === "bookmarked"
+                                  ? "active-filter"
+                                  : ""
+                              }`}
                               onClick={() => handleFilterChange("bookmarked")}
                             >
                               <Image
@@ -1367,10 +1350,11 @@ useEffect(() => {
                                 width={15}
                                 height={15}
                                 src="/bookmark.png"
-                                className={`ms-2 ${filterOption === "bookmarked"
-                                  ? styles.iconBlue
-                                  : ""
-                                  }`}
+                                className={`ms-2 ${
+                                  filterOption === "bookmarked"
+                                    ? styles.iconBlue
+                                    : ""
+                                }`}
                               />{" "}
                               <div className={`me- ${styles.addFilter}`}>
                                 Select
@@ -1386,12 +1370,15 @@ useEffect(() => {
                                 alt="redo"
                                 width={15}
                                 height={15}
-                                className={`ms-2 ${filterOption === "default"
-                                  ? styles.iconBlue
-                                  : ""
-                                  }`}
+                                className={`ms-2 ${
+                                  filterOption === "default"
+                                    ? styles.iconBlue
+                                    : ""
+                                }`}
                               />
-                              <div className={`${styles.addFilter}`}>Default</div>
+                              <div className={`${styles.addFilter}`}>
+                                Default
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -1414,14 +1401,15 @@ useEffect(() => {
         </select>
       </div>
 
-                          {currentAddresses.length > 0 ? (
-                            currentAddresses.map((address) => (
+                          {addresses1.length > 0 ? (
+                            addresses1.map((address) => (
                               <li
                                 key={address.id}
-                                className={`d-flex align-items-left   mt-4 me-3 ${selectedAddressId === address.id
-                                  ? styles.selectedAdd
-                                  : ""
-                                  }`}
+                                className={`d-flex align-items-left   mt-4 me-3 ${
+                                  selectedAddressId === address.id
+                                    ? styles.selectedAdd
+                                    : ""
+                                }`}
                                 onClick={() =>
                                   handleAddressSelect(
                                     address.displayAddress,
@@ -1431,13 +1419,15 @@ useEffect(() => {
                               >
                                 <div className="setaddress d-flex align-items-start gap-3">
                                   <i
-                                    className={`bi ${address.is_bookmarked
-                                      ? "bi-bookmark-fill"
-                                      : "bi-bookmark"
-                                      } ${address.is_bookmarked
+                                    className={`bi ${
+                                      address.is_bookmarked
+                                        ? "bi-bookmark-fill"
+                                        : "bi-bookmark"
+                                    } ${
+                                      address.is_bookmarked
                                         ? styles.bookmarked
                                         : styles.bookmarkIcon
-                                      }`}
+                                    }`}
                                     onClick={() =>
                                       handleBookmarkClick(address.id)
                                     }
@@ -1467,12 +1457,12 @@ useEffect(() => {
                         </div>
                       </div>
                       <span className="text-center">
-                      <Pagination
-        currentPage={currentPage}
-        itemsPerPage={itemsPerPage}
-        totalItems={totalItems}
-        onPageChange={setCurrentPage}
-      />
+                        <Pagination
+                          currentPage={currentPage}
+                          itemsPerPage={itemsPerPage}
+                          totalItems={totalItems}
+                          onPageChange={setCurrentPage}
+                        />
                       </span>
                     </div>
                   </div>
@@ -1482,59 +1472,56 @@ useEffect(() => {
                       <i className="bi bi-bar-chart me-3"></i>
                       Analytic data of selected Address
                     </p>
-                    <div className=""> 
-                    <div className={`row g-3 ${styles.comprenshiveAddress}`}>
-             
+                    <div className="">
+                      <div className={`row g-3 ${styles.comprenshiveAddress}`}>
+                        {/* First column: Message Delivered */}
+                        <div className="col-lg-3 col-md-6 col-sm-12">
+                          <div
+                            className={`d-flex justify-content-between align-items-center p-1 ${styles.AnlyDelivered}`}
+                          >
+                            <span>Message Delivered</span>
+                            <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
+                              {formatCount(messageDelivered)}
+                            </span>
+                          </div>
+                        </div>
 
-              {/* First column: Message Delivered */}
-              <div className="col-lg-3 col-md-6 col-sm-12">
-                <div
-                  className={`d-flex justify-content-between align-items-center p-1 ${styles.AnlyDelivered}`}
-                >
-                  <span>Message Delivered</span>
-                  <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
-                    {formatCount(messageDelivered)}
-                  </span>
-                </div>
-              </div>
+                        {/* Second column: Message Response */}
+                        <div className="col-lg-3 col-md-6 col-sm-12">
+                          <div
+                            className={`d-flex justify-content-between align-items-center p-1 ${styles.AnlyResponse}`}
+                          >
+                            <span>Message Response</span>
+                            <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
+                              {formatCount(messageResponse)}
+                            </span>
+                          </div>
+                        </div>
 
-              {/* Second column: Message Response */}
-              <div className="col-lg-3 col-md-6 col-sm-12">
-                <div
-                  className={`d-flex justify-content-between align-items-center p-1 ${styles.AnlyResponse}`}
-                >
-                  <span>Message Response</span>
-                  <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
-                    {formatCount(messageResponse)}
-                  </span>
-                </div>
-              </div>
+                        {/* Third column: Call */}
+                        <div className="col-lg-3 col-md-6 col-sm-12">
+                          <div
+                            className={`d-flex justify-content-between align-items-center p-1 text-left ${styles.AnlyCall}`}
+                          >
+                            <span>Call</span>
+                            <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
+                              {formatCount(call)}
+                            </span>
+                          </div>
+                        </div>
 
-              {/* Third column: Call */}
-              <div className="col-lg-3 col-md-6 col-sm-12">
-                <div
-                  className={`d-flex justify-content-between align-items-center p-1 text-left ${styles.AnlyCall}`}
-                >
-                  <span>Call</span>
-                  <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
-                    {formatCount(call)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Fourth column: Call Response */}
-              <div className="col-lg-3 col-md-6 col-sm-12">
-                <div
-                  className={`d-flex justify-content-between align-items-center p-1 text-left ${styles.AnlyCallRes}`}
-                >
-                  <span>Call Response</span>
-                  <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
-                  {formatCount(callResponse)}
-                  </span>
-                </div>
-              </div>
-            </div>
-                    
+                        {/* Fourth column: Call Response */}
+                        <div className="col-lg-3 col-md-6 col-sm-12">
+                          <div
+                            className={`d-flex justify-content-between align-items-center p-1 text-left ${styles.AnlyCallRes}`}
+                          >
+                            <span>Call Response</span>
+                            <span className="badge bg-light text-dark rounded-circle d-flex justify-content-center align-items-center p-3">
+                              {formatCount(callResponse)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
 
                       <div className="conversation">
                         <div className="d-flex gap-3 justify-content-between align-items-center">
@@ -1583,175 +1570,183 @@ useEffect(() => {
                                 {events.length > 0
                                   ? filteredMessages.length > 0
                                     ? filteredMessages.map((conversationId) => {
-                                      const isStop = updatedMessages[
-                                        conversationId
-                                      ].some((message) => message.is_stop);
-                                      return (
-                                        <div key={conversationId}>
-                                          <div
-                                            className={`${styles.toLine}`}
-                                          ></div>
-                                          <div
-                                            className={` ${styles.toValue} text-center`}
-                                          >
-                                            <span className="text-dark">
-                                              To{" "}
-                                            </span>
-                                            <span
-                                              style={{
-                                                color: isStop
-                                                  ? "red"
-                                                  : "inherit",
-                                              }}
+                                        const isStop = updatedMessages[
+                                          conversationId
+                                        ].some((message) => message.is_stop);
+                                        return (
+                                          <div key={conversationId}>
+                                            <div
+                                              className={`${styles.toLine}`}
+                                            ></div>
+                                            <div
+                                              className={` ${styles.toValue} text-center`}
                                             >
-                                              {
-                                                updatedMessages[
-                                                  conversationId
-                                                ][0].to
-                                              }
-                                            </span>
-
-                                            <i
-                                              className={`bi pinnumber text-secondary ${pinnedConversations.has(
-                                                conversationId
-                                              )
-                                                ? "bi-pin-fill"
-                                                : "bi-pin"
-                                                }`}
-                                              onClick={() =>
-                                                handlePinNumber(
-                                                  conversationId
-                                                )
-                                              }
-                                            ></i>
-                                          </div>
-
-                                          {updatedMessages[
-                                            conversationId
-                                          ].map((message, index) => (
-                                            <div key={index}>
-                                              <div
-                                                className={
-                                                  message.event_type_id === 1
-                                                    ? styles.chatMessageRight
-                                                    : styles.chatMessageLeft
-                                                }
+                                              <span className="text-dark">
+                                                To{" "}
+                                              </span>
+                                              <span
+                                                style={{
+                                                  color: isStop
+                                                    ? "red"
+                                                    : "inherit",
+                                                }}
                                               >
-                                                <div className="message-body-1">
-                                                  {expandedMessages.has(
-                                                    index
-                                                  ) ? (
-                                                    <div>
-                                                      {message.body}
-                                                      <button
-                                                        onClick={() =>
-                                                          toggleMessageExpansion(
-                                                            index
-                                                          )
-                                                        }
-                                                        className={`${styles.readLessBtn
-                                                          } ${message.event_type_id ===
-                                                            1
-                                                            ? styles.readLessBtnRight
-                                                            : styles.readLessBtnLeft
-                                                          }`}
-                                                      >
-                                                        Read Less
-                                                      </button>
+                                                {
+                                                  updatedMessages[
+                                                    conversationId
+                                                  ][0].to
+                                                }
+                                              </span>
 
-                                                      <i
-                                                        className={`bi ${message.is_message_pinned
-                                                          ? "bi-star-fill text-warning"
-                                                          : "bi-star"
+                                              <i
+                                                className={`bi pinnumber text-secondary ${
+                                                  pinnedConversations.has(
+                                                    conversationId
+                                                  )
+                                                    ? "bi-pin-fill"
+                                                    : "bi-pin"
+                                                }`}
+                                                onClick={() =>
+                                                  handlePinNumber(
+                                                    conversationId
+                                                  )
+                                                }
+                                              ></i>
+                                            </div>
+
+                                            {updatedMessages[
+                                              conversationId
+                                            ].map((message, index) => (
+                                              <div key={index}>
+                                                <div
+                                                  className={
+                                                    message.event_type_id === 1
+                                                      ? styles.chatMessageRight
+                                                      : styles.chatMessageLeft
+                                                  }
+                                                >
+                                                  <div className="message-body-1">
+                                                    {expandedMessages.has(
+                                                      index
+                                                    ) ? (
+                                                      <div>
+                                                        {message.body}
+                                                        <button
+                                                          onClick={() =>
+                                                            toggleMessageExpansion(
+                                                              index
+                                                            )
+                                                          }
+                                                          className={`${
+                                                            styles.readLessBtn
+                                                          } ${
+                                                            message.event_type_id ===
+                                                            1
+                                                              ? styles.readLessBtnRight
+                                                              : styles.readLessBtnLeft
+                                                          }`}
+                                                        >
+                                                          Read Less
+                                                        </button>
+
+                                                        <i
+                                                          className={`bi ${
+                                                            message.is_message_pinned
+                                                              ? "bi-star-fill text-warning"
+                                                              : "bi-star"
                                                           } star-icon`}
-                                                        onClick={() =>
-                                                          toggleMessagePin(
-                                                            message.id,
-                                                            conversationId
-                                                          )
-                                                        }
-                                                      ></i>
-                                                    </div>
-                                                  ) : (
-                                                    <div>
-                                                      {message.body &&
+                                                          onClick={() =>
+                                                            toggleMessagePin(
+                                                              message.id,
+                                                              conversationId
+                                                            )
+                                                          }
+                                                        ></i>
+                                                      </div>
+                                                    ) : (
+                                                      <div>
+                                                        {message.body &&
                                                         message.body.length >
-                                                        100 ? (
-                                                        <>
-                                                          {message.body.substring(
-                                                            0,
-                                                            100
-                                                          )}
-                                                          ...
-                                                          <button
-                                                            onClick={() =>
-                                                              toggleMessageExpansion(
-                                                                index
-                                                              )
-                                                            }
-                                                            className={`${styles.readMoreBtn
-                                                              } ${message.event_type_id ===
+                                                          100 ? (
+                                                          <>
+                                                            {message.body.substring(
+                                                              0,
+                                                              100
+                                                            )}
+                                                            ...
+                                                            <button
+                                                              onClick={() =>
+                                                                toggleMessageExpansion(
+                                                                  index
+                                                                )
+                                                              }
+                                                              className={`${
+                                                                styles.readMoreBtn
+                                                              } ${
+                                                                message.event_type_id ===
                                                                 1
-                                                                ? styles.readMoreBtnRight
-                                                                : styles.readMoreBtnLeft
+                                                                  ? styles.readMoreBtnRight
+                                                                  : styles.readMoreBtnLeft
                                                               }`}
-                                                          >
-                                                            Read More
-                                                          </button>
-                                                          <i
-                                                            style={{
-                                                              cursor:
-                                                                "pointer",
-                                                            }}
-                                                            className={`bi ${message.is_message_pinned
-                                                              ? "bi-star-fill text-warning"
-                                                              : "bi-star"
+                                                            >
+                                                              Read More
+                                                            </button>
+                                                            <i
+                                                              style={{
+                                                                cursor:
+                                                                  "pointer",
+                                                              }}
+                                                              className={`bi ${
+                                                                message.is_message_pinned
+                                                                  ? "bi-star-fill text-warning"
+                                                                  : "bi-star"
                                                               } star-icon cursor-pointer`}
-                                                            onClick={() =>
-                                                              toggleMessagePin(
-                                                                message.id,
-                                                                conversationId
-                                                              )
-                                                            }
-                                                          ></i>
-                                                        </>
-                                                      ) : (
-                                                        <>
-                                                          {message.body}{" "}
-                                                          <i
-                                                            className={`bi ${message.is_message_pinned
-                                                              ? "bi-star-fill text-warning"
-                                                              : "bi-star"
+                                                              onClick={() =>
+                                                                toggleMessagePin(
+                                                                  message.id,
+                                                                  conversationId
+                                                                )
+                                                              }
+                                                            ></i>
+                                                          </>
+                                                        ) : (
+                                                          <>
+                                                            {message.body}{" "}
+                                                            <i
+                                                              className={`bi ${
+                                                                message.is_message_pinned
+                                                                  ? "bi-star-fill text-warning"
+                                                                  : "bi-star"
                                                               } star-icon`}
-                                                            onClick={() =>
-                                                              toggleMessagePin(
-                                                                message.id,
-                                                                conversationId
-                                                              )
-                                                            }
-                                                          ></i>
-                                                        </>
-                                                      )}
-                                                    </div>
-                                                  )}
+                                                              onClick={() =>
+                                                                toggleMessagePin(
+                                                                  message.id,
+                                                                  conversationId
+                                                                )
+                                                              }
+                                                            ></i>
+                                                          </>
+                                                        )}
+                                                      </div>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                                <div
+                                                  className={
+                                                    message.event_type_id === 1
+                                                      ? styles.messageDateRight
+                                                      : styles.messageDateLeft
+                                                  }
+                                                >
+                                                  {new Date(
+                                                    message.created_at
+                                                  ).toLocaleDateString()}
                                                 </div>
                                               </div>
-                                              <div
-                                                className={
-                                                  message.event_type_id === 1
-                                                    ? styles.messageDateRight
-                                                    : styles.messageDateLeft
-                                                }
-                                              >
-                                                {new Date(
-                                                  message.created_at
-                                                ).toLocaleDateString()}
-                                              </div>
-                                            </div>
-                                          ))}
-                                        </div>
-                                      );
-                                    })
+                                            ))}
+                                          </div>
+                                        );
+                                      })
                                     : "No chats found for this number"
                                   : "Loading..."}
                               </div>
@@ -1772,6 +1767,3 @@ useEffect(() => {
 };
 
 export default Dashboard;
-
-
-
