@@ -381,6 +381,18 @@ const handleItemsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) =
   setCurrentPage(1); // Reset to the first page on changing items per page
 };
 
+
+
+ // Save recordsPerPage to localStorage whenever it changes
+ useEffect(() => {
+  localStorage.setItem('itemsPerPage', itemsPerPage.toString());
+}, [itemsPerPage]); 
+
+// Optional: Save currentPage to localStorage whenever it changes
+useEffect(() => {
+  localStorage.setItem('currentPage', currentPage.toString());
+}, [currentPage]);
+
 // Handle page change (update currentPage state)
 
 
