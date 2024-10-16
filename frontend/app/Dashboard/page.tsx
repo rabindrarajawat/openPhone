@@ -188,10 +188,10 @@ const Dashboard = () => {
   const [totalItems, setTotalItems] = useState(0);
 
   // Initialize recordsPerPage from localStorage or default to 20
-  const [itemsPerPage, setItemsPerPage] = useState<number>(() => {
-    const saved = localStorage.getItem('itemsPerPage');
-    return saved ? parseInt(saved, 10) : 20;
-  });
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10)
+    // const saved = localStorage.getItem('itemsPerPage');
+    // return saved ? parseInt(saved, 10) : 20;
+
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
