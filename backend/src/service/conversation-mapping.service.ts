@@ -59,21 +59,28 @@ import { Repository } from "typeorm";
 import { conversationmapping } from "src/entities/conversation-mapping.entity";
 import { AddressService } from "src/service/address.service";
 import { OpenPhoneEventEntity } from "src/entities/open-phone-event.entity";
+import { AddressEntity } from "src/entities/address.entity";
 
 @Injectable()
 export class ConversationMapingService {
     constructor(
         @InjectRepository(conversationmapping)
-        private readonly conversationmapingRepository: Repository<conversationmapping>,
-        @InjectRepository(OpenPhoneEventEntity)
-        private readonly openPhoneEventRepository: Repository<OpenPhoneEventEntity>,
-        private readonly addressService: AddressService
-    ) { }
+    private readonly conversationmapingRepository: Repository<conversationmapping>,
+
+    @InjectRepository(OpenPhoneEventEntity)
+    private readonly openPhoneEventRepository: Repository<OpenPhoneEventEntity>, // Correct injection
+
+    @InjectRepository(AddressEntity)
+    private readonly addressRepository: Repository<AddressEntity>, // Correct injection for AddressEntity
+
+    private readonly addressService: AddressService // Address service is injected as a dependency
+  ) {}
+    
 
     async mapConversationToAddress(conversationId: string, address: string): Promise<conversationmapping> {
         // Get address_id from address service
         const addressId = await this.addressService.getAddressIdByAddress(address);
-
+       
         if (!addressId) {
             throw new NotFoundException(`Address not found: ${address}`);
         }
@@ -97,6 +104,10 @@ export class ConversationMapingService {
             firstEvent.address_id = addressId;
             await this.openPhoneEventRepository.save(firstEvent);
         }
+        await this.addressRepository.update(
+            { id: addressId },
+            { modified_at: new Date() }
+          );
 
         return savedMapping;
     }
