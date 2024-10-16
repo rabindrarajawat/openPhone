@@ -9,7 +9,7 @@ import { AddressDto } from "../dto/address.dto";
 import { AddressEntity } from "../entities/address.entity";
 import { OpenPhoneEventEntity } from "src/entities/open-phone-event.entity";
 import * as moment from "moment";
-
+  
 @Injectable()
 export class AddressService {
   constructor(
@@ -408,6 +408,8 @@ export class AddressService {
         });
       }
 
+     
+
       if (withResponses) {
         queryBuilder.andWhere((qb) => {
           const subQuery = qb
@@ -465,7 +467,17 @@ export class AddressService {
       }
 
       // Add sorting
-      queryBuilder.orderBy(`address.${sortBy}`, sortOrder);
+      // queryBuilder.orderBy(`address.${sortBy}`, sortOrder);
+
+      if (sortBy === 'modified_at') {
+        queryBuilder.orderBy("address.modified_at", sortOrder);
+      } else {
+        queryBuilder.orderBy(`address.${sortBy}`, sortOrder);
+      }
+
+
+
+
 
       // Add distinct to avoid duplicate addresses due to the join
       queryBuilder.distinct(true);
