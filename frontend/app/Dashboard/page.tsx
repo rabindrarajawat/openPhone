@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect, useState, useMemo, useCallback } from "react";
@@ -110,6 +111,7 @@ interface EventItem {
 
 const Dashboard = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
+  const [auctionEventId, setAuctionEventId] = useState<number | null>(null);
 
 
 
@@ -160,15 +162,19 @@ const Dashboard = () => {
   );
   const [showAllAddresses, setShowAllAddresses] = useState<boolean>(true);
   const [selectedDateFilter, setSelectedDateFilter] = useState<
-    "all" | "weekly" | "monthly"
+  "all" | "weekly" | "monthly"
   >("all");
+  console.log("🚀 ~ Dashboard ~ selectedDateFilter:", selectedDateFilter)
 
   const [fromDate, setFromDate] = useState("");
+  console.log("🚀 ~ Dashboard ~ fromDate:", fromDate)
   const [toDate, setToDate] = useState("");
+  console.log("🚀 ~ Dashboard ~ toDate:", toDate)
 
   const [pinnedConversations, setPinnedConversations] = useState<Set<string>>(
     new Set<string>()
-  );
+  );  const [eventTypeId, setEventTypeId] = useState<number | null>(null); // Accepts either a number or null
+
   const [searchQuery, setSearchQuery] = useState("");
   const [deliveredChecked, setDeliveredChecked] = useState(false);
   const [receivedChecked, setReceivedChecked] = useState(false);
@@ -189,7 +195,8 @@ const Dashboard = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [withResponses, setWithResponses] = useState(false);
+  const [withStopResponses, setWithStopResponses] = useState(false);
 
 
   const [notificationCount, setNotificationCount] = useState(0);
@@ -272,6 +279,14 @@ const Dashboard = () => {
             params:{
               page: currentPage,
               limit: itemsPerPage,
+              auctionEventId:auctionEventId,
+              filterType:selectedDateFilter !=="all"?selectedDateFilter:null,
+              fromDate:fromDate&&toDate?fromDate:null,
+              toDate:toDate&&fromDate?toDate:null,
+              withResponses: withResponses ? 'true' : null,
+              withStopResponses: withStopResponses ? 'true' : null,
+              eventTypeId: eventTypeId ? eventTypeId : null, 
+        // isDelivered: deliveredChecked ? 'true' : 'false', 
 
             }
           }
@@ -358,7 +373,7 @@ const Dashboard = () => {
     };
   
     fetchData();
-  }, [Base_Url,currentPage,itemsPerPage]);
+  }, [currentPage,itemsPerPage,auctionEventId,selectedDateFilter,toDate,fromDate,withResponses,withStopResponses,receivedChecked , deliveredChecked,eventTypeId]);
 
   // Handle items per page change (reset page to 1)
 const handleItemsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -368,111 +383,74 @@ const handleItemsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) =
 
 // Handle page change (update currentPage state)
 
- // Save recordsPerPage to localStorage whenever it changes
- useEffect(() => {
-  localStorage.setItem('itemsPerPage', itemsPerPage.toString());
-}, [itemsPerPage]);
-
-// Optional: Save currentPage to localStorage whenever it changes
-useEffect(() => {
-  localStorage.setItem('currentPage', currentPage.toString());
-}, [currentPage]);
 
     
   
 
-  useEffect(() => {
-    // Retrieve Token
-    const token = localStorage.getItem("authToken");
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
+  // useEffect(() => {
+  //   // Retrieve Token
+  //   const token = localStorage.getItem("authToken");
+  //   const config = {
+  //     headers: {
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //   };
   
    
-    const fetchFilteredAddresses = async () => {
-      let deliveredAddresses: any[] = [];
-      let receivedAddresses: any[] = [];
+  //   const fetchFilteredAddresses = async () => {
+  //     let deliveredAddresses: any[] = [];
+  //     let receivedAddresses: any[] = [];
   
-      // Fetch delivered addresses if deliveredChecked is true
-      if (deliveredChecked) {
-        const deliveredResponse = await axios.get(
-          `${Base_Url}openPhoneEventData?filter=delivered`,
-          config
-        );
-        deliveredAddresses = deliveredResponse.data.data
-          .filter(
-            (event: { event_type_id: number }) => event.event_type_id === 2
-          )
-          .map((event: { address: any }) => event.address);
-      }
+  //     // Fetch delivered addresses if deliveredChecked is true
+  //     if (deliveredChecked) {
+  //       const deliveredResponse = await axios.get(
+  //         `${Base_Url}openPhoneEventData?filter=delivered`,
+  //         config
+  //       );
+  //       deliveredAddresses = deliveredResponse.data.data
+  //         .filter(
+  //           (event: { event_type_id: number }) => event.event_type_id === 2
+  //         )
+  //         .map((event: { address: any }) => event.address);
+  //     }
   
-      // Fetch received addresses if receivedChecked is true
-      if (receivedChecked) {
-        const receivedResponse = await axios.get(
-          `${Base_Url}openPhoneEventData?filter=received`,
-          config
-        );
-        receivedAddresses = receivedResponse.data.data.map(
-          (event: { address: any }) => event.address
-        );
-      }
+  //     // Fetch received addresses if receivedChecked is true
+  //     if (receivedChecked) {
+  //       const receivedResponse = await axios.get(
+  //         `${Base_Url}openPhoneEventData?filter=received`,
+  //         config
+  //       );
+  //       receivedAddresses = receivedResponse.data.data.map(
+  //         (event: { address: any }) => event.address
+  //       );
+  //     }
   
-      // Combine delivered and received addresses
-      const combinedAddresses = [
-        ...new Set([...deliveredAddresses, ...receivedAddresses]),
-      ];
+  //     // Combine delivered and received addresses
+  //     const combinedAddresses = [
+  //       ...new Set([...deliveredAddresses, ...receivedAddresses]),
+  //     ];
   
-      if (deliveredChecked || receivedChecked) {
-        // If a filter is applied and no addresses are found, show "No address found"
-        if (combinedAddresses.length === 0) {
-          console.log("No address found for the selected filters.");
-          setFilteredAddresses2([]); // Show "No address found" in UI
-          return;
-        }
+  //     if (deliveredChecked || receivedChecked) {
+  //       // If a filter is applied and no addresses are found, show "No address found"
+  //       if (combinedAddresses.length === 0) {
+  //         console.log("No address found for the selected filters.");
+  //         setFilteredAddresses2([]); // Show "No address found" in UI
+  //         return;
+  //       }
   
-        // Filter the addresses based on combinedAddresses
-        const filtered = addresses2.filter((addressObj: { address: any }) =>
-          combinedAddresses.includes(addressObj.address)
-        );
-         setFilteredAddresses2(filtered);
-      } else {
-        // Show all addresses by default when no filters are applied
-        setFilteredAddresses2(addresses2);
-      }
-    };
+  //       // Filter the addresses based on combinedAddresses
+  //       const filtered = addresses2.filter((addressObj: { address: any }) =>
+  //         combinedAddresses.includes(addressObj.address)
+  //       );
+  //        setFilteredAddresses2(filtered);
+  //     } else {
+  //       // Show all addresses by default when no filters are applied
+  //       setFilteredAddresses2(addresses2);
+  //     }
+  //   };
   
-    fetchFilteredAddresses();
-  }, [deliveredChecked, receivedChecked, addresses2, Base_Url]);
-
-  
-  useEffect(() => {
-    const fetchAddresses = async () => {
-      try {
-        const token = localStorage.getItem("authToken");
-
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`, 
-          },
-        };
-
-        const response = await axios.get(
-          `${Base_Url}/address/with-stop-responses`,
-          config
-        );
-        setAddresses(response.data);
-        console.log("stop Address", response.data);
-      } catch (error) {
-        setError("error.message");  
-      }
-    };
-
-    fetchAddresses();
-  }, [Base_Url]); 
-
-
+  //   fetchFilteredAddresses();
+  // }, [deliveredChecked, receivedChecked, addresses2, Base_Url]);
   
   
 
@@ -615,6 +593,23 @@ useEffect(() => {
   
 
 
+  useEffect(() => {
+    updateEventTypeId();
+  }, [receivedChecked, deliveredChecked, eventTypeId,
+]);
+
+
+  const updateEventTypeId = () => {
+    if (receivedChecked && deliveredChecked) {
+      setEventTypeId(2); // Both received and delivered checked
+    } else if (receivedChecked) {
+      setEventTypeId(1); // Only received checked
+    } else if (deliveredChecked) {
+      setEventTypeId(2); // Only delivered checked
+    } else {
+      setEventTypeId(null); // Neither checked
+    }
+  };
 
 
   const handleDefaultClick = () => {
@@ -622,14 +617,16 @@ useEffect(() => {
   };
 
   const handleCheckboxChange = (typeId: number) => {
-    setSelectedAuctionTypes((prevSelected) => {
-      if (prevSelected.includes(typeId)) {
-        // Remove the filter if already selected
-        return prevSelected.filter((id) => id !== typeId);
-      } else {
-        return [...prevSelected, typeId];
-      }
-    });
+    console.log("🚀 ~ handleCheckboxChange ~ typeId:", typeId)
+    // setSelectedAuctionTypes((prevSelected) => {
+    //   if (prevSelected.includes(typeId)) {
+    //     // Remove the filter if already selected
+    //     return prevSelected.filter((id) => id !== typeId);
+    //   } else {
+    //     return [...prevSelected, typeId];
+    //   }
+    // });
+    setAuctionEventId(typeId)
   };
 
   // Helper function to check if a date is within the last week
@@ -1005,8 +1002,10 @@ useEffect(() => {
                         <li className="dropdown-item">
                           <input
                             type="checkbox"
+                            // checked={deliveredChecked}
+                            // onChange={handleDeliveredChange}
                             checked={deliveredChecked}
-                            onChange={handleDeliveredChange}
+            onChange={() => setDeliveredChecked(!deliveredChecked)}
                             className={styles.checkBox}
                           />
                           <label className="ms-2">Delivered</label>
@@ -1014,8 +1013,11 @@ useEffect(() => {
                         <li className="dropdown-item pt-2">
                           <input
                             type="checkbox"
+                            // checked={receivedChecked}
+                            // onChange={handleReceivedChange}
+
                             checked={receivedChecked}
-                            onChange={handleReceivedChange}
+                            onChange={() => setReceivedChecked(!receivedChecked)}
                             id="notDelivered"
                             className={styles.checkBox}
                           />
@@ -1082,7 +1084,7 @@ useEffect(() => {
                             onChange={() => handleCheckboxChange(4)}
                           />
                           <label className="ms-2" htmlFor="taxDeed">
-                            Tax disaster
+                            Beach Data
                           </label>
                         </li>
                       </div>
@@ -1151,7 +1153,7 @@ useEffect(() => {
                           <button
                             className="btn ms-2"
                             type="button"
-                            // onClick={handleCustomDateToggle}
+                            onClick={handleCustomDateToggle}
                             aria-expanded={isCustomDateOpen}
                           >
                             <Image
@@ -1205,7 +1207,6 @@ useEffect(() => {
                         )}
                       </li>
                     </div>
-
                     <div className="mt-4">
                       Address
                       {/* <span className=""> */}
@@ -1226,8 +1227,10 @@ useEffect(() => {
                         <li className="dropdown-item">
                           <input
                             type="checkbox"
-                            checked={deliveredChecked}
-                            onChange={handleDeliveredChange}
+                            // checked={deliveredChecked}
+                            // onChange={handleDeliveredChange}
+                            checked={withResponses}
+            onChange={() => setWithResponses(!withResponses)}
                             className={styles.checkBox}
                           />
                           <label className="ms-2">Stop </label>
@@ -1235,8 +1238,10 @@ useEffect(() => {
                         <li className="dropdown-item pt-2">
                           <input
                             type="checkbox"
-                            checked={receivedChecked}
-                            onChange={handleReceivedChange}
+                            // checked={receivedChecked}
+                            // onChange={handleReceivedChange}
+                            checked={withStopResponses}
+            onChange={() => setWithStopResponses(!withStopResponses)}
                             id="notDelivered"
                             className={styles.checkBox}
                           />
