@@ -123,29 +123,24 @@ const ConversationTable = () => {
 
             <Dropdown.Menu>
               <Dropdown.Item 
-                active={recordsPerPage === 2}
-                onClick={() => handleRecordsPerPageChange(2)}
-              >
-                20
-              </Dropdown.Item>
-              <Dropdown.Item 
-                active={recordsPerPage === 5}
-                onClick={() => handleRecordsPerPageChange(5)}
-              >
-                50
-              </Dropdown.Item>
-              <Dropdown.Item 
-                active={recordsPerPage === 10}
-                onClick={() => handleRecordsPerPageChange(10)}
-              >
-                100
-              </Dropdown.Item>
-              <Dropdown.Item 
                 active={recordsPerPage === 20}
                 onClick={() => handleRecordsPerPageChange(20)}
               >
                 20
               </Dropdown.Item>
+              <Dropdown.Item 
+                active={recordsPerPage === 50}
+                onClick={() => handleRecordsPerPageChange(50)}
+              >
+                50
+              </Dropdown.Item>
+              <Dropdown.Item 
+                active={recordsPerPage === 100}
+                onClick={() => handleRecordsPerPageChange(100)}
+              >
+                100
+              </Dropdown.Item>
+              
               {/* Add more options if needed */}
             </Dropdown.Menu>
           </Dropdown>
