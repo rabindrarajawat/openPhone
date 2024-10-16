@@ -37,8 +37,7 @@ const AddressList = () => {
         });
 
         // Log the API response to understand its structure
-        console.log('API Response:', response.data);
-
+ 
         // Ensure addresses are set correctly
         if (response.data && response.data.data) {
           setAddresses(response.data.data); // Adjusted to reflect the correct field name
