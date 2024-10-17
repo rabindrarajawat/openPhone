@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ILike, Repository } from "typeorm";
+import { Brackets, ILike, Repository } from "typeorm";
 import { AddressDto } from "../dto/address.dto";
 import { AddressEntity } from "../entities/address.entity";
 import { OpenPhoneEventEntity } from "src/entities/open-phone-event.entity";
@@ -368,7 +368,9 @@ export class AddressService {
     withStopResponses?: boolean,
     sortBy: string = "modified_at",
     sortOrder: 'ASC' | 'DESC' = 'DESC',
-    eventTypeId?: number
+    eventTypeId?: number,
+    isBookmarked?: boolean,
+    searchTerm?: string
   ): Promise<{ data: AddressEntity[]; totalCount: number }> {
     if (isNaN(page) || page <= 0) page = 1;
     if (isNaN(limit) || limit <= 0) limit = 10;
@@ -466,6 +468,20 @@ export class AddressService {
         queryBuilder.setParameter("eventTypeId", eventTypeId);
       }
 
+      if (searchTerm) {
+        queryBuilder.andWhere(new Brackets(qb => {
+          qb.where("address.address ILIKE :searchTerm", { searchTerm: `%${searchTerm}%` });
+          // Add any other searchable fields from CommonEntity if needed
+        }));
+      }
+
+
+
+      if (isBookmarked !== undefined) {
+        queryBuilder.andWhere("address.is_bookmarked = :isBookmarked", { isBookmarked });
+      }
+
+
       // Add sorting
       // queryBuilder.orderBy(`address.${sortBy}`, sortOrder);
 
@@ -476,8 +492,7 @@ export class AddressService {
       }
 
 
-
-
+     
 
       // Add distinct to avoid duplicate addresses due to the join
       queryBuilder.distinct(true);
