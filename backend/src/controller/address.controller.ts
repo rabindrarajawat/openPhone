@@ -309,7 +309,10 @@ export class AddressController {
     @Query("withStopResponses") withStopResponses?: boolean,
     @Query("sortBy") sortBy: string = "modified_at",
     @Query("sortOrder") sortOrder: 'ASC' | 'DESC' = 'DESC',
-    @Query("eventTypeId") eventTypeId?: number
+    @Query("eventTypeId") eventTypeId?: number,
+    @Query("isBookmarked") isBookmarked?: boolean,
+    @Query("searchTerm") searchTerm?: string
+
   ) {
     try {
       page = page && page > 0 ? page : 1;
@@ -326,7 +329,9 @@ export class AddressController {
         withStopResponses,
         sortBy,
         sortOrder,
-        eventTypeId
+        eventTypeId,isBookmarked,
+        searchTerm
+        
       );
 
       if (data.length === 0) {
