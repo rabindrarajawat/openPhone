@@ -445,7 +445,8 @@ export class AddressService {
             .subQuery()
             .select("DISTINCT(e.address_id)")
             .from(OpenPhoneEventEntity, "e")
-            .where("e.event_direction_id = :outgoingDirection", { outgoingDirection: 2 })
+            // .where("e.event_direction_id = :outgoingDirection", { outgoingDirection: 2 })
+            .where("e.event_direction_id IN (:...directionIds)", { directionIds: [1, 2] })
             .andWhere("(e.body = :stopMessage OR e.is_stop = :isStop)")
             .getQuery();
           return "address.id IN " + subQuery;
