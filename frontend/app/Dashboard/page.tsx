@@ -171,8 +171,7 @@ const Dashboard = () => {
   const [eventTypeId, setEventTypeId] = useState<number | null>(null); // Accepts either a number or null
 
   const [searchQuery, setSearchQuery] = useState("");
-  console.log("🚀 ~ Dashboard ~ searchQuery:", searchQuery);
-  const [deliveredChecked, setDeliveredChecked] = useState(false);
+   const [deliveredChecked, setDeliveredChecked] = useState(false);
   const [receivedChecked, setReceivedChecked] = useState(false);
   const [addresses2, setAddresses2] = useState<Address1[]>([]);
   const [filteredAddresses2, setFilteredAddresses2] = useState<Address1[]>([]);
@@ -269,7 +268,7 @@ const Dashboard = () => {
             params: {
               page: currentPage,
               limit: itemsPerPage,
-              auctionEventId: auctionEventId,
+              auctionEventId: auctionEventId?auctionEventId:null,
               filterType:
                 selectedDateFilter !== "all" ? selectedDateFilter : null,
               fromDate: fromDate && toDate ? fromDate : null,
@@ -278,9 +277,8 @@ const Dashboard = () => {
               withStopResponses: withResponses ? "true" : null,
               eventTypeId: eventTypeId ? eventTypeId : null,
               isBookmarked: is_boookmarked ? is_boookmarked : null,
-              searchTerm: searchQuery,
-              // isDelivered: deliveredChecked ? 'true' : 'false',
-            },
+              searchTerm: searchQuery?searchQuery:null,
+             },
           });
 
         // Extract the addresses array from the response
@@ -895,8 +893,7 @@ const Dashboard = () => {
     setInput(address.fullAddress);
     setResultsState([]);
   };
-  console.log("🚀 ~ Dashboard ~ is_boookmarked:", is_boookmarked);
-  const handleFilterChange = (type: "all" | "bookmarked" | "default") => {
+   const handleFilterChange = (type: "all" | "bookmarked" | "default") => {
     setFilterOption(type);
     setIsBookmarked(true);
   };
