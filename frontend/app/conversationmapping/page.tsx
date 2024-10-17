@@ -144,7 +144,8 @@ const ConversationTable = () => {
             show={showPopup}
             onHide={handlePopupClose}
             conversationId={selectedRecord.conversation_id} onSaveSuccess={function (): void {
-              throw new Error('Function not implemented.');
+              throw new Error('Function not implemented.'),  fetchData();
+              ;
             } }            // Pass any other necessary props here
           />
         )}

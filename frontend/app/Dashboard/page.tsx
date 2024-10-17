@@ -156,7 +156,7 @@ const Dashboard = () => {
   const [timeFilter, setTimeFilter] = useState<"all" | "weekly" | "monthly">(
     "all"
   );
- 
+
   const [showAllAddresses, setShowAllAddresses] = useState<boolean>(true);
   const [selectedDateFilter, setSelectedDateFilter] = useState<
     "all" | "weekly" | "monthly"
@@ -171,6 +171,7 @@ const Dashboard = () => {
   const [eventTypeId, setEventTypeId] = useState<number | null>(null); // Accepts either a number or null
 
   const [searchQuery, setSearchQuery] = useState("");
+  console.log("🚀 ~ Dashboard ~ searchQuery:", searchQuery);
   const [deliveredChecked, setDeliveredChecked] = useState(false);
   const [receivedChecked, setReceivedChecked] = useState(false);
   const [addresses2, setAddresses2] = useState<Address1[]>([]);
@@ -181,12 +182,12 @@ const Dashboard = () => {
   const [searchTo, setSearchTo] = useState(""); // State to hold search input
   const addressesPerPage = 10;
   const [totalItems, setTotalItems] = useState(0);
+  const [is_boookmarked, setIsBookmarked] = useState(false);
 
   // Initialize recordsPerPage from localStorage or default to 20
-  const [itemsPerPage, setItemsPerPage] = useState<number>(10)
-    // const saved = localStorage.getItem('itemsPerPage');
-    // return saved ? parseInt(saved, 10) : 20;
-
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  // const saved = localStorage.getItem('itemsPerPage');
+  // return saved ? parseInt(saved, 10) : 20;
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -276,6 +277,8 @@ const Dashboard = () => {
               withResponses: withStopResponses ? "true" : null,
               withStopResponses: withResponses ? "true" : null,
               eventTypeId: eventTypeId ? eventTypeId : null,
+              isBookmarked: is_boookmarked ? is_boookmarked : null,
+              searchTerm: searchQuery,
               // isDelivered: deliveredChecked ? 'true' : 'false',
             },
           });
@@ -303,7 +306,6 @@ const Dashboard = () => {
           })
         );
 
- 
         setAddresses2(formattedAddresses);
         setFilteredAddresses2(formattedAddresses);
         setTotalItems(addressResponse.data.totalCount);
@@ -319,7 +321,6 @@ const Dashboard = () => {
         );
         setNotifications(unreadNotifications);
 
-
         // Calculate notification counts
         const addressNotificationCounts = formattedAddresses.map(
           (address: any) => {
@@ -331,7 +332,7 @@ const Dashboard = () => {
         );
 
         setAddresses1(addressNotificationCounts);
-   
+
         // Sort addresses by modified_at to get the latest modified address
         // const sortedAddresses = addressNotificationCounts.sort(
         //   (a: { modified_at: string | number | Date }, b: { modified_at: string | number | Date }) => {
@@ -371,25 +372,27 @@ const Dashboard = () => {
     receivedChecked,
     deliveredChecked,
     eventTypeId,
+    is_boookmarked,
+    searchQuery,
   ]);
 
   // Handle items per page change (reset page to 1)
-const handleItemsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-  setItemsPerPage(Number(event.target.value));
-  setCurrentPage(1); // Reset to the first page on changing items per page
-};
+  const handleItemsPerPageChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setItemsPerPage(Number(event.target.value));
+    setCurrentPage(1); // Reset to the first page on changing items per page
+  };
 
+  // Save recordsPerPage to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("itemsPerPage", itemsPerPage.toString());
+  }, [itemsPerPage]);
 
-
- // Save recordsPerPage to localStorage whenever it changes
- useEffect(() => {
-  localStorage.setItem('itemsPerPage', itemsPerPage.toString());
-}, [itemsPerPage]); 
-
-// Optional: Save currentPage to localStorage whenever it changes
-useEffect(() => {
-  localStorage.setItem('currentPage', currentPage.toString());
-}, [currentPage]);
+  // Optional: Save currentPage to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("currentPage", currentPage.toString());
+  }, [currentPage]);
 
   // Handle page change (update currentPage state)
 
@@ -609,6 +612,7 @@ useEffect(() => {
 
   const handleDefaultClick = () => {
     setFilterOption("all");
+    setIsBookmarked(false);
   };
 
   const handleCheckboxChange = (typeId: number) => {
@@ -891,9 +895,10 @@ useEffect(() => {
     setInput(address.fullAddress);
     setResultsState([]);
   };
-
+  console.log("🚀 ~ Dashboard ~ is_boookmarked:", is_boookmarked);
   const handleFilterChange = (type: "all" | "bookmarked" | "default") => {
     setFilterOption(type);
+    setIsBookmarked(true);
   };
 
   // Hook called unconditionally
@@ -1350,6 +1355,7 @@ useEffect(() => {
                                 width={15}
                                 height={15}
                                 src="/bookmark.png"
+                                style={{ cursor: "pointer" }}
                                 className={`ms-2 ${
                                   filterOption === "bookmarked"
                                     ? styles.iconBlue
@@ -1368,6 +1374,7 @@ useEffect(() => {
                               <Image
                                 src="/redo.svg"
                                 alt="redo"
+                                style={{ cursor: "pointer" }}
                                 width={15}
                                 height={15}
                                 className={`ms-2 ${
@@ -1376,7 +1383,10 @@ useEffect(() => {
                                     : ""
                                 }`}
                               />
-                              <div className={`${styles.addFilter}`}>
+                              <div
+                                style={{ cursor: "pointer" }}
+                                className={`${styles.addFilter}`}
+                              >
                                 Default
                               </div>
                             </div>
@@ -1391,15 +1401,24 @@ useEffect(() => {
                               />
                             )}
                           </div>
-                          <div style={{ marginBottom: '20px' }}>
-        <label htmlFor="itemsPerPage" style={{ marginRight: '10px' }}>Show per page:</label>
-        <select id="itemsPerPage" value={itemsPerPage} onChange={handleItemsPerPageChange}>
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-          <option value={50}>50</option>
-          <option value={100}>100</option>  
-        </select>
-      </div>
+                          <div style={{ marginBottom: "20px" }}>
+                            <label
+                              htmlFor="itemsPerPage"
+                              style={{ marginRight: "10px" }}
+                            >
+                              Show per page:
+                            </label>
+                            <select
+                              id="itemsPerPage"
+                              value={itemsPerPage}
+                              onChange={handleItemsPerPageChange}
+                            >
+                              <option value={10}>10</option>
+                              <option value={20}>20</option>
+                              <option value={50}>50</option>
+                              <option value={100}>100</option>
+                            </select>
+                          </div>
 
                           {addresses1.length > 0 ? (
                             addresses1.map((address) => (
