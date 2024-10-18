@@ -368,9 +368,10 @@ export class AddressService {
     withStopResponses?: boolean,
     sortBy: string = "modified_at",
     sortOrder: 'ASC' | 'DESC' = 'DESC',
-    eventTypeId?: number,
+    // eventTypeId?: number,
     isBookmarked?: boolean,
-    searchTerm?: string
+    searchTerm?: string,
+    eventTypeIds?: number[],
   ): Promise<{ data: AddressEntity[]; totalCount: number }> {
     if (isNaN(page) || page <= 0) page = 1;
     if (isNaN(limit) || limit <= 0) limit = 10;
@@ -456,18 +457,35 @@ export class AddressService {
       }
 
       // Add event type filter
-      if (eventTypeId) {
+      // if (eventTypeId) {
+      //   queryBuilder.andWhere((qb) => {
+      //     const subQuery = qb
+      //       .subQuery()
+      //       .select("DISTINCT(e.address_id)")
+      //       .from(OpenPhoneEventEntity, "e")
+      //       .where("e.event_type_id = :eventTypeId")
+      //       .getQuery();
+      //     return "address.id IN " + subQuery;
+      //   });
+      //   queryBuilder.setParameter("eventTypeId", eventTypeId);
+      // }
+
+
+      if (eventTypeIds && eventTypeIds.length > 0) {
         queryBuilder.andWhere((qb) => {
           const subQuery = qb
             .subQuery()
             .select("DISTINCT(e.address_id)")
             .from(OpenPhoneEventEntity, "e")
-            .where("e.event_type_id = :eventTypeId")
+            .where("e.event_type_id IN (:...eventTypeIds)")
             .getQuery();
           return "address.id IN " + subQuery;
         });
-        queryBuilder.setParameter("eventTypeId", eventTypeId);
+        queryBuilder.setParameter("eventTypeIds", eventTypeIds);
       }
+
+
+
 
       if (searchTerm) {
         queryBuilder.andWhere(new Brackets(qb => {

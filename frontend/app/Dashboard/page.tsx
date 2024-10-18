@@ -250,6 +250,19 @@ const Dashboard = () => {
     }
   }, [router]);
 
+
+
+
+
+  const [eventTypeIds, setEventTypeIds] = useState<number[]>([]);
+
+  useEffect(() => {
+    const newEventTypeIds: number[] = [];
+    if (receivedChecked) newEventTypeIds.push(1);
+    if (deliveredChecked) newEventTypeIds.push(2);
+    setEventTypeIds(newEventTypeIds);
+  }, [receivedChecked, deliveredChecked]);
+
   useEffect(() => {
     const fetchData = async () => {
       // Retrieve Token
@@ -278,6 +291,7 @@ const Dashboard = () => {
               eventTypeId: eventTypeId ? eventTypeId : null,
               isBookmarked: is_boookmarked ? is_boookmarked : null,
               searchTerm: searchQuery?searchQuery:null,
+              eventTypeIds: eventTypeIds.length > 0 ? JSON.stringify(eventTypeIds) : null,
              },
           });
 
@@ -371,7 +385,7 @@ const Dashboard = () => {
     deliveredChecked,
     eventTypeId,
     is_boookmarked,
-    searchQuery,
+    searchQuery,eventTypeIds,auctionEventId
   ]);
 
   // Handle items per page change (reset page to 1)
@@ -592,21 +606,21 @@ const Dashboard = () => {
     setUpdatedMessages(groupedMessages);
   }, [events]);
 
-  useEffect(() => {
-    updateEventTypeId();
-  }, [receivedChecked, deliveredChecked, eventTypeId]);
+  // useEffect(() => {
+  //   updateEventTypeId();
+  // }, [receivedChecked, deliveredChecked, eventTypeId]);
 
-  const updateEventTypeId = () => {
-    if (receivedChecked && deliveredChecked) {
-      setEventTypeId(1); // Both received and delivered checked
-    } else if (receivedChecked) {
-      setEventTypeId(1); // Only received checked
-    } else if (deliveredChecked) {
-      setEventTypeId(2); // Only delivered checked
-    } else {
-      setEventTypeId(null); // Neither checked
-    }
-  };
+  // const updateEventTypeId = () => {
+  //   if (receivedChecked && deliveredChecked) {
+  //     setEventTypeId(1); // Both received and delivered checked
+  //   } else if (receivedChecked) {
+  //     setEventTypeId(1); // Only received checked
+  //   } else if (deliveredChecked) {
+  //     setEventTypeId(2); // Only delivered checked
+  //   } else {
+  //     setEventTypeId(null); // Neither checked
+  //   }
+  // };
 
   const handleDefaultClick = () => {
     setFilterOption("all");
@@ -614,17 +628,11 @@ const Dashboard = () => {
   };
 
   const handleCheckboxChange = (typeId: number) => {
-    // setSelectedAuctionTypes((prevSelected) => {
-    //   if (prevSelected.includes(typeId)) {
-    //     // Remove the filter if already selected
-    //     return prevSelected.filter((id) => id !== typeId);
-    //   } else {
-    //     return [...prevSelected, typeId];
-    //   }
-    // });
-    setAuctionEventId(typeId);
+    setAuctionEventId((prevAuctionEventId) =>
+      prevAuctionEventId === typeId ? null : typeId
+    );
   };
-
+  
   // Helper function to check if a date is within the last week
   const isWithinLastWeek = (dateString: string | number | Date) => {
     const date = new Date(dateString);
@@ -993,7 +1001,7 @@ const Dashboard = () => {
                       </button>
                       <div className={`ms-4 ${isType ? "show" : ""}`}>
                         <li className="dropdown-item">
-                          <input
+                          {/* <input
                             type="checkbox"
                             // checked={deliveredChecked}
                             // onChange={handleDeliveredChange}
@@ -1003,10 +1011,23 @@ const Dashboard = () => {
                             }
                             className={styles.checkBox}
                           />
+
+*/}
+  <input
+            type="checkbox"
+            checked={deliveredChecked}
+            onChange={() => setDeliveredChecked(!deliveredChecked)}
+            className={styles.checkBox}
+          />
+
+
+
+
+
                           <label className="ms-2">Delivered</label>
                         </li>
                         <li className="dropdown-item pt-2">
-                          <input
+                          {/* <input
                             type="checkbox"
                             // checked={receivedChecked}
                             // onChange={handleReceivedChange}
@@ -1017,7 +1038,18 @@ const Dashboard = () => {
                             }
                             id="notDelivered"
                             className={styles.checkBox}
-                          />
+                          /> */}
+
+
+<input
+            type="checkbox"
+            checked={receivedChecked}
+            onChange={() => setReceivedChecked(!receivedChecked)}
+            className={styles.checkBox}
+          />
+
+
+
                           <label className="ms-2" htmlFor="notDelivered">
                             Received
                           </label>
