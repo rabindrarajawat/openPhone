@@ -558,6 +558,8 @@ export class OpenPhoneEventService {
           "event.from",
           "event.to",
           "event.body",
+          "event.created_at",
+
         ])
         .where("event.address_id IS NULL")
         .andWhere("event.conversation_id NOT IN (" + subQuery.getQuery() + ")")
@@ -572,6 +574,7 @@ export class OpenPhoneEventService {
         from: event.from,
         to: event.to,
         body: event.body,
+        created_at:event.created_at,
       }));
 
       return {

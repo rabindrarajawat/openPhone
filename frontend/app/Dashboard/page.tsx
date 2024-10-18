@@ -137,7 +137,7 @@ const Dashboard = () => {
 
   const [uniqueFromNumbers, setUniqueFromNumbers] = useState<string[]>([]);
 
-  const [expandedMessages, setExpandedMessages] = useState(new Map());
+  const [expandedMessages, setExpandedMessages] = useState(new Set());
 
   const [counts, setCounts] = useState({
     messageDelivered: 0,
@@ -171,7 +171,7 @@ const Dashboard = () => {
   const [eventTypeId, setEventTypeId] = useState<number | null>(null); // Accepts either a number or null
 
   const [searchQuery, setSearchQuery] = useState("");
-   const [deliveredChecked, setDeliveredChecked] = useState(false);
+  const [deliveredChecked, setDeliveredChecked] = useState(false);
   const [receivedChecked, setReceivedChecked] = useState(false);
   const [addresses2, setAddresses2] = useState<Address1[]>([]);
   const [filteredAddresses2, setFilteredAddresses2] = useState<Address1[]>([]);
@@ -183,11 +183,22 @@ const Dashboard = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [is_boookmarked, setIsBookmarked] = useState(false);
 
-  // Initialize recordsPerPage from localStorage or default to 20
-  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
-  // const saved = localStorage.getItem('itemsPerPage');
-  // return saved ? parseInt(saved, 10) : 20;
+  const [itemsPerPage, setItemsPerPage] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      const storedData = localStorage.getItem("itemsPerPage");
+      return storedData ? JSON.parse(storedData) : 10; // Default to 10 if no data
+    }
+    return 10; // Default to 10 if window is not defined
+  });
 
+  const handleItemsPerPageChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const selectedPageSize = Number(event.target.value);
+    setItemsPerPage(selectedPageSize);
+    localStorage.setItem("itemsPerPage", JSON.stringify(selectedPageSize)); // Save selected page size to local storage
+    setCurrentPage(1); // Reset to the first page on changing items per page
+  };
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [withResponses, setWithResponses] = useState(false);
@@ -250,10 +261,6 @@ const Dashboard = () => {
     }
   }, [router]);
 
-
-
-
-
   const [eventTypeIds, setEventTypeIds] = useState<number[]>([]);
 
   useEffect(() => {
@@ -281,7 +288,7 @@ const Dashboard = () => {
             params: {
               page: currentPage,
               limit: itemsPerPage,
-              auctionEventId: auctionEventId?auctionEventId:null,
+              auctionEventId: auctionEventId ? auctionEventId : null,
               filterType:
                 selectedDateFilter !== "all" ? selectedDateFilter : null,
               fromDate: fromDate && toDate ? fromDate : null,
@@ -290,9 +297,10 @@ const Dashboard = () => {
               withStopResponses: withResponses ? "true" : null,
               eventTypeId: eventTypeId ? eventTypeId : null,
               isBookmarked: is_boookmarked ? is_boookmarked : null,
-              searchTerm: searchQuery?searchQuery:null,
-              eventTypeIds: eventTypeIds.length > 0 ? JSON.stringify(eventTypeIds) : null,
-             },
+              searchTerm: searchQuery ? searchQuery : null,
+              eventTypeIds:
+                eventTypeIds.length > 0 ? JSON.stringify(eventTypeIds) : null,
+            },
           });
 
         // Extract the addresses array from the response
@@ -385,21 +393,30 @@ const Dashboard = () => {
     deliveredChecked,
     eventTypeId,
     is_boookmarked,
-    searchQuery,eventTypeIds,auctionEventId
+    searchQuery,
+    eventTypeIds,
+    auctionEventId,
   ]);
 
   // Handle items per page change (reset page to 1)
-  const handleItemsPerPageChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    setItemsPerPage(Number(event.target.value));
-    setCurrentPage(1); // Reset to the first page on changing items per page
-  };
-
+  // const handleItemsPerPageChange = (
+  //   event: React.ChangeEvent<HTMLSelectElement>
+  // ) => {
+  //   setItemsPerPage(Number(event.target.value));
+  //   setCurrentPage(1); // Reset to the first page on changing items per page
+  // };
+  // const handleItemsPerPageChange = (
+  //   event: React.ChangeEvent<HTMLSelectElement>
+  // ) => {
+  //   const selectedPageSize = Number(event.target.value);
+  //   setItemsPerPage(selectedPageSize);
+  //   localStorage.setItem("pageNumber", JSON.stringify(selectedPageSize)); // Save selected page size to local storage
+  //   setCurrentPage(1); // Reset to the first page on changing items per page
+  // };
   // Save recordsPerPage to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("itemsPerPage", itemsPerPage.toString());
-  }, [itemsPerPage]);
+  // useEffect(() => {
+  //   localStorage.setItem("itemsPerPage", itemsPerPage.toString());
+  // }, [itemsPerPage]);
 
   // Optional: Save currentPage to localStorage whenever it changes
   useEffect(() => {
@@ -632,91 +649,6 @@ const Dashboard = () => {
       prevAuctionEventId === typeId ? null : typeId
     );
   };
-  
-  // Helper function to check if a date is within the last week
-  const isWithinLastWeek = (dateString: string | number | Date) => {
-    const date = new Date(dateString);
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-    return date >= oneWeekAgo;
-  };
-
-  // Helper function to check if a date is within the last month
-  const isWithinLastMonth = (dateString: string | number | Date) => {
-    const date = new Date(dateString);
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
-    return date >= oneMonthAgo;
-  };
-
-  // Now filter and sort the addresses
-  // const filteredAddresses = addresses1
-  //   .filter((address) => {
-  //     // Apply your existing filter logic
-  //     const matchesAuctionType =
-  //       selectedAuctionTypes.length === 0 ||
-  //       selectedAuctionTypes.includes(address.auction_event_id);
-  //     const matchesBookmark =
-  //       filterOption === "all" ||
-  //       (filterOption === "bookmarked" && address.is_bookmarked) ||
-  //       filterOption === "default";
-  //     const matchesDateFilter =
-  //       selectedDateFilter === "all" ||
-  //       (selectedDateFilter === "weekly" &&
-  //         isWithinLastWeek(address.created_at)) ||
-  //       (selectedDateFilter === "monthly" &&
-  //         isWithinLastMonth(address.created_at));
-  //     const matchesCustomDateFilter =
-  //       (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
-  //       (!toDate || new Date(address.created_at) <= new Date(toDate));
-  //     const matchesSearch = address.displayAddress
-  //       .toLowerCase()
-  //       .includes(searchQuery.toLowerCase());
-
-  //     return (
-  //       matchesAuctionType &&
-  //       matchesBookmark &&
-  //       matchesDateFilter &&
-  //       matchesCustomDateFilter &&
-  //       matchesSearch
-  //     );
-  //   })
-  //   .sort((a: Address1, b: Address1) => {
-  //     return (
-  //       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  //     );
-  //   });
-
-  // const indexOfLastAddress = currentPage * addressesPerPage;
-  // const indexOfFirstAddress = indexOfLastAddress - addressesPerPage;
-
-  // const addressesToShow =
-  //   filteredAddresses.length > 0 // If there are any filtered addresses
-  //     ? filteredAddresses.filter((address) =>
-  //       filteredAddresses2.some(
-  //         (filteredAddress) => filteredAddress.address === address.address
-  //       )
-  //     )
-  //     : [];
-
-  // const currentAddresses = addressesToShow.slice(
-
-  // );
-
-  // const totalPages = Math.ceil(addressesToShow.length / addressesPerPage);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handleToggle = () => {
-    setIsType(!isType);
-  };
-  const handleToggle1 = () => {
-    setIsType((prevIsOpen) => !prevIsOpen);
-  };
 
   const handleCustomDateToggle = () => {
     setIsCustomDateOpen(!isCustomDateOpen);
@@ -732,14 +664,6 @@ const Dashboard = () => {
     target: { value: React.SetStateAction<string> };
   }) => {
     setSearchQuery(e.target.value);
-  };
-
-  const handleDeliveredChange = () => {
-    setDeliveredChecked(!deliveredChecked);
-  };
-
-  const handleReceivedChange = () => {
-    setReceivedChecked(!receivedChecked);
   };
 
   const handleBookmarkClick = (addressId: number) => {
@@ -830,13 +754,25 @@ const Dashboard = () => {
     }
   };
 
-  const toggleMessageExpansion = (index: any) => {
+  // const toggleMessageExpansion = (index: any) => {
+  //   setExpandedMessages((prev) => {
+  //     const newExpandedMessages = new Map(prev);
+  //     if (newExpandedMessages.has(index)) {
+  //       newExpandedMessages.delete(index);
+  //     } else {
+  //       newExpandedMessages.set(index, true);
+  //     }
+  //     return newExpandedMessages;
+  //   });
+  // };
+
+  const toggleMessageExpansion = (id: number) => {
     setExpandedMessages((prev) => {
-      const newExpandedMessages = new Map(prev);
-      if (newExpandedMessages.has(index)) {
-        newExpandedMessages.delete(index);
+      const newExpandedMessages = new Set(prev);
+      if (newExpandedMessages.has(id)) {
+        newExpandedMessages.delete(id);
       } else {
-        newExpandedMessages.set(index, true);
+        newExpandedMessages.add(id);
       }
       return newExpandedMessages;
     });
@@ -889,10 +825,6 @@ const Dashboard = () => {
     }
   };
 
-  const handleAddressSelect1 = (address: Address) => {
-    setSelectedAddress(address.fullAddress);
-  };
-
   const toggleSidebar = () => {
     setIsSidebarVisible((prevState) => !prevState);
   };
@@ -901,12 +833,10 @@ const Dashboard = () => {
     setInput(address.fullAddress);
     setResultsState([]);
   };
-   const handleFilterChange = (type: "all" | "bookmarked" | "default") => {
-    setFilterOption(type);
+  const handleFilterChange = (type: "all" | "bookmarked" | "default") => {
+    // setFilterOption(type);
     setIsBookmarked(true);
   };
-
-  // Hook called unconditionally
 
   const toggleMessagePin = async (
     messageId: number,
@@ -961,7 +891,6 @@ const Dashboard = () => {
       )
     : Object.keys(updatedMessages);
 
-  // Function to format the count
   const formatCount = (count: number) => {
     if (count >= 1000000) {
       return (count / 1000000).toFixed(1) + "M"; // Convert to millions
@@ -969,6 +898,103 @@ const Dashboard = () => {
       return (count / 1000).toFixed(1) + "K"; // Convert to thousands
     }
     return count; // Return the original count if it's less than 1000
+  };
+
+  const handleDeliveredChange = () => {
+    setDeliveredChecked(!deliveredChecked);
+  };
+
+  const handleReceivedChange = () => {
+    setReceivedChecked(!receivedChecked);
+  };
+
+  const handleAddressSelect1 = (address: Address) => {
+    setSelectedAddress(address.fullAddress);
+  };
+
+  // Helper function to check if a date is within the last week
+  const isWithinLastWeek = (dateString: string | number | Date) => {
+    const date = new Date(dateString);
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    return date >= oneWeekAgo;
+  };
+
+  // Helper function to check if a date is within the last month
+  const isWithinLastMonth = (dateString: string | number | Date) => {
+    const date = new Date(dateString);
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    return date >= oneMonthAgo;
+  };
+
+  // Now filter and sort the addresses
+  // const filteredAddresses = addresses1
+  //   .filter((address) => {
+  //     // Apply your existing filter logic
+  //     const matchesAuctionType =
+  //       selectedAuctionTypes.length === 0 ||
+  //       selectedAuctionTypes.includes(address.auction_event_id);
+  //     const matchesBookmark =
+  //       filterOption === "all" ||
+  //       (filterOption === "bookmarked" && address.is_bookmarked) ||
+  //       filterOption === "default";
+  //     const matchesDateFilter =
+  //       selectedDateFilter === "all" ||
+  //       (selectedDateFilter === "weekly" &&
+  //         isWithinLastWeek(address.created_at)) ||
+  //       (selectedDateFilter === "monthly" &&
+  //         isWithinLastMonth(address.created_at));
+  //     const matchesCustomDateFilter =
+  //       (!fromDate || new Date(address.created_at) >= new Date(fromDate)) &&
+  //       (!toDate || new Date(address.created_at) <= new Date(toDate));
+  //     const matchesSearch = address.displayAddress
+  //       .toLowerCase()
+  //       .includes(searchQuery.toLowerCase());
+
+  //     return (
+  //       matchesAuctionType &&
+  //       matchesBookmark &&
+  //       matchesDateFilter &&
+  //       matchesCustomDateFilter &&
+  //       matchesSearch
+  //     );
+  //   })
+  //   .sort((a: Address1, b: Address1) => {
+  //     return (
+  //       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  //     );
+  //   });
+
+  // const indexOfLastAddress = currentPage * addressesPerPage;
+  // const indexOfFirstAddress = indexOfLastAddress - addressesPerPage;
+
+  // const addressesToShow =
+  //   filteredAddresses.length > 0 // If there are any filtered addresses
+  //     ? filteredAddresses.filter((address) =>
+  //       filteredAddresses2.some(
+  //         (filteredAddress) => filteredAddress.address === address.address
+  //       )
+  //     )
+  //     : [];
+
+  // const currentAddresses = addressesToShow.slice(
+
+  // );
+
+  // const totalPages = Math.ceil(addressesToShow.length / addressesPerPage);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleToggle = () => {
+    setIsType(!isType);
+  };
+  const handleToggle1 = () => {
+    setIsType((prevIsOpen) => !prevIsOpen);
   };
 
   return (
@@ -1013,16 +1039,14 @@ const Dashboard = () => {
                           />
 
 */}
-  <input
-            type="checkbox"
-            checked={deliveredChecked}
-            onChange={() => setDeliveredChecked(!deliveredChecked)}
-            className={styles.checkBox}
-          />
-
-
-
-
+                          <input
+                            type="checkbox"
+                            checked={deliveredChecked}
+                            onChange={() =>
+                              setDeliveredChecked(!deliveredChecked)
+                            }
+                            className={styles.checkBox}
+                          />
 
                           <label className="ms-2">Delivered</label>
                         </li>
@@ -1040,15 +1064,14 @@ const Dashboard = () => {
                             className={styles.checkBox}
                           /> */}
 
-
-<input
-            type="checkbox"
-            checked={receivedChecked}
-            onChange={() => setReceivedChecked(!receivedChecked)}
-            className={styles.checkBox}
-          />
-
-
+                          <input
+                            type="checkbox"
+                            checked={receivedChecked}
+                            onChange={() =>
+                              setReceivedChecked(!receivedChecked)
+                            }
+                            className={styles.checkBox}
+                          />
 
                           <label className="ms-2" htmlFor="notDelivered">
                             Received
@@ -1675,14 +1698,14 @@ const Dashboard = () => {
                                                 >
                                                   <div className="message-body-1">
                                                     {expandedMessages.has(
-                                                      index
+                                                      message.id
                                                     ) ? (
                                                       <div>
                                                         {message.body}
                                                         <button
                                                           onClick={() =>
                                                             toggleMessageExpansion(
-                                                              index
+                                                              message.id
                                                             )
                                                           }
                                                           className={`${
@@ -1725,7 +1748,7 @@ const Dashboard = () => {
                                                             <button
                                                               onClick={() =>
                                                                 toggleMessageExpansion(
-                                                                  index
+                                                                  message.id
                                                                 )
                                                               }
                                                               className={`${
