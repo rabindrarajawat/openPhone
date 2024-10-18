@@ -131,10 +131,12 @@ const Pagination: React.FC<PaginationProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: '20px',
+        marginTop: '-31px',
       }}
     >
       {/* Previous Button */}
+      
+
       <button
         onClick={handlePrevious}
         disabled={currentPage === 1}
