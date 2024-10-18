@@ -19,7 +19,7 @@ export class UsersController {
   }
 
   @Get()
-  async getAllUsers(): Promise<UserEntity[]> {
+  async getAllUsers(): Promise<Partial<UserEntity>[]> {
     return this.usersService.getAllUsers();
   }
 
