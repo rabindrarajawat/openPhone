@@ -1,94 +1,78 @@
-"use client"; // Ensure this is a client-side component
+"use client";
+import React, { useState } from "react";
+import styles from "./page.module.css"; // Import the CSS module
 
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import Pagination from '../Pagination/pagination';
+const TwoColumns = () => {
+  const [column1Width, setColumn1Width] = useState(300); // Initial width for Column 1
+  const [column2Width, setColumn2Width] = useState(300); // Initial width for Column 2
 
-// Define the address type with all relevant fields
-interface Address {
-  id: number;
-  address: string; // Change fullAddress to address based on your API response
-}
+  const handleMouseDown = (e: React.MouseEvent, column: string) => {
+    const startX = e.clientX;
+    const startColumn1Width = column1Width;
+    const startColumn2Width = column2Width;
 
-const AddressList = () => {
-  const [addresses, setAddresses] = useState<Address[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10); // Adjust as needed
-  const [totalItems, setTotalItems] = useState(0);
-  const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
+    const onMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - startX;
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem("authToken") : null;
-
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-
-  useEffect(() => {
-    const fetchAddresses = async () => {
-      try {
-        const response = await axios.get(`${Base_Url}address/getalladdress`, {
-          ...config,
-          params: {
-            page: currentPage,
-            limit: itemsPerPage,
-          },
-        });
-
-        // Log the API response to understand its structure
- 
-        // Ensure addresses are set correctly
-        if (response.data && response.data.data) {
-          setAddresses(response.data.data); // Adjusted to reflect the correct field name
-          setTotalItems(response.data.totalCount); // Total items for pagination
-        } else {
-          setAddresses([]); // Set to empty if no data found
-        }
-      } catch (error) {
-        console.error('Error fetching addresses:', error);
-        setAddresses([]); // Handle error case by clearing addresses
+      if (column === "column1") {
+        setColumn1Width(startColumn1Width + deltaX);
+      } else if (column === "column2") {
+        setColumn2Width(startColumn2Width + deltaX);
       }
     };
 
-    fetchAddresses();
-  }, [currentPage, itemsPerPage]);
+    const onMouseUp = () => {
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+    };
 
-  const handleItemsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setItemsPerPage(Number(event.target.value));
-    setCurrentPage(1); // Reset to the first page on changing items per page
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
   };
 
   return (
-    <div>
-      <div style={{ marginBottom: '20px' }}>
-        <label htmlFor="itemsPerPage" style={{ marginRight: '10px' }}>Show per page:</label>
-        <select id="itemsPerPage" value={itemsPerPage} onChange={handleItemsPerPageChange}>
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-          <option value={50}>50</option>
-          <option value={100}>100</option>
-        </select>
+    <div className="container-fluid">
+      <div className="row d-flex justify-content-center">
+        <div className="d-flex" style={{ width: "100%" }}>
+          {/* Column 1 */}
+          <div
+            className={`${styles.column}`}
+            style={{
+              width: `${column1Width}px`,
+              flexShrink: 0, // Prevent column 1 from shrinking
+            }}
+          >
+            <h2>Column 1</h2>
+            <p>This column can be resized by dragging its right border.</p>
+          </div>
+
+          {/* Resizer for Column 1 */}
+          <div
+            className={styles.resizer}
+            onMouseDown={(e) => handleMouseDown(e, "column1")}
+          />
+
+          {/* Column 2 */}
+          <div
+            className={`${styles.column} ${styles.column2}`}
+            style={{
+              width: `${column2Width}px`,
+              flexShrink: 0, // Prevent column 2 from shrinking
+            }}
+          >
+            <h2>Column 2</h2>
+            <p>This column can also be resized by dragging its right border.</p>
+          </div>
+
+          {/* Resizer for Column 2 */}
+          <div
+            className={styles.resizer}
+            onMouseDown={(e) => handleMouseDown(e, "column2")}
+          />
+        </div>
       </div>
-
-      <ul>
-        {addresses.length > 0 ? (
-          addresses.map((address) => (
-            <li key={address.id}>{address.address}</li> // Use address instead of fullAddress
-          ))
-        ) : (
-          <p>No addresses found.</p>
-        )}
-      </ul>
-
-      <Pagination
-        currentPage={currentPage}
-        itemsPerPage={itemsPerPage}
-        totalItems={totalItems}
-        onPageChange={setCurrentPage}
-      />
     </div>
   );
 };
 
-export default AddressList;
+export default TwoColumns;
