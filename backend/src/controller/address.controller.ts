@@ -309,12 +309,15 @@ export class AddressController {
     @Query("withStopResponses") withStopResponses?: boolean,
     @Query("sortBy") sortBy: string = "modified_at",
     @Query("sortOrder") sortOrder: 'ASC' | 'DESC' = 'DESC',
-    @Query("eventTypeId") eventTypeId?: number,
+    // @Query("eventTypeId") eventTypeId?: number,
     @Query("isBookmarked") isBookmarked?: boolean,
-    @Query("searchTerm") searchTerm?: string
+    @Query("searchTerm") searchTerm?: string,
+    @Query('eventTypeIds') eventTypeIds?: string,
 
   ) {
     try {
+      const parsedEventTypeIds = eventTypeIds ? JSON.parse(eventTypeIds) : undefined;
+
       page = page && page > 0 ? page : 1;
       limit = limit && limit > 0 ? limit : 10;
 
@@ -329,8 +332,9 @@ export class AddressController {
         withStopResponses,
         sortBy,
         sortOrder,
-        eventTypeId,isBookmarked,
-        searchTerm
+        // eventTypeId,
+        isBookmarked,
+        searchTerm,parsedEventTypeIds
         
       );
 
