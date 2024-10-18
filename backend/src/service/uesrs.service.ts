@@ -25,9 +25,15 @@ export class UsersService {
     return user;
   }
 
-  async getAllUsers(): Promise<UserEntity[]> {
-    return await this.usersRepository.find({ relations: ['role'] });
+  async getAllUsers(): Promise<Partial<UserEntity>[]> {
+     const userData= await this.usersRepository.find({ relations: ['role'] });
+   const data=  userData.map((user)=>{
+      const {password,...rest}= user;
+      return rest;
+     })
+     return data;
   }
+
   async createUser(createUserDto: CreateUsersDto): Promise<{
     id: string;
     name: string;
