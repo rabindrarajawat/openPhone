@@ -1,6 +1,6 @@
 
 .addressBox {
-  min-height: 67vh;
+  min-height: 80vh;
   border: #D7F5DC solid 3px;
   z-index: 999;
   box-sizing: border-box;
@@ -34,7 +34,7 @@ cursor: col-resize;
 
 
 .addressList {
-  max-height: 55vh;
+  max-height: 65vh;
   overflow-y: auto;
   cursor: pointer;
   margin-top: 5px;
@@ -43,7 +43,7 @@ cursor: col-resize;
 
 .chatBox {
   background-color: #d7f5dc;
-  height: 48vh;
+  height: 61vh;
   overflow-y: auto;
   box-sizing: border-box;
   z-index: 999;

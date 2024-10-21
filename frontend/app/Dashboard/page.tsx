@@ -110,7 +110,7 @@ interface EventItem {
 const Dashboard = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
   const [auctionEventId, setAuctionEventId] = useState<number | null>(null);
-  const [column1Width, setColumn1Width] = useState(275); // Initial width for Column 1
+  const [column1Width, setColumn1Width] = useState(320); // Initial width for Column 1
   const [selectedAddress, setSelectedAddress] = useState("Search Address");
   const [eventData, setEventData] = useState<EventItem[]>([]);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
