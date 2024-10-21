@@ -659,7 +659,7 @@ export class OpenPhoneEventService {
       };
     } else {
       return {
-        message: `Number unpinnrd for conversation_id ${conversation_id}`,
+        message: `Number unpinned for conversation_id ${conversation_id}`,
       };
     }
   }
