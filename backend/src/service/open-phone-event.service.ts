@@ -563,6 +563,7 @@ export class OpenPhoneEventService {
         ])
         .where("event.address_id IS NULL")
         .andWhere("event.conversation_id NOT IN (" + subQuery.getQuery() + ")")
+        .orderBy("event.created_at", "DESC")
         .distinct(true)
         .skip(offset) // Ensure `offset` is a valid number
         .take(limit)
