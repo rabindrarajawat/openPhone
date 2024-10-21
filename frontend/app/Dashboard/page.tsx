@@ -986,73 +986,16 @@ const Dashboard = () => {
 
   // const totalPages = Math.ceil(addressesToShow.length / addressesPerPage);
 
-  // const handlePageChange = (page: number) => {
-  //   setCurrentPage(page);
-  // };
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
-  // const handleToggle = () => {
-  //   setIsType(!isType);
-  // };
-  // const handleToggle1 = () => {
-  //   setIsType((prevIsOpen) => !prevIsOpen);
-  // };
-
-  // const handleMouseDown = (e: { clientX: any; }) => {
-  //   const startX = e.clientX;
-  //   const startWidth = column1Width;
-
-  //   const onMouseMove = (e: { clientX: number; }) => {
-  //     const newWidth = startWidth + (e.clientX - startX);
-  //     setColumn1Width(newWidth);
-  //   };
-
-  //   const onMouseUp = () => {
-  //     document.removeEventListener('mousemove', onMouseMove);
-  //     document.removeEventListener('mouseup', onMouseUp);
-  //   };
-
-  //   document.addEventListener('mousemove', onMouseMove);
-  //   document.addEventListener('mouseup', onMouseUp);
-  // };
-
-  // const handleMouseDown = (e: { clientX: any; }) => {
-  //   const startX = e.clientX;
-  //   const startWidth = column1Width;
-
-  //   const onMouseMove = (e: { clientX: number; }) => {
-  //     const newWidth = startWidth + (e.clientX - startX);
-  //     setColumn1Width(newWidth);
-  //   };
-
-  //   const onMouseUp = () => {
-  //     document.removeEventListener('mousemove', onMouseMove);
-  //     document.removeEventListener('mouseup', onMouseUp);
-  //   };
-
-  //   document.addEventListener('mousemove', onMouseMove);
-  //   document.addEventListener('mouseup', onMouseUp);
-  // };
-
-  // const handleMouseDown = (e: React.MouseEvent, column: string) => {
-  //   const startX = e.clientX;
-  //   const startColumn1Width = column1Width;
-
-  //   const onMouseMove = (e: MouseEvent) => {
-  //     const deltaX = e.clientX - startX;
-
-  //     if (column === "column1") {
-  //       setColumn1Width(startColumn1Width + deltaX);
-  //     }
-  //   };
-
-  //   const onMouseUp = () => {
-  //     document.removeEventListener("mousemove", onMouseMove);
-  //     document.removeEventListener("mouseup", onMouseUp);
-  //   };
-
-  //   document.addEventListener("mousemove", onMouseMove);
-  //   document.addEventListener("mouseup", onMouseUp);
-  // };
+  const handleToggle = () => {
+    setIsType(!isType);
+  };
+  const handleToggle1 = () => {
+    setIsType((prevIsOpen) => !prevIsOpen);
+  };
   const handleMouseDown = (e: React.MouseEvent, column: string) => {
     const startX = e.clientX;
     const startColumn1Width = column1Width;
@@ -1387,9 +1330,6 @@ const Dashboard = () => {
           </div>
 
           <div className="container-fluid ms-2 me-3">
-            <div
-              className={`row g-3 ${styles.comprenshiveAddress} ${styles.comprenshiveAddress1}`}
-            >
             <div
               className={`row g-3 ${styles.comprenshiveAddress} ${styles.comprenshiveAddress1}`}
             >
