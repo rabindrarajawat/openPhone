@@ -1,32 +1,12 @@
-
 .addressBox {
   min-height: 80vh;
-  border: #D7F5DC solid 3px;
+  border: #d7f5dc solid 3px;
   z-index: 999;
   box-sizing: border-box;
-  cursor: col-resize;
-
-
+  /* resize: both; Allows resizing in both directions */
   overflow: auto; /* Prevents overflow */
   max-width: 100%; /* Limits the maximum width */
-
-}
-
-
-
-
-.resizer {
-  width: 5px;
   cursor: col-resize;
-  position: relative;
-  z-index: 10;
-}
-
-
-.itemPerPage{
-  margin-top: 14px;
-  width: 49px;
-  height: 31px;
 }
 
 /* Media query for smaller screens if needed */
@@ -44,15 +24,11 @@
   }
 }
 
-
-
-
 .addressList {
-  max-height: 55vh;
+  max-height: 70vh;
   overflow-y: auto;
   cursor: pointer;
   margin-top: 5px;
-
 }
 
 .chatBox {
@@ -60,9 +36,6 @@
   height: 61vh;
   overflow-y: auto;
   z-index: 999;
-
-
-
 }
 
 /* Media query for smaller screens */
@@ -78,9 +51,6 @@
   }
 }
 
-
-
-
 .comprenshiveAddress {
   color: #4d5e80;
   font-weight: 800;
@@ -95,7 +65,16 @@
   border-left: 3px solid #8833ff;
   /* Set the border width and purple color */
   border-radius: 12px;
-
+}
+.resizer {
+  width: 5px;
+  cursor: col-resize;
+  position: relative;
+  z-index: 10;
+  margin-left: -25px;
+}
+.comprenshiveAddress1 {
+  display: none;
 }
 
 .messageResponse {
@@ -143,9 +122,8 @@
 /* Address list */
 .address {
   font-weight: 600;
-  color: #5A657B;
+  color: #5a657b;
   font-size: x-large;
-
 }
 
 .checkBox {
@@ -169,18 +147,15 @@
   min-width: 15%;
   border-radius: 0.25rem;
   border: 2px solid #aad5bb;
-
 }
 
 .iconBlue {
-  filter: brightness(0) saturate(100%) invert(27%) sepia(94%) saturate(2662%) hue-rotate(198deg) brightness(88%) contrast(108%);
-
+  filter: brightness(0) saturate(100%) invert(27%) sepia(94%) saturate(2662%)
+    hue-rotate(198deg) brightness(88%) contrast(108%);
 }
 
 .addFilter {
   font-size: 10px;
-  
-
 }
 
 .chatMessageRight,
@@ -190,7 +165,7 @@
   margin: 5px 0;
   border-radius: 10px;
   max-width: 60%;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   font-size: 13.5px;
   font-weight: 500;
   line-height: 20.46px;
@@ -200,8 +175,8 @@
 
 .chatMessageRight {
   margin-left: auto;
-  background: #D0D9FA73;
-  color: #4E4E4E;
+  background: #d0d9fa73;
+  color: #4e4e4e;
 }
 
 .chatMessageLeft {
@@ -225,7 +200,7 @@
 
 .readMoreBtnRight,
 .readLessBtnRight {
-  color: #4E4E4E;
+  color: #4e4e4e;
 }
 
 .readMoreBtnLeft,
@@ -244,8 +219,8 @@
 
 .messageDateRight {
   text-align: right;
-  color: #4E4E4E;
-  font-family: 'Roboto', sans-serif;
+  color: #4e4e4e;
+  font-family: "Roboto", sans-serif;
   font-size: 9px;
   font-weight: 400;
   line-height: 20.46px;
@@ -253,36 +228,32 @@
 
 .messageDateLeft {
   text-align: left;
-  color: #4E4E4E;
-  font-family: 'Roboto', sans-serif;
+  color: #4e4e4e;
+  font-family: "Roboto", sans-serif;
   font-size: 9px;
   font-weight: 400;
   line-height: 20.46px;
   margin-left: 6px;
 }
-.conversationFrom
-{
+.conversationFrom {
   border: none;
   background: none;
   color: #0d6efd;
 }
 
 .toLine {
-  border: 1px solid #A2A2A23d;
+  border: 1px solid #a2a2a23d;
   width: 50%;
   display: flex;
   justify-content: center;
-  margin: 0 auto; 
+  margin: 0 auto;
 }
-
 
 .toValue {
   font-weight: bold;
   font-size: 16px;
 
-
-  color: #3361FF;
-
+  color: #3361ff;
 }
 
 .setDate {
@@ -297,3 +268,5 @@
 .toDate {
   margin-left: 19px;
 }
+
+
