@@ -1,17 +1,13 @@
-
 .addressBox {
   min-height: 80vh;
-  border: #D7F5DC solid 3px;
+  border: #d7f5dc solid 3px;
   z-index: 999;
   box-sizing: border-box;
   /* resize: both; Allows resizing in both directions */
   overflow: auto; /* Prevents overflow */
   max-width: 100%; /* Limits the maximum width */
-cursor: col-resize;
+  cursor: col-resize;
 }
-
-
-
 
 /* Media query for smaller screens if needed */
 @media (max-height: 700px) {
@@ -19,7 +15,6 @@ cursor: col-resize;
     min-height: 80vh;
     width: 17vw;
   }
-  
 }
 
 @media (max-height: 500px) {
@@ -27,18 +22,13 @@ cursor: col-resize;
     height: 71vh;
     /* Further reduce the height for extremely small screens */
   }
- 
 }
 
-
-
-
 .addressList {
-  max-height: 65vh;
+  max-height: 70vh;
   overflow-y: auto;
   cursor: pointer;
   margin-top: 5px;
-
 }
 
 .chatBox {
@@ -47,8 +37,6 @@ cursor: col-resize;
   overflow-y: auto;
   box-sizing: border-box;
   z-index: 999;
-
-
 }
 
 /* Media query for smaller screens */
@@ -56,18 +44,13 @@ cursor: col-resize;
   .chatBox {
     height: 43vh;
   }
-  
 }
 
 @media (max-height: 500px) {
   .chatBox {
     height: 55.4vh;
   }
-  
 }
-
-
-
 
 .comprenshiveAddress {
   color: #4d5e80;
@@ -79,7 +62,6 @@ cursor: col-resize;
   border-left: 3px solid #8833ff;
   /* Set the border width and purple color */
   border-radius: 12px;
-
 }
 .resizer {
   width: 5px;
@@ -88,11 +70,9 @@ cursor: col-resize;
   z-index: 10;
   margin-left: -25px;
 }
-.comprenshiveAddress1{
+.comprenshiveAddress1 {
   display: none;
 }
-
-
 
 .messageResponse {
   background: linear-gradient(90deg, #ffffff 0%, #d7f1fd 100%);
@@ -139,9 +119,8 @@ cursor: col-resize;
 /* Address list */
 .address {
   font-weight: 600;
-  color: #5A657B;
+  color: #5a657b;
   font-size: x-large;
-
 }
 
 .checkBox {
@@ -165,18 +144,15 @@ cursor: col-resize;
   min-width: 15%;
   border-radius: 0.25rem;
   border: 2px solid #aad5bb;
-
 }
 
 .iconBlue {
-  filter: brightness(0) saturate(100%) invert(27%) sepia(94%) saturate(2662%) hue-rotate(198deg) brightness(88%) contrast(108%);
-
+  filter: brightness(0) saturate(100%) invert(27%) sepia(94%) saturate(2662%)
+    hue-rotate(198deg) brightness(88%) contrast(108%);
 }
 
 .addFilter {
   font-size: 10px;
-  
-
 }
 
 .chatMessageRight,
@@ -186,7 +162,7 @@ cursor: col-resize;
   margin: 5px 0;
   border-radius: 10px;
   max-width: 60%;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   font-size: 13.5px;
   font-weight: 500;
   line-height: 20.46px;
@@ -196,8 +172,8 @@ cursor: col-resize;
 
 .chatMessageRight {
   margin-left: auto;
-  background: #D0D9FA73;
-  color: #4E4E4E;
+  background: #d0d9fa73;
+  color: #4e4e4e;
 }
 
 .chatMessageLeft {
@@ -221,7 +197,7 @@ cursor: col-resize;
 
 .readMoreBtnRight,
 .readLessBtnRight {
-  color: #4E4E4E;
+  color: #4e4e4e;
 }
 
 .readMoreBtnLeft,
@@ -240,8 +216,8 @@ cursor: col-resize;
 
 .messageDateRight {
   text-align: right;
-  color: #4E4E4E;
-  font-family: 'Roboto', sans-serif;
+  color: #4e4e4e;
+  font-family: "Roboto", sans-serif;
   font-size: 9px;
   font-weight: 400;
   line-height: 20.46px;
@@ -249,36 +225,32 @@ cursor: col-resize;
 
 .messageDateLeft {
   text-align: left;
-  color: #4E4E4E;
-  font-family: 'Roboto', sans-serif;
+  color: #4e4e4e;
+  font-family: "Roboto", sans-serif;
   font-size: 9px;
   font-weight: 400;
   line-height: 20.46px;
   margin-left: 6px;
 }
-.conversationFrom
-{
+.conversationFrom {
   border: none;
   background: none;
   color: #0d6efd;
 }
 
 .toLine {
-  border: 1px solid #A2A2A23d;
+  border: 1px solid #a2a2a23d;
   width: 50%;
   display: flex;
   justify-content: center;
-  margin: 0 auto; 
+  margin: 0 auto;
 }
-
 
 .toValue {
   font-weight: bold;
   font-size: 16px;
 
-
-  color: #3361FF;
-
+  color: #3361ff;
 }
 
 .setDate {
@@ -293,3 +265,5 @@ cursor: col-resize;
 .toDate {
   margin-left: 19px;
 }
+
+
