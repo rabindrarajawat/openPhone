@@ -4,10 +4,10 @@
   border: #D7F5DC solid 3px;
   z-index: 999;
   box-sizing: border-box;
-  resize: both; /* Allows resizing in both directions */
+  /* resize: both; Allows resizing in both directions */
   overflow: auto; /* Prevents overflow */
   max-width: 100%; /* Limits the maximum width */
-
+cursor: col-resize;
 }
 
 
@@ -19,6 +19,7 @@
     min-height: 80vh;
     width: 17vw;
   }
+  
 }
 
 @media (max-height: 500px) {
@@ -26,6 +27,7 @@
     height: 71vh;
     /* Further reduce the height for extremely small screens */
   }
+ 
 }
 
 
@@ -54,12 +56,14 @@
   .chatBox {
     height: 43vh;
   }
+  
 }
 
 @media (max-height: 500px) {
   .chatBox {
     height: 55.4vh;
   }
+  
 }
 
 
@@ -77,6 +81,18 @@
   border-radius: 12px;
 
 }
+.resizer {
+  width: 5px;
+  cursor: col-resize;
+  position: relative;
+  z-index: 10;
+  margin-left: -25px;
+}
+.comprenshiveAddress1{
+  display: none;
+}
+
+
 
 .messageResponse {
   background: linear-gradient(90deg, #ffffff 0%, #d7f1fd 100%);

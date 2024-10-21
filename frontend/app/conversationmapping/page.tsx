@@ -107,22 +107,22 @@ const ConversationTable = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-
+  
     // Format the date in 'dd mm yyyy'
     const formattedDate = date.toLocaleDateString("en-GB", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
     });
-
-    // Format the time in 'hh:mm'
+  
+    // Format the time in 'hh:mm AM/PM'
     const formattedTime = date.toLocaleTimeString("en-GB", {
-      hour: "2-digit",
+      hour: "numeric",
       minute: "2-digit",
-      hour12: false, // 24-hour format
+      hour12: true, // This enables 12-hour format with AM/PM
       timeZone: "UTC", // Ensures that time is shown in UTC
     });
-
+  
     // Combine date and time
     return `${formattedDate} ${formattedTime}`;
   };

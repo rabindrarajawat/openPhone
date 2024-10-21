@@ -110,7 +110,7 @@ interface EventItem {
 const Dashboard = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
   const [auctionEventId, setAuctionEventId] = useState<number | null>(null);
-
+  const [column1Width, setColumn1Width] = useState(250); // Initial width for Column 1
   const [selectedAddress, setSelectedAddress] = useState("Search Address");
   const [eventData, setEventData] = useState<EventItem[]>([]);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -996,7 +996,26 @@ const Dashboard = () => {
   const handleToggle1 = () => {
     setIsType((prevIsOpen) => !prevIsOpen);
   };
+  const handleMouseDown = (e: React.MouseEvent, column: string) => {
+    const startX = e.clientX;
+    const startColumn1Width = column1Width;
 
+    const onMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - startX;
+
+      if (column === "column1") {
+        setColumn1Width(startColumn1Width + deltaX);
+      }
+    };
+
+    const onMouseUp = () => {
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+    };
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  };
   return (
     <>
       <Navbar />
@@ -1311,7 +1330,7 @@ const Dashboard = () => {
           </div>
 
           <div className="container-fluid ms-2 me-3">
-            <div className={`row g-3 ${styles.comprenshiveAddress}`}>
+            <div className={`row g-3 ${styles.comprenshiveAddress} ${styles.comprenshiveAddress1}`}>
               <div className="col-12 d-flex  px-0">
                 <Image
                   src="/Done.svg"
@@ -1370,7 +1389,12 @@ const Dashboard = () => {
             <div className="">
               <div className="text-left">
                 <div className="row">
-                  <div className="col-lg-3 col-md-12 col-sm-12 ">
+                  <div className="col-lg-3 col-md-12 col-sm-12"
+                  style={{
+                    width: `${column1Width}px`,
+                    flexShrink: 0, // Prevent column 2 from shrinking
+                   }}
+                  >
                     <div className="d-flex mt-4">
                       <span className="me-4">
                         <Image
@@ -1382,8 +1406,11 @@ const Dashboard = () => {
                       </span>
                       <span className={styles.address}>Address</span>
                     </div>
-                    <div className="me-4 mt-2">
-                      <div className={`${styles.addressBox} p-2`}>
+                    {/* <div className="me-4 mt-2 col"> */}
+                      <div className={`${styles.addressBox} p-2`} style={{
+                      width: `${column1Width}px`,
+                      flexShrink: 0, // Prevent column 2 from shrinking
+                    }}>
                         <div className="d-flex align-items-center mt-1 gap-1">
                           <input
                             type="text"
@@ -1535,9 +1562,12 @@ const Dashboard = () => {
                           onPageChange={setCurrentPage}
                         />
                       </span>
-                    </div>
+                    {/* </div> */}
                   </div>
-
+                  <div
+                    className={styles.resizer}
+                    onMouseDown={(e) => handleMouseDown(e, "column1")}
+                  />
                   <div className="col">
                     <p className={`mt-4 ${styles.address}`}>
                       <i className="bi bi-bar-chart me-3"></i>
@@ -1827,6 +1857,10 @@ const Dashboard = () => {
                       </div>
                     </div>
                   </div>
+
+
+
+                 
                 </div>
               </div>
             </div>
