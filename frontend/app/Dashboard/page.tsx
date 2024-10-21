@@ -110,7 +110,7 @@ interface EventItem {
 const Dashboard = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
   const [auctionEventId, setAuctionEventId] = useState<number | null>(null);
-  const [column1Width, setColumn1Width] = useState(250); // Initial width for Column 1
+  const [column1Width, setColumn1Width] = useState(275); // Initial width for Column 1
   const [selectedAddress, setSelectedAddress] = useState("Search Address");
   const [eventData, setEventData] = useState<EventItem[]>([]);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -1330,7 +1330,9 @@ const Dashboard = () => {
           </div>
 
           <div className="container-fluid ms-2 me-3">
-            <div className={`row g-3 ${styles.comprenshiveAddress} ${styles.comprenshiveAddress1}`}>
+            <div
+              className={`row g-3 ${styles.comprenshiveAddress} ${styles.comprenshiveAddress1}`}
+            >
               <div className="col-12 d-flex  px-0">
                 <Image
                   src="/Done.svg"
@@ -1389,13 +1391,14 @@ const Dashboard = () => {
             <div className="">
               <div className="text-left">
                 <div className="row">
-                  <div className="col-lg-3 col-md-12 col-sm-12"
-                  style={{
-                    width: `${column1Width}px`,
-                    flexShrink: 0, // Prevent column 2 from shrinking
-                   }}
+                  <div
+                    className="col-lg-3 col-md-12 col-sm-12"
+                    style={{
+                      width: `${column1Width}px`,
+                      flexShrink: 0, // Prevent column 2 from shrinking
+                    }}
                   >
-                    <div className="d-flex mt-4">
+                    <div className="d-flex">
                       <span className="me-4">
                         <Image
                           alt="Dropdown Icon"
@@ -1407,80 +1410,83 @@ const Dashboard = () => {
                       <span className={styles.address}>Address</span>
                     </div>
                     {/* <div className="me-4 mt-2 col"> */}
-                      <div className={`${styles.addressBox} p-2`} style={{
-                      width: `${column1Width}px`,
-                      flexShrink: 0, // Prevent column 2 from shrinking
-                    }}>
-                        <div className="d-flex align-items-center mt-1 gap-1">
-                          <input
-                            type="text"
-                            placeholder="Search Address"
-                            value={searchQuery}
-                            onChange={handleSearchChange}
-                            className={` ps-4 bi bi-search  px-0 py-1 ${styles.seachAdd}`}
-                          ></input>
+                    <div
+                      className={`${styles.addressBox} p-2`}
+                      style={{
+                        width: `${column1Width}px`,
+                        flexShrink: 0, // Prevent column 2 from shrinking
+                      }}
+                    >
+                      <div className="d-flex align-items-center mt-1 gap-1">
+                        <input
+                          type="text"
+                          placeholder="Search Address"
+                          value={searchQuery}
+                          onChange={handleSearchChange}
+                          className={` ps-4 bi bi-search  px-0 py-1 ${styles.seachAdd}`}
+                        ></input>
 
-                          <div className="d-flex">
-                            <div
-                              className={`me-2 ${
+                        <div className="d-flex">
+                          <div
+                            className={`me-2 ${
+                              filterOption === "bookmarked"
+                                ? "active-filter"
+                                : ""
+                            }`}
+                            onClick={() => handleFilterChange("bookmarked")}
+                          >
+                            <Image
+                              alt="Bookmark Icon"
+                              width={15}
+                              height={15}
+                              src="/bookmark.png"
+                              style={{ cursor: "pointer" }}
+                              className={`ms-2 ${
                                 filterOption === "bookmarked"
-                                  ? "active-filter"
+                                  ? styles.iconBlue
                                   : ""
                               }`}
-                              onClick={() => handleFilterChange("bookmarked")}
-                            >
-                              <Image
-                                alt="Bookmark Icon"
-                                width={15}
-                                height={15}
-                                src="/bookmark.png"
-                                style={{ cursor: "pointer" }}
-                                className={`ms-2 ${
-                                  filterOption === "bookmarked"
-                                    ? styles.iconBlue
-                                    : ""
-                                }`}
-                              />{" "}
-                              <div className={`me- ${styles.addFilter}`}>
-                                Select
-                              </div>
+                            />{" "}
+                            <div className={`me- ${styles.addFilter}`}>
+                              Select
                             </div>
+                          </div>
 
+                          <div
+                            className={`${filterOption === "default"}`}
+                            onClick={() => handleDefaultClick()}
+                          >
+                            <Image
+                              src="/redo.svg"
+                              alt="redo"
+                              style={{ cursor: "pointer" }}
+                              width={15}
+                              height={15}
+                              className={`ms-2 ${
+                                filterOption === "default"
+                                  ? styles.iconBlue
+                                  : ""
+                              }`}
+                            />
                             <div
-                              className={`${filterOption === "default"}`}
-                              onClick={() => handleDefaultClick()}
+                              style={{ cursor: "pointer" }}
+                              className={`${styles.addFilter}`}
                             >
-                              <Image
-                                src="/redo.svg"
-                                alt="redo"
-                                style={{ cursor: "pointer" }}
-                                width={15}
-                                height={15}
-                                className={`ms-2 ${
-                                  filterOption === "default"
-                                    ? styles.iconBlue
-                                    : ""
-                                }`}
-                              />
-                              <div
-                                style={{ cursor: "pointer" }}
-                                className={`${styles.addFilter}`}
-                              >
-                                Default
-                              </div>
+                              Default
                             </div>
                           </div>
                         </div>
-                        <div className={`${styles.addressList}`}>
-                          <div className="">
-                            {results.length > 0 && (
-                              <SearchResultList
-                                results={results}
-                                onSelect={handleSelectAddress}
-                              />
-                            )}
-                          </div>
-                          <div style={{ marginBottom: "20px" }}>
+                      </div>
+                      <div className={`${styles.addressList}`}>
+                        <div className="">
+                          {results.length > 0 && (
+                            <SearchResultList
+                              results={results}
+                              onSelect={handleSelectAddress}
+                            />
+                          )}
+                        </div>
+                        {/* <div style={{ marginBottom: "20px" }}>
                             <label
                               htmlFor="itemsPerPage"
                               style={{ marginRight: "10px" }}
@@ -1497,71 +1503,96 @@ const Dashboard = () => {
                               <option value={50}>50</option>
                               <option value={100}>100</option>
                             </select>
-                          </div>
+                          </div> */}
 
-                          {addresses1.length > 0 ? (
-                            addresses1.map((address) => (
-                              <li
-                                key={address.id}
-                                className={`d-flex align-items-left   mt-4 me-3 ${
-                                  selectedAddressId === address.id
-                                    ? styles.selectedAdd
-                                    : ""
-                                }`}
-                                onClick={() =>
-                                  handleAddressSelect(
-                                    address.displayAddress,
-                                    address.id
-                                  )
-                                }
-                              >
-                                <div className="setaddress d-flex align-items-start gap-3">
-                                  <i
-                                    className={`bi ${
-                                      address.is_bookmarked
-                                        ? "bi-bookmark-fill"
-                                        : "bi-bookmark"
-                                    } ${
-                                      address.is_bookmarked
-                                        ? styles.bookmarked
-                                        : styles.bookmarkIcon
-                                    }`}
-                                    onClick={() =>
-                                      handleBookmarkClick(address.id)
-                                    }
-                                  ></i>
+                        {addresses1.length > 0 ? (
+                          addresses1.map((address) => (
+                            <li
+                              key={address.id}
+                              className={`d-flex align-items-left   mt-4 me-3 ${
+                                selectedAddressId === address.id
+                                  ? styles.selectedAdd
+                                  : ""
+                              }`}
+                              onClick={() =>
+                                handleAddressSelect(
+                                  address.displayAddress,
+                                  address.id
+                                )
+                              }
+                            >
+                              <div className="setaddress d-flex align-items-start gap-3">
+                                <i
+                                  className={`bi ${
+                                    address.is_bookmarked
+                                      ? "bi-bookmark-fill"
+                                      : "bi-bookmark"
+                                  } ${
+                                    address.is_bookmarked
+                                      ? styles.bookmarked
+                                      : styles.bookmarkIcon
+                                  }`}
+                                  onClick={() =>
+                                    handleBookmarkClick(address.id)
+                                  }
+                                ></i>
 
-                                  <span className="text-start scroll">
-                                    {address.displayAddress ||
-                                      address.fullAddress}
-                                    {address.notificationCount > 0 && (
-                                      <span className="notification-count ml-2 text-success ms-1">
-                                        ({address.notificationCount})
-                                      </span>
-                                    )}
-                                  </span>
-                                </div>
+                                <span className="text-start scroll">
+                                  {address.displayAddress ||
+                                    address.fullAddress}
+                                  {address.notificationCount > 0 && (
+                                    <span className="notification-count ml-2 text-success ms-1">
+                                      ({address.notificationCount})
+                                    </span>
+                                  )}
+                                </span>
+                              </div>
 
-                                {/* {address.fullAddress && (
+                              {/* {address.fullAddress && (
                                   <div className="filtered-address">
                                     {address.fullAddress}
                                   </div>
                                 )} */}
-                              </li>
-                            ))
-                          ) : (
-                            <p>No addresses found.</p>
-                          )}
-                        </div>
+                            </li>
+                          ))
+                        ) : (
+                          <p>No addresses found.</p>
+                        )}
                       </div>
-                      <span className="text-center">
-                        <Pagination
-                          currentPage={currentPage}
-                          itemsPerPage={itemsPerPage}
-                          totalItems={totalItems}
-                          onPageChange={setCurrentPage}
-                        />
-                      </span>
+                    </div>
+                    <span className="text-center">
+                      <Pagination
+                        currentPage={currentPage}
+                        itemsPerPage={itemsPerPage}
+                        totalItems={totalItems}
+                        onPageChange={setCurrentPage}
+                      />
+                    </span>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        marginTop: "5px",
+                        gap: "40px",
+                      }}
+                    >
+                      <label
+                        htmlFor="itemsPerPage"
+                        style={{ marginRight: "10px" }}
+                      >
+                        Show per page:
+                      </label>
+                      <select
+                        id="itemsPerPage"
+                        value={itemsPerPage}
+                        onChange={handleItemsPerPageChange}
+                      >
+                        <option value={10}>10</option>
+                        <option value={20}>20</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                      </select>
+                    </div>
                     {/* </div> */}
                   </div>
                   <div
@@ -1857,10 +1888,6 @@ const Dashboard = () => {
                       </div>
                     </div>
                   </div>
-
-
-
-                 
                 </div>
               </div>
             </div>
