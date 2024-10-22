@@ -1759,11 +1759,11 @@ const Dashboard = () => {
 
                                         return (
                                           <div key={conversationId}>
+                                            {/* <div
+                                              // className={`${styles.toLine}`}
+                                            ></div> */}
                                             <div
-                                              className={`${styles.toLine}`}
-                                            ></div>
-                                            <div
-                                              className={` ${styles.toValue} text-center`}
+                                              className={`${styles.toLine} ${styles.toValue} text-center`}
                                             >
                                               <span className="text-dark">
                                                 To{" "}
