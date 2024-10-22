@@ -778,6 +778,18 @@ const Dashboard = () => {
     });
   };
 
+  // const toggleMessageExpansion = (id: number) => {
+  //   setExpandedMessages((prev) => {
+  //     const newExpandedMessages = new Set(prev);
+  //     if (newExpandedMessages.has(id)) {
+  //       newExpandedMessages.delete(id);
+  //     } else {
+  //       newExpandedMessages.add(id);
+  //     }
+  //     return newExpandedMessages;
+  //   });
+  // };
+
   const handleAddressSelect = async (address: string, addressId: number) => {
     setSelectedAddress(address);
     setSelectedAddressId(addressId);
@@ -838,16 +850,53 @@ const Dashboard = () => {
     setIsBookmarked(true);
   };
 
+  // const toggleMessagePin = async (
+  //   messageId: number,
+  //   conversationId: string
+  // ) => {
+  //   // Retrieve Token
+  //   const token = localStorage.getItem("authToken");
+  //   const config = {
+  //     headers: {
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //   };
+
+  //   try {
+  //     await axios.post(
+  //       `${Base_Url}openPhoneEventData/toggle-message-pin/${messageId}`,
+  //       null,
+  //       config
+  //     );
+
+  //     setUpdatedMessages((prevMessages) => {
+  //       const updatedMessages = { ...prevMessages };
+  //       const conversationMessages = updatedMessages[conversationId].map(
+  //         (msg) => {
+  //           if (msg.id === messageId) {
+  //             return {
+  //               ...msg,
+  //               is_message_pinned: !msg.is_message_pinned,
+  //             };
+  //           }
+  //           return msg;
+  //         }
+  //       );
+  //       updatedMessages[conversationId] = conversationMessages;
+  //       return updatedMessages;
+  //     });
+  //   } catch (error) {
+  //     console.error("Failed to toggle pin state:", error);
+  //   }
+  // };
+
   const toggleMessagePin = async (
     messageId: number,
     conversationId: string
   ) => {
-    // Retrieve Token
     const token = localStorage.getItem("authToken");
     const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     };
 
     try {
@@ -862,10 +911,7 @@ const Dashboard = () => {
         const conversationMessages = updatedMessages[conversationId].map(
           (msg) => {
             if (msg.id === messageId) {
-              return {
-                ...msg,
-                is_message_pinned: !msg.is_message_pinned,
-              };
+              return { ...msg, is_message_pinned: !msg.is_message_pinned };
             }
             return msg;
           }
@@ -1702,6 +1748,219 @@ const Dashboard = () => {
                                 {events.length > 0
                                   ? filteredMessages.length > 0
                                     ? filteredMessages.map((conversationId) => {
+                                        // Sort messages by created_at date in ascending order
+                                        const sortedMessages = updatedMessages[
+                                          conversationId
+                                        ].sort(
+                                          (a, b) =>
+                                            new Date(a.created_at).getTime() -
+                                            new Date(b.created_at).getTime()
+                                        );
+
+                                        return (
+                                          <div key={conversationId}>
+                                            <div
+                                              className={`${styles.toLine}`}
+                                            ></div>
+                                            <div
+                                              className={` ${styles.toValue} text-center`}
+                                            >
+                                              <span className="text-dark">
+                                                To{" "}
+                                              </span>
+                                              <span
+                                                style={{
+                                                  color: sortedMessages.some(
+                                                    (msg) => msg.is_stop
+                                                  )
+                                                    ? "red"
+                                                    : "inherit",
+                                                }}
+                                              >
+                                                {sortedMessages[0].to}
+                                              </span>
+
+                                              <i
+                                                className={`bi pinnumber text-secondary ${
+                                                  pinnedConversations.has(
+                                                    conversationId
+                                                  )
+                                                    ? "bi-pin-fill"
+                                                    : "bi-pin"
+                                                }`}
+                                                onClick={() =>
+                                                  handlePinNumber(
+                                                    conversationId
+                                                  )
+                                                }
+                                              ></i>
+                                            </div>
+
+                                            {sortedMessages.map(
+                                              (message, index) => (
+                                                <div key={index}>
+                                                  <div
+                                                    className={
+                                                      message.event_type_id ===
+                                                      1
+                                                        ? styles.chatMessageRight
+                                                        : styles.chatMessageLeft
+                                                    }
+                                                  >
+                                                    <div className="message-body-1">
+                                                      {expandedMessages.has(
+                                                        message.id
+                                                      ) ? (
+                                                        <div>
+                                                          {message.body}
+                                                          <button
+                                                            onClick={() =>
+                                                              toggleMessageExpansion(
+                                                                message.id
+                                                              )
+                                                            }
+                                                            className={`${
+                                                              styles.readLessBtn
+                                                            } ${
+                                                              message.event_type_id ===
+                                                              1
+                                                                ? styles.readLessBtnRight
+                                                                : styles.readLessBtnLeft
+                                                            }`}
+                                                          >
+                                                            Read Less
+                                                          </button>
+
+                                                          <i
+                                                            className={`bi ${
+                                                              message.is_message_pinned
+                                                                ? "bi-star-fill text-warning"
+                                                                : "bi-star"
+                                                            } star-icon`}
+                                                            onClick={() =>
+                                                              toggleMessagePin(
+                                                                message.id,
+                                                                conversationId
+                                                              )
+                                                            }
+                                                          ></i>
+                                                        </div>
+                                                      ) : (
+                                                        <div>
+                                                          {message.body &&
+                                                          message.body.length >
+                                                            100 ? (
+                                                            <>
+                                                              {message.body.substring(
+                                                                0,
+                                                                100
+                                                              )}
+                                                              ...
+                                                              <button
+                                                                onClick={() =>
+                                                                  toggleMessageExpansion(
+                                                                    message.id
+                                                                  )
+                                                                }
+                                                                className={`${
+                                                                  styles.readMoreBtn
+                                                                } ${
+                                                                  message.event_type_id ===
+                                                                  1
+                                                                    ? styles.readMoreBtnRight
+                                                                    : styles.readMoreBtnLeft
+                                                                }`}
+                                                              >
+                                                                Read More
+                                                              </button>
+                                                              <i
+                                                                className={`bi ${
+                                                                  message.is_message_pinned
+                                                                    ? "bi-star-fill text-warning"
+                                                                    : "bi-star"
+                                                                } star-icon`}
+                                                                onClick={() =>
+                                                                  toggleMessagePin(
+                                                                    message.id,
+                                                                    conversationId
+                                                                  )
+                                                                }
+                                                              ></i>
+                                                            </>
+                                                          ) : (
+                                                            <>
+                                                              {message.body}
+                                                              <i
+                                                                className={`bi ${
+                                                                  message.is_message_pinned
+                                                                    ? "bi-star-fill text-warning"
+                                                                    : "bi-star"
+                                                                } star-icon`}
+                                                                onClick={() =>
+                                                                  toggleMessagePin(
+                                                                    message.id,
+                                                                    conversationId
+                                                                  )
+                                                                }
+                                                              ></i>
+                                                            </>
+                                                          )}
+                                                        </div>
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                  <div
+                                                    className={
+                                                      message.event_type_id ===
+                                                      1
+                                                        ? styles.messageDateRight
+                                                        : styles.messageDateLeft
+                                                    }
+                                                  >
+                                                    {new Date(
+                                                      message.created_at
+                                                    ).toLocaleString("en-GB", {
+                                                      day: "2-digit",
+                                                      month: "2-digit",
+                                                      year: "numeric",
+                                                      hour: "2-digit",
+                                                      minute: "2-digit",
+                                                      hour12: true,
+                                                      timeZone: "UTC", // Ensure UTC is used to avoid local time zone conversion
+                                                    })}
+
+                                                    {/* {new Date(message.created_at).toLocaleString('en-GB', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: false,
+})} */}
+
+                                                    {/* {new Date(message.created_at).toLocaleDateString()} */}
+                                                  </div>
+                                                </div>
+                                              )
+                                            )}
+                                          </div>
+                                        );
+                                      })
+                                    : "No chats found for this number"
+                                  : "Loading..."}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* <div className="container py-3">
+                          <div className="card p-3">
+                            <div className={`p-3 rounded-3 ${styles.chatBox}`}>
+                              <div className="d-flex flex-column justify-content-end">
+                                {events.length > 0
+                                  ? filteredMessages.length > 0
+                                    ? filteredMessages.map((conversationId) => {
                                         const isStop = updatedMessages[
                                           conversationId
                                         ].some((message) => message.is_stop);
@@ -1884,7 +2143,7 @@ const Dashboard = () => {
                               </div>
                             </div>
                           </div>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </div>
