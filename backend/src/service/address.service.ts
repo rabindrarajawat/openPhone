@@ -552,28 +552,67 @@ export class AddressService {
     if (isNaN(limit) || limit <= 0) limit = 10;
 
     try {
-      const queryBuilder = this.addressRepository
+      // Start with a subquery to get addresses with responses
+      const baseQuery = this.addressRepository
         .createQueryBuilder("address")
+        .distinct(true)
         .leftJoinAndSelect("address.events", "event")
         .where("address.is_active = :isActive", { isActive: true });
 
-      // Apply auction event filter
+      // Add auction event filter if present
       if (auctionEventId) {
-        queryBuilder.andWhere("address.auction_event_id = :auctionEventId", { auctionEventId });
+        baseQuery.andWhere("address.auction_event_id = :auctionEventId", { auctionEventId });
       }
 
-      // Apply date filters
+      // Add search term filter
+      if (searchTerm) {
+        const decodedSearchTerm = decodeURIComponent(searchTerm).trim();
+        baseQuery.andWhere("LOWER(address.address) LIKE LOWER(:searchTerm)", {
+          searchTerm: `%${decodedSearchTerm}%`
+        });
+      }
+
+      // Create a subquery for addresses with responses
+      if (withResponses) {
+        const responseSubQuery = this.addressRepository
+          .createQueryBuilder("a")
+          .select("DISTINCT a.id")
+          .innerJoin(OpenPhoneEventEntity, "e1", "e1.address_id = a.id")
+          .innerJoin(OpenPhoneEventEntity, "e2", "e2.conversation_id = e1.conversation_id")
+          .where("a.is_active = :isActive", { isActive: true })
+          .andWhere("e1.event_direction_id = :incomingDirection")
+          .andWhere("e2.event_direction_id = :outgoingDirection")
+          .andWhere("e1.is_stop = :isStop");
+
+        // Add auction event filter to subquery if present
+        if (auctionEventId) {
+          responseSubQuery.andWhere("a.auction_event_id = :auctionEventId");
+        }
+
+        // Add search term to subquery if present
+        if (searchTerm) {
+          const decodedSearchTerm = decodeURIComponent(searchTerm).trim();
+          responseSubQuery.andWhere("LOWER(a.address) LIKE LOWER(:searchTerm)");
+        }
+
+        baseQuery.andWhere(`address.id IN (${responseSubQuery.getQuery()})`)
+          .setParameter("incomingDirection", 1)
+          .setParameter("outgoingDirection", 2)
+          .setParameter("isStop", false);
+      }
+
+      // Add date filters
       if (filterType === "weekly") {
         const startOfWeek = moment().startOf("week").toDate();
         const endOfWeek = moment().endOf("week").toDate();
-        queryBuilder.andWhere("address.created_at BETWEEN :startOfWeek AND :endOfWeek", {
+        baseQuery.andWhere("address.created_at BETWEEN :startOfWeek AND :endOfWeek", {
           startOfWeek,
           endOfWeek,
         });
       } else if (filterType === "monthly") {
         const startOfMonth = moment().startOf("month").toDate();
         const endOfMonth = moment().endOf("month").toDate();
-        queryBuilder.andWhere("address.created_at BETWEEN :startOfMonth AND :endOfMonth", {
+        baseQuery.andWhere("address.created_at BETWEEN :startOfMonth AND :endOfMonth", {
           startOfMonth,
           endOfMonth,
         });
@@ -582,110 +621,42 @@ export class AddressService {
       if (fromDate && toDate) {
         const startDate = moment(fromDate).startOf("day").toDate();
         const endDate = moment(toDate).endOf("day").toDate();
-        queryBuilder.andWhere("address.created_at BETWEEN :startDate AND :endDate", {
+        baseQuery.andWhere("address.created_at BETWEEN :startDate AND :endDate", {
           startDate,
           endDate,
         });
       }
 
-      // Modified withResponses filter to work with auction events
-      if (withResponses) {
-        queryBuilder.andWhere((qb) => {
-          const subQuery = qb
-            .subQuery()
-            .select("DISTINCT(e1.address_id)")
-            .from(OpenPhoneEventEntity, "e1")
-            .innerJoin(OpenPhoneEventEntity, "e2", "e1.conversation_id = e2.conversation_id")
-            .where("e1.event_direction_id = :incomingDirection", { incomingDirection: 1 })
-            .andWhere("e2.event_direction_id = :outgoingDirection", { outgoingDirection: 2 })
-            .andWhere((qb) => {
-              const activeConversationSubQuery = qb
-                .subQuery()
-                .select("1")
-                .from(OpenPhoneEventEntity, "e3")
-                .where("e3.address_id = e1.address_id")
-                .andWhere("e3.conversation_id = e1.conversation_id")
-                .andWhere("(e3.body != :stopMessage AND e3.is_stop = :isStop)")
-                .getQuery();
-              return "EXISTS " + activeConversationSubQuery;
-            });
-          
-          // Add auction event condition to the subquery if needed
-          if (auctionEventId) {
-            subQuery.innerJoin(AddressEntity, "addr", "addr.id = e1.address_id")
-              .andWhere("addr.auction_event_id = :auctionEventId");
-          }
-          
-          return "address.id IN " + subQuery.getQuery();
-        });
-        queryBuilder.setParameter("stopMessage", "Stop")
-          .setParameter("isStop", false);
-      }
-
-      // Modified withStopResponses filter
-      if (withStopResponses) {
-        queryBuilder.andWhere((qb) => {
-          const subQuery = qb
-            .subQuery()
-            .select("DISTINCT(e.address_id)")
-            .from(OpenPhoneEventEntity, "e")
-            .where("e.event_direction_id IN (:...directionIds)", { directionIds: [1, 2] })
-            .andWhere("(e.body = :stopMessage OR e.is_stop = :isStop)");
-          
-          // Add auction event condition to the subquery if needed
-          if (auctionEventId) {
-            subQuery.innerJoin(AddressEntity, "addr", "addr.id = e.address_id")
-              .andWhere("addr.auction_event_id = :auctionEventId");
-          }
-          
-          return "address.id IN " + subQuery.getQuery();
-        });
-        queryBuilder.setParameter("stopMessage", "Stop")
-          .setParameter("isStop", true);
-      }
-
-      // Event type filter
+      // Add event type filter if present
       if (eventTypeIds && eventTypeIds.length > 0) {
-        queryBuilder.andWhere((qb) => {
-          const subQuery = qb
-            .subQuery()
-            .select("DISTINCT(e.address_id)")
-            .from(OpenPhoneEventEntity, "e")
-            .where("e.event_type_id IN (:...eventTypeIds)");
-          
-          if (auctionEventId) {
-            subQuery.innerJoin(AddressEntity, "addr", "addr.id = e.address_id")
-              .andWhere("addr.auction_event_id = :auctionEventId");
-          }
-          
-          return "address.id IN " + subQuery.getQuery();
-        });
-        queryBuilder.setParameter("eventTypeIds", eventTypeIds);
+        const eventTypeSubQuery = this.addressRepository
+          .createQueryBuilder("a")
+          .select("DISTINCT a.id")
+          .innerJoin(OpenPhoneEventEntity, "e", "e.address_id = a.id")
+          .where("e.event_type_id IN (:...eventTypeIds)");
+
+        baseQuery.andWhere(`address.id IN (${eventTypeSubQuery.getQuery()})`)
+          .setParameter("eventTypeIds", eventTypeIds);
       }
 
-      // Search filter with proper handling of special characters
-      if (searchTerm) {
-        const sanitizedSearchTerm = searchTerm.replace(/[%_]/g, '\\$&');
-        queryBuilder.andWhere(new Brackets(qb => {
-          qb.where("address.address ILIKE :searchTerm", { searchTerm: `%${sanitizedSearchTerm}%` });
-        }));
-      }
-
+      // Add bookmark filter if present
       if (isBookmarked !== undefined) {
-        queryBuilder.andWhere("address.is_bookmarked = :isBookmarked", { isBookmarked });
+        baseQuery.andWhere("address.is_bookmarked = :isBookmarked", { isBookmarked });
       }
 
-      // Sorting
-      if (sortBy === 'modified_at') {
-        queryBuilder.orderBy("address.modified_at", sortOrder);
-      } else {
-        queryBuilder.orderBy(`address.${sortBy}`, sortOrder);
-      }
+      // Add sorting
+      baseQuery.orderBy(
+        sortBy === 'modified_at' ? "address.modified_at" : `address.${sortBy}`,
+        sortOrder
+      );
 
-      queryBuilder.distinct(true);
+      // Log the generated query for debugging
+      console.log("Generated SQL:", baseQuery.getSql());
+      console.log("Parameters:", baseQuery.getParameters());
 
-      const totalCount = await queryBuilder.getCount();
-      const data = await queryBuilder
+      // Get total count and data
+      const totalCount = await baseQuery.getCount();
+      const data = await baseQuery
         .skip((page - 1) * limit)
         .take(limit)
         .getMany();
@@ -696,7 +667,6 @@ export class AddressService {
       throw new InternalServerErrorException("Error finding all addresses");
     }
   }
-
 
 
 
