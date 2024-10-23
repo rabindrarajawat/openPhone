@@ -357,6 +357,182 @@ export class AddressService {
 
 
   //with recieved and delivered
+  // async findAll(
+  //   page: number = 1,
+  //   limit: number = 10,
+  //   auctionEventId?: number,
+  //   filterType?: string,
+  //   fromDate?: string,
+  //   toDate?: string,
+  //   withResponses?: boolean,
+  //   withStopResponses?: boolean,
+  //   sortBy: string = "modified_at",
+  //   sortOrder: 'ASC' | 'DESC' = 'DESC',
+  //   // eventTypeId?: number,
+  //   isBookmarked?: boolean,
+  //   searchTerm?: string,
+  //   eventTypeIds?: number[],
+  // ): Promise<{ data: AddressEntity[]; totalCount: number }> {
+  //   if (isNaN(page) || page <= 0) page = 1;
+  //   if (isNaN(limit) || limit <= 0) limit = 10;
+
+  //   try {
+  //     const queryBuilder = this.addressRepository
+  //       .createQueryBuilder("address")
+  //       .leftJoinAndSelect("address.events", "event")
+  //       .where("address.is_active = :isActive", { isActive: true });
+
+  //     if (auctionEventId) {
+  //       queryBuilder.andWhere("address.auction_event_id = :auctionEventId", { auctionEventId });
+  //     }
+
+  //     if (filterType === "weekly") {
+  //       const startOfWeek = moment().startOf("week").toDate();
+  //       const endOfWeek = moment().endOf("week").toDate();
+  //       queryBuilder.andWhere("address.created_at BETWEEN :startOfWeek AND :endOfWeek", {
+  //         startOfWeek,
+  //         endOfWeek,
+  //       });
+  //     } else if (filterType === "monthly") {
+  //       const startOfMonth = moment().startOf("month").toDate();
+  //       const endOfMonth = moment().endOf("month").toDate();
+  //       queryBuilder.andWhere("address.created_at BETWEEN :startOfMonth AND :endOfMonth", {
+  //         startOfMonth,
+  //         endOfMonth,
+  //       });
+  //     }
+
+  //     if (fromDate && toDate) {
+  //       const startDate = moment(fromDate).startOf("day").toDate();
+  //       const endDate = moment(toDate).endOf("day").toDate();
+  //       queryBuilder.andWhere("address.created_at BETWEEN :startDate AND :endDate", {
+  //         startDate,
+  //         endDate,
+  //       });
+  //     }
+
+     
+
+  //     if (withResponses) {
+  //       queryBuilder.andWhere((qb) => {
+  //         const subQuery = qb
+  //           .subQuery()
+  //           .select("DISTINCT(e1.address_id)")
+  //           .from(OpenPhoneEventEntity, "e1")
+  //           .innerJoin(OpenPhoneEventEntity, "e2", "e1.conversation_id = e2.conversation_id")
+  //           .where("e1.event_direction_id = :incomingDirection", { incomingDirection: 1 })
+  //           .andWhere("e2.event_direction_id = :outgoingDirection", { outgoingDirection: 2 })
+  //           .andWhere((qb) => {
+  //             const activeConversationSubQuery = qb
+  //               .subQuery()
+  //               .select("1")
+  //               .from(OpenPhoneEventEntity, "e3")
+  //               .where("e3.address_id = e1.address_id")
+  //               .andWhere("e3.conversation_id = e1.conversation_id")
+  //               .andWhere("(e3.body != :stopMessage AND e3.is_stop = :isStop)")
+  //               .getQuery();
+  //             return "EXISTS " + activeConversationSubQuery;
+  //           })
+  //           .getQuery();
+  //         return "address.id IN " + subQuery;
+  //       });
+  //       queryBuilder.setParameter("stopMessage", "Stop")
+  //         .setParameter("isStop", false);
+  //     }
+
+  //     if (withStopResponses) {
+  //       queryBuilder.andWhere((qb) => {
+  //         const subQuery = qb
+  //           .subQuery()
+  //           .select("DISTINCT(e.address_id)")
+  //           .from(OpenPhoneEventEntity, "e")
+  //           // .where("e.event_direction_id = :outgoingDirection", { outgoingDirection: 2 })
+  //           .where("e.event_direction_id IN (:...directionIds)", { directionIds: [1, 2] })
+  //           .andWhere("(e.body = :stopMessage OR e.is_stop = :isStop)")
+  //           .getQuery();
+  //         return "address.id IN " + subQuery;
+  //       });
+  //       queryBuilder.setParameter("stopMessage", "Stop")
+  //         .setParameter("isStop", true);
+  //     }
+
+  //     // Add event type filter
+  //     // if (eventTypeId) {
+  //     //   queryBuilder.andWhere((qb) => {
+  //     //     const subQuery = qb
+  //     //       .subQuery()
+  //     //       .select("DISTINCT(e.address_id)")
+  //     //       .from(OpenPhoneEventEntity, "e")
+  //     //       .where("e.event_type_id = :eventTypeId")
+  //     //       .getQuery();
+  //     //     return "address.id IN " + subQuery;
+  //     //   });
+  //     //   queryBuilder.setParameter("eventTypeId", eventTypeId);
+  //     // }
+
+
+  //     if (eventTypeIds && eventTypeIds.length > 0) {
+  //       queryBuilder.andWhere((qb) => {
+  //         const subQuery = qb
+  //           .subQuery()
+  //           .select("DISTINCT(e.address_id)")
+  //           .from(OpenPhoneEventEntity, "e")
+  //           .where("e.event_type_id IN (:...eventTypeIds)")
+  //           .getQuery();
+  //         return "address.id IN " + subQuery;
+  //       });
+  //       queryBuilder.setParameter("eventTypeIds", eventTypeIds);
+  //     }
+
+
+
+
+  //     if (searchTerm) {
+  //       queryBuilder.andWhere(new Brackets(qb => {
+  //         qb.where("address.address ILIKE :searchTerm", { searchTerm: `%${searchTerm}%` });
+  //         // Add any other searchable fields from CommonEntity if needed
+  //       }));
+  //     }
+
+
+
+  //     if (isBookmarked !== undefined) {
+  //       queryBuilder.andWhere("address.is_bookmarked = :isBookmarked", { isBookmarked });
+  //     }
+
+
+  //     // Add sorting
+  //     // queryBuilder.orderBy(`address.${sortBy}`, sortOrder);
+
+  //     if (sortBy === 'modified_at') {
+  //       queryBuilder.orderBy("address.modified_at", sortOrder);
+  //     } else {
+  //       queryBuilder.orderBy(`address.${sortBy}`, sortOrder);
+  //     }
+
+
+     
+
+  //     // Add distinct to avoid duplicate addresses due to the join
+  //     queryBuilder.distinct(true);
+
+  //     const totalCount = await queryBuilder.getCount();
+
+  //     const data = await queryBuilder
+  //       .skip((page - 1) * limit)
+  //       .take(limit)
+  //       .getMany();
+
+  //     return { data, totalCount };
+  //   } catch (error) {
+  //     console.error("Error finding all addresses:", error);
+  //     throw new InternalServerErrorException("Error finding all addresses");
+  //   }
+  // }
+
+
+
+
   async findAll(
     page: number = 1,
     limit: number = 10,
@@ -368,7 +544,6 @@ export class AddressService {
     withStopResponses?: boolean,
     sortBy: string = "modified_at",
     sortOrder: 'ASC' | 'DESC' = 'DESC',
-    // eventTypeId?: number,
     isBookmarked?: boolean,
     searchTerm?: string,
     eventTypeIds?: number[],
@@ -382,10 +557,12 @@ export class AddressService {
         .leftJoinAndSelect("address.events", "event")
         .where("address.is_active = :isActive", { isActive: true });
 
+      // Apply auction event filter
       if (auctionEventId) {
         queryBuilder.andWhere("address.auction_event_id = :auctionEventId", { auctionEventId });
       }
 
+      // Apply date filters
       if (filterType === "weekly") {
         const startOfWeek = moment().startOf("week").toDate();
         const endOfWeek = moment().endOf("week").toDate();
@@ -411,8 +588,7 @@ export class AddressService {
         });
       }
 
-     
-
+      // Modified withResponses filter to work with auction events
       if (withResponses) {
         queryBuilder.andWhere((qb) => {
           const subQuery = qb
@@ -432,92 +608,83 @@ export class AddressService {
                 .andWhere("(e3.body != :stopMessage AND e3.is_stop = :isStop)")
                 .getQuery();
               return "EXISTS " + activeConversationSubQuery;
-            })
-            .getQuery();
-          return "address.id IN " + subQuery;
+            });
+          
+          // Add auction event condition to the subquery if needed
+          if (auctionEventId) {
+            subQuery.innerJoin(AddressEntity, "addr", "addr.id = e1.address_id")
+              .andWhere("addr.auction_event_id = :auctionEventId");
+          }
+          
+          return "address.id IN " + subQuery.getQuery();
         });
         queryBuilder.setParameter("stopMessage", "Stop")
           .setParameter("isStop", false);
       }
 
+      // Modified withStopResponses filter
       if (withStopResponses) {
         queryBuilder.andWhere((qb) => {
           const subQuery = qb
             .subQuery()
             .select("DISTINCT(e.address_id)")
             .from(OpenPhoneEventEntity, "e")
-            // .where("e.event_direction_id = :outgoingDirection", { outgoingDirection: 2 })
             .where("e.event_direction_id IN (:...directionIds)", { directionIds: [1, 2] })
-            .andWhere("(e.body = :stopMessage OR e.is_stop = :isStop)")
-            .getQuery();
-          return "address.id IN " + subQuery;
+            .andWhere("(e.body = :stopMessage OR e.is_stop = :isStop)");
+          
+          // Add auction event condition to the subquery if needed
+          if (auctionEventId) {
+            subQuery.innerJoin(AddressEntity, "addr", "addr.id = e.address_id")
+              .andWhere("addr.auction_event_id = :auctionEventId");
+          }
+          
+          return "address.id IN " + subQuery.getQuery();
         });
         queryBuilder.setParameter("stopMessage", "Stop")
           .setParameter("isStop", true);
       }
 
-      // Add event type filter
-      // if (eventTypeId) {
-      //   queryBuilder.andWhere((qb) => {
-      //     const subQuery = qb
-      //       .subQuery()
-      //       .select("DISTINCT(e.address_id)")
-      //       .from(OpenPhoneEventEntity, "e")
-      //       .where("e.event_type_id = :eventTypeId")
-      //       .getQuery();
-      //     return "address.id IN " + subQuery;
-      //   });
-      //   queryBuilder.setParameter("eventTypeId", eventTypeId);
-      // }
-
-
+      // Event type filter
       if (eventTypeIds && eventTypeIds.length > 0) {
         queryBuilder.andWhere((qb) => {
           const subQuery = qb
             .subQuery()
             .select("DISTINCT(e.address_id)")
             .from(OpenPhoneEventEntity, "e")
-            .where("e.event_type_id IN (:...eventTypeIds)")
-            .getQuery();
-          return "address.id IN " + subQuery;
+            .where("e.event_type_id IN (:...eventTypeIds)");
+          
+          if (auctionEventId) {
+            subQuery.innerJoin(AddressEntity, "addr", "addr.id = e.address_id")
+              .andWhere("addr.auction_event_id = :auctionEventId");
+          }
+          
+          return "address.id IN " + subQuery.getQuery();
         });
         queryBuilder.setParameter("eventTypeIds", eventTypeIds);
       }
 
-
-
-
+      // Search filter with proper handling of special characters
       if (searchTerm) {
+        const sanitizedSearchTerm = searchTerm.replace(/[%_]/g, '\\$&');
         queryBuilder.andWhere(new Brackets(qb => {
-          qb.where("address.address ILIKE :searchTerm", { searchTerm: `%${searchTerm}%` });
-          // Add any other searchable fields from CommonEntity if needed
+          qb.where("address.address ILIKE :searchTerm", { searchTerm: `%${sanitizedSearchTerm}%` });
         }));
       }
-
-
 
       if (isBookmarked !== undefined) {
         queryBuilder.andWhere("address.is_bookmarked = :isBookmarked", { isBookmarked });
       }
 
-
-      // Add sorting
-      // queryBuilder.orderBy(`address.${sortBy}`, sortOrder);
-
+      // Sorting
       if (sortBy === 'modified_at') {
         queryBuilder.orderBy("address.modified_at", sortOrder);
       } else {
         queryBuilder.orderBy(`address.${sortBy}`, sortOrder);
       }
 
-
-     
-
-      // Add distinct to avoid duplicate addresses due to the join
       queryBuilder.distinct(true);
 
       const totalCount = await queryBuilder.getCount();
-
       const data = await queryBuilder
         .skip((page - 1) * limit)
         .take(limit)
@@ -529,6 +696,8 @@ export class AddressService {
       throw new InternalServerErrorException("Error finding all addresses");
     }
   }
+
+
 
 
 
