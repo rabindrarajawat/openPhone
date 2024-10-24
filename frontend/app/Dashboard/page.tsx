@@ -271,113 +271,100 @@ const Dashboard = () => {
   }, [receivedChecked, deliveredChecked]);
 
   useEffect(() => {
+
     const fetchData = async () => {
-      // Retrieve Token
       const token = localStorage.getItem("authToken");
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       };
-
+    
       try {
-        // Fetch all addresses with the token in the headers
-        const addressResponse: AxiosResponse<AddressApiResponse> =
-          await axios.get(`${Base_Url}address/getalladdress`, {
-            ...config,
-            params: {
-              page: currentPage,
-              limit: itemsPerPage,
-              auctionEventId: auctionEventId ? auctionEventId : null,
-              filterType:
-                selectedDateFilter !== "all" ? selectedDateFilter : null,
-              fromDate: fromDate && toDate ? fromDate : null,
-              toDate: toDate && fromDate ? toDate : null,
-              withResponses: withStopResponses ? "true" : null,
-              withStopResponses: withResponses ? "true" : null,
-              eventTypeId: eventTypeId ? eventTypeId : null,
-              isBookmarked: is_boookmarked ? is_boookmarked : null,
-              searchTerm: searchQuery ? searchQuery : null,
-              eventTypeIds:
-                eventTypeIds.length > 0 ? JSON.stringify(eventTypeIds) : null,
-            },
-          });
-
-        // Extract the addresses array from the response
-        const addressesArray = addressResponse.data.data;
-
-        // Ensure addressesArray is indeed an array
-        if (!Array.isArray(addressesArray)) {
-          throw new Error("Expected data.data to be an array.");
+        // Properly encode search parameters
+        const params = new URLSearchParams({
+          page: currentPage.toString(),
+          limit: itemsPerPage.toString(),
+        });
+    
+        if (auctionEventId) params.append('auctionEventId', auctionEventId.toString());
+        if (selectedDateFilter !== "all") params.append('filterType', selectedDateFilter);
+        if (fromDate && toDate) {
+          params.append('fromDate', fromDate);
+          params.append('toDate', toDate);
         }
-
-        // Map the API response to Address1 format
-        const formattedAddresses: Address1[] = addressesArray.map(
-          (item: AddressResponseItem) => ({
-            id: item.id,
-            displayAddress: item.address,
-            is_bookmarked: item.is_bookmarked,
-            auction_event_id: item.auction_event_id,
-            modified_at: item.modified_at,
-            notificationCount: 0, // Initialize with 0, will be updated later
-            address: item.address,
-            created_at: item.created_at,
-            fullAddress: item.address, // Assigning 'address' to 'fullAddress'
-          })
-        );
-
-        setAddresses2(formattedAddresses);
-        setFilteredAddresses2(formattedAddresses);
-        setTotalItems(addressResponse.data.totalCount);
-
-        // Fetch unread notifications with the token in the headers
-        const notificationResponse = await axios.get(
-          `${Base_Url}notifications`,
+        if (withResponses) params.append('withStopResponses', 'true');
+        if (withStopResponses) params.append('withResponses', 'true');
+        if (is_boookmarked) params.append('isBookmarked', is_boookmarked.toString());
+        if (searchQuery) params.append('searchTerm', searchQuery.trim());
+        if (eventTypeIds.length > 0) params.append('eventTypeIds', JSON.stringify(eventTypeIds));
+    
+        const addressResponse = await axios.get(
+          `${Base_Url}address/getalladdress?${params.toString()}`,
           config
         );
+    // Extract the addresses array from the response
+    const addressesArray = addressResponse.data.data;
 
-        const unreadNotifications = notificationResponse.data.filter(
-          (notification: any) => !notification.is_read
-        );
-        setNotifications(unreadNotifications);
+    // Ensure addressesArray is indeed an array
+    if (!Array.isArray(addressesArray)) {
+      throw new Error("Expected data.data to be an array.");
+    }
 
-        // Calculate notification counts
-        const addressNotificationCounts = formattedAddresses.map(
-          (address: any) => {
-            const count = unreadNotifications.filter(
-              (notification: any) => notification.address_id === address.id
-            ).length;
-            return { ...address, notificationCount: count };
-          }
-        );
+    // Map the API response to Address1 format
+    const formattedAddresses: Address1[] = addressesArray.map(
+      (item: AddressResponseItem) => ({
+        id: item.id,
+        displayAddress: item.address,
+        is_bookmarked: item.is_bookmarked,
+        auction_event_id: item.auction_event_id,
+        modified_at: item.modified_at,
+        notificationCount: 0, // Initialize with 0, will be updated later
+        address: item.address,
+        created_at: item.created_at,
+        fullAddress: item.address, // Assigning 'address' to 'fullAddress'
+      })
+    );
 
-        setAddresses1(addressNotificationCounts);
+    setAddresses2(formattedAddresses);
+    setFilteredAddresses2(formattedAddresses);
+    setTotalItems(addressResponse.data.totalCount);
 
-        // Sort addresses by modified_at to get the latest modified address
-        // const sortedAddresses = addressNotificationCounts.sort(
-        //   (a: { modified_at: string | number | Date }, b: { modified_at: string | number | Date }) => {
-        //     const dateA = new Date(a.modified_at).getTime();
-        //     const dateB = new Date(b.modified_at).getTime();
-        //     console.log("🚀 ~ fetchData ~ dateB:",dateA, dateB)
-        //     return dateB - dateA;
-        //   }
-        // );
-        // console.log("🚀 ~ fetchData ~ sortedAddresses:", sortedAddresses)
+    // Fetch unread notifications with the token in the headers
+    const notificationResponse = await axios.get(
+      `${Base_Url}notifications`,
+      config
+    );
 
-        // // Set default selected address as the latest modified address
-        // if (sortedAddresses.length > 0) {
-        //   setSelectedAddress(sortedAddresses[0].displayAddress);
-        //   setSelectedAddressId(sortedAddresses[0].id);
-        // }
+    const unreadNotifications = notificationResponse.data.filter(
+      (notification: any) => !notification.is_read
+    );
+    setNotifications(unreadNotifications);
 
-        if (addressNotificationCounts.length > 0) {
-          setSelectedAddress(addressNotificationCounts[0].displayAddress);
-          setSelectedAddressId(addressNotificationCounts[0].id);
-        }
+    // Calculate notification counts
+    const addressNotificationCounts = formattedAddresses.map(
+      (address: any) => {
+        const count = unreadNotifications.filter(
+          (notification: any) => notification.address_id === address.id
+        ).length;
+        return { ...address, notificationCount: count };
+      }
+    );
+
+    setAddresses1(addressNotificationCounts);
+
+    
+
+    if (addressNotificationCounts.length > 0) {
+      setSelectedAddress(addressNotificationCounts[0].displayAddress);
+      setSelectedAddressId(addressNotificationCounts[0].id);
+    }
+        // Rest of your code remains the same...
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
+
 
     fetchData();
   }, [
@@ -397,6 +384,22 @@ const Dashboard = () => {
     eventTypeIds,
     auctionEventId,
   ]);
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
 
   // Handle items per page change (reset page to 1)
   // const handleItemsPerPageChange = (
@@ -419,6 +422,156 @@ const Dashboard = () => {
   // }, [itemsPerPage]);
 
   // Optional: Save currentPage to localStorage whenever it changes
+  
+  
+
+
+
+  
+
+//pre  
+ 
+
+
+// useEffect(() => {
+//     const fetchData = async () => {
+//       // Retrieve Token
+//       const token = localStorage.getItem("authToken");
+//       const config = {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       };
+
+//       try {
+//         // Fetch all addresses with the token in the headers
+//         const addressResponse: AxiosResponse<AddressApiResponse> =
+//           await axios.get(`${Base_Url}address/getalladdress`, {
+//             ...config,
+//             params: {
+//               page: currentPage,
+//               limit: itemsPerPage,
+//               auctionEventId: auctionEventId ? auctionEventId : null,
+//               filterType:
+//                 selectedDateFilter !== "all" ? selectedDateFilter : null,
+//               fromDate: fromDate && toDate ? fromDate : null,
+//               toDate: toDate && fromDate ? toDate : null,
+//               withResponses: withStopResponses ? "true" : null,
+//               withStopResponses: withResponses ? "true" : null,
+//               eventTypeId: eventTypeId ? eventTypeId : null,
+//               isBookmarked: is_boookmarked ? is_boookmarked : null,
+//               searchTerm: searchQuery ? searchQuery : null,
+//               eventTypeIds:
+//                 eventTypeIds.length > 0 ? JSON.stringify(eventTypeIds) : null,
+//             },
+//           });
+
+//         // Extract the addresses array from the response
+//         const addressesArray = addressResponse.data.data;
+
+//         // Ensure addressesArray is indeed an array
+//         if (!Array.isArray(addressesArray)) {
+//           throw new Error("Expected data.data to be an array.");
+//         }
+
+//         // Map the API response to Address1 format
+//         const formattedAddresses: Address1[] = addressesArray.map(
+//           (item: AddressResponseItem) => ({
+//             id: item.id,
+//             displayAddress: item.address,
+//             is_bookmarked: item.is_bookmarked,
+//             auction_event_id: item.auction_event_id,
+//             modified_at: item.modified_at,
+//             notificationCount: 0, // Initialize with 0, will be updated later
+//             address: item.address,
+//             created_at: item.created_at,
+//             fullAddress: item.address, // Assigning 'address' to 'fullAddress'
+//           })
+//         );
+
+//         setAddresses2(formattedAddresses);
+//         setFilteredAddresses2(formattedAddresses);
+//         setTotalItems(addressResponse.data.totalCount);
+
+//         // Fetch unread notifications with the token in the headers
+//         const notificationResponse = await axios.get(
+//           `${Base_Url}notifications`,
+//           config
+//         );
+
+//         const unreadNotifications = notificationResponse.data.filter(
+//           (notification: any) => !notification.is_read
+//         );
+//         setNotifications(unreadNotifications);
+
+//         // Calculate notification counts
+//         const addressNotificationCounts = formattedAddresses.map(
+//           (address: any) => {
+//             const count = unreadNotifications.filter(
+//               (notification: any) => notification.address_id === address.id
+//             ).length;
+//             return { ...address, notificationCount: count };
+//           }
+//         );
+
+//         setAddresses1(addressNotificationCounts);
+
+//         // Sort addresses by modified_at to get the latest modified address
+//         // const sortedAddresses = addressNotificationCounts.sort(
+//         //   (a: { modified_at: string | number | Date }, b: { modified_at: string | number | Date }) => {
+//         //     const dateA = new Date(a.modified_at).getTime();
+//         //     const dateB = new Date(b.modified_at).getTime();
+//         //     console.log("🚀 ~ fetchData ~ dateB:",dateA, dateB)
+//         //     return dateB - dateA;
+//         //   }
+//         // );
+//         // console.log("🚀 ~ fetchData ~ sortedAddresses:", sortedAddresses)
+
+//         // // Set default selected address as the latest modified address
+//         // if (sortedAddresses.length > 0) {
+//         //   setSelectedAddress(sortedAddresses[0].displayAddress);
+//         //   setSelectedAddressId(sortedAddresses[0].id);
+//         // }
+
+//         if (addressNotificationCounts.length > 0) {
+//           setSelectedAddress(addressNotificationCounts[0].displayAddress);
+//           setSelectedAddressId(addressNotificationCounts[0].id);
+//         }
+//       } catch (error) {
+//         console.error("Error fetching data:", error);
+//       }
+//     };
+
+
+
+
+  
+
+
+//     fetchData();
+//   }, [
+//     currentPage,
+//     itemsPerPage,
+//     auctionEventId,
+//     selectedDateFilter,
+//     toDate,
+//     fromDate,
+//     withResponses,
+//     withStopResponses,
+//     receivedChecked,
+//     deliveredChecked,
+//     eventTypeId,
+//     is_boookmarked,
+//     searchQuery,
+//     eventTypeIds,
+//     auctionEventId,
+//   ]);
+  
+  
+  
+  
+  
+
   useEffect(() => {
     localStorage.setItem("currentPage", currentPage.toString());
   }, [currentPage]);
@@ -1759,11 +1912,11 @@ const Dashboard = () => {
 
                                         return (
                                           <div key={conversationId}>
+                                            {/* <div
+                                              // className={`${styles.toLine}`}
+                                            ></div> */}
                                             <div
-                                              className={`${styles.toLine}`}
-                                            ></div>
-                                            <div
-                                              className={` ${styles.toValue} text-center`}
+                                              className={`${styles.toLine} ${styles.toValue} text-center`}
                                             >
                                               <span className="text-dark">
                                                 To{" "}

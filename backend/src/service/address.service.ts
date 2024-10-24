@@ -356,7 +356,30 @@ export class AddressService {
 
 
 
-  //with recieved and delivered
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ //with recieved and delivered
   async findAll(
     page: number = 1,
     limit: number = 10,
@@ -411,8 +434,6 @@ export class AddressService {
         });
       }
 
-     
-
       if (withResponses) {
         queryBuilder.andWhere((qb) => {
           const subQuery = qb
@@ -420,8 +441,8 @@ export class AddressService {
             .select("DISTINCT(e1.address_id)")
             .from(OpenPhoneEventEntity, "e1")
             .innerJoin(OpenPhoneEventEntity, "e2", "e1.conversation_id = e2.conversation_id")
-            .where("e1.event_direction_id = :incomingDirection", { incomingDirection: 1 })
-            .andWhere("e2.event_direction_id = :outgoingDirection", { outgoingDirection: 2 })
+            .where("e1.event_direction_id = :incomingDirection", { incomingDirection: 2 })
+            .andWhere("e2.event_direction_id = :outgoingDirection", { outgoingDirection: 1 })
             .andWhere((qb) => {
               const activeConversationSubQuery = qb
                 .subQuery()
@@ -529,6 +550,18 @@ export class AddressService {
       throw new InternalServerErrorException("Error finding all addresses");
     }
   }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
