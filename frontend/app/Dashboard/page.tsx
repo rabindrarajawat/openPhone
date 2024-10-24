@@ -270,8 +270,34 @@ const Dashboard = () => {
     setEventTypeIds(newEventTypeIds);
   }, [receivedChecked, deliveredChecked]);
 
-  useEffect(() => {
 
+
+
+  const [selectedAuctionEventIds, setSelectedAuctionEventIds] = useState<number[]>([]);
+
+  // Update checkbox handler to manage multiple selections
+  const handleCheckboxChange = (typeId: number) => {
+    setSelectedAuctionEventIds(prev => {
+      if (prev.includes(typeId)) {
+        return prev.filter(id => id !== typeId);
+      } else {
+        return [...prev, typeId];
+      }
+    });
+  };
+
+
+
+
+
+
+
+
+
+
+
+
+  useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("authToken");
       const config = {
@@ -279,15 +305,19 @@ const Dashboard = () => {
           Authorization: `Bearer ${token}`,
         },
       };
-    
+  
       try {
-        // Properly encode search parameters
         const params = new URLSearchParams({
           page: currentPage.toString(),
           limit: itemsPerPage.toString(),
         });
-    
-        if (auctionEventId) params.append('auctionEventId', auctionEventId.toString());
+  
+        // Add selected auction event IDs to params if any are selected
+        if (selectedAuctionEventIds.length > 0) {
+          params.append('auctionEventId', JSON.stringify(selectedAuctionEventIds));
+        }
+        if (eventTypeIds.length > 0) params.append('eventTypeIds', JSON.stringify(eventTypeIds));
+        // Add other params
         if (selectedDateFilter !== "all") params.append('filterType', selectedDateFilter);
         if (fromDate && toDate) {
           params.append('fromDate', fromDate);
@@ -297,93 +327,216 @@ const Dashboard = () => {
         if (withStopResponses) params.append('withResponses', 'true');
         if (is_boookmarked) params.append('isBookmarked', is_boookmarked.toString());
         if (searchQuery) params.append('searchTerm', searchQuery.trim());
-        if (eventTypeIds.length > 0) params.append('eventTypeIds', JSON.stringify(eventTypeIds));
-    
+  
         const addressResponse = await axios.get(
           `${Base_Url}address/getalladdress?${params.toString()}`,
           config
         );
-    // Extract the addresses array from the response
-    const addressesArray = addressResponse.data.data;
-
-    // Ensure addressesArray is indeed an array
-    if (!Array.isArray(addressesArray)) {
-      throw new Error("Expected data.data to be an array.");
-    }
-
-    // Map the API response to Address1 format
-    const formattedAddresses: Address1[] = addressesArray.map(
-      (item: AddressResponseItem) => ({
-        id: item.id,
-        displayAddress: item.address,
-        is_bookmarked: item.is_bookmarked,
-        auction_event_id: item.auction_event_id,
-        modified_at: item.modified_at,
-        notificationCount: 0, // Initialize with 0, will be updated later
-        address: item.address,
-        created_at: item.created_at,
-        fullAddress: item.address, // Assigning 'address' to 'fullAddress'
-      })
-    );
-
-    setAddresses2(formattedAddresses);
-    setFilteredAddresses2(formattedAddresses);
-    setTotalItems(addressResponse.data.totalCount);
-
-    // Fetch unread notifications with the token in the headers
-    const notificationResponse = await axios.get(
-      `${Base_Url}notifications`,
-      config
-    );
-
-    const unreadNotifications = notificationResponse.data.filter(
-      (notification: any) => !notification.is_read
-    );
-    setNotifications(unreadNotifications);
-
-    // Calculate notification counts
-    const addressNotificationCounts = formattedAddresses.map(
-      (address: any) => {
-        const count = unreadNotifications.filter(
-          (notification: any) => notification.address_id === address.id
-        ).length;
-        return { ...address, notificationCount: count };
-      }
-    );
-
-    setAddresses1(addressNotificationCounts);
-
-    
-
-    if (addressNotificationCounts.length > 0) {
-      setSelectedAddress(addressNotificationCounts[0].displayAddress);
-      setSelectedAddressId(addressNotificationCounts[0].id);
-    }
-        // Rest of your code remains the same...
+  
+        // Handle empty response
+        if (!addressResponse.data.data || addressResponse.data.data.length === 0) {
+          setAddresses2([]);
+          setFilteredAddresses2([]);
+          setTotalItems(0);
+          return;
+        }
+  
+        // Process response data
+        const addressesArray = addressResponse.data.data;
+        const formattedAddresses: Address1[] = addressesArray.map(
+          (item: AddressResponseItem) => ({
+            id: item.id,
+            displayAddress: item.address,
+            is_bookmarked: item.is_bookmarked,
+            auction_event_id: item.auction_event_id,
+            modified_at: item.modified_at,
+            notificationCount: 0,
+            address: item.address,
+            created_at: item.created_at,
+            fullAddress: item.address,
+          })
+        );
+  
+        setAddresses2(formattedAddresses);
+        setFilteredAddresses2(formattedAddresses);
+        setTotalItems(addressResponse.data.totalCount);
+  
+        // Fetch notifications
+        const notificationResponse = await axios.get(
+          `${Base_Url}notifications`,
+          config
+        );
+  
+        const unreadNotifications = notificationResponse.data.filter(
+          (notification: any) => !notification.is_read
+        );
+  
+        // Update addresses with notification counts
+        const addressNotificationCounts = formattedAddresses.map(
+          (address: any) => {
+            const count = unreadNotifications.filter(
+              (notification: any) => notification.address_id === address.id
+            ).length;
+            return { ...address, notificationCount: count };
+          }
+        );
+  
+        setAddresses1(addressNotificationCounts);
+  
+        if (addressNotificationCounts.length > 0) {
+          setSelectedAddress(addressNotificationCounts[0].displayAddress);
+          setSelectedAddressId(addressNotificationCounts[0].id);
+        }
+  
       } catch (error) {
         console.error("Error fetching data:", error);
+        // Handle error state
+        setAddresses2([]);
+        setFilteredAddresses2([]);
+        setTotalItems(0);
       }
     };
-
-
+  
     fetchData();
   }, [
     currentPage,
     itemsPerPage,
-    auctionEventId,
+    selectedAuctionEventIds, 
     selectedDateFilter,
-    toDate,
-    fromDate,
+    toDate&&fromDate,
     withResponses,
     withStopResponses,
-    receivedChecked,
-    deliveredChecked,
-    eventTypeId,
     is_boookmarked,
     searchQuery,
-    eventTypeIds,
     auctionEventId,
+    eventTypeIds
   ]);
+
+
+
+
+
+
+
+
+
+
+
+
+  // useEffect(() => {
+
+  //   const fetchData = async () => {
+  //     const token = localStorage.getItem("authToken");
+  //     const config = {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     };
+    
+  //     try {
+  //       // Properly encode search parameters
+  //       const params = new URLSearchParams({
+  //         page: currentPage.toString(),
+  //         limit: itemsPerPage.toString(),
+  //       });
+    
+  //       if (auctionEventId) params.append('auctionEventId', auctionEventId.toString());
+  //       if (selectedDateFilter !== "all") params.append('filterType', selectedDateFilter);
+  //       if (fromDate && toDate) {
+  //         params.append('fromDate', fromDate);
+  //         params.append('toDate', toDate);
+  //       }
+  //       if (withResponses) params.append('withStopResponses', 'true');
+  //       if (withStopResponses) params.append('withResponses', 'true');
+  //       if (is_boookmarked) params.append('isBookmarked', is_boookmarked.toString());
+  //       if (searchQuery) params.append('searchTerm', searchQuery.trim());
+  //       if (eventTypeIds.length > 0) params.append('eventTypeIds', JSON.stringify(eventTypeIds));
+    
+  //       const addressResponse = await axios.get(
+  //         `${Base_Url}address/getalladdress?${params.toString()}`,
+  //         config
+  //       );
+  //   // Extract the addresses array from the response
+  //   const addressesArray = addressResponse.data.data;
+
+  //   // Ensure addressesArray is indeed an array
+  //   if (!Array.isArray(addressesArray)) {
+  //     throw new Error("Expected data.data to be an array.");
+  //   }
+
+  //   // Map the API response to Address1 format
+  //   const formattedAddresses: Address1[] = addressesArray.map(
+  //     (item: AddressResponseItem) => ({
+  //       id: item.id,
+  //       displayAddress: item.address,
+  //       is_bookmarked: item.is_bookmarked,
+  //       auction_event_id: item.auction_event_id,
+  //       modified_at: item.modified_at,
+  //       notificationCount: 0, // Initialize with 0, will be updated later
+  //       address: item.address,
+  //       created_at: item.created_at,
+  //       fullAddress: item.address, // Assigning 'address' to 'fullAddress'
+  //     })
+  //   );
+
+  //   setAddresses2(formattedAddresses);
+  //   setFilteredAddresses2(formattedAddresses);
+  //   setTotalItems(addressResponse.data.totalCount);
+
+  //   // Fetch unread notifications with the token in the headers
+  //   const notificationResponse = await axios.get(
+  //     `${Base_Url}notifications`,
+  //     config
+  //   );
+
+  //   const unreadNotifications = notificationResponse.data.filter(
+  //     (notification: any) => !notification.is_read
+  //   );
+  //   setNotifications(unreadNotifications);
+
+  //   // Calculate notification counts
+  //   const addressNotificationCounts = formattedAddresses.map(
+  //     (address: any) => {
+  //       const count = unreadNotifications.filter(
+  //         (notification: any) => notification.address_id === address.id
+  //       ).length;
+  //       return { ...address, notificationCount: count };
+  //     }
+  //   );
+
+  //   setAddresses1(addressNotificationCounts);
+
+    
+
+  //   if (addressNotificationCounts.length > 0) {
+  //     setSelectedAddress(addressNotificationCounts[0].displayAddress);
+  //     setSelectedAddressId(addressNotificationCounts[0].id);
+  //   }
+  //       // Rest of your code remains the same...
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+
+
+  //   fetchData();
+  // }, [
+  //   currentPage,
+  //   itemsPerPage,
+  //   auctionEventId,
+  //   selectedDateFilter,
+  //   toDate,
+  //   fromDate,
+  //   withResponses,
+  //   withStopResponses,
+  //   receivedChecked,
+  //   deliveredChecked,
+  //   eventTypeId,
+  //   is_boookmarked,
+  //   searchQuery,
+  //   eventTypeIds,
+  //   auctionEventId,
+  // ]);
 
 
 
@@ -797,11 +950,11 @@ const Dashboard = () => {
     setIsBookmarked(false);
   };
 
-  const handleCheckboxChange = (typeId: number) => {
-    setAuctionEventId((prevAuctionEventId) =>
-      prevAuctionEventId === typeId ? null : typeId
-    );
-  };
+  // const handleCheckboxChange = (typeId: number) => {
+  //   setAuctionEventId((prevAuctionEventId) =>
+  //     prevAuctionEventId === typeId ? null : typeId
+  //   );
+  // };
 
   const handleCustomDateToggle = () => {
     setIsCustomDateOpen(!isCustomDateOpen);
@@ -1298,68 +1451,58 @@ const Dashboard = () => {
                       </div>
                       {/* </span> */}
                     </div>
+
+
+
+
                     <div className="mt-4">
-                      Type
-                      {/* <span className=""> */}
-                      <button
-                        className="btn"
-                        type="button"
-                        // onClick={handleToggle1}
-                        aria-expanded={isType}
-                      >
-                        <Image
-                          src="/dropdownicon.svg"
-                          alt="Dropdown Icon"
-                          width={12}
-                          height={12}
-                        />
-                      </button>
-                      <div className={`ms-4 ${isType ? "show" : ""}`}>
-                        <li className="dropdown-item">
-                          <input
-                            type="checkbox"
-                            className={styles.checkBox}
-                            id="case"
-                            onChange={() => handleCheckboxChange(3)}
-                          />
-                          <label className="ms-2">Case</label>
-                        </li>
-                        <li className="dropdown-item pt-2">
-                          <input
-                            type="checkbox"
-                            className={styles.checkBox}
-                            id="auction"
-                            onChange={() => handleCheckboxChange(1)}
-                          />
-                          <label className="ms-2" htmlFor="auction">
-                            Auction
-                          </label>
-                        </li>
-                        <li className="dropdown-item pt-2">
-                          <input
-                            type="checkbox"
-                            className={styles.checkBox}
-                            id="taxDeed"
-                            onChange={() => handleCheckboxChange(2)}
-                          />
-                          <label className="ms-2" htmlFor="taxDeed">
-                            Tax deed
-                          </label>
-                        </li>
-                        <li className="dropdown-item pt-2">
-                          <input
-                            type="checkbox"
-                            className={styles.checkBox}
-                            id="taxDeed"
-                            onChange={() => handleCheckboxChange(4)}
-                          />
-                          <label className="ms-2" htmlFor="taxDeed">
-                            Beach Data
-                          </label>
-                        </li>
-                      </div>
-                      {/* </span> */}
-                    </div>
+    <div className="ms-4">
+      <li className="dropdown-item">
+        <input
+          type="checkbox"
+          className={styles.checkBox}
+          id="case"
+          checked={selectedAuctionEventIds.includes(3)}
+          onChange={() => handleCheckboxChange(3)}
+        />
+        <label className="ms-2">Case</label>
+      </li>
+      <li className="dropdown-item pt-2">
+        <input
+          type="checkbox"
+          className={styles.checkBox}
+          id="auction"
+          checked={selectedAuctionEventIds.includes(1)}
+          onChange={() => handleCheckboxChange(1)}
+        />
+        <label className="ms-2">Auction</label>
+      </li>
+      <li className="dropdown-item pt-2">
+        <input
+          type="checkbox"
+          className={styles.checkBox}
+          id="taxDeed"
+          checked={selectedAuctionEventIds.includes(2)}
+          onChange={() => handleCheckboxChange(2)}
+        />
+        <label className="ms-2">Tax deed</label>
+      </li>
+      <li className="dropdown-item pt-2">
+        <input
+          type="checkbox"
+          className={styles.checkBox}
+          id="beachData"
+          checked={selectedAuctionEventIds.includes(4)}
+          onChange={() => handleCheckboxChange(4)}
+        />
+        <label className="ms-2">Beach Data</label>
+      </li>
+    </div>
+  </div>
+
+
+
+
                     <div className="mt-4">
                       Date
                       {/* <span className="ms-2 mb-2"> */}
@@ -1423,7 +1566,7 @@ const Dashboard = () => {
                           <button
                             className="btn ms-2"
                             type="button"
-                            onClick={handleCustomDateToggle}
+                            // onClick={handleCustomDateToggle}
                             aria-expanded={isCustomDateOpen}
                           >
                             <Image
