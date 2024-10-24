@@ -9,7 +9,7 @@ import { AddressDto } from "../dto/address.dto";
 import { AddressEntity } from "../entities/address.entity";
 import { OpenPhoneEventEntity } from "src/entities/open-phone-event.entity";
 import * as moment from "moment";
-  
+
 @Injectable()
 export class AddressService {
   constructor(
@@ -40,398 +40,82 @@ export class AddressService {
     }
   }
 
-  // Pagination code
-  // async findAll(
-  //   page: number = 1,
-  //   limit: number = 10
-  // ): Promise<{ data: AddressEntity[]; totalCount: number }> {
-  //   if (isNaN(page) || page <= 0) {
-  //     page = 1;
-  //   }
-  //   if (isNaN(limit) || limit <= 0) {
-  //     limit = 10;
-  //   }
-  //   try {
-  //     const [data, totalCount] = await this.addressRepository.findAndCount({
-  //       where: { is_active: true },
-  //       order: { created_at: "DESC" },
-  //       skip: (page - 1) * limit,
-  //       take: limit,
-  //     });
-
-  //     return { data, totalCount };
-  //   } catch (error) {
-  //     console.error("Error finding all addresses:", error);
-  //     throw new InternalServerErrorException("Error finding all addresses");
-  //   }
-  // }
-
-  // async findAll(
-  //   page: number = 1,
-  //   limit: number = 10,
-  //   auctionEventId?: number,
-  //   filterType?: string, // 'weekly', 'monthly', or 'custom'
-  //   fromDate?: string, // for custom date range filtering
-  //   toDate?: string // for custom date range filtering
-  // ): Promise<{ data: AddressEntity[]; totalCount: number }> {
-  //   if (isNaN(page) || page <= 0) {
-  //     page = 1;
-  //   }
-  //   if (isNaN(limit) || limit <= 0) {
-  //     limit = 10;
-  //   }
-
-  //   try {
-  //     const queryBuilder = this.addressRepository
-  //       .createQueryBuilder("address")
-  //       .where("address.is_active = :isActive", { isActive: true });
-
-  //     // Apply auction event ID filter
-  //     if (auctionEventId) {
-  //       queryBuilder.andWhere("address.auction_event_id = :auctionEventId", {
-  //         auctionEventId,
-  //       });
-  //     }
-
-  //     // Apply weekly or monthly filters based on 'created_at' column
-  //     if (filterType === "weekly") {
-  //       const startOfWeek = moment().startOf("week").toDate();
-  //       const endOfWeek = moment().endOf("week").toDate();
-  //       queryBuilder.andWhere(
-  //         "address.created_at BETWEEN :startOfWeek AND :endOfWeek",
-  //         {
-  //           startOfWeek,
-  //           endOfWeek,
-  //         }
-  //       );
-  //     } else if (filterType === "monthly") {
-  //       const startOfMonth = moment().startOf("month").toDate();
-  //       const endOfMonth = moment().endOf("month").toDate();
-  //       queryBuilder.andWhere(
-  //         "address.created_at BETWEEN :startOfMonth AND :endOfMonth",
-  //         {
-  //           startOfMonth,
-  //           endOfMonth,
-  //         }
-  //       );
-  //     }
-
-  //     // Apply custom date range filter (fromDate and toDate)
-  //     if (fromDate && toDate) {
-  //       const startDate = moment(fromDate).startOf("day").toDate();
-  //       const endDate = moment(toDate).endOf("day").toDate();
-
-  //       queryBuilder.andWhere(
-  //         "address.created_at BETWEEN :startDate AND :endDate",
-  //         {
-  //           startDate,
-  //           endDate,
-  //         }
-  //       );
-  //     }
-
-  //     // Pagination
-  //     queryBuilder.skip((page - 1) * limit).take(limit);
-
-  //     // Fetch the data and total count
-  //     const [data, totalCount] = await queryBuilder.getManyAndCount();
-
-  //     return { data, totalCount };
-  //   } catch (error) {
-  //     console.error("Error finding all addresses:", error);
-  //     throw new InternalServerErrorException("Error finding all addresses");
-  //   }
-  // }
-
-
-
-
-//without modify sorting 
-  // async findAll(
-  //   page: number = 1,
-  //   limit: number = 10,
-  //   auctionEventId?: number,
-  //   filterType?: string,
-  //   fromDate?: string,
-  //   toDate?: string,
-  //   withResponses?: boolean,
-  //   withStopResponses?: boolean
-  // ): Promise<{ data: AddressEntity[]; totalCount: number }> {
-  //   if (isNaN(page) || page <= 0) page = 1;
-  //   if (isNaN(limit) || limit <= 0) limit = 10;
-
-  //   try {
-  //     const queryBuilder = this.addressRepository
-  //       .createQueryBuilder("address")
-  //       .where("address.is_active = :isActive", { isActive: true });
-
-  //     if (auctionEventId) {
-  //       queryBuilder.andWhere("address.auction_event_id = :auctionEventId", { auctionEventId });
-  //     }
-
-  //     if (filterType === "weekly") {
-  //       const startOfWeek = moment().startOf("week").toDate();
-  //       const endOfWeek = moment().endOf("week").toDate();
-  //       queryBuilder.andWhere("address.created_at BETWEEN :startOfWeek AND :endOfWeek", {
-  //         startOfWeek,
-  //         endOfWeek,
-  //       });
-  //     } else if (filterType === "monthly") {
-  //       const startOfMonth = moment().startOf("month").toDate();
-  //       const endOfMonth = moment().endOf("month").toDate();
-  //       queryBuilder.andWhere("address.created_at BETWEEN :startOfMonth AND :endOfMonth", {
-  //         startOfMonth,
-  //         endOfMonth,
-  //       });
-  //     }
-
-  //     if (fromDate && toDate) {
-  //       const startDate = moment(fromDate).startOf("day").toDate();
-  //       const endDate = moment(toDate).endOf("day").toDate();
-  //       queryBuilder.andWhere("address.created_at BETWEEN :startDate AND :endDate", {
-  //         startDate,
-  //         endDate,
-  //       });
-  //     }
-
-  //     if (withResponses) {
-  //       queryBuilder.andWhere((qb) => {
-  //         const subQuery = qb
-  //           .subQuery()
-  //           .select("DISTINCT(e1.address_id)")
-  //           .from(OpenPhoneEventEntity, "e1")
-  //           .innerJoin(OpenPhoneEventEntity, "e2", "e1.conversation_id = e2.conversation_id")
-  //           .where("e1.event_direction_id = :incomingDirection", { incomingDirection: 1 })
-  //           .andWhere("e2.event_direction_id = :outgoingDirection", { outgoingDirection: 2 })
-  //           .andWhere((qb) => {
-  //             const activeConversationSubQuery = qb
-  //               .subQuery()
-  //               .select("1")
-  //               .from(OpenPhoneEventEntity, "e3")
-  //               .where("e3.address_id = e1.address_id")
-  //               .andWhere("e3.conversation_id = e1.conversation_id")
-  //               .andWhere("(e3.body != :stopMessage AND e3.is_stop = :isStop)")
-  //               .getQuery();
-  //             return "EXISTS " + activeConversationSubQuery;
-  //           })
-  //           .getQuery();
-  //         return "address.id IN " + subQuery;
-  //       });
-  //       queryBuilder.setParameter("stopMessage", "Stop")
-  //         .setParameter("isStop", false);
-  //     }
-
-  //     if (withStopResponses) {
-  //       queryBuilder.andWhere((qb) => {
-  //         const subQuery = qb
-  //           .subQuery()
-  //           .select("DISTINCT(e.address_id)")
-  //           .from(OpenPhoneEventEntity, "e")
-  //           .where("e.event_direction_id = :outgoingDirection", { outgoingDirection: 2 })
-  //           .andWhere("(e.body = :stopMessage OR e.is_stop = :isStop)")
-  //           .getQuery();
-  //         return "address.id IN " + subQuery;
-  //       });
-  //       queryBuilder.setParameter("stopMessage", "Stop")
-  //         .setParameter("isStop", true);
-  //     }
-
-  //     queryBuilder.skip((page - 1) * limit).take(limit);
-
-  //     const [data, totalCount] = await queryBuilder.getManyAndCount();
-
-  //     return { data, totalCount };
-  //   } catch (error) {
-  //     console.error("Error finding all addresses:", error);
-  //     throw new InternalServerErrorException("Error finding all addresses");
-  //   }
-  // }
-
-
-//with modified working filter 
-  // async findAll(
-  //   page: number = 1,
-  //   limit: number = 10,
-  //   auctionEventId?: number,
-  //   filterType?: string,
-  //   fromDate?: string,
-  //   toDate?: string,
-  //   withResponses?: boolean,
-  //   withStopResponses?: boolean,
-  //   sortBy: string = "modified_at",
-  //   sortOrder: 'ASC' | 'DESC' = 'DESC'
-  // ): Promise<{ data: AddressEntity[]; totalCount: number }> {
-  //   if (isNaN(page) || page <= 0) page = 1;
-  //   if (isNaN(limit) || limit <= 0) limit = 10;
-
-  //   try {
-  //     const queryBuilder = this.addressRepository
-  //       .createQueryBuilder("address")
-  //       .where("address.is_active = :isActive", { isActive: true });
-
-  //     if (auctionEventId) {
-  //       queryBuilder.andWhere("address.auction_event_id = :auctionEventId", { auctionEventId });
-  //     }
-
-  //     if (filterType === "weekly") {
-  //       const startOfWeek = moment().startOf("week").toDate();
-  //       const endOfWeek = moment().endOf("week").toDate();
-  //       queryBuilder.andWhere("address.created_at BETWEEN :startOfWeek AND :endOfWeek", {
-  //         startOfWeek,
-  //         endOfWeek,
-  //       });
-  //     } else if (filterType === "monthly") {
-  //       const startOfMonth = moment().startOf("month").toDate();
-  //       const endOfMonth = moment().endOf("month").toDate();
-  //       queryBuilder.andWhere("address.created_at BETWEEN :startOfMonth AND :endOfMonth", {
-  //         startOfMonth,
-  //         endOfMonth,
-  //       });
-  //     }
-
-  //     if (fromDate && toDate) {
-  //       const startDate = moment(fromDate).startOf("day").toDate();
-  //       const endDate = moment(toDate).endOf("day").toDate();
-  //       queryBuilder.andWhere("address.created_at BETWEEN :startDate AND :endDate", {
-  //         startDate,
-  //         endDate,
-  //       });
-  //     }
-
-  //     if (withResponses) {
-  //       queryBuilder.andWhere((qb) => {
-  //         const subQuery = qb
-  //           .subQuery()
-  //           .select("DISTINCT(e1.address_id)")
-  //           .from(OpenPhoneEventEntity, "e1")
-  //           .innerJoin(OpenPhoneEventEntity, "e2", "e1.conversation_id = e2.conversation_id")
-  //           .where("e1.event_direction_id = :incomingDirection", { incomingDirection: 1 })
-  //           .andWhere("e2.event_direction_id = :outgoingDirection", { outgoingDirection: 2 })
-  //           .andWhere((qb) => {
-  //             const activeConversationSubQuery = qb
-  //               .subQuery()
-  //               .select("1")
-  //               .from(OpenPhoneEventEntity, "e3")
-  //               .where("e3.address_id = e1.address_id")
-  //               .andWhere("e3.conversation_id = e1.conversation_id")
-  //               .andWhere("(e3.body != :stopMessage AND e3.is_stop = :isStop)")
-  //               .getQuery();
-  //             return "EXISTS " + activeConversationSubQuery;
-  //           })
-  //           .getQuery();
-  //         return "address.id IN " + subQuery;
-  //       });
-  //       queryBuilder.setParameter("stopMessage", "Stop")
-  //         .setParameter("isStop", false);
-  //     }
-
-  //     if (withStopResponses) {
-  //       queryBuilder.andWhere((qb) => {
-  //         const subQuery = qb
-  //           .subQuery()
-  //           .select("DISTINCT(e.address_id)")
-  //           .from(OpenPhoneEventEntity, "e")
-  //           .where("e.event_direction_id = :outgoingDirection", { outgoingDirection: 2 })
-  //           .andWhere("(e.body = :stopMessage OR e.is_stop = :isStop)")
-  //           .getQuery();
-  //         return "address.id IN " + subQuery;
-  //       });
-  //       queryBuilder.setParameter("stopMessage", "Stop")
-  //         .setParameter("isStop", true);
-  //     }
-
-  //     // Add sorting
-  //     queryBuilder.orderBy(`address.${sortBy}`, sortOrder);
-
-  //     queryBuilder.skip((page - 1) * limit).take(limit);
-
-  //     const [data, totalCount] = await queryBuilder.getManyAndCount();
-
-  //     return { data, totalCount };
-  //   } catch (error) {
-  //     console.error("Error finding all addresses:", error);
-  //     throw new InternalServerErrorException("Error finding all addresses");
-  //   }
-  // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- //with recieved and delivered
+  //with recieved and delivered
   async findAll(
     page: number = 1,
     limit: number = 10,
-    auctionEventId?: number,
+    auctionEventIds?: number[],
     filterType?: string,
     fromDate?: string,
     toDate?: string,
     withResponses?: boolean,
     withStopResponses?: boolean,
     sortBy: string = "modified_at",
-    sortOrder: 'ASC' | 'DESC' = 'DESC',
-    // eventTypeId?: number,
+    sortOrder: "ASC" | "DESC" = "DESC",
     isBookmarked?: boolean,
     searchTerm?: string,
-    eventTypeIds?: number[],
+    eventTypeIds?: number[]
   ): Promise<{ data: AddressEntity[]; totalCount: number }> {
-    if (isNaN(page) || page <= 0) page = 1;
-    if (isNaN(limit) || limit <= 0) limit = 10;
-
     try {
       const queryBuilder = this.addressRepository
         .createQueryBuilder("address")
         .leftJoinAndSelect("address.events", "event")
         .where("address.is_active = :isActive", { isActive: true });
 
-      if (auctionEventId) {
-        queryBuilder.andWhere("address.auction_event_id = :auctionEventId", { auctionEventId });
+      // Handle multiple auction event IDs
+      if (auctionEventIds && auctionEventIds.length > 0) {
+        queryBuilder.andWhere(
+          "address.auction_event_id IN (:...auctionEventIds)",
+          { auctionEventIds }
+        );
+      }
+
+      // Handle event type IDs (including received/delivered)
+      if (eventTypeIds && eventTypeIds.length > 0) {
+        queryBuilder.andWhere((qb) => {
+          const subQuery = qb
+            .subQuery()
+            .select("DISTINCT(e.address_id)")
+            .from(OpenPhoneEventEntity, "e")
+            .where("e.event_type_id IN (:...eventTypeIds)")
+            .getQuery();
+          return "address.id IN " + subQuery;
+        });
+        queryBuilder.setParameter("eventTypeIds", eventTypeIds);
       }
 
       if (filterType === "weekly") {
         const startOfWeek = moment().startOf("week").toDate();
         const endOfWeek = moment().endOf("week").toDate();
-        queryBuilder.andWhere("address.created_at BETWEEN :startOfWeek AND :endOfWeek", {
-          startOfWeek,
-          endOfWeek,
-        });
+        queryBuilder.andWhere(
+          "address.created_at BETWEEN :startOfWeek AND :endOfWeek",
+          {
+            startOfWeek,
+            endOfWeek,
+          }
+        );
       } else if (filterType === "monthly") {
         const startOfMonth = moment().startOf("month").toDate();
         const endOfMonth = moment().endOf("month").toDate();
-        queryBuilder.andWhere("address.created_at BETWEEN :startOfMonth AND :endOfMonth", {
-          startOfMonth,
-          endOfMonth,
-        });
+        queryBuilder.andWhere(
+          "address.created_at BETWEEN :startOfMonth AND :endOfMonth",
+          {
+            startOfMonth,
+            endOfMonth,
+          }
+        );
       }
 
       if (fromDate && toDate) {
         const startDate = moment(fromDate).startOf("day").toDate();
         const endDate = moment(toDate).endOf("day").toDate();
-        queryBuilder.andWhere("address.created_at BETWEEN :startDate AND :endDate", {
-          startDate,
-          endDate,
-        });
+        queryBuilder.andWhere(
+          "address.created_at BETWEEN :startDate AND :endDate",
+          {
+            startDate,
+            endDate,
+          }
+        );
       }
 
       if (withResponses) {
@@ -440,9 +124,17 @@ export class AddressService {
             .subQuery()
             .select("DISTINCT(e1.address_id)")
             .from(OpenPhoneEventEntity, "e1")
-            .innerJoin(OpenPhoneEventEntity, "e2", "e1.conversation_id = e2.conversation_id")
-            .where("e1.event_direction_id = :incomingDirection", { incomingDirection: 2 })
-            .andWhere("e2.event_direction_id = :outgoingDirection", { outgoingDirection: 1 })
+            .innerJoin(
+              OpenPhoneEventEntity,
+              "e2",
+              "e1.conversation_id = e2.conversation_id"
+            )
+            .where("e1.event_direction_id = :incomingDirection", {
+              incomingDirection: 2,
+            })
+            .andWhere("e2.event_direction_id = :outgoingDirection", {
+              outgoingDirection: 1,
+            })
             .andWhere((qb) => {
               const activeConversationSubQuery = qb
                 .subQuery()
@@ -457,7 +149,8 @@ export class AddressService {
             .getQuery();
           return "address.id IN " + subQuery;
         });
-        queryBuilder.setParameter("stopMessage", "Stop")
+        queryBuilder
+          .setParameter("stopMessage", "Stop")
           .setParameter("isStop", false);
       }
 
@@ -468,12 +161,15 @@ export class AddressService {
             .select("DISTINCT(e.address_id)")
             .from(OpenPhoneEventEntity, "e")
             // .where("e.event_direction_id = :outgoingDirection", { outgoingDirection: 2 })
-            .where("e.event_direction_id IN (:...directionIds)", { directionIds: [1, 2] })
+            .where("e.event_direction_id IN (:...directionIds)", {
+              directionIds: [1, 2],
+            })
             .andWhere("(e.body = :stopMessage OR e.is_stop = :isStop)")
             .getQuery();
           return "address.id IN " + subQuery;
         });
-        queryBuilder.setParameter("stopMessage", "Stop")
+        queryBuilder
+          .setParameter("stopMessage", "Stop")
           .setParameter("isStop", true);
       }
 
@@ -491,58 +187,57 @@ export class AddressService {
       //   queryBuilder.setParameter("eventTypeId", eventTypeId);
       // }
 
-
-      if (eventTypeIds && eventTypeIds.length > 0) {
-        queryBuilder.andWhere((qb) => {
-          const subQuery = qb
-            .subQuery()
-            .select("DISTINCT(e.address_id)")
-            .from(OpenPhoneEventEntity, "e")
-            .where("e.event_type_id IN (:...eventTypeIds)")
-            .getQuery();
-          return "address.id IN " + subQuery;
-        });
-        queryBuilder.setParameter("eventTypeIds", eventTypeIds);
-      }
-
-
-
+      // if (eventTypeIds && eventTypeIds.length > 0) {
+      //   queryBuilder.andWhere((qb) => {
+      //     const subQuery = qb
+      //       .subQuery()
+      //       .select("DISTINCT(e.address_id)")
+      //       .from(OpenPhoneEventEntity, "e")
+      //       .where("e.event_type_id IN (:...eventTypeIds)")
+      //       .getQuery();
+      //     return "address.id IN " + subQuery;
+      //   });
+      //   queryBuilder.setParameter("eventTypeIds", eventTypeIds);
+      // }
 
       if (searchTerm) {
-        queryBuilder.andWhere(new Brackets(qb => {
-          qb.where("address.address ILIKE :searchTerm", { searchTerm: `%${searchTerm}%` });
-          // Add any other searchable fields from CommonEntity if needed
-        }));
+        queryBuilder.andWhere(
+          new Brackets((qb) => {
+            qb.where("address.address ILIKE :searchTerm", {
+              searchTerm: `%${searchTerm}%`,
+            });
+            // Add any other searchable fields from CommonEntity if needed
+          })
+        );
       }
-
-
 
       if (isBookmarked !== undefined) {
-        queryBuilder.andWhere("address.is_bookmarked = :isBookmarked", { isBookmarked });
+        queryBuilder.andWhere("address.is_bookmarked = :isBookmarked", {
+          isBookmarked,
+        });
       }
-
 
       // Add sorting
       // queryBuilder.orderBy(`address.${sortBy}`, sortOrder);
 
-      if (sortBy === 'modified_at') {
+      if (sortBy === "modified_at") {
         queryBuilder.orderBy("address.modified_at", sortOrder);
       } else {
         queryBuilder.orderBy(`address.${sortBy}`, sortOrder);
       }
 
-
-     
-
       // Add distinct to avoid duplicate addresses due to the join
       queryBuilder.distinct(true);
 
-      const totalCount = await queryBuilder.getCount();
+      // const totalCount = await queryBuilder.getCount();
 
-      const data = await queryBuilder
-        .skip((page - 1) * limit)
-        .take(limit)
-        .getMany();
+      const [data, totalCount] = await Promise.all([
+        queryBuilder
+          .skip((page - 1) * limit)
+          .take(limit)
+          .getMany(),
+        queryBuilder.getCount(),
+      ]);
 
       return { data, totalCount };
     } catch (error) {
@@ -550,20 +245,6 @@ export class AddressService {
       throw new InternalServerErrorException("Error finding all addresses");
     }
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   async getAddressesWithResponses(
     page: number,
@@ -656,11 +337,7 @@ export class AddressService {
         })
         .setParameter("stopMessage", "Stop")
         .setParameter("isStop", true)
-        .select([
-          "address.id",
-          "address.address",
-          "address.auction_event_id",
-        ])
+        .select(["address.id", "address.address", "address.auction_event_id"])
         .skip(skip) // Pagination: Skip number of records
         .take(limit) // Pagination: Limit the number of records
         .getManyAndCount(); // Fetch both the result and total count
