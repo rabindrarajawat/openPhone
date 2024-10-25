@@ -146,7 +146,7 @@ const Dashboard = () => {
     callResponse: 0,
   });
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selectedAuctionTypes, setSelectedAuctionTypes] = useState<number[]>(
     []
   );
@@ -332,9 +332,20 @@ const Dashboard = () => {
           !addressResponse.data.data ||
           addressResponse.data.data.length === 0
         ) {
+          // setAddresses2([]);
+          // setFilteredAddresses2([]);
+          // setTotalItems(0);
+          // return;
+
           setAddresses2([]);
           setFilteredAddresses2([]);
           setTotalItems(0);
+          setAddresses1([]); // Ensure address1 is also cleared
+          setSelectedAddress(""); // Clear selected address
+          setSelectedAddressId(null); // Clear selected address ID
+          setEvents([]);
+          setFromNumber("");
+          setUniqueFromNumbers([]);
           return;
         }
 
@@ -1401,7 +1412,7 @@ const Dashboard = () => {
 
                     <div className="mt-4">
                       Type
-                    <button
+                      <button
                         className="btn"
                         type="button"
                         // onClick={handleToggle1}
@@ -1954,7 +1965,8 @@ const Dashboard = () => {
 
                       <div className="conversation">
                         <div className="d-flex gap-3 justify-content-between align-items-center">
-                          {selectedAddress && (
+                          {/* selectedAddress &&  */}
+                          {
                             <div className="d-flex flex-wrap align-items-center gap-2">
                               <Image
                                 src="converstation.svg"
@@ -1962,8 +1974,9 @@ const Dashboard = () => {
                                 width={24}
                                 height={24}
                               />{" "}
+                              {/* uniqueFromNumbers.length > 0 &&  */}
                               Conversation From{" "}
-                              {uniqueFromNumbers.length > 0 && (
+                              {
                                 <select
                                   className={styles.conversationFrom}
                                   value={fromNumber}
@@ -1972,14 +1985,17 @@ const Dashboard = () => {
                                   }
                                 >
                                   {uniqueFromNumbers.map((number, index) => (
-                                    <option key={index} value={number}>
+                                    <option
+                                      key={index}
+                                      value={number ? number : ""}
+                                    >
                                       {number}
                                     </option>
                                   ))}
                                 </select>
-                              )}
+                              }
                             </div>
-                          )}
+                          }
 
                           <div className="me-2 mt-4">
                             <input
