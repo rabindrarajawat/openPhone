@@ -371,6 +371,10 @@ export class OpenPhoneEventService {
 
 
 
+
+
+
+
 //working for 2nd case of disaster assistance
 // private extractInformation(message: string, templates: any[]) {
 //   console.log("Starting extractInformation with message:", message);
@@ -399,7 +403,7 @@ export class OpenPhoneEventService {
 
 //   // Process each template
 //   templates.forEach(template => {
-//     console.log("Processing template:", template);
+//     // console.log("Processing template:", template);
 
 //     const addressRegex = createRegExp(template.address_expression);
 //     const disasterAssistanceRegex = createRegExp(template.disaster_assistance_expression);
@@ -478,16 +482,10 @@ export class OpenPhoneEventService {
 
 
 
-
-
-
-
-
-
-
+//working for tax auction
 private extractInformation(message: string, templates: any[]) {
-  console.log("Starting extractInformation with message:", message);
-  console.log("Available templates:", templates);
+  // console.log("Starting extractInformation with message:", message);
+  // console.log("Available templates:", templates);
 
   let bestMatch = {
     address: null,
@@ -512,7 +510,7 @@ private extractInformation(message: string, templates: any[]) {
 
   // Process each template
   templates.forEach(template => {
-    console.log("Processing template:", template);
+    // console.log("Processing template:", template);
 
     const addressRegex = createRegExp(template.address_expression);
     const disasterAssistanceRegex = createRegExp(template.disaster_assistance_expression);
@@ -562,11 +560,11 @@ private extractInformation(message: string, templates: any[]) {
     );
 
     if (hasDisasterPhrases || disasterAssistanceMatch) {
-      console.log("Disaster assistance pattern matched in template", template.id);
+      // console.log("Disaster assistance pattern matched in template", template.id);
       auctionType = "disaster assistance";
       priority = 2; // Highest priority
     } else if (auctionTypeMatch) {
-      console.log("Regular auction type matched in template", template.id);
+      // console.log("Regular auction type matched in template", template.id);
       auctionType = auctionTypeMatch[1]?.toLowerCase() || auctionTypeMatch[0]?.toLowerCase();
       
       // Give tax auction matches slightly higher priority
@@ -590,7 +588,7 @@ private extractInformation(message: string, templates: any[]) {
     }
   });
 
-  console.log("Best match found:", bestMatch);
+  // console.log("Best match found:", bestMatch);
   
   // Return only the needed fields
   const result = {
@@ -603,6 +601,12 @@ private extractInformation(message: string, templates: any[]) {
   console.log("Final extracted information:", result);
   return result;
 }
+
+
+
+
+
+
 
 
 
