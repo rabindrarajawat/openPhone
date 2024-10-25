@@ -372,6 +372,119 @@ export class OpenPhoneEventService {
 
 
 //working for 2nd case of disaster assistance
+// private extractInformation(message: string, templates: any[]) {
+//   console.log("Starting extractInformation with message:", message);
+//   console.log("Available templates:", templates);
+
+//   let bestMatch = {
+//     address: null,
+//     auction_type: null,
+//     name: null,
+//     date: null,
+//     template_id: null,
+//     priority: -1 // Used to prioritize disaster assistance matches
+//   };
+
+//   const createRegExp = (pattern: string) => {
+//     if (!pattern) return null;
+//     pattern = pattern.replace(/;$/, "");
+//     const lastSlashIndex = pattern.lastIndexOf("/");
+//     if (lastSlashIndex === -1) {
+//       return new RegExp(pattern, "i");
+//     }
+//     const flags = pattern.slice(lastSlashIndex + 1);
+//     const patternBody = pattern.slice(1, lastSlashIndex);
+//     return new RegExp(patternBody, flags);
+//   };
+
+//   // Process each template
+//   templates.forEach(template => {
+//     console.log("Processing template:", template);
+
+//     const addressRegex = createRegExp(template.address_expression);
+//     const disasterAssistanceRegex = createRegExp(template.disaster_assistance_expression);
+//     const auctionTypeRegex = createRegExp(template.type_expression);
+//     const nameRegex = createRegExp(template.name_regex);
+//     const dateRegex = createRegExp(template.date_regex);
+
+//     const addressMatch = addressRegex ? message.match(addressRegex) : null;
+//     const disasterAssistanceMatch = disasterAssistanceRegex ? message.match(disasterAssistanceRegex) : null;
+//     const auctionTypeMatch = auctionTypeRegex ? message.match(auctionTypeRegex) : null;
+//     const nameMatch = nameRegex ? message.match(nameRegex) : null;
+//     const dateMatch = dateRegex ? message.match(dateRegex) : null;
+
+//     console.log("Matches for template", template.id, ":", {
+//       addressMatch,
+//       disasterAssistanceMatch,
+//       auctionTypeMatch,
+//       nameMatch,
+//       dateMatch
+//     });
+
+//     // Extract address
+//     const extractedAddress = addressMatch ? (addressMatch[1] || addressMatch[2])?.trim() : null;
+
+//     // Determine auction type and priority
+//     let auctionType = null;
+//     let priority = 0;
+
+//     // Check for disaster assistance patterns first
+//     const disasterPhrases = [
+//       'Looking to buy some homes',
+//       'flood damage',
+//       'local custom home builder'
+//     ];
+
+//     const hasDisasterPhrases = disasterPhrases.every(phrase => 
+//       message.toLowerCase().includes(phrase.toLowerCase())
+//     );
+
+//     if (hasDisasterPhrases || disasterAssistanceMatch) {
+//       console.log("Disaster assistance pattern matched in template", template.id);
+//       auctionType = "disaster assistance";
+//       priority = 2; // Highest priority
+//     } else if (auctionTypeMatch) {
+//       console.log("Regular auction type matched in template", template.id);
+//       auctionType = auctionTypeMatch[1]?.toLowerCase();
+//       priority = 1;
+//     }
+
+//     // Update best match if this template has higher priority or is the first valid match
+//     if (priority > bestMatch.priority && extractedAddress) {
+//       bestMatch = {
+//         address: extractedAddress,
+//         auction_type: auctionType,
+//         name: nameMatch ? nameMatch[1]?.trim() : null,
+//         date: dateMatch ? this.parseDate(dateMatch[1]) : null,
+//         template_id: template.id,
+//         priority
+//       };
+//     }
+//   });
+
+//   console.log("Best match found:", bestMatch);
+  
+//   // Return only the needed fields
+//   const result = {
+//     address: bestMatch.address,
+//     auction_type: bestMatch.auction_type,
+//     name: bestMatch.name,
+//     date: bestMatch.date
+//   };
+
+//   console.log("Final extracted information:", result);
+//   return result;
+// }
+
+
+
+
+
+
+
+
+
+
 private extractInformation(message: string, templates: any[]) {
   console.log("Starting extractInformation with message:", message);
   console.log("Available templates:", templates);
@@ -382,7 +495,7 @@ private extractInformation(message: string, templates: any[]) {
     name: null,
     date: null,
     template_id: null,
-    priority: -1 // Used to prioritize disaster assistance matches
+    priority: -1
   };
 
   const createRegExp = (pattern: string) => {
@@ -421,8 +534,17 @@ private extractInformation(message: string, templates: any[]) {
       dateMatch
     });
 
-    // Extract address
-    const extractedAddress = addressMatch ? (addressMatch[1] || addressMatch[2])?.trim() : null;
+    // Extract address - try multiple capture groups if available
+    let extractedAddress = null;
+    if (addressMatch) {
+      // Try each capture group until we find a non-null match
+      for (let i = 1; i < addressMatch.length; i++) {
+        if (addressMatch[i]) {
+          extractedAddress = addressMatch[i].trim();
+          break;
+        }
+      }
+    }
 
     // Determine auction type and priority
     let auctionType = null;
@@ -445,12 +567,18 @@ private extractInformation(message: string, templates: any[]) {
       priority = 2; // Highest priority
     } else if (auctionTypeMatch) {
       console.log("Regular auction type matched in template", template.id);
-      auctionType = auctionTypeMatch[1]?.toLowerCase();
-      priority = 1;
+      auctionType = auctionTypeMatch[1]?.toLowerCase() || auctionTypeMatch[0]?.toLowerCase();
+      
+      // Give tax auction matches slightly higher priority
+      if (auctionType && auctionType.includes('tax')) {
+        priority = 1.5;
+      } else {
+        priority = 1;
+      }
     }
 
     // Update best match if this template has higher priority or is the first valid match
-    if (priority > bestMatch.priority && extractedAddress) {
+    if ((priority > bestMatch.priority || !bestMatch.address) && extractedAddress) {
       bestMatch = {
         address: extractedAddress,
         auction_type: auctionType,
@@ -475,6 +603,10 @@ private extractInformation(message: string, templates: any[]) {
   console.log("Final extracted information:", result);
   return result;
 }
+
+
+
+
 
 private parseDate(dateString: string): Date | null {
   try {
