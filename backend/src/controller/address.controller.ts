@@ -69,8 +69,16 @@ import {
 } from "@nestjs/common";
 import { AuthGuard } from "../authguard/auth.guard";
 import { AddressDto } from "../dto/address.dto";
-import { AddressService } from "../service/address.service";
+// import { AddressService } from "../service/address.service";
+import { AddressService, AddressWithConversations } from '../service/address.service';
 
+interface AddressResponse {
+  message: string;
+  data: AddressWithConversations[];
+  totalCount: number;
+  currentPage: number;
+  totalPages: number;
+}
 @Controller("address")
 @UseGuards(AuthGuard)
 export class AddressController {
@@ -204,6 +212,22 @@ export class AddressController {
     }
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
   // @Get("with-responses")
   // async getAddressesWithResponses(
   //   @Query("page") page: number = 1, // Default page is 1
