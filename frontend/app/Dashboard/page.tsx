@@ -2215,7 +2215,7 @@ const Dashboard = () => {
                                         );
                                       })
                                     : "No chats found for this number"
-                                  : "Loading..."}
+                                  : "No chats found"}
                               </div>
                             </div>
                           </div>
