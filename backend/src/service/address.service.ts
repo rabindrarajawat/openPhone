@@ -9,6 +9,18 @@ import { AddressDto } from "../dto/address.dto";
 import { AddressEntity } from "../entities/address.entity";
 import { OpenPhoneEventEntity } from "src/entities/open-phone-event.entity";
 import * as moment from "moment";
+interface Event {
+  id: number;
+  event_type_id: number;
+  event_direction_id: number;
+  body: string;
+  created_at: string;
+}
+export interface AddressWithConversations
+  extends Omit<AddressEntity, "events"> {
+  events: OpenPhoneEventEntity[];
+  conversation_ids: string[];
+}
 
 @Injectable()
 export class AddressService {
@@ -245,6 +257,193 @@ export class AddressService {
       throw new InternalServerErrorException("Error finding all addresses");
     }
   }
+
+  // async findAll(
+  //   page: number = 1,
+  //   limit: number = 10,
+  //   auctionEventIds?: number[],
+  //   filterType?: string,
+  //   fromDate?: string,
+  //   toDate?: string,
+  //   withResponses?: boolean,
+  //   withStopResponses?: boolean,
+  //   sortBy: string = "modified_at",
+  //   sortOrder: "ASC" | "DESC" = "DESC",
+  //   isBookmarked?: boolean,
+  //   searchTerm?: string,
+  //   eventTypeIds?: number[]
+  // ): Promise<{ data: AddressWithConversations[]; totalCount: number }> {
+  //   try {
+  //     const queryBuilder = this.addressRepository
+  //       .createQueryBuilder("address")
+  //       .leftJoinAndSelect("address.events", "events")
+  //       .where("address.is_active = :isActive", { isActive: true });
+
+  //     // Handle multiple auction event IDs
+  //     if (auctionEventIds?.length) {
+  //       queryBuilder.andWhere("address.auction_event_id IN (:...auctionEventIds)", {
+  //         auctionEventIds
+  //       });
+  //     }
+
+  //     // Handle event type IDs
+  //     if (eventTypeIds?.length) {
+  //       queryBuilder.andWhere((qb) => {
+  //         const subQuery = qb
+  //           .subQuery()
+  //           .select("DISTINCT(e.address_id)")
+  //           .from(OpenPhoneEventEntity, "e")
+  //           .where("e.event_type_id IN (:...eventTypeIds)")
+  //           .getQuery();
+  //         return "address.id IN " + subQuery;
+  //       });
+  //       queryBuilder.setParameter("eventTypeIds", eventTypeIds);
+  //     }
+
+  //     // Handle withResponses - Modified to check for conversations with both direction IDs
+  //     if (withResponses) {
+  //       queryBuilder.andWhere((qb) => {
+  //         const subQuery = qb
+  //           .subQuery()
+  //           .select("DISTINCT(e1.address_id)")
+  //           .from(OpenPhoneEventEntity, "e1")
+  //           .where(
+  //             `EXISTS (
+  //               SELECT 1 FROM open_phone_event e2
+  //               WHERE e2.conversation_id = e1.conversation_id
+  //               AND e2.event_direction_id = 1
+  //             )`
+  //           )
+  //           .andWhere(
+  //             `EXISTS (
+  //               SELECT 1 FROM open_phone_event e3
+  //               WHERE e3.conversation_id = e1.conversation_id
+  //               AND e3.event_direction_id = 2
+  //             )`
+  //           )
+  //           .andWhere(
+  //             `NOT EXISTS (
+  //               SELECT 1 FROM open_phone_event e4
+  //               WHERE e4.conversation_id = e1.conversation_id
+  //               AND (e4.body = :stopMessage OR e4.is_stop = :isStop)
+  //             )`
+  //           )
+  //           .getQuery();
+  //         return "address.id IN " + subQuery;
+  //       });
+  //       queryBuilder
+  //         .setParameter("stopMessage", "Stop")
+  //         .setParameter("isStop", true);
+  //     }
+
+  //     // Handle withStopResponses
+  //     if (withStopResponses) {
+  //       queryBuilder.andWhere((qb) => {
+  //         const subQuery = qb
+  //           .subQuery()
+  //           .select("DISTINCT(e.address_id)")
+  //           .from(OpenPhoneEventEntity, "e")
+  //           .where("e.event_direction_id IN (:...directionIds)", {
+  //             directionIds: [1, 2]
+  //           })
+  //           .andWhere("(e.body = :stopMessage OR e.is_stop = :isStop)")
+  //           .getQuery();
+  //         return "address.id IN " + subQuery;
+  //       });
+  //       queryBuilder
+  //         .setParameter("stopMessage", "Stop")
+  //         .setParameter("isStop", true);
+  //     }
+
+  //     // Handle date filters
+  //     if (filterType === "weekly") {
+  //       const startOfWeek = moment().startOf("week").toDate();
+  //       const endOfWeek = moment().endOf("week").toDate();
+  //       queryBuilder.andWhere(
+  //         "address.created_at BETWEEN :startOfWeek AND :endOfWeek",
+  //         { startOfWeek, endOfWeek }
+  //       );
+  //     } else if (filterType === "monthly") {
+  //       const startOfMonth = moment().startOf("month").toDate();
+  //       const endOfMonth = moment().endOf("month").toDate();
+  //       queryBuilder.andWhere(
+  //         "address.created_at BETWEEN :startOfMonth AND :endOfMonth",
+  //         { startOfMonth, endOfMonth }
+  //       );
+  //     }
+
+  //     if (fromDate && toDate) {
+  //       const startDate = moment(fromDate).startOf("day").toDate();
+  //       const endDate = moment(toDate).endOf("day").toDate();
+  //       queryBuilder.andWhere(
+  //         "address.created_at BETWEEN :startDate AND :endDate",
+  //         { startDate, endDate }
+  //       );
+  //     }
+
+  //     // Handle search
+  //     if (searchTerm) {
+  //       queryBuilder.andWhere(
+  //         new Brackets((qb) => {
+  //           qb.where("address.address ILIKE :searchTerm", {
+  //             searchTerm: `%${searchTerm}%`
+  //           });
+  //         })
+  //       );
+  //     }
+
+  //     // Handle bookmarks
+  //     if (isBookmarked !== undefined) {
+  //       queryBuilder.andWhere("address.is_bookmarked = :isBookmarked", {
+  //         isBookmarked
+  //       });
+  //     }
+
+  //     // Add sorting
+  //     if (sortBy === "modified_at") {
+  //       queryBuilder.orderBy("address.modified_at", sortOrder);
+  //     } else {
+  //       queryBuilder.orderBy(`address.${sortBy}`, sortOrder);
+  //     }
+
+  //     // Make query distinct
+  //     queryBuilder.distinct(true);
+
+  //     // Execute query with pagination
+  //     const [addresses, totalCount] = await Promise.all([
+  //       queryBuilder
+  //         .skip((page - 1) * limit)
+  //         .take(limit)
+  //         .getMany(),
+  //       queryBuilder.getCount()
+  //     ]);
+
+  //     // Get conversation IDs for each address
+  //     const addressesWithConversations: any[] = await Promise.all(
+  //       addresses.map(async (address) => {
+  //         const conversationIds = await this.openPhoneEventRepository
+  //           .createQueryBuilder("event")
+  //           .select("DISTINCT event.conversation_id", "conversation_id")
+  //           .where("event.address_id = :addressId", { addressId: address.id })
+  //           .getRawMany()
+  //           .then(results => results.map(result => result.conversation_id));
+
+  //         return {
+  //           ...address,
+  //           conversation_ids: conversationIds
+  //         };
+  //       })
+  //     );
+
+  //     return {
+  //       data: addressesWithConversations,
+  //       totalCount
+  //     };
+  //   } catch (error) {
+  //     console.error("Error finding all addresses:", error);
+  //     throw new InternalServerErrorException("Error finding all addresses");
+  //   }
+  // }
 
   async getAddressesWithResponses(
     page: number,

@@ -69,8 +69,19 @@ import {
 } from "@nestjs/common";
 import { AuthGuard } from "../authguard/auth.guard";
 import { AddressDto } from "../dto/address.dto";
-import { AddressService } from "../service/address.service";
+// import { AddressService } from "../service/address.service";
+import {
+  AddressService,
+  AddressWithConversations,
+} from "../service/address.service";
 
+interface AddressResponse {
+  message: string;
+  data: AddressWithConversations[];
+  totalCount: number;
+  currentPage: number;
+  totalPages: number;
+}
 @Controller("address")
 @UseGuards(AuthGuard)
 export class AddressController {
@@ -145,8 +156,6 @@ export class AddressController {
   //   }
   // }
 
- 
-
   @Get("getalladdress")
   async getAllAddressData(
     @Query("page") page: number,
@@ -204,53 +213,53 @@ export class AddressController {
     }
   }
 
-  // @Get("with-responses")
-  // async getAddressesWithResponses(
-  //   @Query("page") page: number = 1, // Default page is 1
-  //   @Query("limit") limit: number = 10 // Default limit is 10
-  // ) {
-  //   // Set default values for pagination if not provided
-  //   page = page && page > 0 ? page : 1;
-  //   limit = limit && limit > 0 ? limit : 10;
+  @Get("with-responses")
+  async getAddressesWithResponses(
+    @Query("page") page: number = 1, // Default page is 1
+    @Query("limit") limit: number = 10 // Default limit is 10
+  ) {
+    // Set default values for pagination if not provided
+    page = page && page > 0 ? page : 1;
+    limit = limit && limit > 0 ? limit : 10;
 
-  //   const [data, totalCount] =
-  //     await this.addressService.getAddressesWithResponses(page, limit);
+    const [data, totalCount] =
+      await this.addressService.getAddressesWithResponses(page, limit);
 
-  //   return {
-  //     totalCount, // Total number of entries
-  //     currentPage: page,
-  //     totalPages: Math.ceil(totalCount / limit),
-  //     data, // Paginated data
-  //   };
-  // }
+    return {
+      totalCount, // Total number of entries
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+      data, // Paginated data
+    };
+  }
 
-  // @Get("with-stop-responses")
-  // async getAddressesWithStopResponses(
-  //   @Query("page") page: number = 1, // Default page is 1
-  //   @Query("limit") limit: number = 10 // Default limit is 10
-  // ) {
-  //   // Ensure valid page and limit values
-  //   page = page && page > 0 ? page : 1;
-  //   limit = limit && limit > 0 ? limit : 10;
+  @Get("with-stop-responses")
+  async getAddressesWithStopResponses(
+    @Query("page") page: number = 1, // Default page is 1
+    @Query("limit") limit: number = 10 // Default limit is 10
+  ) {
+    // Ensure valid page and limit values
+    page = page && page > 0 ? page : 1;
+    limit = limit && limit > 0 ? limit : 10;
 
-  //   try {
-  //     const [data, totalCount] =
-  //       await this.addressService.getAddressesWithStopResponses(page, limit);
+    try {
+      const [data, totalCount] =
+        await this.addressService.getAddressesWithStopResponses(page, limit);
 
-  //     return {
-  //       totalCount, // Total number of entries
-  //       currentPage: page, // Current page
-  //       totalPages: Math.ceil(totalCount / limit), // Calculate total pages
-  //       data, // Paginated data
-  //     };
-  //   } catch (error) {
-  //     return {
-  //       statusCode: 500,
-  //       message: "An error occurred while fetching the data.",
-  //       error: error.message || "Internal Server Error",
-  //     };
-  //   }
-  // }
+      return {
+        totalCount, // Total number of entries
+        currentPage: page, // Current page
+        totalPages: Math.ceil(totalCount / limit), // Calculate total pages
+        data, // Paginated data
+      };
+    } catch (error) {
+      return {
+        statusCode: 500,
+        message: "An error occurred while fetching the data.",
+        error: error.message || "Internal Server Error",
+      };
+    }
+  }
 
   @Get("search")
   async searchAddresses(@Query("address") searchTerm: string) {
