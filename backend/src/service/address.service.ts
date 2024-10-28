@@ -83,17 +83,60 @@ export class AddressService {
       }
 
       // Handle event type IDs (including received/delivered)
+      // if (eventTypeIds && eventTypeIds.length > 0) {
+      //   queryBuilder.andWhere((qb) => {
+      //     const subQuery = qb
+      //       .subQuery()
+      //       .select("DISTINCT(e.address_id)")
+      //       .from(OpenPhoneEventEntity, "e")
+      //       .where("e.event_type_id IN (:...eventTypeIds)")
+      //       .getQuery();
+      //     return "address.id IN " + subQuery;
+      //   });
+      //   queryBuilder.setParameter("eventTypeIds", eventTypeIds);
+      // }
+
       if (eventTypeIds && eventTypeIds.length > 0) {
         queryBuilder.andWhere((qb) => {
-          const subQuery = qb
+          const conversationsSubQuery = qb
             .subQuery()
-            .select("DISTINCT(e.address_id)")
+            .select("DISTINCT(e.conversation_id)")
             .from(OpenPhoneEventEntity, "e")
-            .where("e.event_type_id IN (:...eventTypeIds)")
+            .where(
+              new Brackets((sqb) => {
+                // Handle received events
+                if (eventTypeIds.includes(1)) {
+                  sqb.orWhere(
+                    "(e.event_type_id = :receivedTypeId AND e.event_direction_id = :incomingDirection)"
+                  );
+                }
+                // Handle delivered events
+                if (eventTypeIds.includes(2)) {
+                  sqb.orWhere(
+                    "(e.event_type_id = :deliveredTypeId AND e.event_direction_id = :outgoingDirection)"
+                  );
+                }
+              })
+            )
             .getQuery();
-          return "address.id IN " + subQuery;
+
+          // Now get address IDs from these conversations
+          const addressSubQuery = qb
+            .subQuery()
+            .select("DISTINCT(e2.address_id)")
+            .from(OpenPhoneEventEntity, "e2")
+            .where(`e2.conversation_id IN (${conversationsSubQuery})`)
+            .getQuery();
+
+          return "address.id IN " + addressSubQuery;
         });
-        queryBuilder.setParameter("eventTypeIds", eventTypeIds);
+
+        // Set parameters for event type filtering
+        queryBuilder
+          .setParameter("receivedTypeId", 1)
+          .setParameter("deliveredTypeId", 2)
+          .setParameter("incomingDirection", 1)
+          .setParameter("outgoingDirection", 2);
       }
 
       if (filterType === "weekly") {
@@ -185,40 +228,12 @@ export class AddressService {
           .setParameter("isStop", true);
       }
 
-      // Add event type filter
-      // if (eventTypeId) {
-      //   queryBuilder.andWhere((qb) => {
-      //     const subQuery = qb
-      //       .subQuery()
-      //       .select("DISTINCT(e.address_id)")
-      //       .from(OpenPhoneEventEntity, "e")
-      //       .where("e.event_type_id = :eventTypeId")
-      //       .getQuery();
-      //     return "address.id IN " + subQuery;
-      //   });
-      //   queryBuilder.setParameter("eventTypeId", eventTypeId);
-      // }
-
-      // if (eventTypeIds && eventTypeIds.length > 0) {
-      //   queryBuilder.andWhere((qb) => {
-      //     const subQuery = qb
-      //       .subQuery()
-      //       .select("DISTINCT(e.address_id)")
-      //       .from(OpenPhoneEventEntity, "e")
-      //       .where("e.event_type_id IN (:...eventTypeIds)")
-      //       .getQuery();
-      //     return "address.id IN " + subQuery;
-      //   });
-      //   queryBuilder.setParameter("eventTypeIds", eventTypeIds);
-      // }
-
       if (searchTerm) {
         queryBuilder.andWhere(
           new Brackets((qb) => {
             qb.where("address.address ILIKE :searchTerm", {
               searchTerm: `%${searchTerm}%`,
             });
-            // Add any other searchable fields from CommonEntity if needed
           })
         );
       }
@@ -258,6 +273,207 @@ export class AddressService {
     }
   }
 
+  // async findAll(
+  //   page: number = 1,
+  //   limit: number = 10,
+  //   auctionEventIds?: number[],
+  //   filterType?: string,
+  //   fromDate?: string,
+  //   toDate?: string,
+  //   withResponses?: boolean,
+  //   withStopResponses?: boolean,
+  //   sortBy: string = "modified_at",
+  //   sortOrder: "ASC" | "DESC" = "DESC",
+  //   isBookmarked?: boolean,
+  //   searchTerm?: string,
+  //   eventTypeIds?: number[]
+  // ): Promise<{ data: AddressEntity[]; totalCount: number }> {
+  //   try {
+  //     const queryBuilder = this.addressRepository
+  //       .createQueryBuilder("address")
+  //       .leftJoinAndSelect("address.events", "event")
+  //       .where("address.is_active = :isActive", { isActive: true });
+
+  //     if (auctionEventIds && auctionEventIds.length > 0) {
+  //       queryBuilder.andWhere(
+  //         "address.auction_event_id IN (:...auctionEventIds)",
+  //         { auctionEventIds }
+  //       );
+  //     }
+
+  //     // Updated event type filtering logic
+  //     if (eventTypeIds && eventTypeIds.length > 0) {
+  //       queryBuilder.andWhere((qb) => {
+  //         const conversationsSubQuery = qb
+  //           .subQuery()
+  //           .select("DISTINCT(e.conversation_id)")
+  //           .from(OpenPhoneEventEntity, "e")
+  //           .where(
+  //             new Brackets((sqb) => {
+  //               // Handle received events
+  //               if (eventTypeIds.includes(1)) {
+  //                 sqb.orWhere(
+  //                   "(e.event_type_id = :receivedTypeId AND e.event_direction_id = :incomingDirection)"
+  //                 );
+  //               }
+  //               // Handle delivered events
+  //               if (eventTypeIds.includes(2)) {
+  //                 sqb.orWhere(
+  //                   "(e.event_type_id = :deliveredTypeId AND e.event_direction_id = :outgoingDirection)"
+  //                 );
+  //               }
+  //             })
+  //           )
+  //           .getQuery();
+
+  //         // Now get address IDs from these conversations
+  //         const addressSubQuery = qb
+  //           .subQuery()
+  //           .select("DISTINCT(e2.address_id)")
+  //           .from(OpenPhoneEventEntity, "e2")
+  //           .where(`e2.conversation_id IN (${conversationsSubQuery})`)
+  //           .getQuery();
+
+  //         return "address.id IN " + addressSubQuery;
+  //       });
+
+  //       // Set parameters for event type filtering
+  //       queryBuilder
+  //         .setParameter("receivedTypeId", 1)
+  //         .setParameter("deliveredTypeId", 2)
+  //         .setParameter("incomingDirection", 1)
+  //         .setParameter("outgoingDirection", 2);
+  //     }
+
+  //     // Rest of the filtering logic remains the same
+  //     if (filterType === "weekly") {
+  //       const startOfWeek = moment().startOf("week").toDate();
+  //       const endOfWeek = moment().endOf("week").toDate();
+  //       queryBuilder.andWhere(
+  //         "address.created_at BETWEEN :startOfWeek AND :endOfWeek",
+  //         {
+  //           startOfWeek,
+  //           endOfWeek,
+  //         }
+  //       );
+  //     } else if (filterType === "monthly") {
+  //       const startOfMonth = moment().startOf("month").toDate();
+  //       const endOfMonth = moment().endOf("month").toDate();
+  //       queryBuilder.andWhere(
+  //         "address.created_at BETWEEN :startOfMonth AND :endOfMonth",
+  //         {
+  //           startOfMonth,
+  //           endOfMonth,
+  //         }
+  //       );
+  //     }
+
+  //     if (fromDate && toDate) {
+  //       const startDate = moment(fromDate).startOf("day").toDate();
+  //       const endDate = moment(toDate).endOf("day").toDate();
+  //       queryBuilder.andWhere(
+  //         "address.created_at BETWEEN :startDate AND :endDate",
+  //         {
+  //           startDate,
+  //           endDate,
+  //         }
+  //       );
+  //     }
+
+  //     if (withResponses) {
+  //       queryBuilder.andWhere((qb) => {
+  //         const subQuery = qb
+  //           .subQuery()
+  //           .select("DISTINCT(e1.address_id)")
+  //           .from(OpenPhoneEventEntity, "e1")
+  //           .innerJoin(
+  //             OpenPhoneEventEntity,
+  //             "e2",
+  //             "e1.conversation_id = e2.conversation_id"
+  //           )
+  //           .where("e1.event_direction_id = :incomingDirection", {
+  //             incomingDirection: 2,
+  //           })
+  //           .andWhere("e2.event_direction_id = :outgoingDirection", {
+  //             outgoingDirection: 1,
+  //           })
+  //           .andWhere((qb) => {
+  //             const activeConversationSubQuery = qb
+  //               .subQuery()
+  //               .select("1")
+  //               .from(OpenPhoneEventEntity, "e3")
+  //               .where("e3.address_id = e1.address_id")
+  //               .andWhere("e3.conversation_id = e1.conversation_id")
+  //               .andWhere("(e3.body != :stopMessage AND e3.is_stop = :isStop)")
+  //               .getQuery();
+  //             return "EXISTS " + activeConversationSubQuery;
+  //           })
+  //           .getQuery();
+  //         return "address.id IN " + subQuery;
+  //       });
+  //       queryBuilder
+  //         .setParameter("stopMessage", "Stop")
+  //         .setParameter("isStop", false);
+  //     }
+
+  //     if (withStopResponses) {
+  //       queryBuilder.andWhere((qb) => {
+  //         const subQuery = qb
+  //           .subQuery()
+  //           .select("DISTINCT(e.address_id)")
+  //           .from(OpenPhoneEventEntity, "e")
+  //           .where("e.event_direction_id IN (:...directionIds)", {
+  //             directionIds: [1, 2],
+  //           })
+  //           .andWhere("(e.body = :stopMessage OR e.is_stop = :isStop)")
+  //           .getQuery();
+  //         return "address.id IN " + subQuery;
+  //       });
+  //       queryBuilder
+  //         .setParameter("stopMessage", "Stop")
+  //         .setParameter("isStop", true);
+  //     }
+
+  //     if (searchTerm) {
+  //       queryBuilder.andWhere(
+  //         new Brackets((qb) => {
+  //           qb.where("address.address ILIKE :searchTerm", {
+  //             searchTerm: `%${searchTerm}%`,
+  //           });
+  //         })
+  //       );
+  //     }
+
+  //     if (isBookmarked !== undefined) {
+  //       queryBuilder.andWhere("address.is_bookmarked = :isBookmarked", {
+  //         isBookmarked,
+  //       });
+  //     }
+
+  //     if (sortBy === "modified_at") {
+  //       queryBuilder.orderBy("address.modified_at", sortOrder);
+  //     } else {
+  //       queryBuilder.orderBy(`address.${sortBy}`, sortOrder);
+  //     }
+
+  //     queryBuilder.distinct(true);
+
+  //     const [data, totalCount] = await Promise.all([
+  //       queryBuilder
+  //         .skip((page - 1) * limit)
+  //         .take(limit)
+  //         .getMany(),
+  //       queryBuilder.getCount(),
+  //     ]);
+
+  //     return { data, totalCount };
+  //   } catch (error) {
+  //     console.error("Error finding all addresses:", error);
+  //     throw new InternalServerErrorException("Error finding all addresses");
+  //   }
+  // }
+
+  //with conversation id in response
   // async findAll(
   //   page: number = 1,
   //   limit: number = 10,
