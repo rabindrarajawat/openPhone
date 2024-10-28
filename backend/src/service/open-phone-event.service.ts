@@ -483,6 +483,9 @@ export class OpenPhoneEventService {
 
 
 //working for tax auction
+
+
+
 private extractInformation(message: string, templates: any[]) {
   // console.log("Starting extractInformation with message:", message);
   // console.log("Available templates:", templates);
@@ -602,16 +605,6 @@ private extractInformation(message: string, templates: any[]) {
   return result;
 }
 
-
-
-
-
-
-
-
-
-
-
 private parseDate(dateString: string): Date | null {
   try {
     const [month, day] = dateString.split("/").map(Number);
@@ -625,8 +618,6 @@ private parseDate(dateString: string): Date | null {
     return null;
   }
 }
-
-
 
 async create(payload: OpenPhoneEventDto) {
     const templates = await this.templateExpressionsRepository.find();
