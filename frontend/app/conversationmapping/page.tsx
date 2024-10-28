@@ -130,11 +130,14 @@ const ConversationTable = () => {
   return (
     <div>
       <Navbar />
-
+      
       <div className={`container-fluid ${styles.converstaionMapping}`}>
         <h2 className={styles.tableHeading}>Conversation Mapping</h2>
+       
 
         <div className="d-flex justify-content-end mb-3">
+        <button type="button" className="btn btn-success me-4 ">Map Address</button>
+
           <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">
               {recordsPerPage} records per page
@@ -155,6 +158,7 @@ const ConversationTable = () => {
         </div>
 
         <div className={`table-responsive ${styles.tableContainer}`}>
+
           <table
             className={`table table-bordered table-hover ${styles.customTable}`}
           >
