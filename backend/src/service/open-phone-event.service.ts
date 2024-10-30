@@ -527,13 +527,13 @@ private extractInformation(message: string, templates: any[]) {
     const nameMatch = nameRegex ? message.match(nameRegex) : null;
     const dateMatch = dateRegex ? message.match(dateRegex) : null;
 
-    console.log("Matches for template", template.id, ":", {
-      addressMatch,
-      disasterAssistanceMatch,
-      auctionTypeMatch,
-      nameMatch,
-      dateMatch
-    });
+    // console.log("Matches for template", template.id, ":", {
+    //   addressMatch,
+    //   disasterAssistanceMatch,
+    //   auctionTypeMatch,
+    //   nameMatch,
+    //   dateMatch
+    // });
 
     // Extract address - try multiple capture groups if available
     let extractedAddress = null;
@@ -601,7 +601,7 @@ private extractInformation(message: string, templates: any[]) {
     date: bestMatch.date
   };
 
-  console.log("Final extracted information:", result);
+  // console.log("Final extracted information:", result);
   return result;
 }
 
@@ -619,8 +619,9 @@ private parseDate(dateString: string): Date | null {
   }
 }
 
+
 async create(payload: OpenPhoneEventDto) {
-    const templates = await this.templateExpressionsRepository.find();
+     const templates = await this.templateExpressionsRepository.find();
     try {
       if (!payload || !payload.data || !payload.data.object) {
         return { openPhoneEvent: null, addressCreated: false };
@@ -782,170 +783,6 @@ async create(payload: OpenPhoneEventDto) {
 
 
 
-
-
-//Check for both if address and auction type idboth founds than only creates the entry in the address table
-// async create(payload: OpenPhoneEventDto) {
-//     const templates = await this.templateExpressionsRepository.find();
-//     try {
-//       if (!payload || !payload.data || !payload.data.object) {
-//         return { openPhoneEvent: null, addressCreated: false };
-//       }
-
-//       const messageData = payload.data.object;
-//       const body = messageData.body || null;
-//       const existingEvent = await this.openPhoneEventRepository.findOne({
-//         where: { conversation_id: messageData.conversationId },
-//       });
-
-//       const eventTypeId = this.getEventTypeId(payload.type);
-//       if (eventTypeId === null || eventTypeId === undefined) {
-//         throw new BadRequestException(`Invalid event type: ${payload.type}`);
-//       }
-
-//       let addressId = null;
-//       let addressCreated = false;
-//       let auctionTypeId = null;
-
-//       // Try to extract and save address information, but don't let failures block event creation
-//       if (body && !existingEvent) {
-//         try {
-//           const extractedInfo = this.extractInformation(body, templates);
-//           console.log(
-//             "🚀 ~ OpenPhoneEventService ~ create ~ extractedInfo:",
-//             extractedInfo
-//           );
-
-//           // Get auction type ID if available
-//           if (extractedInfo.auction_type) {
-//             auctionTypeId = this.auctionTypeId(extractedInfo.auction_type);
-//           }
-
-//           // Only proceed with address creation if both address and auction type are present
-//           if (extractedInfo.address && auctionTypeId) {
-//             const existingAddress = await this.addressRepository.findOne({
-//               where: { address: extractedInfo.address },
-//             });
-
-//             if (!existingAddress) {
-//               const addressDto: AddressDto = {
-//                 address: extractedInfo.address,
-//                 date: extractedInfo.date || new Date(),
-//                 created_by: "Admin",
-//                 is_active: true,
-//                 is_bookmarked: false,
-//                 auction_event_id: auctionTypeId,
-//                 modified_at: new Date(),
-//               };
-
-//               try {
-//                 const addressErrors = await validate(addressDto);
-//                 if (addressErrors.length === 0) {
-//                   const savedAddress = await this.addressService.createAddress(addressDto);
-//                   addressId = savedAddress.id;
-//                   addressCreated = true;
-//                 }
-//               } catch (error) {
-//                 console.log("Failed to create address, continuing with event creation:", error);
-//               }
-//             } else {
-//               await this.addressRepository.update(
-//                 { id: existingAddress.id },
-//                 { modified_at: new Date() }
-//               );
-//               addressId = existingAddress.id;
-//             }
-//           } else {
-//             console.log(
-//               "Skipping address creation - missing required fields:",
-//               {
-//                 hasAddress: !!extractedInfo.address,
-//                 hasAuctionType: !!auctionTypeId
-//               }
-//             );
-//           }
-//         } catch (error) {
-//           console.log("Error in address extraction/creation, continuing with event creation:", error);
-//         }
-//       }
-
-//       // Create the OpenPhoneEvent regardless of address processing success/failure
-//       const openPhoneEvent = new OpenPhoneEventEntity();
-//       openPhoneEvent.event_type_id = eventTypeId;
-//       // openPhoneEvent.address_id = addressId || existingEvent?.address_id || null;
-//       openPhoneEvent.address_id = !existingEvent ? addressId : null;
-//       openPhoneEvent.auction_event_id = !existingEvent ? auctionTypeId : null;
-//       openPhoneEvent.event_direction_id = this.getEventDirectionId(
-//         messageData.direction
-//       );
-//       openPhoneEvent.from = messageData.from;
-//       openPhoneEvent.to = messageData.to;
-//       openPhoneEvent.body = body;
-//       openPhoneEvent.url = messageData.media?.[0]?.url || "url";
-//       openPhoneEvent.url_type = messageData.media?.[0]?.type || "image";
-//       openPhoneEvent.conversation_id = messageData.conversationId;
-//       openPhoneEvent.created_at = messageData.createdAt;
-//       openPhoneEvent.received_at = payload.createdAt;
-//       openPhoneEvent.contact_established = "NA";
-//       openPhoneEvent.dead = "No";
-//       openPhoneEvent.keep_an_eye = "Yes";
-//       openPhoneEvent.is_stop = messageData.body?.toUpperCase() === "STOP" ? true : false;
-//       openPhoneEvent.created_by = "Admin";
-//       openPhoneEvent.phone_number_id = messageData.phoneNumberId;
-//       openPhoneEvent.user_id = messageData.userId;
-
-//       const eventErrors = await validate(openPhoneEvent);
-//       if (eventErrors.length > 0) {
-//         const errorMessages = eventErrors
-//           .map((error) => Object.values(error.constraints))
-//           .flat();
-//         throw new BadRequestException(
-//           `Invalid open phone event data: ${errorMessages.join(", ")}`
-//         );
-//       }
-
-//       const savedOpenPhoneEvent = await this.openPhoneEventRepository.save(openPhoneEvent);
-
-//       // Only try to create notification and auction event if we actually created an address
-//       if (addressCreated) {
-//         try {
-//           await this.notificationService.createNotification(savedOpenPhoneEvent.id);
-          
-//           const auctionEventDto: AuctionEventDto = {
-//             event_id: savedOpenPhoneEvent.id,
-//             created_by: "Admin",
-//           };
-
-//           const auctionErrors = await validate(auctionEventDto);
-//           if (auctionErrors.length === 0) {
-//             await this.auctionService.create(auctionEventDto);
-//           }
-//         } catch (error) {
-//           console.log("Error creating notification or auction event:", error);
-//         }
-//       }
-
-//       return { openPhoneEvent: savedOpenPhoneEvent, addressCreated };
-//     } catch (error) {
-//       console.error("Error in create method:", error);
-//       if (error instanceof BadRequestException) {
-//         throw error;
-//       }
-//       if (error instanceof Error) {
-//         if (error.message.includes("violates not-null constraint")) {
-//           throw new BadRequestException(`Invalid data: ${error.message}`);
-//         }
-//         throw new InternalServerErrorException(
-//           `Error saving open phone event: ${error.message}`
-//         );
-//       }
-//       throw new InternalServerErrorException("An unknown error occurred");
-//     }
-//   }
-
-
-
-
   async findAll() {
     return this.openPhoneEventRepository.find();
   }
@@ -975,24 +812,7 @@ async create(payload: OpenPhoneEventDto) {
         return 2;
     }
   }
-
-
-
-
-  // private auctionTypeId(auctionType: string): number | null {
-  //   const auctionTypes = {
-  //     'auction': 1,
-  //     'tax auction': 2,
-  //     'foreclosure': 3,
-  //     'disaster assistance': 4
-  //   };
-    
-  //   console.log("Looking up auction type ID for:", auctionType);
-  //   const id = auctionTypes[auctionType] || null;
-  //   console.log("Found auction type ID:", id);
-  //   return id;
-  // }
-
+ 
 
   private auctionTypeId(auctionType: string): number | null {
     const auctionTypes = {
@@ -1002,9 +822,9 @@ async create(payload: OpenPhoneEventDto) {
       'disaster assistance': 4
     };
     
-    console.log("Looking up auction type ID for:", auctionType);
+    // console.log("Looking up auction type ID for:", auctionType);
     const id = auctionTypes[auctionType] || null;
-    console.log("Found auction type ID:", id);
+    // console.log("Found auction type ID:", id);
     return id;
   }
 
@@ -1023,6 +843,332 @@ async create(payload: OpenPhoneEventDto) {
   //       return null;
   //   }
   // }
+
+
+
+
+
+
+// Add this new method to your OpenPhoneEventService class
+
+// async mapUnmappedConversationsToAddresses(payload: any) {
+ 
+//   try {
+//     // Get all unmapped conversations (without pagination to process all)
+//     // const unmappedData = await this.findConversationsWithoutAddress(1, Number.MAX_SAFE_INTEGER);
+//       const templates = await this.templateExpressionsRepository.find();
+     
+//     const results = {
+//       processed: 0,
+//       addressesCreated: 0,
+//       addressesMapped: 0,
+//       failed: 0
+//     };
+  
+//     // Process each unmapped conversation
+//     for (const conversation of payload.data) {
+//       try {
+//         // Skip if no body content to analyze
+//         if (!conversation.body) {
+//           continue;
+//         }
+
+//         // Extract address information from the message body
+//         const extractedInfo = this.extractInformation(conversation.body, templates);
+
+//         if (extractedInfo.address) {
+//           let addressId = null;
+//           let auctionTypeId = null;
+
+//           // Get auction type ID if available
+//           if (extractedInfo.auction_type) {
+//             auctionTypeId = this.auctionTypeId(extractedInfo.auction_type);
+//           }
+
+//           // Check if address already exists
+//           const existingAddress = await this.addressRepository.findOne({
+//             where: { address: extractedInfo.address }
+//           });
+
+//           if (!existingAddress) {
+//             // Create new address
+//             const addressDto: AddressDto = {
+//               address: extractedInfo.address,
+//               date: extractedInfo.date || new Date(),
+//               created_by: "Admin",
+//               is_active: true,
+//               is_bookmarked: false,
+//               auction_event_id: auctionTypeId,
+//               modified_at: new Date()
+//             };
+
+//             try {
+//               const addressErrors = await validate(addressDto);
+//               if (addressErrors.length === 0) {
+//                 const savedAddress = await this.addressService.createAddress(addressDto);
+//                 addressId = savedAddress.id;
+//                 results.addressesCreated++;
+               
+//               }
+//             } catch (error) {
+//               console.log(`Failed to create address for conversation ${conversation.conversation_id}:`, error);
+//               results.failed++;
+//               continue;
+//             }
+//           } else {
+//             addressId = existingAddress.id;
+//             // Update modified_at timestamp
+//             await this.addressRepository.update(
+//               { id: addressId },
+//               { modified_at: new Date() }
+//             );
+//           }
+
+//           // Update all events in this conversation with the address_id
+//           if (addressId) {
+//             await this.openPhoneEventRepository.update(
+//               { conversation_id: conversation.conversation_id },
+//               { 
+//                 address_id: addressId,
+//                 auction_event_id: auctionTypeId
+//               }
+//             );
+//             results.addressesMapped++;
+//           }
+//         }
+        
+//         results.processed++;
+//       } catch (error) {
+//         console.error(`Error processing conversation ${conversation.conversation_id}:`, error);
+//         results.failed++;
+//       }
+//     }
+
+//     return {
+//       message: "Address mapping process completed",
+//       results: {
+//         totalProcessed: results.processed,
+//         newAddressesCreated: results.addressesCreated,
+//         conversationsMapped: results.addressesMapped,
+//         failed: results.failed
+//       }
+//     };
+//   } catch (error) {
+//     console.error("Error in mapUnmappedConversationsToAddresses:", error);
+//     throw new InternalServerErrorException(
+//       `Error mapping addresses to conversations: ${error.message}`
+//     );
+//   }
+// }
+
+
+
+
+
+async mapUnmappedConversationsToAddresses(payload: any) {
+  try {
+    const templates = await this.templateExpressionsRepository.find();
+
+    const results = {
+      processed: 0,
+      addressesCreated: 0,
+      addressesMapped: 0,
+      failed: 0
+    };
+
+    // Process each record individually since we need to maintain the original record ID
+    for (const record of payload.data) {
+      try {
+        // Skip if no body content to analyze
+        if (!record.body) {
+          continue;
+        }
+
+        // Extract address information from the message body
+        const extractedInfo = this.extractInformation(record.body, templates);
+
+        if (extractedInfo.address) {
+          let addressId = null;
+          let auctionTypeId = null;
+
+          // Get auction type ID if available
+          if (extractedInfo.auction_type) {
+            auctionTypeId = this.auctionTypeId(extractedInfo.auction_type);
+          }
+
+          // Check if address already exists
+          const existingAddress = await this.addressRepository.findOne({
+            where: { address: extractedInfo.address }
+          });
+
+          if (!existingAddress) {
+            // Create new address
+            const addressDto: AddressDto = {
+              address: extractedInfo.address,
+              date: extractedInfo.date || new Date(),
+              created_by: "Admin",
+              is_active: true,
+              is_bookmarked: false,
+              auction_event_id: auctionTypeId,
+              modified_at: new Date()
+            };
+
+            try {
+              const addressErrors = await validate(addressDto);
+              if (addressErrors.length === 0) {
+                const savedAddress = await this.addressService.createAddress(addressDto);
+                addressId = savedAddress.id;
+                results.addressesCreated++;
+              }
+            } catch (error) {
+              console.log(`Failed to create address for record ${record.id}:`, error);
+              results.failed++;
+              continue;
+            }
+          } else {
+            addressId = existingAddress.id;
+            // Update modified_at timestamp
+            await this.addressRepository.update(
+              { id: addressId },
+              { modified_at: new Date() }
+            );
+          }
+
+          // Update only this record with the address
+          if (addressId) {
+            try {
+              // Log the current record
+             
+
+              // First, verify the record exists
+              const existingRecord = await this.openPhoneEventRepository.findOne({
+                where: { id: record.id }
+              });
+
+              if (!existingRecord) {
+                console.log(`Record not found with ID: ${record.id}`);
+                results.failed++;
+                continue;
+              }
+
+              // Perform the update using the record's ID
+              const updateResult = await this.openPhoneEventRepository
+                .createQueryBuilder()
+                .update()
+                .set({
+                  address_id: addressId,
+                  auction_event_id: auctionTypeId
+                })
+                .where("id = :id", { id: record.id })
+                .execute();
+
+              console.log('Update result:', updateResult);
+
+              if (updateResult.affected > 0) {
+                results.addressesMapped++;
+              } else {
+                console.log(`Failed to update record ${record.id}`);
+                results.failed++;
+              }
+
+              // Verify the update
+              const verifiedRecord = await this.openPhoneEventRepository.findOne({
+                where: { id: record.id }
+              });
+              console.log('Verified record after update:', verifiedRecord);
+
+            } catch (updateError) {
+              console.error('Error updating OpenPhoneEvent:', updateError);
+              results.failed++;
+            }
+          }
+        }
+
+        results.processed++;
+      } catch (error) {
+        console.error(`Error processing record:`, error);
+        results.failed++;
+      }
+    }
+
+    return {
+      message: "Address mapping process completed",
+      results: {
+        totalProcessed: results.processed,
+        newAddressesCreated: results.addressesCreated,
+        conversationsMapped: results.addressesMapped,
+        failed: results.failed
+      }
+    };
+  } catch (error) {
+    console.error("Error in mapUnmappedConversationsToAddresses:", error);
+    throw new InternalServerErrorException(
+      `Error mapping addresses to conversations: ${error.message}`
+    );
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1208,27 +1354,6 @@ async create(payload: OpenPhoneEventDto) {
     };
   }
 
-  // async findConversationsWithoutAddress(): Promise<any[]> {
-  //   const subQuery = this.openPhoneEventRepository
-  //     .createQueryBuilder("sub_event")
-  //     .select("sub_event.conversation_id")
-  //     .where("sub_event.address_id IS NOT NULL");
-
-  //   const openPhoneEvents = await this.openPhoneEventRepository
-  //     .createQueryBuilder("event")
-  //     .select(["event.conversation_id", "event.from", "event.to", "event.body"])
-  //     .where("event.address_id IS NULL")
-  //     .andWhere("event.conversation_id NOT IN (" + subQuery.getQuery() + ")")
-  //     .distinct(true)
-  //     .getRawMany();
-
-  //   return openPhoneEvents.map((event) => ({
-  //     conversation_id: event.event_conversation_id,
-  //     from: event.event_from,
-  //     to: event.event_to,
-  //     body: event.event_body,
-  //   }));
-  // }
 
 
 
@@ -1268,14 +1393,14 @@ async create(payload: OpenPhoneEventDto) {
     try {
       const [openPhoneEvents, totalCount] = await this.openPhoneEventRepository
         .createQueryBuilder("event")
-        .select([
-          "event.conversation_id",
-          "event.from",
-          "event.to",
-          "event.body",
-          "event.created_at",
+        // .select([
+        //   "event.conversation_id",
+        //   "event.from",
+        //   "event.to",
+        //   "event.body",
+        //   "event.created_at",
 
-        ])
+        // ])
         .where("event.address_id IS NULL")
         .andWhere("event.conversation_id NOT IN (" + subQuery.getQuery() + ")")
         .orderBy("event.created_at", "DESC")
@@ -1285,16 +1410,16 @@ async create(payload: OpenPhoneEventDto) {
         .getManyAndCount();
 
  
-      const data = openPhoneEvents.map((event) => ({
-        conversation_id: event.conversation_id,
-        from: event.from,
-        to: event.to,
-        body: event.body,
-        created_at:event.created_at,
-      }));
+      // const data = openPhoneEvents.map((event) => ({
+      //   conversation_id: event.conversation_id,
+      //   from: event.from,
+      //   to: event.to,
+      //   body: event.body,
+      //   created_at:event.created_at,
+      // }));
 
       return {
-        data,
+        data:openPhoneEvents,
         totalCount,
         currentPage: page,
         totalPages: Math.ceil(totalCount / limit),
@@ -1306,6 +1431,63 @@ async create(payload: OpenPhoneEventDto) {
       );
     }
   } 
+
+
+
+
+
+
+
+  // async getUnmappedConversations(): Promise<any[]> {
+  //   const subQuery = this.openPhoneEventRepository
+  //     .createQueryBuilder("sub_event")
+  //     .select("sub_event.conversation_id")
+  //     .where("sub_event.address_id IS NOT NULL");
+
+  //   const openPhoneEvents = await this.openPhoneEventRepository
+  //     .createQueryBuilder("event")
+  //     .select(["event.conversation_id", "event.from", "event.to", "event.body"])
+  //     .where("event.address_id IS NULL")
+  //     .andWhere("event.conversation_id NOT IN (" + subQuery.getQuery() + ")")
+  //     .distinct(true)
+  //     .getRawMany();
+
+  //   return openPhoneEvents
+  //   .map((event) => ({
+  //     conversation_id: event.event_conversation_id,
+  //     from: event.event_from,
+  //     to: event.event_to,
+  //     body: event.event_body,
+  //   }));
+  // }
+
+
+
+  async getUnmappedConversations(): Promise<any[]> {
+    const subQuery = this.openPhoneEventRepository
+      .createQueryBuilder("sub_event")
+      .select("sub_event.conversation_id")
+      .where("sub_event.address_id IS NOT NULL");
+  
+    try {
+      const openPhoneEvents = await this.openPhoneEventRepository
+        .createQueryBuilder("event")
+        .where("event.address_id IS NULL")
+        .andWhere("event.conversation_id NOT IN (" + subQuery.getQuery() + ")")
+        .orderBy("event.created_at", "DESC")
+        .distinct(true)
+        .getMany(); // This will retrieve all fields
+  
+      return openPhoneEvents;
+    } catch (error) {
+      console.error("Error in getUnmappedConversations:", error);
+      throw new InternalServerErrorException(
+        `Error fetching unmapped conversations: ${error.message}`
+      );
+    }
+  }
+  
+
 
 
 
@@ -1400,3 +1582,236 @@ async create(payload: OpenPhoneEventDto) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Check for both if address and auction type idboth founds than only creates the entry in the address table
+// async create(payload: OpenPhoneEventDto) {
+//     const templates = await this.templateExpressionsRepository.find();
+//     try {
+//       if (!payload || !payload.data || !payload.data.object) {
+//         return { openPhoneEvent: null, addressCreated: false };
+//       }
+
+//       const messageData = payload.data.object;
+//       const body = messageData.body || null;
+//       const existingEvent = await this.openPhoneEventRepository.findOne({
+//         where: { conversation_id: messageData.conversationId },
+//       });
+
+//       const eventTypeId = this.getEventTypeId(payload.type);
+//       if (eventTypeId === null || eventTypeId === undefined) {
+//         throw new BadRequestException(`Invalid event type: ${payload.type}`);
+//       }
+
+//       let addressId = null;
+//       let addressCreated = false;
+//       let auctionTypeId = null;
+
+//       // Try to extract and save address information, but don't let failures block event creation
+//       if (body && !existingEvent) {
+//         try {
+//           const extractedInfo = this.extractInformation(body, templates);
+//           console.log(
+//             "🚀 ~ OpenPhoneEventService ~ create ~ extractedInfo:",
+//             extractedInfo
+//           );
+
+//           // Get auction type ID if available
+//           if (extractedInfo.auction_type) {
+//             auctionTypeId = this.auctionTypeId(extractedInfo.auction_type);
+//           }
+
+//           // Only proceed with address creation if both address and auction type are present
+//           if (extractedInfo.address && auctionTypeId) {
+//             const existingAddress = await this.addressRepository.findOne({
+//               where: { address: extractedInfo.address },
+//             });
+
+//             if (!existingAddress) {
+//               const addressDto: AddressDto = {
+//                 address: extractedInfo.address,
+//                 date: extractedInfo.date || new Date(),
+//                 created_by: "Admin",
+//                 is_active: true,
+//                 is_bookmarked: false,
+//                 auction_event_id: auctionTypeId,
+//                 modified_at: new Date(),
+//               };
+
+//               try {
+//                 const addressErrors = await validate(addressDto);
+//                 if (addressErrors.length === 0) {
+//                   const savedAddress = await this.addressService.createAddress(addressDto);
+//                   addressId = savedAddress.id;
+//                   addressCreated = true;
+//                 }
+//               } catch (error) {
+//                 console.log("Failed to create address, continuing with event creation:", error);
+//               }
+//             } else {
+//               await this.addressRepository.update(
+//                 { id: existingAddress.id },
+//                 { modified_at: new Date() }
+//               );
+//               addressId = existingAddress.id;
+//             }
+//           } else {
+//             console.log(
+//               "Skipping address creation - missing required fields:",
+//               {
+//                 hasAddress: !!extractedInfo.address,
+//                 hasAuctionType: !!auctionTypeId
+//               }
+//             );
+//           }
+//         } catch (error) {
+//           console.log("Error in address extraction/creation, continuing with event creation:", error);
+//         }
+//       }
+
+//       // Create the OpenPhoneEvent regardless of address processing success/failure
+//       const openPhoneEvent = new OpenPhoneEventEntity();
+//       openPhoneEvent.event_type_id = eventTypeId;
+//       // openPhoneEvent.address_id = addressId || existingEvent?.address_id || null;
+//       openPhoneEvent.address_id = !existingEvent ? addressId : null;
+//       openPhoneEvent.auction_event_id = !existingEvent ? auctionTypeId : null;
+//       openPhoneEvent.event_direction_id = this.getEventDirectionId(
+//         messageData.direction
+//       );
+//       openPhoneEvent.from = messageData.from;
+//       openPhoneEvent.to = messageData.to;
+//       openPhoneEvent.body = body;
+//       openPhoneEvent.url = messageData.media?.[0]?.url || "url";
+//       openPhoneEvent.url_type = messageData.media?.[0]?.type || "image";
+//       openPhoneEvent.conversation_id = messageData.conversationId;
+//       openPhoneEvent.created_at = messageData.createdAt;
+//       openPhoneEvent.received_at = payload.createdAt;
+//       openPhoneEvent.contact_established = "NA";
+//       openPhoneEvent.dead = "No";
+//       openPhoneEvent.keep_an_eye = "Yes";
+//       openPhoneEvent.is_stop = messageData.body?.toUpperCase() === "STOP" ? true : false;
+//       openPhoneEvent.created_by = "Admin";
+//       openPhoneEvent.phone_number_id = messageData.phoneNumberId;
+//       openPhoneEvent.user_id = messageData.userId;
+
+//       const eventErrors = await validate(openPhoneEvent);
+//       if (eventErrors.length > 0) {
+//         const errorMessages = eventErrors
+//           .map((error) => Object.values(error.constraints))
+//           .flat();
+//         throw new BadRequestException(
+//           `Invalid open phone event data: ${errorMessages.join(", ")}`
+//         );
+//       }
+
+//       const savedOpenPhoneEvent = await this.openPhoneEventRepository.save(openPhoneEvent);
+
+//       // Only try to create notification and auction event if we actually created an address
+//       if (addressCreated) {
+//         try {
+//           await this.notificationService.createNotification(savedOpenPhoneEvent.id);
+          
+//           const auctionEventDto: AuctionEventDto = {
+//             event_id: savedOpenPhoneEvent.id,
+//             created_by: "Admin",
+//           };
+
+//           const auctionErrors = await validate(auctionEventDto);
+//           if (auctionErrors.length === 0) {
+//             await this.auctionService.create(auctionEventDto);
+//           }
+//         } catch (error) {
+//           console.log("Error creating notification or auction event:", error);
+//         }
+//       }
+
+//       return { openPhoneEvent: savedOpenPhoneEvent, addressCreated };
+//     } catch (error) {
+//       console.error("Error in create method:", error);
+//       if (error instanceof BadRequestException) {
+//         throw error;
+//       }
+//       if (error instanceof Error) {
+//         if (error.message.includes("violates not-null constraint")) {
+//           throw new BadRequestException(`Invalid data: ${error.message}`);
+//         }
+//         throw new InternalServerErrorException(
+//           `Error saving open phone event: ${error.message}`
+//         );
+//       }
+//       throw new InternalServerErrorException("An unknown error occurred");
+//     }
+//   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

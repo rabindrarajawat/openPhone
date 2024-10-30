@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Table, Container, Dropdown } from "react-bootstrap";
+import { Table, Container, Dropdown, Button } from "react-bootstrap";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
 import Popup from "../popup/popup";
@@ -22,7 +22,9 @@ interface Address {
 const ConversationTable = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
   const [records, setRecords] = useState<ConversationRecord[]>([]);
-  const [showPopup, setShowPopup] = useState(false);
+  const [allRecords, setAllRecords] = useState<ConversationRecord[]>([]);
+ 
+   const [showPopup, setShowPopup] = useState(false);
   const [selectedRecord, setSelectedRecord] =
     useState<ConversationRecord | null>(null);
   const [selectedAddress, setSelectedAddress] = useState("Search Address");
@@ -107,14 +109,14 @@ const ConversationTable = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-  
+
     // Format the date in 'dd mm yyyy'
     const formattedDate = date.toLocaleDateString("en-GB", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
     });
-  
+
     // Format the time in 'hh:mm AM/PM'
     const formattedTime = date.toLocaleTimeString("en-GB", {
       hour: "numeric",
@@ -122,9 +124,56 @@ const ConversationTable = () => {
       hour12: true, // This enables 12-hour format with AM/PM
       timeZone: "UTC", // Ensures that time is shown in UTC
     });
-  
+
     // Combine date and time
     return `${formattedDate} ${formattedTime}`;
+  };
+
+  const MapAddress = async () => {
+    const token = localStorage.getItem("authToken");
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    try {
+       const response = await axios.get(
+        `${Base_Url}openPhoneEventData/getUnmappedConversations`,
+        {
+          headers: config.headers,
+        }
+      );
+ 
+      const data = response.data.data;
+      setAllRecords(data);
+
+
+
+      if(data){
+         try {
+         const res = await axios.post(
+           `${Base_Url}openPhoneEventData/mapUnmappedAddresses`,
+           {data:data}
+         );
+         console.log("🚀 ~ MapAddress ~ res:", res.data)
+    
+        } catch (error) {
+         console.log("🚀 ~ MapAddress ~ error:", error);
+       }
+      }
+
+
+
+       console.log("🚀 ~ MapAddress ~ data:", data)
+      //  if (Array.isArray(data)) {
+      // } else {
+      //   console.error("API response is not an array:", data);
+      // }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+
+  
   };
 
   return (
@@ -152,6 +201,9 @@ const ConversationTable = () => {
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
+          <Button className="ms-2 btn btn-success" onClick={MapAddress}>
+            Map Address
+          </Button>
         </div>
 
         <div className={`table-responsive ${styles.tableContainer}`}>
