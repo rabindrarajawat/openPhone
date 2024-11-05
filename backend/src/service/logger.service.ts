@@ -1,30 +1,36 @@
 import { Injectable, LoggerService } from '@nestjs/common';
-import { createLogger, format, transports } from 'winston';
+import { createLogger, format, transports, Logger } from 'winston';
+import * as path from 'path';
 
 @Injectable()
 export class CustomLogger implements LoggerService {
-  private logger = createLogger({
-    level: 'info',
-    format: format.combine(
-      format.timestamp(),
-      format.json(),
-      format.prettyPrint(),
-    ),
-    transports: [
-      new transports.Console(),
-      new transports.File({ filename: 'application.log' }),
-    ],
-  });
+    private logger: Logger;
 
-  log(message: any) {
-    this.logger.info(message);
-  }
+    constructor() {
+        this.logger = createLogger({
+            level: 'info',
+            format: format.combine(
+                format.timestamp(),
+                format.json()
+            ),
+            transports: [
+                new transports.File({ filename: path.join(__dirname, '../../logs/error.log'), level: 'error' }),
+                new transports.File({ filename: path.join(__dirname, '../../logs/combined.log') }),
+            ],
+        });
+    }
 
-  error(message: any, trace?: string) {
-    this.logger.error(message, trace);
-  }
+    log(message: any) {
+        this.logger.info(message);
+    }
 
-  warn(message: any) {
-    this.logger.warn(message);
-  }
+    error(message: any, trace?: string) {
+        this.logger.error(message);
+    }
+
+    warn(message: any) {
+        this.logger.warn(message);
+    }
+
+    // Add more methods as needed
 }

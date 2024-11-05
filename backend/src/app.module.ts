@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module,MiddlewareConsumer, NestModule } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { OpenPhoneEventEntity } from "./entities/open-phone-event.entity";
@@ -30,6 +30,11 @@ import { BookmarkModule } from "./module/bookmark.module";
 import { NotificationModule } from "./module/notification.module";
  import { TemplatesExpressionsEntity } from "./entities/template-expressions.entity";
 import { LoggerModule } from "./module/logger.module";
+import { CustomLogger } from './service/logger.service';
+import { RequestLoggerMiddleware } from './middleware/request-logger.middleware.ts:';
+import { AppController } from "./app.controller";
+
+import { AppService } from "./app.service";
  
 @Module({
   imports: [
@@ -70,5 +75,15 @@ import { LoggerModule } from "./module/logger.module";
     CaseEventModule,
     AuctionEventModule,LoggerModule, MessageMasterModule, RoleModule, usersModule, ConversationMappingModule,BookmarkModule,NotificationModule,
   ],
+  controllers:[AppController],
+  providers:[AppService,CustomLogger],
 })
-export class AppModule { }
+export class AppModule  implements NestModule{
+  configure(consumer: MiddlewareConsumer) {
+    
+    consumer
+    .apply(RequestLoggerMiddleware)
+    .forRoutes('*');
+  } 
+
+}

@@ -24,46 +24,53 @@ export class OpenPhoneEventController {
     private readonly logger:CustomLogger,
   ) {}
 
-  @Post()
-  async createOpenPhoneEvent(@Body() payload: any) {
-    try {
-      console.log(
-        "🚀 ~ OpenPhoneEventController ~ createOpenPhoneEvent ~ payload:",
-        payload
-      );
-      this.logger.log(`Open phone event data created: ${JSON.stringify(payload)}`);
+ @Post()
+async createOpenPhoneEvent(@Body() payload: any) {
+  try {
+    console.log(
+      "🚀 ~ OpenPhoneEventController ~ createOpenPhoneEvent ~ payload:",
+      payload
+    );
+    this.logger.log(`Open phone event data created: ${JSON.stringify(payload)}`);
 
-      // Check for empty or null payload
-      if (!payload || Object.keys(payload).length === 0) {
-        return { message: "Empty payload received", status: 200 };
-      }
-
-      // Proceed with creating the event
-      const { openPhoneEvent, addressCreated } =
-        await this.openPhoneEventService.create(payload);
-
-      // If no entry was created in openPhoneEvent
-      if (!openPhoneEvent || !openPhoneEvent.id) {
-        return { message: "Empty payload received", status: 200 };
-      }
-
-      let responseMessage = "Open phone event data created successfully.";
-      if (addressCreated) {
-        responseMessage += " New address data created.";
-      }
-
-      return {
-        message: responseMessage,
-        openPhoneEventId: openPhoneEvent?.id,
-        addressCreated: addressCreated,
-      };
-    } catch (error) {
-      console.error("Error in createOpenPhoneEvent:", error);
-      throw new InternalServerErrorException(
-        "Failed to create open phone event"
-      );
+    // Check for empty or null payload
+    if (!payload || Object.keys(payload).length === 0) {
+      const response = { message: "Empty payload received", status: 200 };
+      this.logger.warn(`Warning: ${response.message}`);
+      return response;
     }
+
+    // Proceed with creating the event
+    const { openPhoneEvent, addressCreated } = await this.openPhoneEventService.create(payload);
+
+    // If no entry was created in openPhoneEvent
+    if (!openPhoneEvent || !openPhoneEvent.id) {
+      const response = { message: "No open phone event created", status: 200 };
+      this.logger.warn(`Warning: ${response.message}`);
+      return response;
+    }
+
+    let responseMessage = "Open phone event data created successfully.";
+    if (addressCreated) {
+      responseMessage += " New address data created.";
+    }
+
+    const response = {
+      message: responseMessage,
+      openPhoneEventId: openPhoneEvent?.id,
+      addressCreated: addressCreated,
+    };
+    
+    this.logger.log(`Success: ${response.message} - ID: ${response.openPhoneEventId}, Address Created: ${addressCreated}`);
+    
+    return response;
+  } catch (error) {
+    console.error("Error in createOpenPhoneEvent:", error);
+    this.logger.error("Error in createOpenPhoneEvent:", error); // Log the error for tracking
+    throw new InternalServerErrorException("Failed to create open phone event");
   }
+}
+
 
   // @Post()
   // async createOpenPhoneEvent(
