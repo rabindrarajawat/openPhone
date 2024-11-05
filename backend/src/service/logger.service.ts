@@ -4,9 +4,10 @@ import * as path from 'path';
 
 @Injectable()
 export class CustomLogger implements LoggerService {
-    private logger: Logger;
+    private  readonly logger: Logger;
 
     constructor() {
+        
         this.logger = createLogger({
             level: 'info',
             format: format.combine(
@@ -14,8 +15,8 @@ export class CustomLogger implements LoggerService {
                 format.json()
             ),
             transports: [
-                new transports.File({ filename: path.join(__dirname, '../../logs/error.log'), level: 'error' }),
-                new transports.File({ filename: path.join(__dirname, '../../logs/combined.log') }),
+                new transports.File({ filename: path.join(__dirname, '../../../logs/error.log'), level: 'error' }),
+                new transports.File({ filename: path.join(__dirname, '../../../logs/combined.log') }),
             ],
         });
     }
