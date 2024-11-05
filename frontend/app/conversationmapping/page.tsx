@@ -1,12 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Table, Container, Dropdown } from "react-bootstrap";
+import { Table, Container, Dropdown, Button } from "react-bootstrap";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
 import Popup from "../popup/popup";
 import styles from "./page.module.css";
 import Navbar from "../Navbar/Navbar";
-
+import { ToastContainer, toast } from "react-toastify";
 type ConversationRecord = {
   conversation_id: string;
   from: string;
@@ -22,15 +22,16 @@ interface Address {
 const ConversationTable = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
   const [records, setRecords] = useState<ConversationRecord[]>([]);
+  const [allRecords, setAllRecords] = useState<ConversationRecord[]>([]);
+
   const [showPopup, setShowPopup] = useState(false);
   const [selectedRecord, setSelectedRecord] =
     useState<ConversationRecord | null>(null);
   const [selectedAddress, setSelectedAddress] = useState("Search Address");
   const [currentPage, setCurrentPage] = useState(0);
   const [recordsPerPage, setRecordsPerPage] = useState<number>(30); // Initialize to default
-
   const [totalRecords, setTotalRecords] = useState(0); // Track the total records count for pagination
-
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     const storedRecordsPerPage = localStorage.getItem("recordsPerPage");
     const parsedValue = storedRecordsPerPage
@@ -107,14 +108,14 @@ const ConversationTable = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-  
+
     // Format the date in 'dd mm yyyy'
     const formattedDate = date.toLocaleDateString("en-GB", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
     });
-  
+
     // Format the time in 'hh:mm AM/PM'
     const formattedTime = date.toLocaleTimeString("en-GB", {
       hour: "numeric",
@@ -122,15 +123,50 @@ const ConversationTable = () => {
       hour12: true, // This enables 12-hour format with AM/PM
       timeZone: "UTC", // Ensures that time is shown in UTC
     });
-  
+
     // Combine date and time
     return `${formattedDate} ${formattedTime}`;
+  };
+
+  const MapAddress = async () => {
+    setIsLoading(true);
+    const token = localStorage.getItem("authToken");
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    try {
+      const res = await axios.post(
+        `${Base_Url}openPhoneEventData/mapUnmappedAddresses`,
+        config
+      );
+      if(res.data.results.failed>0){
+        toast.error("Failed to map addresses.");
+      }
+      else{
+
+        const { totalProcessed, newAddressesCreated, conversationsMapped, failed } = res.data.results;
+        toast.success(`Address mapping successful! 
+          - Total Processed: ${totalProcessed}
+          - New Addresses Created: ${newAddressesCreated}
+          - Conversations Mapped: ${conversationsMapped}
+          - Failed: ${failed}`);
+        // toast.success(`Address mapping successful!  ,${JSON.stringify(res.data.results)}`);
+        fetchData()
+      }
+    } catch (error) {
+      console.log("🚀 ~ MapAddress ~ error:", error);
+      // toast.error("Failed to map addresses.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div>
       <Navbar />
-
+      <ToastContainer />
       <div className={`container-fluid ${styles.converstaionMapping}`}>
         <h2 className={styles.tableHeading}>Conversation Mapping</h2>
 
@@ -152,6 +188,9 @@ const ConversationTable = () => {
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
+          <Button className="ms-2 btn btn-success" onClick={MapAddress}>
+            {isLoading ? "Processing" : "Map Address"}
+          </Button>
         </div>
 
         <div className={`table-responsive ${styles.tableContainer}`}>

@@ -20,8 +20,8 @@ export class OpenPhoneEventController {
   constructor(
     private readonly openPhoneEventService: OpenPhoneEventService,
     private readonly addressService: AddressService
-  ) {}
-
+  ) {
+  }
   @Post()
   async createOpenPhoneEvent(@Body() payload: any) {
     try {
@@ -159,24 +159,28 @@ export class OpenPhoneEventController {
     }
   }
 
-  // @Get("getConversationsWithoutAddress")
-  // @UseGuards(AuthGuard)
-  // async getConversationsWithoutAddress() {
-  //   try {
-  //     const conversationIds =
-  //       await this.openPhoneEventService.findConversationsWithoutAddress();
-  //     return {
-  //       message: "Conversations without address IDs fetched successfully.",
-  //       data: conversationIds,
-  //     };
-  //   } catch (error) {
-  //     console.error("Error in getConversationsWithoutAddress:", error);
-  //     throw new InternalServerErrorException(
-  //       "Failed to fetch conversations without address"
-  //     );
-  //   }
-  // }
+  @Get("getUnmappedConversations")
+  @UseGuards(AuthGuard)
+  async getUnmappedConversations() {
+    try {
+      const conversationIds =
+        await this.openPhoneEventService.getUnmappedConversations();
+      return {
+        message: "Conversations without address IDs fetched successfully.",
+        data: conversationIds,
+      };
+    } catch (error) {
+      console.error("Error in getConversationsWithoutAddress:", error);
+      throw new InternalServerErrorException(
+        "Failed to fetch conversations without address"
+      );
+    }
+  }
 
+
+
+
+  
 @Get("getConversationsWithoutAddress")
   @UseGuards(AuthGuard)
   async getConversationsWithoutAddress(
@@ -203,6 +207,22 @@ export class OpenPhoneEventController {
     }
   }
    
+
+
+
+  @Post("mapUnmappedAddresses")
+  @UseGuards(AuthGuard)
+  async mapUnmappedAddresses() {
+     try {
+      const result = await this.openPhoneEventService.mapUnmappedConversationsToAddresses();
+      return result;
+    } catch (error) {
+      console.error("Error in mapUnmappedAddresses:", error);
+      throw new InternalServerErrorException(
+        "Failed to map addresses to conversations"
+      );
+    }
+  }
 
 
 
