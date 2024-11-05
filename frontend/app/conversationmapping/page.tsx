@@ -6,7 +6,7 @@ import ReactPaginate from "react-paginate";
 import Popup from "../popup/popup";
 import styles from "./page.module.css";
 import Navbar from "../Navbar/Navbar";
-
+import { ToastContainer, toast } from "react-toastify";
 type ConversationRecord = {
   conversation_id: string;
   from: string;
@@ -23,16 +23,15 @@ const ConversationTable = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
   const [records, setRecords] = useState<ConversationRecord[]>([]);
   const [allRecords, setAllRecords] = useState<ConversationRecord[]>([]);
- 
-   const [showPopup, setShowPopup] = useState(false);
+
+  const [showPopup, setShowPopup] = useState(false);
   const [selectedRecord, setSelectedRecord] =
     useState<ConversationRecord | null>(null);
   const [selectedAddress, setSelectedAddress] = useState("Search Address");
   const [currentPage, setCurrentPage] = useState(0);
   const [recordsPerPage, setRecordsPerPage] = useState<number>(30); // Initialize to default
-
   const [totalRecords, setTotalRecords] = useState(0); // Track the total records count for pagination
-
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     const storedRecordsPerPage = localStorage.getItem("recordsPerPage");
     const parsedValue = storedRecordsPerPage
@@ -130,6 +129,7 @@ const ConversationTable = () => {
   };
 
   const MapAddress = async () => {
+    setIsLoading(true);
     const token = localStorage.getItem("authToken");
     const config = {
       headers: {
@@ -137,49 +137,36 @@ const ConversationTable = () => {
       },
     };
     try {
-       const response = await axios.get(
-        `${Base_Url}openPhoneEventData/getUnmappedConversations`,
-        {
-          headers: config.headers,
-        }
+      const res = await axios.post(
+        `${Base_Url}openPhoneEventData/mapUnmappedAddresses`,
+        config
       );
- 
-      const data = response.data.data;
-      setAllRecords(data);
-
-
-
-      if(data){
-         try {
-         const res = await axios.post(
-           `${Base_Url}openPhoneEventData/mapUnmappedAddresses`,
-           {data:data}
-         );
-         console.log("🚀 ~ MapAddress ~ res:", res.data)
-    
-        } catch (error) {
-         console.log("🚀 ~ MapAddress ~ error:", error);
-       }
+      if(res.data.results.failed>0){
+        toast.error("Failed to map addresses.");
       }
+      else{
 
-
-
-       console.log("🚀 ~ MapAddress ~ data:", data)
-      //  if (Array.isArray(data)) {
-      // } else {
-      //   console.error("API response is not an array:", data);
-      // }
+        const { totalProcessed, newAddressesCreated, conversationsMapped, failed } = res.data.results;
+        toast.success(`Address mapping successful! 
+          - Total Processed: ${totalProcessed}
+          - New Addresses Created: ${newAddressesCreated}
+          - Conversations Mapped: ${conversationsMapped}
+          - Failed: ${failed}`);
+        // toast.success(`Address mapping successful!  ,${JSON.stringify(res.data.results)}`);
+        fetchData()
+      }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.log("🚀 ~ MapAddress ~ error:", error);
+      // toast.error("Failed to map addresses.");
+    } finally {
+      setIsLoading(false);
     }
-
-  
   };
 
   return (
     <div>
       <Navbar />
-
+      <ToastContainer />
       <div className={`container-fluid ${styles.converstaionMapping}`}>
         <h2 className={styles.tableHeading}>Conversation Mapping</h2>
 
@@ -202,7 +189,7 @@ const ConversationTable = () => {
             </Dropdown.Menu>
           </Dropdown>
           <Button className="ms-2 btn btn-success" onClick={MapAddress}>
-            Map Address
+            {isLoading ? "Processing" : "Map Address"}
           </Button>
         </div>
 

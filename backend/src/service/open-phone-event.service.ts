@@ -965,10 +965,10 @@ async create(payload: OpenPhoneEventDto) {
 
 
 
-async mapUnmappedConversationsToAddresses(payload: any) {
+async mapUnmappedConversationsToAddresses() {
   try {
     const templates = await this.templateExpressionsRepository.find();
-
+    const unmappedData = await this.findConversationsWithoutAddress(1, Number.MAX_SAFE_INTEGER);
     const results = {
       processed: 0,
       addressesCreated: 0,
@@ -977,7 +977,7 @@ async mapUnmappedConversationsToAddresses(payload: any) {
     };
 
     // Process each record individually since we need to maintain the original record ID
-    for (const record of payload.data) {
+    for (const record of unmappedData.data) {
       try {
         // Skip if no body content to analyze
         if (!record.body) {
@@ -1403,6 +1403,9 @@ async mapUnmappedConversationsToAddresses(payload: any) {
         // ])
         .where("event.address_id IS NULL")
         .andWhere("event.conversation_id NOT IN (" + subQuery.getQuery() + ")")
+        .andWhere("event.body IS NOT NULL")
+        .andWhere("event.body != ''")
+        .andWhere("TRIM(event.body) != ''")
         .orderBy("event.created_at", "DESC")
         .distinct(true)
         .skip(offset) // Ensure `offset` is a valid number

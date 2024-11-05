@@ -211,10 +211,10 @@ export class OpenPhoneEventController {
 
 
   @Post("mapUnmappedAddresses")
-  // @UseGuards(AuthGuard)
-  async mapUnmappedAddresses(@Body() payload: any) {
+  @UseGuards(AuthGuard)
+  async mapUnmappedAddresses() {
      try {
-      const result = await this.openPhoneEventService.mapUnmappedConversationsToAddresses(payload);
+      const result = await this.openPhoneEventService.mapUnmappedConversationsToAddresses();
       return result;
     } catch (error) {
       console.error("Error in mapUnmappedAddresses:", error);
