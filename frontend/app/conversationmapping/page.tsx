@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Table, Container, Dropdown, Button } from "react-bootstrap";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
@@ -23,6 +23,7 @@ const ConversationTable = () => {
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
   const [records, setRecords] = useState<ConversationRecord[]>([]);
   const [allRecords, setAllRecords] = useState<ConversationRecord[]>([]);
+  const tableContainerRef = useRef<HTMLDivElement>(null); // Ref for table container
 
   const [showPopup, setShowPopup] = useState(false);
   const [selectedRecord, setSelectedRecord] =
@@ -62,13 +63,20 @@ const ConversationTable = () => {
           headers: config.headers,
         }
       );
-
+     
       const data = response.data.data;
       setTotalRecords(response.data.totalCount); // Assuming your API returns total count
       if (Array.isArray(data)) {
         setRecords(data);
       } else {
         console.error("API response is not an array:", data);
+      }
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth" // Adds a smooth scrolling effect
+      });
+      if (tableContainerRef.current) {
+        tableContainerRef.current.scrollTop = 0;
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -138,7 +146,7 @@ const ConversationTable = () => {
     };
     try {
       const res = await axios.post(
-        `${Base_Url}openPhoneEventData/mapUnmappedAddresses`,
+        `${Base_Url}openPhoneEventData/mapUnmappedAddresses`,{},
         config
       );
       if(res.data.results.failed>0){
@@ -155,11 +163,11 @@ const ConversationTable = () => {
         // toast.success(`Address mapping successful!  ,${JSON.stringify(res.data.results)}`);
         fetchData()
       }
-    } catch (error) {
+    } catch (error:any) {
       console.log("🚀 ~ MapAddress ~ error:", error);
-      // toast.error("Failed to map addresses.");
+      toast.error(`"Failed to map addresses." ${error.response.data.message}`);
     } finally {
-      setIsLoading(false);
+       setIsLoading(false);
     }
   };
 
@@ -193,7 +201,7 @@ const ConversationTable = () => {
           </Button>
         </div>
 
-        <div className={`table-responsive ${styles.tableContainer}`}>
+        <div className={`table-responsive ${styles.tableContainer}`} ref={tableContainerRef}>
           <table
             className={`table table-bordered table-hover ${styles.customTable}`}
           >
