@@ -13,7 +13,7 @@ import {
   export class RoleService {
     constructor(
       @InjectRepository(RoleEntity)
-      private roleRepository: Repository<RoleEntity>
+      private roleRepository: Repository<RoleEntity>,
     ) {}
   
     async createRole(data: RoleDto): Promise<string> {

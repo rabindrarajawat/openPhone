@@ -27,18 +27,24 @@ import {
 } from "@nestjs/common";
 import { BookmarkService } from "../service/bookmark.service";
 import { AuthGuard } from "../authguard/auth.guard";
+import { CustomLogger } from "src/service/logger.service";
 
 @Controller("bookmarks")
 @UseGuards(AuthGuard)
 export class BookmarkController {
-  constructor(private bookmarkService: BookmarkService) {}
+  constructor(private bookmarkService: BookmarkService,
+    private readonly logger : CustomLogger
+  ) {}
 
   @Post(":addressId")
   async toggleBookmark(@Param("addressId") addressId: number) {
     try {
-      return await this.bookmarkService.bookmarkAddress(addressId);
+      const result = await this.bookmarkService.bookmarkAddress(addressId);
+      this.logger.log(`Bookmark toggled successfully for addressId: ${addressId}`); // Log successful response
+      return result;
     } catch (error) {
-      console.error("Error in toggleBookmark:", error);
+      this.logger.error("Error in toggleBookmark:", error.message); // Log the error details
+      console.error("Error in toggleBookmark:", error); // Keep console error logging if needed
       throw new InternalServerErrorException("Failed to toggle bookmark");
     }
   }
@@ -46,9 +52,12 @@ export class BookmarkController {
   @Get()
   async getBookmarkedAddresses() {
     try {
-      return await this.bookmarkService.getBookmarkedAddresses();
+      const addresses = await this.bookmarkService.getBookmarkedAddresses();
+      this.logger.log(`Successfully fetched bookmarked addresses: ${JSON.stringify(addresses)}`); // Log successful response
+      return addresses;
     } catch (error) {
-      console.error("Error in getBookmarkedAddresses:", error);
+      this.logger.error("Error in getBookmarkedAddresses:", error.message); // Log the error details
+      console.error("Error in getBookmarkedAddresses:", error); // Keep console error logging if needed
       throw new InternalServerErrorException(
         "Failed to get bookmarked addresses"
       );

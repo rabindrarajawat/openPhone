@@ -29,6 +29,7 @@ import { NotificationEntity } from "./entities/notification.entity";
 import { BookmarkModule } from "./module/bookmark.module";
 import { NotificationModule } from "./module/notification.module";
  import { TemplatesExpressionsEntity } from "./entities/template-expressions.entity";
+import { LoggerModule } from "./module/logger.module";
  
 @Module({
   imports: [
@@ -67,7 +68,7 @@ import { NotificationModule } from "./module/notification.module";
     OpenPhoneEventDirectionModule,
     OpenPhoneEventTypeModule,
     CaseEventModule,
-    AuctionEventModule, TaxDeadModule, MessageMasterModule, RoleModule, usersModule, ConversationMappingModule,BookmarkModule,NotificationModule,
+    AuctionEventModule,LoggerModule, MessageMasterModule, RoleModule, usersModule, ConversationMappingModule,BookmarkModule,NotificationModule,
   ],
 })
 export class AppModule { }

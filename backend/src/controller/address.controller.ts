@@ -74,6 +74,7 @@ import {
   AddressService,
   AddressWithConversations,
 } from "../service/address.service";
+import { CustomLogger } from "src/service/logger.service";
 
 interface AddressResponse {
   message: string;
@@ -85,19 +86,23 @@ interface AddressResponse {
 @Controller("address")
 @UseGuards(AuthGuard)
 export class AddressController {
-  constructor(private readonly addressService: AddressService) {}
+  constructor(private readonly addressService: AddressService,
+    private readonly logger:CustomLogger
+  ) {}
 
   @Post()
   async createAddress(@Body() addressDto: AddressDto) {
+    this.logger.log(`Attempting to create address with data: ${JSON.stringify(addressDto)}`);
     try {
-      const createdAddress =
-        await this.addressService.createAddress(addressDto);
+      const createdAddress = await this.addressService.createAddress(addressDto);
+      this.logger.log(`Address created successfully with ID: ${createdAddress}`);
       return {
         message: "Address Data saved successfully",
         id: createdAddress,
       };
     } catch (error) {
-      console.error("Error in createAddress:", error);
+      // Concatenate error message and stack trace into a single string
+      this.logger.error(`Error in createAddress: ${error.message}\nStack Trace: ${error.stack}`);
       throw new InternalServerErrorException("Failed to create address");
     }
   }
@@ -208,6 +213,7 @@ export class AddressController {
         totalPages: Math.ceil(totalCount / limit),
       };
     } catch (error) {
+      this.logger.error(`Error in getAllAddressData: ${error.message}`, error.stack); // Log error details
       console.error("Error in getAllAddressData:", error);
       throw new InternalServerErrorException("Failed to get all address data");
     }
@@ -222,15 +228,23 @@ export class AddressController {
     page = page && page > 0 ? page : 1;
     limit = limit && limit > 0 ? limit : 10;
 
-    const [data, totalCount] =
-      await this.addressService.getAddressesWithResponses(page, limit);
+    try {
+      const [data, totalCount] = await this.addressService.getAddressesWithResponses(page, limit);
 
-    return {
-      totalCount, // Total number of entries
-      currentPage: page,
-      totalPages: Math.ceil(totalCount / limit),
-      data, // Paginated data
-    };
+      // Log the response details
+      this.logger.log(`Fetched addresses with responses: totalCount = ${totalCount}, currentPage = ${page}, totalPages = ${Math.ceil(totalCount / limit)}`);
+
+      return {
+        totalCount, // Total number of entries
+        currentPage: page,
+        totalPages: Math.ceil(totalCount / limit),
+        data, // Paginated data
+      };
+    } catch (error) {
+      // Log the error details
+      this.logger.error("Error in getAddressesWithResponses:", error.message);
+      throw new InternalServerErrorException("Failed to get addresses with responses");
+    }
   }
 
   @Get("with-stop-responses")
@@ -246,6 +260,9 @@ export class AddressController {
       const [data, totalCount] =
         await this.addressService.getAddressesWithStopResponses(page, limit);
 
+      // Log the response details
+      this.logger.log(`Fetched addresses with stop responses: totalCount = ${totalCount}, currentPage = ${page}, totalPages = ${Math.ceil(totalCount / limit)}`);
+
       return {
         totalCount, // Total number of entries
         currentPage: page, // Current page
@@ -253,27 +270,33 @@ export class AddressController {
         data, // Paginated data
       };
     } catch (error) {
-      return {
-        statusCode: 500,
-        message: "An error occurred while fetching the data.",
-        error: error.message || "Internal Server Error",
-      };
+      // Log the error details
+      this.logger.error("Error in getAddressesWithStopResponses:", error.message);
+      
+      throw new InternalServerErrorException("An error occurred while fetching the data.");
     }
   }
+  
 
   @Get("search")
   async searchAddresses(@Query("address") searchTerm: string) {
     try {
       if (!searchTerm || searchTerm.length < 2) {
+        this.logger.warn("Search term is invalid or too short. Returning empty results."); // Log a warning for invalid search term
+
         return { results: [] };
       }
       const addresses = await this.addressService.searchAddresses(searchTerm);
+      this.logger.log(`Search successful: found ${addresses.length} addresses for term "${searchTerm}"`);
+
       return {
         results: addresses.map((address) => ({
           fullAddress: address.address,
         })),
       };
     } catch (error) {
+      this.logger.error("Error in searchAddresses:", error.message);
+
       console.error("Error in searchAddresses:", error);
       throw new InternalServerErrorException("Failed to search addresses");
     }
@@ -285,11 +308,17 @@ export class AddressController {
       const addressId =
         await this.addressService.getAddressIdByAddress(address);
       if (addressId !== null) {
+        this.logger.log(`Address ID found: ${addressId} for address "${address}"`); // Log success response
+
         return { addressId };
       } else {
+        this.logger.warn(`Address not found for query: "${address}"`); // Log warning for not found
+
         return { message: "Address not found" };
       }
     } catch (error) {
+      this.logger.error("Error in getAddressId:", error.message);
+
       console.error("Error in getAddressId:", error);
       throw new InternalServerErrorException("Failed to get address ID");
     }

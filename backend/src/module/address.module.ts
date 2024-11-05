@@ -6,10 +6,11 @@ import { AddressService } from "src/service/address.service";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { OpenPhoneEventEntity } from "src/entities/open-phone-event.entity";
+import { CustomLogger } from "src/service/logger.service";
 
 @Module({
   imports: [TypeOrmModule.forFeature([AddressEntity,OpenPhoneEventEntity])],
   controllers: [AddressController],
-  providers: [AddressService,JwtService,ConfigService],
+  providers: [AddressService,JwtService,ConfigService,CustomLogger],
 })
 export class AdressModule {}
