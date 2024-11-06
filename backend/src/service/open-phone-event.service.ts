@@ -499,39 +499,18 @@ private extractInformation(message: string, templates: any[]) {
     priority: -1
   };
 
-  // const createRegExp = (pattern: string) => {
-  //   if (!pattern) return null;
-  //   pattern = pattern.replace(/;$/, "");
-  //   const lastSlashIndex = pattern.lastIndexOf("/");
-  //   if (lastSlashIndex === -1) {
-  //     return new RegExp(pattern, "i");
-  //   }
-  //   const flags = pattern.slice(lastSlashIndex + 1);
-  //   const patternBody = pattern.slice(1, lastSlashIndex);
-  //   return new RegExp(patternBody, flags);
-  // };
   const createRegExp = (pattern: string) => {
     if (!pattern) return null;
-
-    // Remove trailing semicolons and whitespace
-    pattern = pattern.replace(/[;\s]+$/, "");
-
-    // Find last `/`, separating pattern body from flags
+    pattern = pattern.replace(/;$/, "");
     const lastSlashIndex = pattern.lastIndexOf("/");
     if (lastSlashIndex === -1) {
-        return new RegExp(pattern, "i"); // Default to case-insensitive
+      return new RegExp(pattern, "i");
     }
-
     const flags = pattern.slice(lastSlashIndex + 1);
     const patternBody = pattern.slice(1, lastSlashIndex);
-
-    // Validate flags to contain only allowed characters
-    if (!/^[gimuy]*$/.test(flags)) {
-        throw new SyntaxError(`Invalid flags supplied to RegExp constructor: '${flags}'`);
-    }
-
     return new RegExp(patternBody, flags);
-};
+  };
+
 
 
   // Process each template

@@ -209,24 +209,56 @@ export class AddressService {
           .setParameter("isStop", false);
       }
 
+      // if (withStopResponses) {
+      //   queryBuilder.andWhere((qb) => {
+      //     const subQuery = qb
+      //       .subQuery()
+      //       .select("DISTINCT(e.address_id)")
+      //       .from(OpenPhoneEventEntity, "e")
+      //       // .where("e.event_direction_id = :outgoingDirection", { outgoingDirection: 2 })
+      //       .where("e.event_direction_id IN (:...directionIds)", {
+      //         directionIds: [1, 2],
+      //       })
+      //       .andWhere("(e.body = :stopMessage OR e.is_stop = :isStop)")
+      //       .getQuery();
+      //     return "address.id IN " + subQuery;
+      //   });
+      //   queryBuilder
+      //     .setParameter("stopMessage", "Stop")
+      //     .setParameter("isStop", true);
+      // }
+
+
+
       if (withStopResponses) {
         queryBuilder.andWhere((qb) => {
-          const subQuery = qb
-            .subQuery()
-            .select("DISTINCT(e.address_id)")
-            .from(OpenPhoneEventEntity, "e")
-            // .where("e.event_direction_id = :outgoingDirection", { outgoingDirection: 2 })
-            .where("e.event_direction_id IN (:...directionIds)", {
-              directionIds: [1, 2],
-            })
-            .andWhere("(e.body = :stopMessage OR e.is_stop = :isStop)")
-            .getQuery();
-          return "address.id IN " + subQuery;
+            // Subquery to find conversation IDs with 'Stop' messages or is_stop marked as true
+            const conversationWithStopSubQuery = qb
+                .subQuery()
+                .select("DISTINCT(e.conversation_id)")
+                .from(OpenPhoneEventEntity, "e")
+                .where("(e.body = :stopMessage OR e.is_stop = :isStop)")
+                .getQuery();
+    
+            // Subquery to find address IDs associated with the conversations found above
+            const addressWithStopSubQuery = qb
+                .subQuery()
+                .select("DISTINCT(e2.address_id)")
+                .from(OpenPhoneEventEntity, "e2")
+                .where(`e2.conversation_id IN (${conversationWithStopSubQuery})`)
+                .andWhere("e2.address_id IS NOT NULL")  // Ensure we only select non-NULL address IDs
+                .getQuery();
+    
+            // Filter the main query by address IDs found in the above subquery
+            return "address.id IN " + addressWithStopSubQuery;
         });
+    
+        // Set parameters for filtering by stop message and is_stop flag
         queryBuilder
-          .setParameter("stopMessage", "Stop")
-          .setParameter("isStop", true);
-      }
+            .setParameter("stopMessage", "Stop")
+            .setParameter("isStop", true);
+    }
+    
 
       if (searchTerm) {
         queryBuilder.andWhere(
