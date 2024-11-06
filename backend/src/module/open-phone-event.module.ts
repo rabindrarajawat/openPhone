@@ -14,10 +14,11 @@ import { AuthGuard } from "src/authguard/auth.guard";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { TemplatesExpressionsEntity } from "../entities/template-expressions.entity";
+import { CustomLogger } from "src/service/logger.service";
 
 @Module({
   imports: [TypeOrmModule.forFeature([OpenPhoneEventEntity,TemplatesExpressionsEntity, AddressEntity,AuctionEventEntity,NotificationEntity,NotificationGateway,AuthGuard,])],
   controllers: [OpenPhoneEventController],
-  providers: [OpenPhoneEventService, AddressService,AuctionEventService,NotificationService,NotificationGateway,JwtService,ConfigService],
+  providers: [OpenPhoneEventService, CustomLogger,AddressService,AuctionEventService,NotificationService,NotificationGateway,JwtService,ConfigService],
 })
 export class OpenPhoneEventModule {}

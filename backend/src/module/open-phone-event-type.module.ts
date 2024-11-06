@@ -5,11 +5,12 @@ import { OpenPhoneEventTypeController } from "src/controller/open-phone-event-ty
 import { AddressEntity } from "src/entities/address.entity";
 import { OpenPhoneEventTypeEntity } from "src/entities/open-phone-event-type.entity";
 import { AddressService } from "src/service/address.service";
+import { CustomLogger } from "src/service/logger.service";
 import { OpenPhoneEventTypeService } from "src/service/open-phone-event-type.service";
 
 @Module({
   imports: [TypeOrmModule.forFeature([OpenPhoneEventTypeEntity])],
   controllers: [OpenPhoneEventTypeController],
-  providers: [OpenPhoneEventTypeService],
+  providers: [OpenPhoneEventTypeService,CustomLogger],
 })
 export class OpenPhoneEventTypeModule {}

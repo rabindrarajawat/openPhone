@@ -511,6 +511,8 @@ private extractInformation(message: string, templates: any[]) {
     return new RegExp(patternBody, flags);
   };
 
+
+
   // Process each template
   templates.forEach(template => {
     // console.log("Processing template:", template);

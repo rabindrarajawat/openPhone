@@ -8,10 +8,11 @@ import { OpenPhoneEventService } from 'src/service/open-phone-event.service';
 import { NotificationController } from 'src/controller/notification.controller';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { CustomLogger } from 'src/service/logger.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([NotificationEntity,OpenPhoneEventEntity])],
-  providers: [NotificationService, NotificationGateway,JwtService,ConfigService],
+  providers: [NotificationService,CustomLogger, NotificationGateway,JwtService,ConfigService],
   controllers: [NotificationController],
 })
 export class NotificationModule {}
