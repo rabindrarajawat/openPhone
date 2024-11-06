@@ -8,12 +8,13 @@ import { BookmarkEntity } from "src/entities/bookmark.entity";
 import { AddressEntity } from "src/entities/address.entity";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
+import { CustomLogger } from "src/service/logger.service";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([BookmarkEntity,AddressEntity]), 
   ],
-  providers: [BookmarkService,JwtService,ConfigService],
+  providers: [BookmarkService,JwtService,ConfigService,CustomLogger],
   controllers: [BookmarkController], 
 })
 export class BookmarkModule {}
