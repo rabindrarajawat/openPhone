@@ -2,9 +2,25 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { GlobalExceptionFilter } from './global-exception.filter';
+import * as express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+
+  // const app = await NestFactory.create(AppModule, {
+  //   bodyParser: false  // Disable built-in body parser
+  // });
+
+  // // Configure raw body buffer
+  // app.use(express.raw({
+  //   type: 'application/json',
+  //   limit: '50mb',
+  //   verify: (req: any, res, buf) => {
+  //     req.rawBody = buf;
+  //   }
+  // }));
+
 
   // Enable CORS for the frontend
   app.enableCors({

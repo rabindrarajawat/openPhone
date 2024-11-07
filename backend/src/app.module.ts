@@ -1,4 +1,4 @@
-import { Module,MiddlewareConsumer, NestModule } from "@nestjs/common";
+import { Module,MiddlewareConsumer, NestModule, RequestMethod } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { OpenPhoneEventEntity } from "./entities/open-phone-event.entity";
@@ -32,6 +32,8 @@ import { NotificationModule } from "./module/notification.module";
 import { LoggerModule } from "./module/logger.module";
 import { CustomLogger } from './service/logger.service';
 import { RequestLoggerMiddleware } from './middleware/request-logger.middleware.ts:';
+import { JsonSanitizerMiddleware } from './middleware/Json-sanitizer-middleware';
+
 import { AppController } from "./app.controller";
 
 import { AppService } from "./app.service";
@@ -84,6 +86,11 @@ export class AppModule  implements NestModule{
     consumer
     .apply(RequestLoggerMiddleware)
     .forRoutes('*');
+
+    consumer
+    .apply(JsonSanitizerMiddleware)
+    .forRoutes({ path: '/openPhoneEventData', method: RequestMethod.POST });
   } 
 
 }
+

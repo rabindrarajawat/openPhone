@@ -509,30 +509,8 @@ private extractInformation(message: string, templates: any[]) {
     const flags = pattern.slice(lastSlashIndex + 1);
     const patternBody = pattern.slice(1, lastSlashIndex);
     return new RegExp(patternBody, flags);
-  };
-  
-//   const createRegExp = (pattern: string) => {
-//     if (!pattern) return null;
+};
 
-//     // Remove trailing semicolons and whitespace
-//     pattern = pattern.replace(/[;\s]+$/, "");
-
-//     // Find last `/`, separating pattern body from flags
-//     const lastSlashIndex = pattern.lastIndexOf("/");
-//     if (lastSlashIndex === -1) {
-//         return new RegExp(pattern, "i"); // Default to case-insensitive
-//     }
-
-//     const flags = pattern.slice(lastSlashIndex + 1);
-//     const patternBody = pattern.slice(1, lastSlashIndex);
-
-//     // Validate flags to contain only allowed characters
-//     if (!/^[gimuy]*$/.test(flags)) {
-//         throw new SyntaxError(`Invalid flags supplied to RegExp constructor: '${flags}'`);
-//     }
-
-//     return new RegExp(patternBody, flags);
-// };
 
 
   // Process each template
