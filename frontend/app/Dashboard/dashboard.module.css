@@ -157,6 +157,7 @@
 
 .chatMessageRight,
 .chatMessageLeft {
+  cursor: pointer;
   text-align: left;
   padding: 10px;
   margin: 5px 0;
@@ -251,6 +252,7 @@
   font-size: 16px;
 
   color: #3361ff;
+  cursor: pointer;
 }
 
 .setDate {
