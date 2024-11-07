@@ -112,10 +112,6 @@ export class OpenPhoneEventService {
   //   };
   // }
 
-
-
-
-
   // async create(payload: OpenPhoneEventDto) {
   //   const templates = await this.templateExpressionsRepository.find();
   //   try {
@@ -195,7 +191,7 @@ export class OpenPhoneEventService {
   //         }
   //       }
   //     }
-  
+
   //     //  Message related to existing conversation
 
   //     // else if (existingEvent?.address_id) {
@@ -290,340 +286,334 @@ export class OpenPhoneEventService {
   //   }
   // }
 
+  // creates the entry in address when auction type id is null but address is present
+  // private extractInformation(message: string, templates: any[]) {
+  //   // Use the first template since we're storing all expressions in one record
+  //   const template = templates[0];
 
+  //   const createRegExp = (pattern: string) => {
+  //     if (!pattern) return null;
+  //     pattern = pattern.replace(/;$/, ""); // Remove trailing semicolon if present
+  //     const lastSlashIndex = pattern.lastIndexOf("/");
+  //     if (lastSlashIndex === -1) {
+  //       return new RegExp(pattern, "i");
+  //     }
+  //     const flags = pattern.slice(lastSlashIndex + 1);
+  //     const patternBody = pattern.slice(1, lastSlashIndex);
+  //     return new RegExp(patternBody, flags);
+  //   };
 
-// creates the entry in address when auction type id is null but address is present 
-// private extractInformation(message: string, templates: any[]) {
-//   // Use the first template since we're storing all expressions in one record
-//   const template = templates[0];
+  //   // Extract regex patterns from the template
+  //   const addressRegex = createRegExp(template.address_expression);
+  //   const auctionTypeRegex = createRegExp(template.type_expression);
+  //   const disasterAssistanceRegex = createRegExp(
+  //     template.disaster_assistance_expression
+  //   );
+  //   const nameRegex = createRegExp(template.name_regex);
+  //   const dateRegex = createRegExp(template.date_regex);
 
-//   const createRegExp = (pattern: string) => {
-//     if (!pattern) return null;
-//     pattern = pattern.replace(/;$/, ""); // Remove trailing semicolon if present
-//     const lastSlashIndex = pattern.lastIndexOf("/");
-//     if (lastSlashIndex === -1) {
-//       return new RegExp(pattern, "i");
-//     }
-//     const flags = pattern.slice(lastSlashIndex + 1);
-//     const patternBody = pattern.slice(1, lastSlashIndex);
-//     return new RegExp(patternBody, flags);
-//   };
+  //   // Match the message against all patterns
+  //   const addressMatch = addressRegex ? message.match(addressRegex) : null;
+  //   const auctionTypeMatch = auctionTypeRegex
+  //     ? message.match(auctionTypeRegex)
+  //     : null;
+  //   const disasterAssistanceMatch = disasterAssistanceRegex
+  //     ? message.match(disasterAssistanceRegex)
+  //     : null;
+  //   const nameMatch = nameRegex ? message.match(nameRegex) : null;
+  //   const dateMatch = dateRegex ? message.match(dateRegex) : null;
 
-//   // Extract regex patterns from the template
-//   const addressRegex = createRegExp(template.address_expression);
-//   const auctionTypeRegex = createRegExp(template.type_expression);
-//   const disasterAssistanceRegex = createRegExp(
-//     template.disaster_assistance_expression
-//   );
-//   const nameRegex = createRegExp(template.name_regex);
-//   const dateRegex = createRegExp(template.date_regex);
+  //   // Extract the address correctly from either of the matched groups
+  //   const extractedAddress = addressMatch
+  //     ? (addressMatch[1] || addressMatch[2])?.trim()
+  //     : null;
 
-//   // Match the message against all patterns
-//   const addressMatch = addressRegex ? message.match(addressRegex) : null;
-//   const auctionTypeMatch = auctionTypeRegex
-//     ? message.match(auctionTypeRegex)
-//     : null;
-//   const disasterAssistanceMatch = disasterAssistanceRegex
-//     ? message.match(disasterAssistanceRegex)
-//     : null;
-//   const nameMatch = nameRegex ? message.match(nameRegex) : null;
-//   const dateMatch = dateRegex ? message.match(dateRegex) : null;
+  //   // Determine the auction type based on the message content
+  //   let auctionType = null;
 
-//   // Extract the address correctly from either of the matched groups
-//   const extractedAddress = addressMatch
-//     ? (addressMatch[1] || addressMatch[2])?.trim()
-//     : null;
+  //   // Check for disaster assistance first
+  //   if (disasterAssistanceMatch) {
+  //     auctionType = "disaster assistance";
+  //   } else if (auctionTypeMatch) {
+  //     auctionType = auctionTypeMatch[1]?.toLowerCase();
+  //   }
 
-//   // Determine the auction type based on the message content
-//   let auctionType = null;
+  //   // Helper function to parse date string to Date object
+  //   const parseDate = (dateString: string): Date | null => {
+  //     try {
+  //       const [month, day] = dateString.split("/").map(Number);
+  //       if (month && day) {
+  //         const currentYear = new Date().getFullYear();
+  //         const date = new Date(currentYear, month - 1, day + 1);
+  //         return isNaN(date.getTime()) ? null : date;
+  //       }
+  //       return null;
+  //     } catch {
+  //       return null;
+  //     }
+  //   };
 
-//   // Check for disaster assistance first
-//   if (disasterAssistanceMatch) {
-//     auctionType = "disaster assistance";
-//   } else if (auctionTypeMatch) {
-//     auctionType = auctionTypeMatch[1]?.toLowerCase();
-//   }
+  //   return {
+  //     address: extractedAddress,
+  //     auction_type: auctionType,
+  //     name: nameMatch ? nameMatch[1]?.trim() : null,
+  //     date: dateMatch ? parseDate(dateMatch[1]) : null,
+  //   };
+  // }
 
-//   // Helper function to parse date string to Date object
-//   const parseDate = (dateString: string): Date | null => {
-//     try {
-//       const [month, day] = dateString.split("/").map(Number);
-//       if (month && day) {
-//         const currentYear = new Date().getFullYear();
-//         const date = new Date(currentYear, month - 1, day + 1);
-//         return isNaN(date.getTime()) ? null : date;
-//       }
-//       return null;
-//     } catch {
-//       return null;
-//     }
-//   };
+  //working for 2nd case of disaster assistance
+  // private extractInformation(message: string, templates: any[]) {
+  //   console.log("Starting extractInformation with message:", message);
+  //   console.log("Available templates:", templates);
 
-//   return {
-//     address: extractedAddress,
-//     auction_type: auctionType,
-//     name: nameMatch ? nameMatch[1]?.trim() : null,
-//     date: dateMatch ? parseDate(dateMatch[1]) : null,
-//   };
-// }
+  //   let bestMatch = {
+  //     address: null,
+  //     auction_type: null,
+  //     name: null,
+  //     date: null,
+  //     template_id: null,
+  //     priority: -1 // Used to prioritize disaster assistance matches
+  //   };
 
+  //   const createRegExp = (pattern: string) => {
+  //     if (!pattern) return null;
+  //     pattern = pattern.replace(/;$/, "");
+  //     const lastSlashIndex = pattern.lastIndexOf("/");
+  //     if (lastSlashIndex === -1) {
+  //       return new RegExp(pattern, "i");
+  //     }
+  //     const flags = pattern.slice(lastSlashIndex + 1);
+  //     const patternBody = pattern.slice(1, lastSlashIndex);
+  //     return new RegExp(patternBody, flags);
+  //   };
 
+  //   // Process each template
+  //   templates.forEach(template => {
+  //     // console.log("Processing template:", template);
 
+  //     const addressRegex = createRegExp(template.address_expression);
+  //     const disasterAssistanceRegex = createRegExp(template.disaster_assistance_expression);
+  //     const auctionTypeRegex = createRegExp(template.type_expression);
+  //     const nameRegex = createRegExp(template.name_regex);
+  //     const dateRegex = createRegExp(template.date_regex);
 
+  //     const addressMatch = addressRegex ? message.match(addressRegex) : null;
+  //     const disasterAssistanceMatch = disasterAssistanceRegex ? message.match(disasterAssistanceRegex) : null;
+  //     const auctionTypeMatch = auctionTypeRegex ? message.match(auctionTypeRegex) : null;
+  //     const nameMatch = nameRegex ? message.match(nameRegex) : null;
+  //     const dateMatch = dateRegex ? message.match(dateRegex) : null;
 
+  //     console.log("Matches for template", template.id, ":", {
+  //       addressMatch,
+  //       disasterAssistanceMatch,
+  //       auctionTypeMatch,
+  //       nameMatch,
+  //       dateMatch
+  //     });
 
+  //     // Extract address
+  //     const extractedAddress = addressMatch ? (addressMatch[1] || addressMatch[2])?.trim() : null;
 
+  //     // Determine auction type and priority
+  //     let auctionType = null;
+  //     let priority = 0;
 
+  //     // Check for disaster assistance patterns first
+  //     const disasterPhrases = [
+  //       'Looking to buy some homes',
+  //       'flood damage',
+  //       'local custom home builder'
+  //     ];
 
-//working for 2nd case of disaster assistance
-// private extractInformation(message: string, templates: any[]) {
-//   console.log("Starting extractInformation with message:", message);
-//   console.log("Available templates:", templates);
+  //     const hasDisasterPhrases = disasterPhrases.every(phrase =>
+  //       message.toLowerCase().includes(phrase.toLowerCase())
+  //     );
 
-//   let bestMatch = {
-//     address: null,
-//     auction_type: null,
-//     name: null,
-//     date: null,
-//     template_id: null,
-//     priority: -1 // Used to prioritize disaster assistance matches
-//   };
+  //     if (hasDisasterPhrases || disasterAssistanceMatch) {
+  //       console.log("Disaster assistance pattern matched in template", template.id);
+  //       auctionType = "disaster assistance";
+  //       priority = 2; // Highest priority
+  //     } else if (auctionTypeMatch) {
+  //       console.log("Regular auction type matched in template", template.id);
+  //       auctionType = auctionTypeMatch[1]?.toLowerCase();
+  //       priority = 1;
+  //     }
 
-//   const createRegExp = (pattern: string) => {
-//     if (!pattern) return null;
-//     pattern = pattern.replace(/;$/, "");
-//     const lastSlashIndex = pattern.lastIndexOf("/");
-//     if (lastSlashIndex === -1) {
-//       return new RegExp(pattern, "i");
-//     }
-//     const flags = pattern.slice(lastSlashIndex + 1);
-//     const patternBody = pattern.slice(1, lastSlashIndex);
-//     return new RegExp(patternBody, flags);
-//   };
+  //     // Update best match if this template has higher priority or is the first valid match
+  //     if (priority > bestMatch.priority && extractedAddress) {
+  //       bestMatch = {
+  //         address: extractedAddress,
+  //         auction_type: auctionType,
+  //         name: nameMatch ? nameMatch[1]?.trim() : null,
+  //         date: dateMatch ? this.parseDate(dateMatch[1]) : null,
+  //         template_id: template.id,
+  //         priority
+  //       };
+  //     }
+  //   });
 
-//   // Process each template
-//   templates.forEach(template => {
-//     // console.log("Processing template:", template);
+  //   console.log("Best match found:", bestMatch);
 
-//     const addressRegex = createRegExp(template.address_expression);
-//     const disasterAssistanceRegex = createRegExp(template.disaster_assistance_expression);
-//     const auctionTypeRegex = createRegExp(template.type_expression);
-//     const nameRegex = createRegExp(template.name_regex);
-//     const dateRegex = createRegExp(template.date_regex);
+  //   // Return only the needed fields
+  //   const result = {
+  //     address: bestMatch.address,
+  //     auction_type: bestMatch.auction_type,
+  //     name: bestMatch.name,
+  //     date: bestMatch.date
+  //   };
 
-//     const addressMatch = addressRegex ? message.match(addressRegex) : null;
-//     const disasterAssistanceMatch = disasterAssistanceRegex ? message.match(disasterAssistanceRegex) : null;
-//     const auctionTypeMatch = auctionTypeRegex ? message.match(auctionTypeRegex) : null;
-//     const nameMatch = nameRegex ? message.match(nameRegex) : null;
-//     const dateMatch = dateRegex ? message.match(dateRegex) : null;
+  //   console.log("Final extracted information:", result);
+  //   return result;
+  // }
 
-//     console.log("Matches for template", template.id, ":", {
-//       addressMatch,
-//       disasterAssistanceMatch,
-//       auctionTypeMatch,
-//       nameMatch,
-//       dateMatch
-//     });
+  //working for tax auction
 
-//     // Extract address
-//     const extractedAddress = addressMatch ? (addressMatch[1] || addressMatch[2])?.trim() : null;
+  private extractInformation(message: string, templates: any[]) {
+    // console.log("Starting extractInformation with message:", message);
+    // console.log("Available templates:", templates);
 
-//     // Determine auction type and priority
-//     let auctionType = null;
-//     let priority = 0;
+    let bestMatch = {
+      address: null,
+      auction_type: null,
+      name: null,
+      date: null,
+      template_id: null,
+      priority: -1,
+    };
 
-//     // Check for disaster assistance patterns first
-//     const disasterPhrases = [
-//       'Looking to buy some homes',
-//       'flood damage',
-//       'local custom home builder'
-//     ];
+    const createRegExp = (pattern: string) => {
+      if (!pattern) return null;
+      pattern = pattern.replace(/;$/, "");
+      const lastSlashIndex = pattern.lastIndexOf("/");
+      if (lastSlashIndex === -1) {
+        return new RegExp(pattern, "i");
+      }
+      const flags = pattern.slice(lastSlashIndex + 1);
+      const patternBody = pattern.slice(1, lastSlashIndex);
+      return new RegExp(patternBody, flags);
+    };
 
-//     const hasDisasterPhrases = disasterPhrases.every(phrase => 
-//       message.toLowerCase().includes(phrase.toLowerCase())
-//     );
+    // Process each template
+    templates.forEach((template) => {
+      // console.log("Processing template:", template);
 
-//     if (hasDisasterPhrases || disasterAssistanceMatch) {
-//       console.log("Disaster assistance pattern matched in template", template.id);
-//       auctionType = "disaster assistance";
-//       priority = 2; // Highest priority
-//     } else if (auctionTypeMatch) {
-//       console.log("Regular auction type matched in template", template.id);
-//       auctionType = auctionTypeMatch[1]?.toLowerCase();
-//       priority = 1;
-//     }
+      const addressRegex = createRegExp(template.address_expression);
+      const disasterAssistanceRegex = createRegExp(
+        template.disaster_assistance_expression
+      );
+      const auctionTypeRegex = createRegExp(template.type_expression);
+      const nameRegex = createRegExp(template.name_regex);
+      const dateRegex = createRegExp(template.date_regex);
 
-//     // Update best match if this template has higher priority or is the first valid match
-//     if (priority > bestMatch.priority && extractedAddress) {
-//       bestMatch = {
-//         address: extractedAddress,
-//         auction_type: auctionType,
-//         name: nameMatch ? nameMatch[1]?.trim() : null,
-//         date: dateMatch ? this.parseDate(dateMatch[1]) : null,
-//         template_id: template.id,
-//         priority
-//       };
-//     }
-//   });
+      const addressMatch = addressRegex ? message.match(addressRegex) : null;
+      const disasterAssistanceMatch = disasterAssistanceRegex
+        ? message.match(disasterAssistanceRegex)
+        : null;
+      const auctionTypeMatch = auctionTypeRegex
+        ? message.match(auctionTypeRegex)
+        : null;
+      const nameMatch = nameRegex ? message.match(nameRegex) : null;
+      const dateMatch = dateRegex ? message.match(dateRegex) : null;
 
-//   console.log("Best match found:", bestMatch);
-  
-//   // Return only the needed fields
-//   const result = {
-//     address: bestMatch.address,
-//     auction_type: bestMatch.auction_type,
-//     name: bestMatch.name,
-//     date: bestMatch.date
-//   };
+      // console.log("Matches for template", template.id, ":", {
+      //   addressMatch,
+      //   disasterAssistanceMatch,
+      //   auctionTypeMatch,
+      //   nameMatch,
+      //   dateMatch
+      // });
 
-//   console.log("Final extracted information:", result);
-//   return result;
-// }
-
-
-
-//working for tax auction
-
-
-
-private extractInformation(message: string, templates: any[]) {
-  // console.log("Starting extractInformation with message:", message);
-  // console.log("Available templates:", templates);
-
-  let bestMatch = {
-    address: null,
-    auction_type: null,
-    name: null,
-    date: null,
-    template_id: null,
-    priority: -1
-  };
-
-  const createRegExp = (pattern: string) => {
-    if (!pattern) return null;
-    pattern = pattern.replace(/;$/, "");
-    const lastSlashIndex = pattern.lastIndexOf("/");
-    if (lastSlashIndex === -1) {
-      return new RegExp(pattern, "i");
-    }
-    const flags = pattern.slice(lastSlashIndex + 1);
-    const patternBody = pattern.slice(1, lastSlashIndex);
-    return new RegExp(patternBody, flags);
-};
-
-
-
-  // Process each template
-  templates.forEach(template => {
-    // console.log("Processing template:", template);
-
-    const addressRegex = createRegExp(template.address_expression);
-    const disasterAssistanceRegex = createRegExp(template.disaster_assistance_expression);
-    const auctionTypeRegex = createRegExp(template.type_expression);
-    const nameRegex = createRegExp(template.name_regex);
-    const dateRegex = createRegExp(template.date_regex);
-
-    const addressMatch = addressRegex ? message.match(addressRegex) : null;
-    const disasterAssistanceMatch = disasterAssistanceRegex ? message.match(disasterAssistanceRegex) : null;
-    const auctionTypeMatch = auctionTypeRegex ? message.match(auctionTypeRegex) : null;
-    const nameMatch = nameRegex ? message.match(nameRegex) : null;
-    const dateMatch = dateRegex ? message.match(dateRegex) : null;
-
-    // console.log("Matches for template", template.id, ":", {
-    //   addressMatch,
-    //   disasterAssistanceMatch,
-    //   auctionTypeMatch,
-    //   nameMatch,
-    //   dateMatch
-    // });
-
-    // Extract address - try multiple capture groups if available
-    let extractedAddress = null;
-    if (addressMatch) {
-      // Try each capture group until we find a non-null match
-      for (let i = 1; i < addressMatch.length; i++) {
-        if (addressMatch[i]) {
-          extractedAddress = addressMatch[i].trim();
-          break;
+      // Extract address - try multiple capture groups if available
+      let extractedAddress = null;
+      if (addressMatch) {
+        // Try each capture group until we find a non-null match
+        for (let i = 1; i < addressMatch.length; i++) {
+          if (addressMatch[i]) {
+            extractedAddress = addressMatch[i].trim();
+            break;
+          }
         }
       }
-    }
 
-    // Determine auction type and priority
-    let auctionType = null;
-    let priority = 0;
+      // Determine auction type and priority
+      let auctionType = null;
+      let priority = 0;
 
-    // Check for disaster assistance patterns first
-    const disasterPhrases = [
-      'Looking to buy some homes',
-      'flood damage',
-      'local custom home builder'
-    ];
+      // Check for disaster assistance patterns first
+      const disasterPhrases = [
+        "Looking to buy some homes",
+        "flood damage",
+        "local custom home builder",
+      ];
 
-    const hasDisasterPhrases = disasterPhrases.every(phrase => 
-      message.toLowerCase().includes(phrase.toLowerCase())
-    );
+      const hasDisasterPhrases = disasterPhrases.every((phrase) =>
+        message.toLowerCase().includes(phrase.toLowerCase())
+      );
 
-    if (hasDisasterPhrases || disasterAssistanceMatch) {
-      // console.log("Disaster assistance pattern matched in template", template.id);
-      auctionType = "disaster assistance";
-      priority = 2; // Highest priority
-    } else if (auctionTypeMatch) {
-      // console.log("Regular auction type matched in template", template.id);
-      auctionType = auctionTypeMatch[1]?.toLowerCase() || auctionTypeMatch[0]?.toLowerCase();
-      
-      // Give tax auction matches slightly higher priority
-      if (auctionType && auctionType.includes('tax')) {
-        priority = 1.5;
-      } else {
-        priority = 1;
+      if (hasDisasterPhrases || disasterAssistanceMatch) {
+        // console.log("Disaster assistance pattern matched in template", template.id);
+        auctionType = "disaster assistance";
+        priority = 2; // Highest priority
+      } else if (auctionTypeMatch) {
+        // console.log("Regular auction type matched in template", template.id);
+        auctionType =
+          auctionTypeMatch[1]?.toLowerCase() ||
+          auctionTypeMatch[0]?.toLowerCase();
+
+        // Give tax auction matches slightly higher priority
+        if (auctionType && auctionType.includes("tax")) {
+          priority = 1.5;
+        } else {
+          priority = 1;
+        }
       }
-    }
 
-    // Update best match if this template has higher priority or is the first valid match
-    if ((priority > bestMatch.priority || !bestMatch.address) && extractedAddress) {
-      bestMatch = {
-        address: extractedAddress,
-        auction_type: auctionType,
-        name: nameMatch ? nameMatch[1]?.trim() : null,
-        date: dateMatch ? this.parseDate(dateMatch[1]) : null,
-        template_id: template.id,
-        priority
-      };
-    }
-  });
+      // Update best match if this template has higher priority or is the first valid match
+      if (
+        (priority > bestMatch.priority || !bestMatch.address) &&
+        extractedAddress
+      ) {
+        bestMatch = {
+          address: extractedAddress,
+          auction_type: auctionType,
+          name: nameMatch ? nameMatch[1]?.trim() : null,
+          date: dateMatch ? this.parseDate(dateMatch[1]) : null,
+          template_id: template.id,
+          priority,
+        };
+      }
+    });
 
-  // console.log("Best match found:", bestMatch);
-  
-  // Return only the needed fields
-  const result = {
-    address: bestMatch.address,
-    auction_type: bestMatch.auction_type,
-    name: bestMatch.name,
-    date: bestMatch.date
-  };
+    // console.log("Best match found:", bestMatch);
 
-  // console.log("Final extracted information:", result);
-  return result;
-}
+    // Return only the needed fields
+    const result = {
+      address: bestMatch.address,
+      auction_type: bestMatch.auction_type,
+      name: bestMatch.name,
+      date: bestMatch.date,
+    };
 
-private parseDate(dateString: string): Date | null {
-  try {
-    const [month, day] = dateString.split("/").map(Number);
-    if (month && day) {
-      const currentYear = new Date().getFullYear();
-      const date = new Date(currentYear, month - 1, day + 1);
-      return isNaN(date.getTime()) ? null : date;
-    }
-    return null;
-  } catch {
-    return null;
+    // console.log("Final extracted information:", result);
+    return result;
   }
-}
 
+  private parseDate(dateString: string): Date | null {
+    try {
+      const [month, day] = dateString.split("/").map(Number);
+      if (month && day) {
+        const currentYear = new Date().getFullYear();
+        const date = new Date(currentYear, month - 1, day + 1);
+        return isNaN(date.getTime()) ? null : date;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
 
-async create(payload: OpenPhoneEventDto) {
-     const templates = await this.templateExpressionsRepository.find();
+  async create(payload: OpenPhoneEventDto) {
+    const templates = await this.templateExpressionsRepository.find();
     try {
       if (!payload || !payload.data || !payload.data.object) {
         return { openPhoneEvent: null, addressCreated: false };
@@ -670,19 +660,23 @@ async create(payload: OpenPhoneEventDto) {
                 created_by: "Admin",
                 is_active: true,
                 is_bookmarked: false,
-                auction_event_id: auctionTypeId, 
+                auction_event_id: auctionTypeId,
                 modified_at: new Date(),
               };
 
               try {
                 const addressErrors = await validate(addressDto);
                 if (addressErrors.length === 0) {
-                  const savedAddress = await this.addressService.createAddress(addressDto);
+                  const savedAddress =
+                    await this.addressService.createAddress(addressDto);
                   addressId = savedAddress.id;
                   addressCreated = true;
                 }
               } catch (error) {
-                console.log("Failed to create address, continuing with event creation:", error);
+                console.log(
+                  "Failed to create address, continuing with event creation:",
+                  error
+                );
               }
             } else {
               await this.addressRepository.update(
@@ -693,7 +687,10 @@ async create(payload: OpenPhoneEventDto) {
             }
           }
         } catch (error) {
-          console.log("Error in address extraction/creation, continuing with event creation:", error);
+          console.log(
+            "Error in address extraction/creation, continuing with event creation:",
+            error
+          );
         }
       }
 
@@ -717,7 +714,8 @@ async create(payload: OpenPhoneEventDto) {
       openPhoneEvent.contact_established = "NA";
       openPhoneEvent.dead = "No";
       openPhoneEvent.keep_an_eye = "Yes";
-      openPhoneEvent.is_stop = messageData.body?.toUpperCase() === "STOP" ? true : false;
+      openPhoneEvent.is_stop =
+        messageData.body?.toUpperCase() === "STOP" ? true : false;
       openPhoneEvent.created_by = "Admin";
       openPhoneEvent.phone_number_id = messageData.phoneNumberId;
       openPhoneEvent.user_id = messageData.userId;
@@ -732,7 +730,8 @@ async create(payload: OpenPhoneEventDto) {
         );
       }
 
-      const savedOpenPhoneEvent = await this.openPhoneEventRepository.save(openPhoneEvent);
+      const savedOpenPhoneEvent =
+        await this.openPhoneEventRepository.save(openPhoneEvent);
 
       // Update address modified_at if we have an address_id
       if (savedOpenPhoneEvent.address_id) {
@@ -748,8 +747,10 @@ async create(payload: OpenPhoneEventDto) {
 
       // Try to create notification and auction event, but don't let failures affect the response
       try {
-        await this.notificationService.createNotification(savedOpenPhoneEvent.id);
-        
+        await this.notificationService.createNotification(
+          savedOpenPhoneEvent.id
+        );
+
         const auctionEventDto: AuctionEventDto = {
           event_id: savedOpenPhoneEvent.id,
           created_by: "Admin",
@@ -781,10 +782,6 @@ async create(payload: OpenPhoneEventDto) {
     }
   }
 
-
-
-
-
   async findAll() {
     return this.openPhoneEventRepository.find();
   }
@@ -814,379 +811,282 @@ async create(payload: OpenPhoneEventDto) {
         return 2;
     }
   }
- 
 
   private auctionTypeId(auctionType: string): number | null {
     const auctionTypes = {
-      'auction': 1,
-      'tax auction': 2,
-      'foreclosure': 3,
-      'disaster assistance': 4
+      auction: 1,
+      "tax auction": 2,
+      foreclosure: 3,
+      "disaster assistance": 4,
     };
-    
+
     // console.log("Looking up auction type ID for:", auctionType);
     const id = auctionTypes[auctionType] || null;
     // console.log("Found auction type ID:", id);
     return id;
   }
 
+  // Add this new method to your OpenPhoneEventService class
 
-  // private auctionTypeId(type: string): number | null {
-  //   switch (type?.toLowerCase()) {
-  //     case "auction":
-  //       return 1;
-  //     case "tax auction": //tax dead
-  //       return 2;
-  //     case "foreclosure": //case
-  //       return 3;
-  //     case "disaster assistance":
-  //       return 4;
-  //     default:
-  //       return null;
+  // async mapUnmappedConversationsToAddresses(payload: any) {
+
+  //   try {
+  //     // Get all unmapped conversations (without pagination to process all)
+  //     // const unmappedData = await this.findConversationsWithoutAddress(1, Number.MAX_SAFE_INTEGER);
+  //       const templates = await this.templateExpressionsRepository.find();
+
+  //     const results = {
+  //       processed: 0,
+  //       addressesCreated: 0,
+  //       addressesMapped: 0,
+  //       failed: 0
+  //     };
+
+  //     // Process each unmapped conversation
+  //     for (const conversation of payload.data) {
+  //       try {
+  //         // Skip if no body content to analyze
+  //         if (!conversation.body) {
+  //           continue;
+  //         }
+
+  //         // Extract address information from the message body
+  //         const extractedInfo = this.extractInformation(conversation.body, templates);
+
+  //         if (extractedInfo.address) {
+  //           let addressId = null;
+  //           let auctionTypeId = null;
+
+  //           // Get auction type ID if available
+  //           if (extractedInfo.auction_type) {
+  //             auctionTypeId = this.auctionTypeId(extractedInfo.auction_type);
+  //           }
+
+  //           // Check if address already exists
+  //           const existingAddress = await this.addressRepository.findOne({
+  //             where: { address: extractedInfo.address }
+  //           });
+
+  //           if (!existingAddress) {
+  //             // Create new address
+  //             const addressDto: AddressDto = {
+  //               address: extractedInfo.address,
+  //               date: extractedInfo.date || new Date(),
+  //               created_by: "Admin",
+  //               is_active: true,
+  //               is_bookmarked: false,
+  //               auction_event_id: auctionTypeId,
+  //               modified_at: new Date()
+  //             };
+
+  //             try {
+  //               const addressErrors = await validate(addressDto);
+  //               if (addressErrors.length === 0) {
+  //                 const savedAddress = await this.addressService.createAddress(addressDto);
+  //                 addressId = savedAddress.id;
+  //                 results.addressesCreated++;
+
+  //               }
+  //             } catch (error) {
+  //               console.log(`Failed to create address for conversation ${conversation.conversation_id}:`, error);
+  //               results.failed++;
+  //               continue;
+  //             }
+  //           } else {
+  //             addressId = existingAddress.id;
+  //             // Update modified_at timestamp
+  //             await this.addressRepository.update(
+  //               { id: addressId },
+  //               { modified_at: new Date() }
+  //             );
+  //           }
+
+  //           // Update all events in this conversation with the address_id
+  //           if (addressId) {
+  //             await this.openPhoneEventRepository.update(
+  //               { conversation_id: conversation.conversation_id },
+  //               {
+  //                 address_id: addressId,
+  //                 auction_event_id: auctionTypeId
+  //               }
+  //             );
+  //             results.addressesMapped++;
+  //           }
+  //         }
+
+  //         results.processed++;
+  //       } catch (error) {
+  //         console.error(`Error processing conversation ${conversation.conversation_id}:`, error);
+  //         results.failed++;
+  //       }
+  //     }
+
+  //     return {
+  //       message: "Address mapping process completed",
+  //       results: {
+  //         totalProcessed: results.processed,
+  //         newAddressesCreated: results.addressesCreated,
+  //         conversationsMapped: results.addressesMapped,
+  //         failed: results.failed
+  //       }
+  //     };
+  //   } catch (error) {
+  //     console.error("Error in mapUnmappedConversationsToAddresses:", error);
+  //     throw new InternalServerErrorException(
+  //       `Error mapping addresses to conversations: ${error.message}`
+  //     );
   //   }
   // }
 
+  async mapUnmappedConversationsToAddresses() {
+    try {
+      const templates = await this.templateExpressionsRepository.find();
+      const unmappedData = await this.findConversationsWithoutAddress(
+        1,
+        Number.MAX_SAFE_INTEGER
+      );
+      const results = {
+        processed: 0,
+        addressesCreated: 0,
+        addressesMapped: 0,
+        failed: 0,
+      };
 
-
-
-
-
-// Add this new method to your OpenPhoneEventService class
-
-// async mapUnmappedConversationsToAddresses(payload: any) {
- 
-//   try {
-//     // Get all unmapped conversations (without pagination to process all)
-//     // const unmappedData = await this.findConversationsWithoutAddress(1, Number.MAX_SAFE_INTEGER);
-//       const templates = await this.templateExpressionsRepository.find();
-     
-//     const results = {
-//       processed: 0,
-//       addressesCreated: 0,
-//       addressesMapped: 0,
-//       failed: 0
-//     };
-  
-//     // Process each unmapped conversation
-//     for (const conversation of payload.data) {
-//       try {
-//         // Skip if no body content to analyze
-//         if (!conversation.body) {
-//           continue;
-//         }
-
-//         // Extract address information from the message body
-//         const extractedInfo = this.extractInformation(conversation.body, templates);
-
-//         if (extractedInfo.address) {
-//           let addressId = null;
-//           let auctionTypeId = null;
-
-//           // Get auction type ID if available
-//           if (extractedInfo.auction_type) {
-//             auctionTypeId = this.auctionTypeId(extractedInfo.auction_type);
-//           }
-
-//           // Check if address already exists
-//           const existingAddress = await this.addressRepository.findOne({
-//             where: { address: extractedInfo.address }
-//           });
-
-//           if (!existingAddress) {
-//             // Create new address
-//             const addressDto: AddressDto = {
-//               address: extractedInfo.address,
-//               date: extractedInfo.date || new Date(),
-//               created_by: "Admin",
-//               is_active: true,
-//               is_bookmarked: false,
-//               auction_event_id: auctionTypeId,
-//               modified_at: new Date()
-//             };
-
-//             try {
-//               const addressErrors = await validate(addressDto);
-//               if (addressErrors.length === 0) {
-//                 const savedAddress = await this.addressService.createAddress(addressDto);
-//                 addressId = savedAddress.id;
-//                 results.addressesCreated++;
-               
-//               }
-//             } catch (error) {
-//               console.log(`Failed to create address for conversation ${conversation.conversation_id}:`, error);
-//               results.failed++;
-//               continue;
-//             }
-//           } else {
-//             addressId = existingAddress.id;
-//             // Update modified_at timestamp
-//             await this.addressRepository.update(
-//               { id: addressId },
-//               { modified_at: new Date() }
-//             );
-//           }
-
-//           // Update all events in this conversation with the address_id
-//           if (addressId) {
-//             await this.openPhoneEventRepository.update(
-//               { conversation_id: conversation.conversation_id },
-//               { 
-//                 address_id: addressId,
-//                 auction_event_id: auctionTypeId
-//               }
-//             );
-//             results.addressesMapped++;
-//           }
-//         }
-        
-//         results.processed++;
-//       } catch (error) {
-//         console.error(`Error processing conversation ${conversation.conversation_id}:`, error);
-//         results.failed++;
-//       }
-//     }
-
-//     return {
-//       message: "Address mapping process completed",
-//       results: {
-//         totalProcessed: results.processed,
-//         newAddressesCreated: results.addressesCreated,
-//         conversationsMapped: results.addressesMapped,
-//         failed: results.failed
-//       }
-//     };
-//   } catch (error) {
-//     console.error("Error in mapUnmappedConversationsToAddresses:", error);
-//     throw new InternalServerErrorException(
-//       `Error mapping addresses to conversations: ${error.message}`
-//     );
-//   }
-// }
-
-
-
-
-
-async mapUnmappedConversationsToAddresses() {
-  try {
-    const templates = await this.templateExpressionsRepository.find();
-    const unmappedData = await this.findConversationsWithoutAddress(1, Number.MAX_SAFE_INTEGER);
-    const results = {
-      processed: 0,
-      addressesCreated: 0,
-      addressesMapped: 0,
-      failed: 0
-    };
-
-    // Process each record individually since we need to maintain the original record ID
-    for (const record of unmappedData.data) {
-      try {
-        // Skip if no body content to analyze
-        if (!record.body) {
-          continue;
-        }
-
-        // Extract address information from the message body
-        const extractedInfo = this.extractInformation(record.body, templates);
-
-        if (extractedInfo.address) {
-          let addressId = null;
-          let auctionTypeId = null;
-
-          // Get auction type ID if available
-          if (extractedInfo.auction_type) {
-            auctionTypeId = this.auctionTypeId(extractedInfo.auction_type);
+      // Process each record individually since we need to maintain the original record ID
+      for (const record of unmappedData.data) {
+        try {
+          // Skip if no body content to analyze
+          if (!record.body) {
+            continue;
           }
 
-          // Check if address already exists
-          const existingAddress = await this.addressRepository.findOne({
-            where: { address: extractedInfo.address }
-          });
+          // Extract address information from the message body
+          const extractedInfo = this.extractInformation(record.body, templates);
 
-          if (!existingAddress) {
-            // Create new address
-            const addressDto: AddressDto = {
-              address: extractedInfo.address,
-              date: extractedInfo.date || new Date(),
-              created_by: "Admin",
-              is_active: true,
-              is_bookmarked: false,
-              auction_event_id: auctionTypeId,
-              modified_at: new Date()
-            };
+          if (extractedInfo.address) {
+            let addressId = null;
+            let auctionTypeId = null;
 
-            try {
-              const addressErrors = await validate(addressDto);
-              if (addressErrors.length === 0) {
-                const savedAddress = await this.addressService.createAddress(addressDto);
-                addressId = savedAddress.id;
-                results.addressesCreated++;
-              }
-            } catch (error) {
-              console.log(`Failed to create address for record ${record.id}:`, error);
-              results.failed++;
-              continue;
+            // Get auction type ID if available
+            if (extractedInfo.auction_type) {
+              auctionTypeId = this.auctionTypeId(extractedInfo.auction_type);
             }
-          } else {
-            addressId = existingAddress.id;
-            // Update modified_at timestamp
-            await this.addressRepository.update(
-              { id: addressId },
-              { modified_at: new Date() }
-            );
-          }
 
-          // Update only this record with the address
-          if (addressId) {
-            try {
-              // Log the current record
-             
+            // Check if address already exists
+            const existingAddress = await this.addressRepository.findOne({
+              where: { address: extractedInfo.address },
+            });
 
-              // First, verify the record exists
-              const existingRecord = await this.openPhoneEventRepository.findOne({
-                where: { id: record.id }
-              });
+            if (!existingAddress) {
+              // Create new address
+              const addressDto: AddressDto = {
+                address: extractedInfo.address,
+                date: extractedInfo.date || new Date(),
+                created_by: "Admin",
+                is_active: true,
+                is_bookmarked: false,
+                auction_event_id: auctionTypeId,
+                modified_at: new Date(),
+              };
 
-              if (!existingRecord) {
-                console.log(`Record not found with ID: ${record.id}`);
+              try {
+                const addressErrors = await validate(addressDto);
+                if (addressErrors.length === 0) {
+                  const savedAddress =
+                    await this.addressService.createAddress(addressDto);
+                  addressId = savedAddress.id;
+                  results.addressesCreated++;
+                }
+              } catch (error) {
+                console.log(
+                  `Failed to create address for record ${record.id}:`,
+                  error
+                );
                 results.failed++;
                 continue;
               }
+            } else {
+              addressId = existingAddress.id;
+              // Update modified_at timestamp
+              await this.addressRepository.update(
+                { id: addressId },
+                { modified_at: new Date() }
+              );
+            }
 
-              // Perform the update using the record's ID
-              const updateResult = await this.openPhoneEventRepository
-                .createQueryBuilder()
-                .update()
-                .set({
-                  address_id: addressId,
-                  auction_event_id: auctionTypeId
-                })
-                .where("id = :id", { id: record.id })
-                .execute();
+            // Update only this record with the address
+            if (addressId) {
+              try {
+                // Log the current record
 
-              console.log('Update result:', updateResult);
+                // First, verify the record exists
+                const existingRecord =
+                  await this.openPhoneEventRepository.findOne({
+                    where: { id: record.id },
+                  });
 
-              if (updateResult.affected > 0) {
-                results.addressesMapped++;
-              } else {
-                console.log(`Failed to update record ${record.id}`);
+                if (!existingRecord) {
+                  console.log(`Record not found with ID: ${record.id}`);
+                  results.failed++;
+                  continue;
+                }
+
+                // Perform the update using the record's ID
+                const updateResult = await this.openPhoneEventRepository
+                  .createQueryBuilder()
+                  .update()
+                  .set({
+                    address_id: addressId,
+                    auction_event_id: auctionTypeId,
+                  })
+                  .where("id = :id", { id: record.id })
+                  .execute();
+
+                console.log("Update result:", updateResult);
+
+                if (updateResult.affected > 0) {
+                  results.addressesMapped++;
+                } else {
+                  console.log(`Failed to update record ${record.id}`);
+                  results.failed++;
+                }
+
+                // Verify the update
+                const verifiedRecord =
+                  await this.openPhoneEventRepository.findOne({
+                    where: { id: record.id },
+                  });
+                console.log("Verified record after update:", verifiedRecord);
+              } catch (updateError) {
+                console.error("Error updating OpenPhoneEvent:", updateError);
                 results.failed++;
               }
-
-              // Verify the update
-              const verifiedRecord = await this.openPhoneEventRepository.findOne({
-                where: { id: record.id }
-              });
-              console.log('Verified record after update:', verifiedRecord);
-
-            } catch (updateError) {
-              console.error('Error updating OpenPhoneEvent:', updateError);
-              results.failed++;
             }
           }
+
+          results.processed++;
+        } catch (error) {
+          console.error(`Error processing record:`, error);
+          results.failed++;
         }
-
-        results.processed++;
-      } catch (error) {
-        console.error(`Error processing record:`, error);
-        results.failed++;
       }
+
+      return {
+        message: "Address mapping process completed",
+        results: {
+          totalProcessed: results.processed,
+          newAddressesCreated: results.addressesCreated,
+          conversationsMapped: results.addressesMapped,
+          failed: results.failed,
+        },
+      };
+    } catch (error) {
+      console.error("Error in mapUnmappedConversationsToAddresses:", error);
+      throw new InternalServerErrorException(
+        `Error mapping addresses to conversations: ${error.message}`
+      );
     }
-
-    return {
-      message: "Address mapping process completed",
-      results: {
-        totalProcessed: results.processed,
-        newAddressesCreated: results.addressesCreated,
-        conversationsMapped: results.addressesMapped,
-        failed: results.failed
-      }
-    };
-  } catch (error) {
-    console.error("Error in mapUnmappedConversationsToAddresses:", error);
-    throw new InternalServerErrorException(
-      `Error mapping addresses to conversations: ${error.message}`
-    );
   }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   async findOpenPhoneEventsByAddress(address: string): Promise<{
     events: Partial<OpenPhoneEventEntity>[];
@@ -1356,16 +1256,7 @@ async mapUnmappedConversationsToAddresses() {
     };
   }
 
-
-
-
-
- 
-
-
-
-
- async findConversationsWithoutAddress(
+  async findConversationsWithoutAddress(
     page: number = 1, // Default to 1 if not provided
     limit: number = 10 // Default to 10 if not provided
   ): Promise<{
@@ -1395,14 +1286,6 @@ async mapUnmappedConversationsToAddresses() {
     try {
       const [openPhoneEvents, totalCount] = await this.openPhoneEventRepository
         .createQueryBuilder("event")
-        // .select([
-        //   "event.conversation_id",
-        //   "event.from",
-        //   "event.to",
-        //   "event.body",
-        //   "event.created_at",
-
-        // ])
         .where("event.address_id IS NULL")
         .andWhere("event.conversation_id NOT IN (" + subQuery.getQuery() + ")")
         .andWhere("event.body IS NOT NULL")
@@ -1414,17 +1297,8 @@ async mapUnmappedConversationsToAddresses() {
         .take(limit)
         .getManyAndCount();
 
- 
-      // const data = openPhoneEvents.map((event) => ({
-      //   conversation_id: event.conversation_id,
-      //   from: event.from,
-      //   to: event.to,
-      //   body: event.body,
-      //   created_at:event.created_at,
-      // }));
-
       return {
-        data:openPhoneEvents,
+        data: openPhoneEvents,
         totalCount,
         currentPage: page,
         totalPages: Math.ceil(totalCount / limit),
@@ -1435,13 +1309,7 @@ async mapUnmappedConversationsToAddresses() {
         `Error fetching conversations: ${error.message}`
       );
     }
-  } 
-
-
-
-
-
-
+  }
 
   // async getUnmappedConversations(): Promise<any[]> {
   //   const subQuery = this.openPhoneEventRepository
@@ -1466,14 +1334,12 @@ async mapUnmappedConversationsToAddresses() {
   //   }));
   // }
 
-
-
   async getUnmappedConversations(): Promise<any[]> {
     const subQuery = this.openPhoneEventRepository
       .createQueryBuilder("sub_event")
       .select("sub_event.conversation_id")
       .where("sub_event.address_id IS NOT NULL");
-  
+
     try {
       const openPhoneEvents = await this.openPhoneEventRepository
         .createQueryBuilder("event")
@@ -1482,7 +1348,7 @@ async mapUnmappedConversationsToAddresses() {
         .orderBy("event.created_at", "DESC")
         .distinct(true)
         .getMany(); // This will retrieve all fields
-  
+
       return openPhoneEvents;
     } catch (error) {
       console.error("Error in getUnmappedConversations:", error);
@@ -1491,11 +1357,6 @@ async mapUnmappedConversationsToAddresses() {
       );
     }
   }
-  
-
-
-
-
 
   async findAllFiltered(filter?: "delivered" | "received") {
     const query = this.openPhoneEventRepository
@@ -1583,69 +1444,6 @@ async mapUnmappedConversationsToAddresses() {
     });
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //Check for both if address and auction type idboth founds than only creates the entry in the address table
 // async create(payload: OpenPhoneEventDto) {
@@ -1773,7 +1571,7 @@ async mapUnmappedConversationsToAddresses() {
 //       if (addressCreated) {
 //         try {
 //           await this.notificationService.createNotification(savedOpenPhoneEvent.id);
-          
+
 //           const auctionEventDto: AuctionEventDto = {
 //             event_id: savedOpenPhoneEvent.id,
 //             created_by: "Admin",
@@ -1805,18 +1603,3 @@ async mapUnmappedConversationsToAddresses() {
 //       throw new InternalServerErrorException("An unknown error occurred");
 //     }
 //   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
