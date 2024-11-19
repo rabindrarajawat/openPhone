@@ -19,6 +19,6 @@ import { CustomLogger } from "src/service/logger.service";
 @Module({
   imports: [TypeOrmModule.forFeature([OpenPhoneEventEntity,TemplatesExpressionsEntity, AddressEntity,AuctionEventEntity,NotificationEntity,NotificationGateway,AuthGuard,])],
   controllers: [OpenPhoneEventController],
-  providers: [OpenPhoneEventService, CustomLogger,AddressService,AuctionEventService,NotificationService,NotificationGateway,JwtService,ConfigService],
+  providers: [OpenPhoneEventService, CustomLogger,AddressService,AuctionEventService,NotificationService,NotificationGateway,JwtService,ConfigService,NotificationEntity],
 })
 export class OpenPhoneEventModule {}

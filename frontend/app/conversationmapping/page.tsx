@@ -197,7 +197,7 @@ const ConversationTable = () => {
             </Dropdown.Menu>
           </Dropdown>
           <Button className="ms-2 btn btn-success" onClick={MapAddress}>
-            {isLoading ? "Processing" : "Map Address"}
+            {isLoading ? "Processing" : "Auto_Map_Address"}
           </Button>
         </div>
 

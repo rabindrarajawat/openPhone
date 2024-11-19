@@ -164,16 +164,6 @@
 
 // export default Pagination;
 
-
-
-
-
-
-
-
-
-
-
 import React, { useState } from 'react';
 
 interface PaginationProps {

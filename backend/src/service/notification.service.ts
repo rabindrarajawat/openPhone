@@ -90,6 +90,8 @@ export class NotificationService {
     private notificationGateway: NotificationGateway
   ) { }
 
+
+
   async createNotification(eventId: number): Promise<NotificationEntity> {
     try {
       const event = await this.eventRepository.findOne({
@@ -124,23 +126,134 @@ export class NotificationService {
     }
   }
 
-  async getUnreadNotifications(): Promise<NotificationEntity[]> {
+  // async getUnreadNotificationss(): Promise<NotificationEntity[]> {
+  //   try {
+  //     return this.notificationRepository.find({
+  //       where: { is_read: false },
+  //       relations: ["event"],
+  //       order: { created_at: "DESC" },
+  //     });
+  //   } catch (error) {
+  //     this.logger.error(
+  //       `Error in getUnreadNotifications: ${error.message}`,
+  //       error.stack
+  //     );
+  //     throw new InternalServerErrorException(
+  //       "Failed to get unread notifications"
+  //     );
+  //   }
+  // }
+
+ 
+  // async getUnreadNotificationCountByAddress(): Promise<{ addressId: number; unreadCount: number }[]> {
+  //   try {
+  //     const unreadCounts = await this.notificationRepository
+  //       .createQueryBuilder('notification')
+  //       .select('notification.address_id', 'addressId')
+  //       .addSelect('COUNT(notification.id)', 'unreadCount')
+  //       .where('notification.is_read = :isRead', { isRead: false })
+  //       .groupBy('notification.address_id')
+  //       .getRawMany();
+
+  //     return unreadCounts.map((result) => ({
+  //       addressId: parseInt(result.addressId, 10),
+  //       unreadCount: parseInt(result.unreadCount, 10),
+  //     }));
+  //   } catch (error) {
+  //     this.logger.error(`Error in getUnreadNotificationCountByAddress: ${error.message}`, error.stack);
+  //     throw new InternalServerErrorException('Failed to get unread notification counts by address');
+  //   }
+  // }
+
+
+  async getUnreadNotificationCountByAddress(
+    page: number,
+    limit: number,
+  ): Promise<{
+    message: string;
+    data: Array<{
+      addressId: number;
+      unreadCount: number;
+    }>;
+    totalCount: number;
+    currentPage: number;
+    totalPages: number;
+  }> {
     try {
-      return this.notificationRepository.find({
-        where: { is_read: false },
-        relations: ["event"],
-        order: { created_at: "DESC" },
-      });
+      const offset = (page - 1) * limit;
+  
+      // Fetch total count of unread notifications
+      const totalCount = await this.notificationRepository
+        .createQueryBuilder('notification')
+        .where('notification.is_read = :isRead', { isRead: false })
+        .getCount();
+  
+      // Calculate total pages
+      const totalPages = Math.ceil(totalCount / limit);
+  
+      // Fetch paginated unread counts
+      const rawData = await this.notificationRepository
+        .createQueryBuilder('notification')
+        .select('notification.address_id', 'addressId')
+        .addSelect('COUNT(notification.id)', 'unreadCount')
+        .where('notification.is_read = :isRead', { isRead: false })
+        .groupBy('notification.address_id')
+        .offset(offset)
+        .limit(limit)
+        .getRawMany();
+  
+      // Map raw data to desired structure
+      const data = rawData.map((item) => ({
+        addressId: parseInt(item.addressId, 10),
+        unreadCount: parseInt(item.unreadCount, 10),
+      }));
+  
+      // Return structured response
+      return {
+        message: 'Success',
+        data,
+        totalCount,
+        currentPage: page,
+        totalPages,
+      };
     } catch (error) {
       this.logger.error(
-        `Error in getUnreadNotifications: ${error.message}`,
-        error.stack
+        `Error in getUnreadNotificationCountByAddress: ${error.message}`,
+        error.stack,
       );
       throw new InternalServerErrorException(
-        "Failed to get unread notifications"
+        'Failed to get unread notification counts by address',
       );
     }
   }
+  
+  
+  
+  async getUnreadNotificationCount(): Promise<number> {
+    return await this.notificationRepository.count({
+      where: { is_read: false }
+    });
+  }
+
+  async getUnreadNotifications(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+  
+    const [notifications, total] = await this.notificationRepository.findAndCount({
+      where: { is_read: false },
+      order: { created_at: 'DESC' },
+      skip,
+      take: limit,
+      relations: ['event'],  // Load the 'event' relationship
+    });
+  
+    const hasMore = total > page * limit;
+  
+    return {
+      notifications,
+      hasMore
+    };
+  }
+  
 
   async markNotificationAsRead(notificationId: number, addressId?: number): Promise<void> {
     try {

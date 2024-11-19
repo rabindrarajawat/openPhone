@@ -15,6 +15,7 @@
 //   @Get()
 //   async getUnreadNotifications() {
 //     return this.notificationService.getUnreadNotifications();
+
 //   }
 
 //   @Post(':notificationId/read')
@@ -58,18 +59,113 @@ export class NotificationController {
   }
 
 
-  @Get()
-  async getUnreadNotifications() {
+  @Get("count")
+  async getUnreadNotificationCount() {
     try {
-      const notifications = await this.notificationService.getUnreadNotifications();
-      this.logger.log(`Retrieved ${notifications.length} unread notifications successfully`); // Log success response
-      return notifications;
+      const count = await this.notificationService.getUnreadNotificationCount();
+      this.logger.log(`Retrieved unread notification count: ${count}`);
+      return { count };
     } catch (error) {
-      this.logger.error('Error in getUnreadNotifications:', error.message); // Log error details
-      console.error('Error in getUnreadNotifications:', error); // Optional: Log to console for debugging
+      this.logger.error('Error in getUnreadNotificationCount:', error.message);
+      console.error('Error in getUnreadNotificationCount:', error);
+      throw new InternalServerErrorException('Failed to get notification count');
+    }
+  }
+
+
+  // @Get()
+  // async getUnreadNotificationss() {
+  //   try {
+  //     const notifications = await this.notificationService.getUnreadNotificationss();
+  //     this.logger.log(`Retrieved ${notifications.length} unread notifications successfully`); // Log success response
+  //     return notifications;
+  //   } catch (error) {
+  //     this.logger.error('Error in getUnreadNotifications:', error.message); // Log error details
+  //     console.error('Error in getUnreadNotifications:', error); // Optional: Log to console for debugging
+  //     throw new InternalServerErrorException('Failed to get unread notifications');
+  //   }
+  // }
+
+  // @Get('unreadcount')
+  // async getUnreadNotificationCountByAddress() {
+  //   try {
+  //     const unreadCounts = await this.notificationService.getUnreadNotificationCountByAddress();
+  //     this.logger.log(
+  //       `Retrieved unread notification counts for ${unreadCounts.length} addresses successfully`
+  //     ); // Log success response
+  //     return unreadCounts;
+  //   } catch (error) {
+  //     this.logger.error(
+  //       'Error in getUnreadNotificationCountByAddress:',
+  //       error.message
+  //     ); // Log error details
+  //     console.error('Error in getUnreadNotificationCountByAddress:', error); // Optional: Log to console for debugging
+  //     throw new InternalServerErrorException(
+  //       'Failed to get unread notification counts by address'
+  //     );
+  //   }
+  // }
+
+
+
+  // @Get('unreadcount')
+  // async getUnreadNotificationCountByAddress(
+  //   @Query('page') page: number = 1,
+  //   @Query('limit') limit: number = 10,
+  // ) {
+  //   try {
+  //     const unreadCounts = await this.notificationService.getUnreadNotificationCountByAddress(
+  //       page,
+  //       limit,
+  //     );
+  //     this.logger.log(
+  //       `Retrieved unread notification counts for ${unreadCounts.length} addresses successfully`,
+  //     );
+  //     return unreadCounts;
+  //   } catch (error) {
+  //     this.logger.error(
+  //       'Error in getUnreadNotificationCountByAddress:',
+  //       error.message,
+  //     );
+  //     console.error('Error in getUnreadNotificationCountByAddress:', error);
+  //     throw new InternalServerErrorException(
+  //       'Failed to get unread notification counts by address',
+  //     );
+  //   }
+  // }
+
+
+  @Get('unreadcount')
+async getUnreadCounts(
+  @Query('page') page: number,
+  @Query('limit') limit: number
+) {
+  return this.notificationService.getUnreadNotificationCountByAddress(page, limit);
+}
+
+  
+  @Get('unread')
+  async getUnreadNotifications(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 1000
+  ) {
+    try {
+      const { notifications, hasMore } = await this.notificationService.getUnreadNotifications(page, limit);
+      this.logger.log(`Retrieved ${notifications.length} unread notifications successfully for page ${page}`);
+      return {
+        notifications,
+        hasMore,
+        currentPage: page
+      };
+    } catch (error) {
+      this.logger.error('Error in getUnreadNotifications:', error.message);
+      console.error('Error in getUnreadNotifications:', error);
       throw new InternalServerErrorException('Failed to get unread notifications');
     }
   }
+  
+
+
   @Post(":notificationId/read")
   async markNotificationAsRead(
     @Param("notificationId") notificationId: number,

@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
 import Navbar from "../Navbar/Navbar";
 import SideBar from "../SideNavbar/sideNavbar";
 import Image from "next/image";
@@ -182,6 +188,7 @@ const Dashboard = () => {
   const addressesPerPage = 10;
   const [totalItems, setTotalItems] = useState(0);
   const [is_boookmarked, setIsBookmarked] = useState(false);
+  const hasCalledApi = useRef(false);
 
   const [itemsPerPage, setItemsPerPage] = useState<number>(() => {
     if (typeof window !== "undefined") {
@@ -205,6 +212,9 @@ const Dashboard = () => {
   const [withStopResponses, setWithStopResponses] = useState(false);
 
   const [notificationCount, setNotificationCount] = useState(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const isMounted = useRef<boolean>(true);
+
   const router = useRouter();
 
   const groupedMessages = events.reduce<{ [key: string]: EventItem[] }>(
@@ -285,139 +295,118 @@ const Dashboard = () => {
     });
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem("authToken");
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const token = localStorage.getItem("authToken");
+  //     const config = {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     };
 
-      try {
-        const params = new URLSearchParams({
-          page: currentPage.toString(),
-          limit: itemsPerPage.toString(),
-        });
+  //     try {
+  //       const params = new URLSearchParams({
+  //         page: currentPage.toString(),
+  //         limit: itemsPerPage.toString(),
+  //       });
 
-        // Add selected auction event IDs to params if any are selected
-        if (selectedAuctionEventIds.length > 0) {
-          params.append(
-            "auctionEventId",
-            JSON.stringify(selectedAuctionEventIds)
-          );
-        }
-        if (eventTypeIds.length > 0)
-          params.append("eventTypeIds", JSON.stringify(eventTypeIds));
-        // Add other params
-        if (selectedDateFilter !== "all")
-          params.append("filterType", selectedDateFilter);
-        if (fromDate && toDate) {
-          params.append("fromDate", fromDate);
-          params.append("toDate", toDate);
-        }
-        if (withResponses) params.append("withStopResponses", "true");
-        if (withStopResponses) params.append("withResponses", "true");
-        if (is_boookmarked)
-          params.append("isBookmarked", is_boookmarked.toString());
-        if (searchQuery) params.append("searchTerm", searchQuery.trim());
+  //       if (selectedAuctionEventIds.length > 0) {
+  //         params.append("auctionEventId", JSON.stringify(selectedAuctionEventIds));
+  //       }
+  //       if (eventTypeIds.length > 0) {
+  //         params.append("eventTypeIds", JSON.stringify(eventTypeIds));
+  //       }
+  //       if (selectedDateFilter !== "all") {
+  //         params.append("filterType", selectedDateFilter);
+  //       }
+  //       if (fromDate && toDate) {
+  //         params.append("fromDate", fromDate);
+  //         params.append("toDate", toDate);
+  //       }
+  //       if (withResponses) params.append("withStopResponses", "true");
+  //       if (withStopResponses) params.append("withResponses", "true");
+  //       if (is_boookmarked) params.append("isBookmarked", is_boookmarked.toString());
+  //       if (searchQuery) params.append("searchTerm", searchQuery.trim());
 
-        const addressResponse = await axios.get(
-          `${Base_Url}address/getalladdress?${params.toString()}`,
-          config
-        );
+  //       const addressResponse = await axios.get(
+  //         `${Base_Url}address/getalladdress?${params.toString()}`,
+  //         config
+  //       );
 
-        // Handle empty response
-        if (
-          !addressResponse.data.data ||
-          addressResponse.data.data.length === 0
-        ) {
-          // setAddresses2([]);
-          // setFilteredAddresses2([]);
-          // setTotalItems(0);
-          // return;
+  //       if (!addressResponse.data.data || addressResponse.data.data.length === 0) {
+  //         setAddresses2([]);
+  //         setFilteredAddresses2([]);
+  //         setTotalItems(0);
+  //         setAddresses1([]);
+  //         setSelectedAddress("");
+  //         setSelectedAddressId(null);
+  //         setEvents([]);
+  //         setFromNumber("");
+  //         setUniqueFromNumbers([]);
+  //         return;
+  //       }
 
-          setAddresses2([]);
-          setFilteredAddresses2([]);
-          setTotalItems(0);
-          setAddresses1([]); // Ensure address1 is also cleared
-          setSelectedAddress(""); // Clear selected address
-          setSelectedAddressId(null); // Clear selected address ID
-          setEvents([]);
-          setFromNumber("");
-          setUniqueFromNumbers([]);
-          return;
-        }
+  //       const addressesArray = addressResponse.data.data;
+  //       const formattedAddresses = addressesArray.map((item: { id: any; address: any; is_bookmarked: any; auction_event_id: any; modified_at: any; created_at: any; }) => ({
+  //         id: item.id,
+  //         displayAddress: item.address,
+  //         is_bookmarked: item.is_bookmarked,
+  //         auction_event_id: item.auction_event_id,
+  //         modified_at: item.modified_at,
+  //         notificationCount: 0,
+  //         address: item.address,
+  //         created_at: item.created_at,
+  //         fullAddress: item.address,
+  //       }));
 
-        // Process response data
-        const addressesArray = addressResponse.data.data;
-        const formattedAddresses: Address1[] = addressesArray.map(
-          (item: AddressResponseItem) => ({
-            id: item.id,
-            displayAddress: item.address,
-            is_bookmarked: item.is_bookmarked,
-            auction_event_id: item.auction_event_id,
-            modified_at: item.modified_at,
-            notificationCount: 0,
-            address: item.address,
-            created_at: item.created_at,
-            fullAddress: item.address,
-          })
-        );
+  //       setAddresses2(formattedAddresses);
+  //       setFilteredAddresses2(formattedAddresses);
+  //       setTotalItems(addressResponse.data.totalCount);
 
-        setAddresses2(formattedAddresses);
-        setFilteredAddresses2(formattedAddresses);
-        setTotalItems(addressResponse.data.totalCount);
+  //       const notificationResponse = await axios.get(
+  //         `${Base_Url}notifications/unreadcount`,
+  //         config
+  //       );
 
-        // Fetch notifications
-        const notificationResponse = await axios.get(
-          `${Base_Url}notifications`,
-          config
-        );
+  //       const addressNotificationCounts = formattedAddresses.map((address: { id: any; }) => {
+  //         const matchingNotification = notificationResponse.data.find(
+  //           (notification: { addressId: any; }) => notification.addressId === address.id
+  //         );
+  //         return {
+  //           ...address,
+  //           notificationCount: matchingNotification ? matchingNotification.unreadCount : 0,
+  //         };
+  //       });
 
-        const unreadNotifications = notificationResponse.data.filter(
-          (notification: any) => !notification.is_read
-        );
+  //       setAddresses1(addressNotificationCounts);
 
-        // Update addresses with notification counts
-        const addressNotificationCounts = formattedAddresses.map(
-          (address: any) => {
-            const count = unreadNotifications.filter(
-              (notification: any) => notification.address_id === address.id
-            ).length;
-            return { ...address, notificationCount: count };
-          }
-        );
+  //       if (addressNotificationCounts.length > 0) {
+  //         setSelectedAddress(addressNotificationCounts[0].displayAddress);
+  //         setSelectedAddressId(addressNotificationCounts[0].id);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //       setAddresses2([]);
+  //       setFilteredAddresses2([]);
+  //       setTotalItems(0);
+  //     }
+  //   };
 
-        setAddresses1(addressNotificationCounts);
+  //   fetchData();
+  // }, [
+  //   currentPage,
+  //   itemsPerPage,
+  //   selectedAuctionEventIds,
+  //   selectedDateFilter,
+  //   toDate && fromDate,
+  //   withResponses,
+  //   withStopResponses,
+  //   is_boookmarked,
+  //   searchQuery,
+  //   auctionEventId,
+  //   eventTypeIds,
 
-        if (addressNotificationCounts.length > 0) {
-          setSelectedAddress(addressNotificationCounts[0].displayAddress);
-          setSelectedAddressId(addressNotificationCounts[0].id);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        // Handle error state
-        setAddresses2([]);
-        setFilteredAddresses2([]);
-        setTotalItems(0);
-      }
-    };
-
-    fetchData();
-  }, [
-    currentPage,
-    itemsPerPage,
-    selectedAuctionEventIds,
-    selectedDateFilter,
-    toDate && fromDate,
-    withResponses,
-    withStopResponses,
-    is_boookmarked,
-    searchQuery,
-    auctionEventId,
-    eventTypeIds,
-  ]);
+  // ]);
 
   // useEffect(() => {
 
@@ -683,6 +672,154 @@ const Dashboard = () => {
   //     auctionEventId,
   //   ]);
 
+  // Memoize the fetch function to prevent recreating it on every render
+
+  useEffect(() => {
+    // Set mounted flag
+    isMounted.current = true;
+  
+    const fetchData = async () => {
+      try {
+        // Cancel any previous requests
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
+  
+        // Create new abort controller
+        abortControllerRef.current = new AbortController();
+  
+        const token = localStorage.getItem("authToken");
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          signal: abortControllerRef.current.signal,
+        };
+  
+        const params = new URLSearchParams({
+          page: currentPage.toString(),
+          limit: itemsPerPage.toString(),
+        });
+  
+        // Add other params conditionally
+        if (selectedAuctionEventIds?.length) {
+          params.append(
+            "auctionEventId",
+            JSON.stringify(selectedAuctionEventIds)
+          );
+        }
+        if (eventTypeIds?.length) {
+          params.append("eventTypeIds", JSON.stringify(eventTypeIds));
+        }
+        if (selectedDateFilter !== "all") {
+          params.append("filterType", selectedDateFilter);
+        }
+        if (fromDate && toDate) {
+          params.append("fromDate", fromDate);
+          params.append("toDate", toDate);
+        }
+        if (withResponses) params.append("withStopResponses", "true");
+        if (withStopResponses) params.append("withResponses", "true");
+        if (is_boookmarked)
+          params.append("isBookmarked", is_boookmarked.toString());
+        if (searchQuery?.trim())
+          params.append("searchTerm", searchQuery.trim());
+  
+        // Only proceed with fetch if component is still mounted
+        if (isMounted.current) {
+          const response = await axios.get(
+            `${Base_Url}address/getalladdress?${params.toString()}`, config
+            
+          ).catch((error) => {
+            if (axios.isCancel(error)) {
+              return { data: { data: [], totalCount: 0 } };
+            }
+            throw error;
+          });
+  
+          // Only update state if component is still mounted
+          if (isMounted.current) {
+            if (!response.data.data?.length) {
+              setAddresses2([]);
+              setFilteredAddresses2([]);
+              setTotalItems(0);
+              setAddresses1([]);
+              setSelectedAddress("");
+              setSelectedAddressId(null);
+              setEvents([]);
+              setFromNumber("");
+              setUniqueFromNumbers([]);
+              return;
+            }
+  
+            // Format addresses with notification counts from the response
+            const formattedAddresses = response.data.data.map((item: { address: { id: any; address: any; is_bookmarked: any; auction_event_id: any; modified_at: any; created_at: any; }; unreadCount: any; }) => ({
+              id: item.address.id,
+              displayAddress: item.address.address,
+              is_bookmarked: item.address.is_bookmarked,
+              auction_event_id: item.address.auction_event_id,
+              modified_at: item.address.modified_at,
+              created_at: item.address.created_at,
+              address: item.address.address,
+              fullAddress: item.address.address,
+              notificationCount: item.unreadCount || 0
+            }));
+  
+            // Update states with the formatted addresses
+            setAddresses2(formattedAddresses);
+            setFilteredAddresses2(formattedAddresses);
+            setTotalItems(response.data.totalCount);
+            setAddresses1(formattedAddresses);
+  
+            // Set selected address if we have addresses
+            if (formattedAddresses.length) {
+              setSelectedAddress(formattedAddresses[0].displayAddress);
+              setSelectedAddressId(formattedAddresses[0].id);
+            }
+          }
+        }
+      } catch (error) {
+        // Only log non-cancellation errors
+        if (!axios.isCancel(error)) {
+          console.error("Error fetching data:", error);
+          if (isMounted.current) {
+            setAddresses2([]);
+            setFilteredAddresses2([]);
+            setTotalItems(0);
+          }
+        }
+      }
+    };
+  
+    // Debounce the fetch call to prevent rapid re-fetches
+    const timeoutId = setTimeout(() => {
+      fetchData();
+    }, 300);
+  
+    // Cleanup function
+    return () => {
+      clearTimeout(timeoutId);
+      isMounted.current = false;
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [
+    currentPage,
+    itemsPerPage,
+    selectedAuctionEventIds,
+    eventTypeIds,
+    selectedDateFilter,
+    fromDate,
+    toDate,
+    withResponses,
+    withStopResponses,
+    is_boookmarked,
+    searchQuery,
+  ]);
+
+  
+
   useEffect(() => {
     localStorage.setItem("currentPage", currentPage.toString());
   }, [currentPage]);
@@ -754,7 +891,9 @@ const Dashboard = () => {
   // }, [deliveredChecked, receivedChecked, addresses2, Base_Url]);
 
   useEffect(() => {
-    // Retrieve Token
+    // Guard clause - only run once
+    if (hasCalledApi.current) return;
+
     const token = localStorage.getItem("authToken");
     const config = {
       headers: {
@@ -774,13 +913,46 @@ const Dashboard = () => {
         const data = await response.json();
         setCounts(data);
       } catch (err) {
+        console.error("Error fetching counts:", err);
       } finally {
         setLoading(false);
       }
     };
 
+    hasCalledApi.current = true;
     fetchEventCounts();
-  }, [Base_Url]); // Empty dependency array means this effect runs once on mount
+  }, []); 
+
+  // Empty dependency array
+
+  // useEffect(() => {
+  //   // Retrieve Token
+  //   const token = localStorage.getItem("authToken");
+  //   const config = {
+  //     headers: {
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //   };
+
+  //   const fetchEventCounts = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         `${Base_Url}openPhoneEventData/all`,
+  //         config
+  //       );
+  //       if (!response.ok) {
+  //         throw new Error("Failed to fetch event counts");
+  //       }
+  //       const data = await response.json();
+  //       setCounts(data);
+  //     } catch (err) {
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchEventCounts();
+  // }, []);
 
   useEffect(() => {
     // Retrieve Token
@@ -1786,87 +1958,55 @@ const Dashboard = () => {
                         </div>
                       </div>
                       <div className={`${styles.addressList}`}>
-                        <div className="">
-                          {results.length > 0 && (
-                            <SearchResultList
-                              results={results}
-                              onSelect={handleSelectAddress}
-                            />
-                          )}
-                        </div>
-                        {/* <div style={{ marginBottom: "20px" }}>
-                            <label
-                              htmlFor="itemsPerPage"
-                              style={{ marginRight: "10px" }}
-                            >
-                              Show per page:
-                            </label>
-                            <select
-                              id="itemsPerPage"
-                              value={itemsPerPage}
-                              onChange={handleItemsPerPageChange}
-                            >
-                              <option value={10}>10</option>
-                              <option value={20}>20</option>
-                              <option value={50}>50</option>
-                              <option value={100}>100</option>
-                            </select>
-                          </div> */}
+  <div className="">
+    {results.length > 0 && (
+      <SearchResultList
+        results={results}
+        onSelect={handleSelectAddress}
+      />
+    )}
+  </div>
+  
+  {addresses1.length > 0 ? (
+    addresses1.map((address) => {
+      console.log("Rendering address:", address); // Debug log
+      return (
+        <li
+          key={address.id}
+          className={`d-flex align-items-left mt-4 me-3 ${
+            selectedAddressId === address.id ? styles.selectedAdd : ""
+          }`}
+          onClick={() => handleAddressSelect(address.displayAddress, address.id)}
+        >
+          <div className="setaddress d-flex align-items-start gap-3">
+            <i
+              className={`bi ${
+                address.is_bookmarked ? "bi-bookmark-fill" : "bi-bookmark"
+              } ${
+                address.is_bookmarked ? styles.bookmarked : styles.bookmarkIcon
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleBookmarkClick(address.id);
+              }}
+            />
+            <span className="text-start scroll">
+              {address.displayAddress || address.fullAddress}
 
-                        {addresses1.length > 0 ? (
-                          addresses1.map((address) => (
-                            <li
-                              key={address.id}
-                              className={`d-flex align-items-left   mt-4 me-3 ${
-                                selectedAddressId === address.id
-                                  ? styles.selectedAdd
-                                  : ""
-                              }`}
-                              onClick={() =>
-                                handleAddressSelect(
-                                  address.displayAddress,
-                                  address.id
-                                )
-                              }
-                            >
-                              <div className="setaddress d-flex align-items-start gap-3">
-                                <i
-                                  className={`bi ${
-                                    address.is_bookmarked
-                                      ? "bi-bookmark-fill"
-                                      : "bi-bookmark"
-                                  } ${
-                                    address.is_bookmarked
-                                      ? styles.bookmarked
-                                      : styles.bookmarkIcon
-                                  }`}
-                                  onClick={() =>
-                                    handleBookmarkClick(address.id)
-                                  }
-                                ></i>
-
-                                <span className="text-start scroll">
-                                  {address.displayAddress ||
-                                    address.fullAddress}
-                                  {address.notificationCount > 0 && (
-                                    <span className="notification-count ml-2 text-success ms-1">
-                                      ({address.notificationCount})
-                                    </span>
-                                  )}
-                                </span>
-                              </div>
-
-                              {/* {address.fullAddress && (
-                                  <div className="filtered-address">
-                                    {address.fullAddress}
-                                  </div>
-                                )} */}
-                            </li>
-                          ))
-                        ) : (
-                          <p>No addresses found.</p>
-                        )}
-                      </div>
+              {address.notificationCount > 0 && (
+                <span className="notification-count ml-2 text-success ms-1">
+                  ({address.notificationCount})
+                </span>
+              )}
+            </span>
+          </div>
+        </li>
+      );
+    })
+  ) : (
+    <p>No addresses found.</p>
+  )}
+</div>
                     </div>
                     <span className="text-center">
                       <Pagination

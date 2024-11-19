@@ -9,9 +9,10 @@ import { NotificationController } from 'src/controller/notification.controller';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { CustomLogger } from 'src/service/logger.service';
+import { AddressEntity } from 'src/entities/address.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([NotificationEntity,OpenPhoneEventEntity])],
+  imports: [TypeOrmModule.forFeature([NotificationEntity,OpenPhoneEventEntity,AddressEntity])],
   providers: [NotificationService,CustomLogger, NotificationGateway,JwtService,ConfigService],
   controllers: [NotificationController],
 })
