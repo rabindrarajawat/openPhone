@@ -20,9 +20,15 @@ export class CreateUsersDto {
   @IsString({ message: "password must be a string" })
   password: string;
 
-  @IsNotEmpty({ message: "roleid should not be empty" })
-  @IsUUID("4", { message: "roleid must be a UUID" })
-  roleid: string;
+ 
+
+ @IsNotEmpty({ message: "roleName should not be empty" })
+  @IsString({ message: "roleName must be a string" })
+  roleName: string; // Role name instead of role ID
+
+
+
+
 
   // @IsNotEmpty({ message: 'created_at should not be empty' })
   // @IsISO8601({}, { message: 'created_at must be a valid ISO 8601 date string' })

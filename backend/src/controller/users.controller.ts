@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param,Put,Delete, InternalServerErrorException } from '@nestjs/common';
 import { UsersService } from '../service/uesrs.service';
 import { CreateUsersDto } from '../dto/users.dto';
 import { UserEntity } from '../entities/users.entity';
@@ -10,6 +10,24 @@ export class UsersController {
     private readonly usersService: UsersService,
     private readonly logger: CustomLogger,
   ) {}
+
+
+
+
+   // Edit a user by ID
+   @Put(':id')
+   async editUser(
+     @Param('id') id: string,
+     @Body() updateUserDto: CreateUsersDto,
+   ): Promise<UserEntity> {
+     return this.usersService.editUser(id, updateUserDto);
+   }
+ 
+   // Delete a user by ID
+   @Delete(':id')
+   async deleteUser(@Param('id') id: string): Promise<void> {
+     return this.usersService.deleteUser(id);
+   }
 
   @Post()
   async createUser(@Body() createUserDto: CreateUsersDto): Promise<{
