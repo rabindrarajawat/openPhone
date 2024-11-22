@@ -168,7 +168,7 @@ const Navbar: React.FC = () => {
         abortControllerRef.current = null;
       }
     };
-  }, [page]); // Only depend on page number
+  }, [page,Base_Url]); // Only depend on page number
 
 
 

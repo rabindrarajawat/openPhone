@@ -33,6 +33,18 @@ function Sidebar() {
             />
             <p className="">Map Address</p>
             </Link>
+
+            <Link href={'/RigsterUser'}>
+            
+            <Image
+              src="/userRegister.png"
+              alt="Logo"
+              className="ms-1"
+              width={50}
+              height={50}
+            />
+            <p className="">Rigster User</p>
+            </Link>
         </div>
 
         <div className="d-flex flex-column justify-content-end align-items-end flex-grow-1 mb-4 fs-6">
