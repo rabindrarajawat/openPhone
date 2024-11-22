@@ -7,7 +7,6 @@ import Popup from "../popup/popup";
 import styles from "./page.module.css";
 import Navbar from "../Navbar/Navbar";
 import { ToastContainer, toast } from "react-toastify";
-
 type ConversationRecord = {
   conversation_id: string;
   from: string;
@@ -21,8 +20,6 @@ interface Address {
 }
 
 const ConversationTable = () => {
-  const isFetching = useRef(false); // Initialize isFetching with useRef
-
   const Base_Url = process.env.NEXT_PUBLIC_BASE_URL;
   const [records, setRecords] = useState<ConversationRecord[]>([]);
   const [allRecords, setAllRecords] = useState<ConversationRecord[]>([]);
@@ -36,10 +33,6 @@ const ConversationTable = () => {
   const [recordsPerPage, setRecordsPerPage] = useState<number>(30); // Initialize to default
   const [totalRecords, setTotalRecords] = useState(0); // Track the total records count for pagination
   const [isLoading, setIsLoading] = useState(false);
-
-
-  // Add a ref to track if the component is mounted
-  const isMounted = useRef(false);
   useEffect(() => {
     const storedRecordsPerPage = localStorage.getItem("recordsPerPage");
     const parsedValue = storedRecordsPerPage
@@ -50,6 +43,7 @@ const ConversationTable = () => {
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
+  // Fetch data when page or page size changes
   const fetchData = async () => {
     const token = localStorage.getItem("authToken");
     const config = {
@@ -69,7 +63,7 @@ const ConversationTable = () => {
           headers: config.headers,
         }
       );
-
+     
       const data = response.data.data;
       setTotalRecords(response.data.totalCount); // Assuming your API returns total count
       if (Array.isArray(data)) {
@@ -77,30 +71,21 @@ const ConversationTable = () => {
       } else {
         console.error("API response is not an array:", data);
       }
-
       window.scrollTo({
         top: 0,
-        behavior: "smooth", // Adds a smooth scrolling effect
+        behavior: "smooth" // Adds a smooth scrolling effect
       });
-
       if (tableContainerRef.current) {
         tableContainerRef.current.scrollTop = 0;
       }
     } catch (error) {
       console.error("Error fetching data:", error);
-    } finally {
-      isFetching.current = false; // Reset fetch status
     }
   };
 
   useEffect(() => {
-    if (!isFetching.current) {
-      isFetching.current = true; // Mark as fetching
-      fetchData();
-    }
+    fetchData();
   }, [Base_Url, currentPage, recordsPerPage]);
-
-  
 
   const handleRowClick = (record: ConversationRecord) => {
     setSelectedRecord(record);
@@ -212,7 +197,7 @@ const ConversationTable = () => {
             </Dropdown.Menu>
           </Dropdown>
           <Button className="ms-2 btn btn-success" onClick={MapAddress}>
-            {isLoading ? "Processing" : "Auto Map Address"}
+            {isLoading ? "Processing" : "Auto_Map_Address"}
           </Button>
         </div>
 
