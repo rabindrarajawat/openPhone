@@ -1,16 +1,17 @@
 "use client";
-import React, { useState, useEffect,useCallback,useRef,useMemo } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Navbar from "../Navbar/Navbar";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./page.css"
 
 interface Role {
   id: string;
   name: string;
 }
 
-interface User {  
+interface User {
   id?: string;
   name: string;
   email: string;
@@ -18,8 +19,6 @@ interface User {
   roleName: string;
   role?: Role;
 }
-
-
 
 function RegisterUser() {
   const [users, setUsers] = useState<User[]>([]);
@@ -32,6 +31,8 @@ function RegisterUser() {
     roleName: "",
   });
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage] = useState(8);
   const rolesFetched = useRef(false);
   const usersFetched = useRef(false);
 
@@ -48,10 +49,8 @@ function RegisterUser() {
     }
   };
 
- 
-
   const fetchUsers = async () => {
-    if(usersFetched.current) return;
+    if (usersFetched.current) return;
     usersFetched.current = true;
     try {
       const response = await axios.get<User[]>(`${Base_Url}users`);
@@ -65,13 +64,14 @@ function RegisterUser() {
     }
   };
 
-
   useEffect(() => {
     fetchRoles();
     fetchUsers();
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -105,9 +105,14 @@ function RegisterUser() {
       }
 
       if (isEditing && formData.id) {
-        const response = await axios.put(`${Base_Url}users/${formData.id}`, userDataToSend);
+        const response = await axios.put(
+          `${Base_Url}users/${formData.id}`,
+          userDataToSend
+        );
         setUsers((prev) =>
-          prev.map((user) => (user.id === formData.id ? { ...user, ...response.data } : user))
+          prev.map((user) =>
+            user.id === formData.id ? { ...user, ...response.data } : user
+          )
         );
         toast.success("User updated successfully!");
       } else {
@@ -133,7 +138,9 @@ function RegisterUser() {
     } catch (error: any) {
       console.error("Error creating/updating user:", error);
       const errorMessage = error.response?.data?.message || error.message;
-      toast.error(`Failed to ${isEditing ? "update" : "register"} user: ${errorMessage}`);
+      toast.error(
+        `Failed to ${isEditing ? "update" : "register"} user: ${errorMessage}`
+      );
     }
   };
 
@@ -148,63 +155,77 @@ function RegisterUser() {
     }
   };
 
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+
+  const totalPages = Math.ceil(users.length / usersPerPage);
+
   return (
     <>
       <Navbar />
       <ToastContainer />
       <div className="container my-5">
-        <h1 className="text-center">{isEditing ? "Edit User" : "Register User"}</h1>
+        <h1 className="text-center">
+          {isEditing ? "Edit User" : "Register User"}
+        </h1>
 
         <form className="mb-4" onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label>Name</label>
-            <input
-              type="text"
-              name="name"
-              className="form-control"
-              value={formData.name}
-              onChange={handleInputChange}
-              required
-            />
+          <div className="row">
+            <div className="col-md-6 mb-3">
+              <label>Name</label>
+              <input
+                type="text"
+                name="name"
+                className="form-control"
+                value={formData.name}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="col-md-6 mb-3">
+              <label>Email</label>
+              <input
+                type="email"
+                name="email"
+                className="form-control"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
           </div>
-          <div className="mb-3">
-            <label>Email</label>
-            <input
-              type="email"
-              name="email"
-              className="form-control"
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label>Password {isEditing && "(Leave blank to keep current password)"}</label>
-            <input
-              type="password"
-              name="password"
-              className="form-control"
-              value={formData.password}
-              onChange={handleInputChange}
-              required={!isEditing}
-            />
-          </div>
-          <div className="mb-3">
-            <label>Role</label>
-            <select
-              name="roleName"
-              className="form-select"
-              value={formData.roleName}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="">Select Role</option>
-              {roles.map((role) => (
-                <option key={role.id} value={role.name}>
-                  {role.name}
-                </option>
-              ))}
-            </select>
+          <div className="row">
+            <div className="col-md-6 mb-3">
+              <label>
+                Password {isEditing && "(Leave blank to keep current password)"}
+              </label>
+              <input
+                type="password"
+                name="password"
+                className="form-control"
+                value={formData.password}
+                onChange={handleInputChange}
+                required={!isEditing}
+              />
+            </div>
+            <div className="col-md-6 mb-3">
+              <label>Role</label>
+              <select
+                name="roleName"
+                className="form-select"
+                value={formData.roleName}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="">Select Role</option>
+                {roles.map((role) => (
+                  <option key={role.id} value={role.name}>
+                    {role.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <button type="submit" className="btn btn-primary me-2">
             {isEditing ? "Update" : "Register"}
@@ -228,41 +249,74 @@ function RegisterUser() {
           )}
         </form>
 
-        <table className="table table-bordered">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.id}</td>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>{user.roleName}</td>
-                <td>
-                  <button
-                    className="btn btn-sm btn-warning me-2"
-                    onClick={() => handleEdit(user)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="btn btn-sm btn-danger"
-                    onClick={() => user.id && handleDelete(user.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
+        <div className="table-responsive">
+          <table className="table table-bordered">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {currentUsers.map((user) => (
+                <tr key={user.id}>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>{user.roleName}</td>
+                  <td>
+                    <button
+                      className="btn btn-sm btn-warning me-2"
+                      onClick={() => handleEdit(user)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn btn-sm btn-danger"
+                      onClick={() => user.id && handleDelete(user.id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="d-flex justify-content-center mt-4">
+          <button
+            className="btn border"
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            {"<"}
+          </button>
+          <div>
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+              (page) => (
+                <button
+                  key={page}
+                  className={`btn ${
+                    currentPage === page ? "btn btn-primary" : ""
+                  }`}
+                  onClick={() => setCurrentPage(page)}
+                >
+                  {page}
+                </button>
+              )
+            )}
+          </div>
+          <button
+            className="btn border"
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            {">"}
+          </button>
+        </div>
       </div>
     </>
   );
