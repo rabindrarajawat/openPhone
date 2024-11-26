@@ -72,8 +72,6 @@ const Navbar: React.FC = () => {
     }
   }, []);
 
- 
-
   useEffect(() => {
     // Set mounted flag
     isMounted.current = true;
