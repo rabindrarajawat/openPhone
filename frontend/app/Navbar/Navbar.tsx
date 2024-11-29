@@ -72,8 +72,6 @@ const Navbar: React.FC = () => {
     }
   }, []);
 
- 
-
   useEffect(() => {
     // Set mounted flag
     isMounted.current = true;
@@ -168,7 +166,7 @@ const Navbar: React.FC = () => {
         abortControllerRef.current = null;
       }
     };
-  }, [page,Base_Url]); // Only depend on page number
+  }, [page]); // Only depend on page number
 
 
 
