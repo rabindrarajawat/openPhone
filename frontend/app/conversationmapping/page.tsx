@@ -71,7 +71,7 @@ const ConversationTable = () => {
       } else {
         console.error("API response is not an array:", data);
       }
-      window.scrollTo({ 
+      window.scrollTo({
         top: 0,
         behavior: "smooth" // Adds a smooth scrolling effect
       });
@@ -197,7 +197,7 @@ const ConversationTable = () => {
             </Dropdown.Menu>
           </Dropdown>
           <Button className="ms-2 btn btn-success" onClick={MapAddress}>
-            {isLoading ? "Processing" : " Auto Map Address "}
+            {isLoading ? "Processing" : "Auto_Map_Address"}
           </Button>
         </div>
 
