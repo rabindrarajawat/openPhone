@@ -14,7 +14,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve", // Ensure JSX is set correctly for Next.js
+    "jsx": "preserve",
     "incremental": true,
     "target": "es2015",
     "plugins": [

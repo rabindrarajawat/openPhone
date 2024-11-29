@@ -816,6 +816,7 @@ const Dashboard = () => {
     withStopResponses,
     is_boookmarked,
     searchQuery,
+    Base_Url
   ]);
 
   
@@ -921,7 +922,7 @@ const Dashboard = () => {
 
     hasCalledApi.current = true;
     fetchEventCounts();
-  }, []); 
+  }, [Base_Url]); 
 
   // Empty dependency array
 
