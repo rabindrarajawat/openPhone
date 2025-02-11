@@ -10,10 +10,6 @@ export class UsersController {
     private readonly usersService: UsersService,
     private readonly logger: CustomLogger,
   ) {}
-
-
-
-
    // Edit a user by ID
    @Put(':id')
    async editUser(
